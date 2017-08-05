@@ -9,58 +9,35 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import java.util.Date;
+
 public class PlayTableActivity extends AppCompatActivity implements ServerDataListener {
 
+    ServerDataProxy _serverProxy;
+    Handler _serverMsgHandler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_table);
         //TestSmack();
-        Handler handler = new Handler()
+        _serverMsgHandler = new Handler()
         {
             public void handleMessage(android.os.Message msg) {
                 if(msg.what==0x123)
                 {
-                    //tv.setText("更新后的TextView");
                     showNewCard("10_c");
                 }
             };
        };
-//        final ConnectionConfiguration connectionConfig = new ConnectionConfiguration(
-//                "192.168.1.78", Integer.parseInt("5222"), "csdn.shimiso.com");
 
-        // 允许自动连接
-        //connectionConfig.setReconnectionAllowed(true);
-        //connectionConfig.setSendPresence(true);
-
-//        Connection connection = new XMPPConnection(connectionConfig);
-//        try {
-//            AbstractXMPPConnection conn2 = new XMPPTCPConnection("user2", "user2", "192.168.1.6");
-//            conn2.connect();
-//        } catch (XmppStringprepException e) {
-//            e.printStackTrace();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (SmackException e) {
-//            e.printStackTrace();
-//        } catch (XMPPException e) {
-//            e.printStackTrace();
-//        }
-        ServerDataProxy.addDataListener(this);
-
+        _serverProxy = new ServerDataProxy(MyConfig.getServerIP(), MyConfig.getServerPort(), _serverMsgHandler);
         Bundle bundle = this.getIntent().getExtras();
-        //接收name值
         String ruleId = bundle.getString("ruleId");
 
         LoadMyImage();
 
-        ServerDataProxy.startRun(handler);
+        _serverProxy.execute();
     }
-
-
-
 
     //设置横屏
     @Override
@@ -72,29 +49,7 @@ public class PlayTableActivity extends AppCompatActivity implements ServerDataLi
     }
 
     public void onTestClick(View view){
-//        XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
-//                .setUsernameAndPassword("user1", "user1")
-//                .setXmppDomain("win-2dstoe8tald")
-//                .setHost("win-2dstoe8tald")
-//                .setPort(5222)
-//                .build();
-        //TestSmack();
-
-//        String strTmp="点击Button03";
-//        Ev1.setText(strTmp);
-//        LinearLayout myArea = (LinearLayout)findViewById(R.id.myZone);
-//        LinearLayout.LayoutParams param1 = (LinearLayout.LayoutParams)myArea.getLayoutParams();
-//
-//        int height = myArea.getHeight();
-//
-//        FrameLayout myProfileLayout = (FrameLayout)findViewById(R.id.myProfileArea);
-//        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) myProfileLayout.getLayoutParams();
-//        params.width = myProfileLayout.getHeight();
-//        //params.width = params.height;
-//
-//
-//        myProfileLayout.setLayoutParams(params);
-        //showNewCard("10_c");
+        this._serverProxy.SendPlayMessage((new Date()).toString());
     }
 
     private void LoadMyImage(){
