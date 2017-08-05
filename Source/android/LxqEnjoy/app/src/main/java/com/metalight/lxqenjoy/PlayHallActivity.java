@@ -87,10 +87,10 @@ public class PlayHallActivity extends AppCompatActivity {
     }
 
     private void loadPlayTable(PlayRule rule){
-//        Intent intent = new Intent(this, PlayTableActivity.class);
-//        Bundle bundle=new Bundle();
-//        bundle.putString("ruleId", rule.getId());
-//        intent.putExtras(bundle);
-//        startActivity(intent);
+        Intent intent = new Intent(this, PlayTableActivity.class);
+        Bundle bundle=new Bundle();
+        bundle.putString("ruleId", rule.getId());
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 }
