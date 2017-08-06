@@ -17,7 +17,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         while flag:
             data = conn.recv(1024)
             print('received:' + data.decode())
-            PlayManager.dispatch_player_commands(conn, data);
+            PlayManager.dispatch_player_commands(conn, data.decode());
 
             # print(conn)
             # print(MyTCPHandler.__Clients.index(conn))

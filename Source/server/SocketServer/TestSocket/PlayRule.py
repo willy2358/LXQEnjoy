@@ -18,6 +18,9 @@ class PlayRule:
     def set_cards_number_not_deal(self, number):
         self.__cards_num_not_deal = number
 
+    def get_cards_number_not_deal(self):
+        return self.__cards_num_not_deal
+
     def set_cards(self, cards):
         self.__cards = cards
 
@@ -26,5 +29,8 @@ class PlayRule:
 
     def get_play_rule_id(self):
         return self.__rule_id
+
+    def get_cards(self):
+        return self.__cards
 
 

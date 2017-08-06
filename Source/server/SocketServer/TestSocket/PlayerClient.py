@@ -1,3 +1,6 @@
+import json
+
+
 class PlayerClient:
     def __init__(self, conn):
         self.__socket__conn = conn
@@ -25,3 +28,7 @@ class PlayerClient:
         for p in partners:
             self.add_play_partner(p)
 
+    def deal_one_card(self, card):
+        deal = {"deal" : card}
+        j_str = json.dumps(deal)
+        self.__socket__conn.sendall(j_str.encode(encoding="utf-8"))

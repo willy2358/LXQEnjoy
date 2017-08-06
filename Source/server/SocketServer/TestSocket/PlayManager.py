@@ -1,11 +1,14 @@
 import json
+import random
 
 import PlayRule
 import PlayerClient
+import Utils
 
 __Players = []
 __Waiting_Players = {}
 __PlayRules = {}
+
 
 def init_play_rules():
     rule_id = "1212"
@@ -28,7 +31,7 @@ def init_play_rules():
              "poker_13_c", "poker_13_d", "poker_13_h", "poker_13_s",
              "poker_joker_moon", "poker_joker_sun"]
     rule.set_cards(cards)
-    __PlayRules[rule_id, rule]
+    __PlayRules[rule_id] = rule
 
 
 def add_player_client(conn):
@@ -42,9 +45,9 @@ def dispatch_player_commands(conn, comm_text):
     parts = comm_text.split('#')
     if len(parts) == 2:
         if parts[0].lower() == "play_rule":
-            process_command_play_rule(conn, comm_text)
+            process_command_play_rule(conn, parts[1])
         if parts[0].lower() == "play_card":
-            process_command_play_card(conn, comm_text)
+            process_command_play_card(conn, parts[1])
         if parts[0].lower() == "play_leave":
             process_command_play_leave(conn)
 
@@ -57,9 +60,12 @@ def get_player_client_from_conn(conn):
     return None
 
 
+# command samples: play_rule#"{\"rule_id\":\"1212\"}"
 def process_command_play_rule(conn, command_text):
     try:
         j_obj = json.loads(command_text)
+        if (isinstance(j_obj, type(" "))):
+            j_obj = json.loads(j_obj)
         rule_id = j_obj["rule_id"]
         if rule_id not in __Waiting_Players:
             __Waiting_Players[rule_id] = []
@@ -72,19 +78,34 @@ def process_command_play_rule(conn, command_text):
 def update_players_waiting_state():
     for item in __Waiting_Players:
         play_rule = __PlayRules[item]
-        rule_id = play_rule.get_rule_id()
+        rule_id = play_rule.get_play_rule_id()
         min_player_num = play_rule.get_player_min_number()
         if len(__Waiting_Players[item]) >= min_player_num:
-            players = get_players_of_waiting_rule_id(rule_id)
+            players = get_players_of_waiting_rule_id(rule_id, min_player_num)
             for p in players:
                 p.set_playing_rule_id(rule_id)
-                p.set_play_partners(players)
-            create_new_play_group(rule_id,players)
+                p.set_player_partners(players)
+            remove_waiting_players(rule_id, players)
+            begin_new_deal(rule_id, players)
 
 
-def create_new_play_group(rule_id, players):
+def remove_waiting_players(rule_id, players):
     for p in players:
         __Waiting_Players[rule_id].remove(p)
+
+
+def begin_new_deal(rule_id, players):
+    rule = __PlayRules[rule_id]
+    cards = rule.get_cards()
+    cards_b = cards[:]
+    remain_cards = random.sample(cards_b, rule.get_cards_number_not_deal())
+    Utils.list_remove_parts(cards_b, remain_cards)
+    player_num = len(players)
+    while len(cards_b) > 0:
+        cards_one_deal = random.sample(cards_b, player_num)
+        for j in range(player_num):
+            players[j].deal_one_card(cards_one_deal[j])
+        Utils.list_remove_parts(cards_b, cards_one_deal)
 
 
 def get_players_of_waiting_rule_id(rule_id, num):
