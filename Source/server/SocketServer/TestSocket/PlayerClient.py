@@ -1,5 +1,7 @@
 import json
 
+import PlayManager
+
 
 class PlayerClient:
     def __init__(self, conn):
@@ -28,7 +30,17 @@ class PlayerClient:
         for p in partners:
             self.add_play_partner(p)
 
+    def send_command_message(self, msg):
+        self.__socket__conn.sendall(msg.encode(encoding="utf-8"))
+
+    def begin_new_deal(self):
+        self.send_command_message(PlayManager.SERVER_CMD_DEAL_BEGIN)
+
+    def finish_new_deal(self):
+        self.send_command_message(PlayManager.SERVER_CMD_DEAL_FINISH)
+
     def deal_one_card(self, card):
-        deal = {"deal" : card}
-        j_str = json.dumps(deal)
-        self.__socket__conn.sendall(j_str.encode(encoding="utf-8"))
+        deal = {"card" : card}
+        j_str =  json.dumps(deal)
+        cmdPack = PlayManager.create_command_packet(PlayManager.SERVER_CMD_DEAL_CARD, j_str)
+        self.send_command_message(cmdPack)

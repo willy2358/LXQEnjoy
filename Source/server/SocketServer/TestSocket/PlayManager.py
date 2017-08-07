@@ -10,6 +10,18 @@ __Waiting_Players = {}
 __PlayRules = {}
 
 
+SERVER_CMD_DEAL_BEGIN = "deal_begin"  # 开始发牌
+SERVER_CMD_DEAL_FINISH = "deal_finish"   # 结束发牌
+SERVER_CMD_DEAL_CARD = "deal_card"   # 发牌
+
+CLIENT_CMD_CARDS_ARRANGED = "cards_arranged"  # 理牌完成
+CLIENT_CMD_PLAY_RULE = "begin_play" # 开始游戏
+
+
+# command:开始发牌: deal_begin
+# command:结束发牌: deal_finish
+# commands 发牌: deal#{"deal":card}. ex: deal#{"deal":"poker_1_h"}
+
 def init_play_rules():
     rule_id = "1212"
     rule = PlayRule.PlayRule(rule_id)
@@ -32,6 +44,10 @@ def init_play_rules():
              "poker_joker_moon", "poker_joker_sun"]
     rule.set_cards(cards)
     __PlayRules[rule_id] = rule
+
+
+def create_command_packet(command, commandData):
+    return command + "#" + commandData
 
 
 def add_player_client(conn):
@@ -101,11 +117,18 @@ def begin_new_deal(rule_id, players):
     remain_cards = random.sample(cards_b, rule.get_cards_number_not_deal())
     Utils.list_remove_parts(cards_b, remain_cards)
     player_num = len(players)
+    for p in players:
+        p.begin_new_deal()
+
     while len(cards_b) > 0:
         cards_one_deal = random.sample(cards_b, player_num)
         for j in range(player_num):
             players[j].deal_one_card(cards_one_deal[j])
         Utils.list_remove_parts(cards_b, cards_one_deal)
+
+    for p in players:
+        p.finish_new_deal()
+
 
 
 def get_players_of_waiting_rule_id(rule_id, num):
