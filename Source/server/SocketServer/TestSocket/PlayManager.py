@@ -15,7 +15,8 @@ SERVER_CMD_DEAL_FINISH = "deal_finish"   # 结束发牌
 SERVER_CMD_DEAL_CARD = "deal_card"   # 发牌
 
 CLIENT_CMD_CARDS_ARRANGED = "cards_arranged"  # 理牌完成
-CLIENT_CMD_PLAY_RULE = "begin_play" # 开始游戏
+CLIENT_CMD_BEGIN_PLAY = "begin_play" # 开始游戏
+CLIENT_CMD_PLAY_CARD = "play_card"
 
 
 # command:开始发牌: deal_begin
@@ -57,15 +58,35 @@ def add_player_client(conn):
     print('new player:' + str(conn))
 
 
+def begin_player_inter_actions(players):
+    pass
+
+
+def record_player_cards_arranged(conn):
+    client = get_player_client_from_conn(conn)
+    client.set_cards_arranged()
+    partners = client.get_play_partners()
+    all_arranged = True
+    for p in partners:
+        if not p.is_cards_arranged():
+            all_arranged = False
+            break
+    if all_arranged:
+        all_players = [client] + partners
+        begin_player_inter_actions(all_players)
+
+
 def dispatch_player_commands(conn, comm_text):
     parts = comm_text.split('#')
     if len(parts) == 2:
-        if parts[0].lower() == "play_rule":
+        if parts[0].lower() == CLIENT_CMD_BEGIN_PLAY.lower() :
             process_command_play_rule(conn, parts[1])
-        if parts[0].lower() == "play_card":
+        if parts[0].lower() == CLIENT_CMD_BEGIN_PLAY.lower() :
             process_command_play_card(conn, parts[1])
         if parts[0].lower() == "play_leave":
             process_command_play_leave(conn)
+        if parts[0].lower() == CLIENT_CMD_CARDS_ARRANGED.lower():
+            record_player_cards_arranged(conn)
 
 
 def get_player_client_from_conn(conn):
@@ -76,11 +97,11 @@ def get_player_client_from_conn(conn):
     return None
 
 
-# command samples: play_rule#"{\"rule_id\":\"1212\"}"
+# command samples: begin_play#"{\"rule_id\":\"1212\"}"
 def process_command_play_rule(conn, command_text):
     try:
         j_obj = json.loads(command_text)
-        if (isinstance(j_obj, type(" "))):
+        if isinstance(j_obj, type(" ")):
             j_obj = json.loads(j_obj)
         rule_id = j_obj["rule_id"]
         if rule_id not in __Waiting_Players:
@@ -128,7 +149,6 @@ def begin_new_deal(rule_id, players):
 
     for p in players:
         p.finish_new_deal()
-
 
 
 def get_players_of_waiting_rule_id(rule_id, num):
