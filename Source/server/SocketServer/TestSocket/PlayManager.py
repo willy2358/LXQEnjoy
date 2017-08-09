@@ -4,18 +4,23 @@ import random
 import PlayRule
 import PlayerClient
 import Utils
+from CallAction import CallAction
+from PlayRound import PlayRound
 
 __Players = []
 __Waiting_Players = {}
 __PlayRules = {}
 
+__game_rounds = []
+
 
 SERVER_CMD_DEAL_BEGIN = "deal_begin"  # 开始发牌
 SERVER_CMD_DEAL_FINISH = "deal_finish"   # 结束发牌
 SERVER_CMD_DEAL_CARD = "deal_card"   # 发牌
+SERVER_CMD_CALL_ACTIONS = "call_actions"  # 叫牌
 
-CLIENT_CMD_CARDS_ARRANGED = "cards_arranged"  # 理牌完成
-CLIENT_CMD_BEGIN_PLAY = "begin_play" # 开始游戏
+CLIENT_CMD_CARDS_SORTED = "cards_sorted"  # 理牌完成
+CLIENT_CMD_BEGIN_PLAY = "join_game" # 开始游戏
 CLIENT_CMD_PLAY_CARD = "play_card"
 
 
@@ -27,7 +32,7 @@ def init_play_rules():
     rule_id = "1212"
     rule = PlayRule.PlayRule(rule_id)
     rule.set_player_min_number(3)
-    rule.set_player_mzx_number(3)
+    rule.set_player_max_number(3)
     rule.set_cards_number_not_deal(3)
     cards = ["poker_1_c","poker_1_d", "poker_1_h", "poker_1_s",
              "poker_2_c", "poker_2_d", "poker_2_h", "poker_2_s",
@@ -44,11 +49,45 @@ def init_play_rules():
              "poker_13_c", "poker_13_d", "poker_13_h", "poker_13_s",
              "poker_joker_moon", "poker_joker_sun"]
     rule.set_cards(cards)
+
+    stages = ["server_group_players",
+              "server_deal_cards",
+              "client_sort_cards",
+              "server_ask_player_call",
+              "client_call",
+              "server_publish_banker"
+              "client_play_cards"
+              "server_publish_winner"
+              "server_update_players_score"
+              ]
+    a1 = CallAction("1", "Call")
+    a11 = a1.add_follow_up_action(CallAction("1_1", "Rob"))
+    a12 = a1.add_follow_up_action(CallAction("1_2", "Not Rob"))
+
+    a111 = a11.add_follow_up_action(CallAction("1_1_1", "Rob"))
+    a112 = a11.add_follow_up_action(CallAction("1_1_2", "Not rob"))
+
+    a121 = a12.add_follow_up_action(CallAction("1_2_1", "Rob"))
+    a122 = a12.add_follow_up_action(CallAction("1_2_2", "Not rob"))
+
+    a2 = CallAction("2", "Not Call")
+    a21 = a2.add_follow_up_action(CallAction("2_1", "Call"))
+    a22 = a2.add_follow_up_action(CallAction("2_2","Not call"))
+
+    a211 = a21.add_follow_up_action(CallAction("2_1_1", "Rob"))
+    a212 = a21.add_follow_up_action(CallAction("2_1_2", "Not rob"))
+
+    a221 = a22.add_follow_up_action(CallAction("2_2_1", "Call"))
+    a222 = a22.add_follow_up_action(CallAction("2_2_2", "end_game"))
+    rule.add_call_action(a1)
+    rule.add_call_action(a2)
+
+    rule.set_stages(stages)
     __PlayRules[rule_id] = rule
 
 
-def create_command_packet(command, commandData):
-    return command + "#" + commandData
+def create_command_packet(command, command_data):
+    return command + "#" + command_data
 
 
 def add_player_client(conn):
@@ -62,13 +101,13 @@ def begin_player_inter_actions(players):
     pass
 
 
-def record_player_cards_arranged(conn):
+def record_player_cards_sorted(conn):
     client = get_player_client_from_conn(conn)
     client.set_cards_arranged()
     partners = client.get_play_partners()
     all_arranged = True
     for p in partners:
-        if not p.is_cards_arranged():
+        if not p.is_cards_sorted():
             all_arranged = False
             break
     if all_arranged:
@@ -80,13 +119,15 @@ def dispatch_player_commands(conn, comm_text):
     parts = comm_text.split('#')
     if len(parts) == 2:
         if parts[0].lower() == CLIENT_CMD_BEGIN_PLAY.lower() :
-            process_command_play_rule(conn, parts[1])
-        if parts[0].lower() == CLIENT_CMD_BEGIN_PLAY.lower() :
+            process_command_join_game(conn, parts[1])
+        if parts[0].lower() == CLIENT_CMD_PLAY_CARD.lower() :
             process_command_play_card(conn, parts[1])
+    elif len(parts) == 1:
         if parts[0].lower() == "play_leave":
             process_command_play_leave(conn)
-        if parts[0].lower() == CLIENT_CMD_CARDS_ARRANGED.lower():
-            record_player_cards_arranged(conn)
+        if parts[0].lower() == CLIENT_CMD_CARDS_SORTED.lower():
+            player = get_player_client_from_conn(conn)
+            player.process_cards_sorted()
 
 
 def get_player_client_from_conn(conn):
@@ -97,17 +138,37 @@ def get_player_client_from_conn(conn):
     return None
 
 
-# command samples: begin_play#"{\"rule_id\":\"1212\"}"
-def process_command_play_rule(conn, command_text):
+def get_rule_by_id(rule_id):
+    if rule_id in __PlayRules:
+        return __PlayRules[rule_id]
+    else:
+        return None
+
+
+def get_available_game_round(rule_id):
+    for r in __game_rounds:
+        if r.get_rule().get_rule_id() != rule_id:
+            continue
+        if r.can_new_player_in():
+            return r
+    r = PlayRound(get_rule_by_id(rule_id))
+    __game_rounds.append(r)
+    return r
+
+
+# command samples: join_game#"{\"rule_id\":\"1212\"}"
+def process_command_join_game(conn, command_text):
     try:
         j_obj = json.loads(command_text)
         if isinstance(j_obj, type(" ")):
             j_obj = json.loads(j_obj)
         rule_id = j_obj["rule_id"]
-        if rule_id not in __Waiting_Players:
-            __Waiting_Players[rule_id] = []
-        __Waiting_Players[rule_id].append(get_player_client_from_conn(conn))
-        update_players_waiting_state()
+        play_round = get_available_game_round(rule_id)
+        play_round.add_player(get_player_client_from_conn(conn))
+        # if rule_id not in __Waiting_Players:
+        #     __Waiting_Players[rule_id] = []
+        # __Waiting_Players[rule_id].append(get_player_client_from_conn(conn))
+        # update_players_waiting_state()
     except Exception as ex:
         print("ex")
 
@@ -115,7 +176,7 @@ def process_command_play_rule(conn, command_text):
 def update_players_waiting_state():
     for item in __Waiting_Players:
         play_rule = __PlayRules[item]
-        rule_id = play_rule.get_play_rule_id()
+        rule_id = play_rule.get_rule_id()
         min_player_num = play_rule.get_player_min_number()
         if len(__Waiting_Players[item]) >= min_player_num:
             players = get_players_of_waiting_rule_id(rule_id, min_player_num)
