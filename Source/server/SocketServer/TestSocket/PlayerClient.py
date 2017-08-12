@@ -54,12 +54,14 @@ class PlayerClient:
         self.send_command_message(PlayManager.SERVER_CMD_DEAL_FINISH)
 
     def send_call_command_options(self, act_group):
-        cmd = '{"actions":['
-        for c in act_group.get_actions():
-            cmd += c.to_json() + ","
-            if c.get_is_default():
-                self.__pre_call_action = c
-        cmd += "]}"
+        # cmd = '{"actions":['
+        # for c in act_group.get_actions():
+        #     cmd += c.to_json() + ","
+        #     if c.get_is_default():
+        #         self.__pre_call_action = c
+        # cmd += "]}"
+        self.__pre_call_action = act_group.get_default_action()
+        cmd = act_group.to_json()
         self.start_timer_to_tell_server_my_action(act_group.get_select_timeout())
 
         cmd_pack = PlayManager.create_command_packet(PlayManager.SERVER_CMD_CALL_ACTIONS, cmd)

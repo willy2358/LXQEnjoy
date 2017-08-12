@@ -27,6 +27,17 @@ class ActionGroup:
         self.__player_select_timeout_seconds = seconds
 
     def to_json(self):
-        pass
+        j_str = '{"actions":['
+        for c in self.__actions:
+            j_str += c.to_json() + ","
+        j_str += "]}"
+
+        return j_str
+
+    def get_default_action(self):
+        for c in self.__actions:
+            if c.get_is_default():
+                return c
+        return None
 
 
