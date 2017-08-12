@@ -3,6 +3,7 @@ import socketserver
 import PlayManager
 import PlayerClient
 
+
 class MyTCPHandler(socketserver.BaseRequestHandler):
     __Players = []
 
@@ -30,7 +31,6 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
             #         conn.sendall(resp.encode(encoding="utf-8"))
             #     except Exception as x:
             #         print('Send exception:' + x.message)
-
 
 
 if __name__ == "__main__":

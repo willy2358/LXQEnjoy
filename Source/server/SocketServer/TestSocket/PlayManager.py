@@ -4,6 +4,7 @@ import random
 import PlayRule
 import PlayerClient
 import Utils
+from ActionGroup import ActionGroup
 from CallAction import CallAction
 from PlayRound import PlayRound
 
@@ -22,6 +23,7 @@ SERVER_CMD_CALL_ACTIONS = "call_actions"  # 叫牌
 CLIENT_CMD_CARDS_SORTED = "cards_sorted"  # 理牌完成
 CLIENT_CMD_BEGIN_PLAY = "join_game" # 开始游戏
 CLIENT_CMD_PLAY_CARD = "play_card"
+CLIENT_CMD_SELECT_ACTION = "select_call"
 
 
 # command:开始发牌: deal_begin
@@ -60,27 +62,41 @@ def init_play_rules():
               "server_publish_winner"
               "server_update_players_score"
               ]
+
     a1 = CallAction("1", "Call")
     a11 = a1.add_follow_up_action(CallAction("1_1", "Rob"))
     a12 = a1.add_follow_up_action(CallAction("1_2", "Not Rob"))
+    a1.get_following_action_group().set_select_timeout(20)
+    a12.set_as_default()
 
     a111 = a11.add_follow_up_action(CallAction("1_1_1", "Rob"))
     a112 = a11.add_follow_up_action(CallAction("1_1_2", "Not rob"))
+    a11.get_following_action_group().set_select_timeout(20)
+    a112.set_as_default()
 
     a121 = a12.add_follow_up_action(CallAction("1_2_1", "Rob"))
     a122 = a12.add_follow_up_action(CallAction("1_2_2", "Not rob"))
+    a12.get_following_action_group().set_select_timeout(20)
+    a122.set_as_default()
 
     a2 = CallAction("2", "Not Call")
+    a2.set_as_default()
     a21 = a2.add_follow_up_action(CallAction("2_1", "Call"))
     a22 = a2.add_follow_up_action(CallAction("2_2","Not call"))
+    a2.get_following_action_group().set_select_timeout(20)
+    a22.set_as_default()
 
     a211 = a21.add_follow_up_action(CallAction("2_1_1", "Rob"))
     a212 = a21.add_follow_up_action(CallAction("2_1_2", "Not rob"))
+    a21.get_following_action_group().set_select_timeout(20)
+    a212.set_as_default()
 
     a221 = a22.add_follow_up_action(CallAction("2_2_1", "Call"))
-    a222 = a22.add_follow_up_action(CallAction("2_2_2", "end_game"))
+    a222 = a22.add_follow_up_action(CallAction("2_2_2", "Not call"))
+    a22.get_following_action_group().set_select_timeout(20)
     rule.add_call_action(a1)
     rule.add_call_action(a2)
+    rule.set_action_call_timeout_seconds(20)
 
     rule.set_stages(stages)
     __PlayRules[rule_id] = rule
@@ -122,6 +138,8 @@ def dispatch_player_commands(conn, comm_text):
             process_command_join_game(conn, parts[1])
         if parts[0].lower() == CLIENT_CMD_PLAY_CARD.lower() :
             process_command_play_card(conn, parts[1])
+        if parts[0].lower() == CLIENT_CMD_SELECT_ACTION.lower():
+            process_player_select_call_action(conn, parts[1])
     elif len(parts) == 1:
         if parts[0].lower() == "play_leave":
             process_command_play_leave(conn)
@@ -170,7 +188,20 @@ def process_command_join_game(conn, command_text):
         # __Waiting_Players[rule_id].append(get_player_client_from_conn(conn))
         # update_players_waiting_state()
     except Exception as ex:
-        print("ex")
+        print(ex)
+
+
+# command : select_call#"{\"action_id\":"1"}"
+def process_player_select_call_action(client_conn, command_text):
+    try:
+        client = get_player_client_from_conn(client_conn)
+        j_obj = json.loads(command_text)
+        if isinstance(j_obj, type(" ")):
+            j_obj = json.loads(j_obj)
+        action_id = j_obj["action_id"]
+        client.update_my_call_action(action_id)
+    except Exception as ex:
+        print(ex)
 
 
 def update_players_waiting_state():

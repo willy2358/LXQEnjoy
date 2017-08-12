@@ -53,11 +53,18 @@ class PlayRound:
         return self.__players
 
     def begin_players_call_process(self):
-        players_in_turn = self.get_players_call_turns()
+        # players_in_turn = self.get_players_call_turns()
+        # player = self.get_next_call_player()
+        # if player:
+        #    call_commands = self.get_next_call_actions()
+        #    player.send_call_command_options(call_commands)
+        self.make_next_player_select_action(None)
+
+    def make_next_player_select_action(self, prev_action_id):
         player = self.get_next_call_player()
-        if player:
-            call_commands = self.get_next_call_actions()
-            player.send_call_command_options(call_commands)
+        call_acts_group = self.get_next_call_action_group(prev_action_id)
+        if player and call_acts_group:
+            player.send_call_command_options(call_acts_group)
 
     def get_rule(self):
         return self.__play_rule
@@ -74,5 +81,5 @@ class PlayRound:
         else:
             return None
 
-    def get_next_call_actions(self):
-        return self.__play_rule.get_follow_up_actions(self.__cur_call_action_id)
+    def get_next_call_action_group(self, action_id):
+        return self.__play_rule.get_follow_up_action_group(action_id)
