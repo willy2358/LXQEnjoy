@@ -9,7 +9,9 @@ class PlayRule:
         self.__cards_num_not_deal = 0;
         self.__rule_id = rule_id;
         self.__cards = []
-        self.__stages = []
+        # self.__stages = []
+        self.__game_stages = []
+
         # self.__call_actions = []
         self.__head_action_group = ActionGroup()
 
@@ -38,8 +40,11 @@ class PlayRule:
     def set_cards(self, cards):
         self.__cards = cards
 
-    def set_stages(self, stages):
-        self.__stages = stages
+    # def set_stages(self, stages):
+    #     self.__stages = stages
+
+    def add_game_stage(self, stage):
+        self.__game_stages.append(stage)
 
     def get_player_min_number(self):
         return self.__player_num_min

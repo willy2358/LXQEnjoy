@@ -6,6 +6,7 @@ import PlayerClient
 import Utils
 from ActionGroup import ActionGroup
 from CallAction import CallAction
+from GameStage import GameStage
 from PlayRound import PlayRound
 
 __Players = []
@@ -98,7 +99,22 @@ def init_play_rules():
     rule.add_call_action(a2)
     rule.set_action_call_timeout_seconds(20)
 
-    rule.set_stages(stages)
+    stage = GameStage("group-players")
+    stage.add_complete_condition(GameStage.CONDITION_PROPERTY_PLAYER_COUNT, rule.get_player_min_number())
+    stage.add_complete_condition(GameStage.CONDITION_PROPERTY_TIME_OUT, 20)
+
+    rule.add_game_stage(stage)
+
+    stage = GameStage("deal-cards")
+    stage.add_complete_condition(GameStage.CONDITION_CARDS_DEAL_RESPONSE, "count-rount-players")
+    rule.add_game_stage(stage)
+
+
+
+
+
+
+    # rule.set_stages(stages)
     __PlayRules[rule_id] = rule
 
 
