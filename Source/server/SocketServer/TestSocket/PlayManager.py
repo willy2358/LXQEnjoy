@@ -6,7 +6,13 @@ import PlayerClient
 import Utils
 from ActionGroup import ActionGroup
 from CallAction import CallAction
-from GameStage import GameStage
+from GameStages.CalScores import CalScores
+from GameStages.CallBanker import CallBanker
+from GameStages.DealCards import DealCards
+from GameStages.GroupPlayers import GroupPlayers
+from GameStages.PlayCards import PlayCards
+from GameStages.PublishScores import PublishScores
+from GameStages.TellWinner import TellWinner
 from PlayRound import PlayRound
 
 __Players = []
@@ -99,20 +105,26 @@ def init_play_rules():
     rule.add_call_action(a2)
     rule.set_action_call_timeout_seconds(20)
 
-    stage = GameStage("group-players")
-    stage.add_complete_condition(GameStage.CONDITION_PROPERTY_PLAYER_COUNT, rule.get_player_min_number())
-    stage.add_complete_condition(GameStage.CONDITION_PROPERTY_TIME_OUT, 20)
-
+    stage = GroupPlayers(rule)
     rule.add_game_stage(stage)
 
-    stage = GameStage("deal-cards")
-    stage.add_complete_condition(GameStage.CONDITION_CARDS_DEAL_RESPONSE, "count-rount-players")
+    stage = DealCards(rule)
     rule.add_game_stage(stage)
 
+    stage = CallBanker(rule)
+    rule.add_game_stage(stage)
 
+    stage = PlayCards(rule)
+    rule.add_game_stage(stage)
 
+    stage = TellWinner(rule)
+    rule.add_game_stage(stage)
 
+    stage = CalScores(rule)
+    rule.add_game_stage(stage)
 
+    stage = PublishScores(rule)
+    rule.add_game_stage(stage)
 
     # rule.set_stages(stages)
     __PlayRules[rule_id] = rule

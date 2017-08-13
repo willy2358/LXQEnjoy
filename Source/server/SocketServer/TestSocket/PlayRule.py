@@ -15,8 +15,20 @@ class PlayRule:
         # self.__call_actions = []
         self.__head_action_group = ActionGroup()
 
+        self.__cur_game_stage_idx = -1;
+
     def get_head_action_group(self):
         return self.__head_action_group
+
+    def get_next_game_stage(self):
+        self.__cur_game_stage_idx += 1
+        if self.__cur_game_stage_idx < len(self.__game_stages):
+            return self.__game_stages[self.__cur_game_stage_idx]
+        else:
+            return None
+
+    def get_game_stages(self):
+        return self.__game_stages
 
     def add_call_action(self, action):
         # self.__call_actions.append(action)

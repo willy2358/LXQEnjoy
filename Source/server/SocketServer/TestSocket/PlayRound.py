@@ -10,15 +10,24 @@ class PlayRound:
         self.__started = False
         self.__cur_call_player_idx = -1
         self.__cur_call_action_id = ""
+        self.__cur_stage = play_rule.get_next_game_stage()
+        for s in self.__play_rule.get_game_stages():
+            s.set_my_round(self)
 
     def get_players(self):
         return self.__players
 
+    def get_players_count(self):
+        return len(self.__players)
+
     def add_player(self, player):
         self.__players.append(player)
         player.set_game_round(self)
-        if len(self.__players) >= self.__play_rule.get_player_min_number():
-            self.begin_game()
+        # if len(self.__players) >= self.__play_rule.get_player_min_number():
+        #     self.begin_game()
+        if self.__cur_stage and self.__cur_stage.is_completed():
+            self.__cur_stage = self.__play_rule.get_next_game_stage()
+            self.__cur_stage.begin()
 
     def begin_game(self):
         self.__started = True
