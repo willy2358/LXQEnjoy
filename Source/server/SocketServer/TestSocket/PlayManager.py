@@ -28,7 +28,8 @@ SERVER_CMD_DEAL_CARD = "deal_card"   # 发牌
 SERVER_CMD_CALL_ACTIONS = "call_actions"  # 叫牌
 
 CLIENT_CMD_CARDS_SORTED = "cards_sorted"  # 理牌完成
-CLIENT_CMD_BEGIN_PLAY = "join_game" # 开始游戏
+CLIENT_REQ_JOIN_GAME = "join-game" # 开始游戏
+CLIENT_REQ_PLAYER_RESP = "player-resp"
 CLIENT_CMD_PLAY_CARD = "play_card"
 CLIENT_CMD_SELECT_ACTION = "select_call"
 
@@ -160,20 +161,31 @@ def record_player_cards_sorted(conn):
 
 
 def dispatch_player_commands(conn, comm_text):
-    parts = comm_text.split('#')
-    if len(parts) == 2:
-        if parts[0].lower() == CLIENT_CMD_BEGIN_PLAY.lower() :
-            process_command_join_game(conn, parts[1])
-        if parts[0].lower() == CLIENT_CMD_PLAY_CARD.lower() :
-            process_command_play_card(conn, parts[1])
-        if parts[0].lower() == CLIENT_CMD_SELECT_ACTION.lower():
-            process_player_select_call_action(conn, parts[1])
-    elif len(parts) == 1:
-        if parts[0].lower() == "play_leave":
-            process_command_play_leave(conn)
-        if parts[0].lower() == CLIENT_CMD_CARDS_SORTED.lower():
-            player = get_player_client_from_conn(conn)
-            player.process_cards_sorted()
+    try:
+        j_obj = json.loads(comm_text)
+        if j_obj["req"] == CLIENT_REQ_JOIN_GAME.lower():
+            process_req_join_game(conn, j_obj)
+        if j_obj["req"] == CLIENT_REQ_PLAYER_RESP.lower():
+            process_player_resp(conn, j_obj)
+
+
+    except Exception as ex:
+        print(ex)
+
+    # parts = comm_text.split('#')
+    # if len(parts) == 2:
+    #     if parts[0].lower() == CLIENT_CMD_BEGIN_PLAY.lower() :
+    #         process_command_join_game(conn, parts[1])
+    #     if parts[0].lower() == CLIENT_CMD_PLAY_CARD.lower() :
+    #         process_command_play_card(conn, parts[1])
+    #     if parts[0].lower() == CLIENT_CMD_SELECT_ACTION.lower():
+    #         process_player_select_call_action(conn, parts[1])
+    # elif len(parts) == 1:
+    #     if parts[0].lower() == "play_leave":
+    #         process_command_play_leave(conn)
+    #     if parts[0].lower() == CLIENT_CMD_CARDS_SORTED.lower():
+    #         player = get_player_client_from_conn(conn)
+    #         player.process_cards_sorted()
 
 
 def get_player_client_from_conn(conn):
@@ -203,12 +215,12 @@ def get_available_game_round(rule_id):
 
 
 # command samples: join_game#"{\"rule_id\":\"1212\"}"
-def process_command_join_game(conn, command_text):
+def process_req_join_game(conn, j_req):
     try:
-        j_obj = json.loads(command_text)
-        if isinstance(j_obj, type(" ")):
-            j_obj = json.loads(j_obj)
-        rule_id = j_obj["rule_id"]
+        # j_obj = json.loads(j_req)
+        # if isinstance(j_obj, type(" ")):
+        #     j_obj = json.loads(j_obj)
+        rule_id = j_req["rule_id"]
         play_round = get_available_game_round(rule_id)
         play_round.add_player(get_player_client_from_conn(conn))
         # if rule_id not in __Waiting_Players:
@@ -218,6 +230,9 @@ def process_command_join_game(conn, command_text):
     except Exception as ex:
         print(ex)
 
+def process_player_resp(client_conn, j_obj):
+    player = get_player_client_from_conn(client_conn)
+    player.add_recv_resp(j_obj["resp"])
 
 # command : select_call#"{\"action_id\":"1"}"
 def process_player_select_call_action(client_conn, command_text):

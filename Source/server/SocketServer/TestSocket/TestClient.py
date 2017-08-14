@@ -7,6 +7,12 @@ while line != 'exit':
     client.send_message(line)
     line = input("input a command\r\n")
 
+"""
+join_game#{"rule_id":"1212"}
+{"req":"join-game", "rule_id":"1212"}
+{"req":"player-resp",
+"resp":"resp-deal_finish"}
 
-
-
+cards_sorted
+select_call#{"action_id":"1"}
+"""

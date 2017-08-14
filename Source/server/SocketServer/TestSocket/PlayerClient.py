@@ -17,6 +17,7 @@ class PlayerClient:
         self.__pre_call_action = None
         self.__my_call_action = None
         self.__timer_for_call = None
+        self.__recv_resps = []
 
     def set_wait_play_rule_id(self, rule_id):
         self.__playing_rule_id = rule_id
@@ -27,6 +28,9 @@ class PlayerClient:
     def add_play_partner(self, partner):
         if partner != self:
             self.__play_partners.append(partner)
+
+    def add_recv_resp(self, resp):
+        self.__recv_resps.append(resp)
 
     def set_game_round(self, round):
         self.__game_round = round
@@ -51,7 +55,10 @@ class PlayerClient:
         self.send_command_message(PlayManager.SERVER_CMD_DEAL_BEGIN)
 
     def finish_new_deal(self):
-        self.send_command_message(PlayManager.SERVER_CMD_DEAL_FINISH)
+        cmd = {"cmd": PlayManager.SERVER_CMD_DEAL_FINISH,
+               "recv-resp" :  "resp-" + PlayManager.SERVER_CMD_DEAL_FINISH}
+        j_str = json.dumps(cmd)
+        self.send_command_message(j_str)
 
     def send_call_command_options(self, act_group):
         # cmd = '{"actions":['
@@ -109,6 +116,8 @@ class PlayerClient:
 
 """
 join_game#{"rule_id":"1212"}
+{"req":"join-game", "rule_id":"1212"}
+ 
 cards_sorted
 select_call#{"action_id":"1"}
 """
