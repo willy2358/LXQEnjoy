@@ -25,6 +25,9 @@ class PlayRound:
         player.set_game_round(self)
         # if len(self.__players) >= self.__play_rule.get_player_min_number():
         #     self.begin_game()
+        # self.test_and_update_current_stage()
+
+    def test_and_update_current_stage(self):
         if self.__cur_stage and self.__cur_stage.is_completed():
             self.__cur_stage = self.__play_rule.get_next_game_stage()
             self.__cur_stage.begin()

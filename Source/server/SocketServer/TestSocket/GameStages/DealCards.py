@@ -1,5 +1,6 @@
 import random
 
+import PlayManager
 import Utils
 from GameStages.GameStage import GameStage
 
@@ -9,7 +10,14 @@ class DealCards(GameStage):
         super(DealCards, self).__init__(rule)
 
     def is_completed(self):
-        return False
+        all_resp = True
+        players = self.get_my_round().get_players()
+        for p in players:
+            if p.has_received_resp("resp-" + PlayManager.SERVER_CMD_DEAL_FINISH):
+                all_resp = False
+                break;
+
+        return all_resp
 
     def begin(self):
         cards = self.get_my_rule().get_cards()

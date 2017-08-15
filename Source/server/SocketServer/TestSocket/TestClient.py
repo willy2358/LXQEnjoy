@@ -10,8 +10,7 @@ while line != 'exit':
 """
 join_game#{"rule_id":"1212"}
 {"req":"join-game", "rule_id":"1212"}
-{"req":"player-resp",
-"resp":"resp-deal_finish"}
+{"req":"player-resp","resp":"resp-deal_finish"}
 
 cards_sorted
 select_call#{"action_id":"1"}

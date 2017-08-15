@@ -22,6 +22,9 @@ class PlayerClient:
     def set_wait_play_rule_id(self, rule_id):
         self.__playing_rule_id = rule_id
 
+    def has_received_resp(self, resp):
+        return self.__recv_resps.index(resp) >= 0
+
     def set_playing_rule_id(self, rule_id):
         self.__playing_rule_id = rule_id
 

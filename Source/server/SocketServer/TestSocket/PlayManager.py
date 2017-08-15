@@ -168,6 +168,7 @@ def dispatch_player_commands(conn, comm_text):
         if j_obj["req"] == CLIENT_REQ_PLAYER_RESP.lower():
             process_player_resp(conn, j_obj)
 
+        update_round_stage(conn)
 
     except Exception as ex:
         print(ex)
@@ -187,6 +188,10 @@ def dispatch_player_commands(conn, comm_text):
     #         player = get_player_client_from_conn(conn)
     #         player.process_cards_sorted()
 
+def update_round_stage(client_conn):
+    player = get_player_client_from_conn(client_conn)
+    round = player.get_game_round()
+    round.test_and_update_current_stage()
 
 def get_player_client_from_conn(conn):
     for c in __Players:
@@ -233,6 +238,7 @@ def process_req_join_game(conn, j_req):
 def process_player_resp(client_conn, j_obj):
     player = get_player_client_from_conn(client_conn)
     player.add_recv_resp(j_obj["resp"])
+
 
 # command : select_call#"{\"action_id\":"1"}"
 def process_player_select_call_action(client_conn, command_text):
