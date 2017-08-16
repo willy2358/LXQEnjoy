@@ -6,6 +6,7 @@ from GameStages.GameStage import GameStage
 
 
 class DealCards(GameStage):
+    COMMAND_DEAL_CARD = "deal-cards"
     def __init__(self, rule):
         super(DealCards, self).__init__(rule)
 
@@ -13,7 +14,7 @@ class DealCards(GameStage):
         all_resp = True
         players = self.get_my_round().get_players()
         for p in players:
-            if p.has_received_resp("resp-" + PlayManager.SERVER_CMD_DEAL_FINISH):
+            if not p.has_received_resp("resp-" + PlayManager.SERVER_CMD_DEAL_FINISH):
                 all_resp = False
                 break;
 
@@ -31,7 +32,9 @@ class DealCards(GameStage):
         while len(cards_b) > 0:
             cards_one_deal = random.sample(cards_b, player_num)
             for j in range(player_num):
-                players[j].deal_one_card(cards_one_deal[j])
+                cmd_obj = {"cmd": DealCards.COMMAND_DEAL_CARD, "cards": [cards_one_deal[j]] }
+                players[j].send_server_command(cmd_obj)
+                # players[j].deal_one_card(cards_one_deal[j])
             Utils.list_remove_parts(cards_b, cards_one_deal)
         for p in players:
             p.finish_new_deal()

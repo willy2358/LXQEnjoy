@@ -96,7 +96,11 @@ class PlayerClient:
         j_str = json.dumps(deal)
         cmd_pack = PlayManager.create_command_packet(PlayManager.SERVER_CMD_DEAL_CARD, j_str)
         self.send_command_message(cmd_pack)
-    
+
+    def send_server_command(self, cmd_obj):
+        j_str = json.dumps(cmd_obj)
+        self.send_command_message(j_str)
+
     def start_timer_to_tell_server_my_action(self, timeout_seconds):
         self.__timer_for_call = Timer(timeout_seconds, self.apply_default_action_as_my_action)
         self.__timer_for_call.start()

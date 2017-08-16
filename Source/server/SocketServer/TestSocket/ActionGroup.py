@@ -27,10 +27,10 @@ class ActionGroup:
         self.__player_select_timeout_seconds = seconds
 
     def to_json(self):
-        j_str = '{"actions":['
+        j_str = '['
         for c in self.__actions:
             j_str += c.to_json() + ","
-        j_str += "]}"
+        j_str += ']'
 
         return j_str
 
