@@ -11,6 +11,7 @@ while line != 'exit':
 
 {"req":"join-game", "rule_id":"1212"}
 {"req":"player-resp","resp":"resp-deal_finish"}
+{"req":"call", "act-id":"2"}
 
 cards_sorted
 select_call#{"action_id":"1"}

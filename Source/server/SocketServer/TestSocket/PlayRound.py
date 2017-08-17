@@ -95,3 +95,7 @@ class PlayRound:
 
     def get_next_call_action_group(self, action_id):
         return self.__play_rule.get_follow_up_action_group(action_id)
+
+    def execute_player_call(player, call):
+        if type(self.__cure_stage) == type(CallBanker):
+            self.__cure_stage.publish_player_call_action(player, call)
