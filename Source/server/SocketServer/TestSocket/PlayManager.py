@@ -26,6 +26,7 @@ SERVER_CMD_DEAL_BEGIN = "deal_begin"  # 开始发牌
 SERVER_CMD_DEAL_FINISH = "deal_finish"   # 结束发牌
 SERVER_CMD_DEAL_CARD = "deal_card"   # 发牌
 SERVER_CMD_CALL_ACTIONS = "call_actions"  # 叫牌
+SERVER_INFO = "info"
 
 CLIENT_CMD_CARDS_SORTED = "cards_sorted"  # 理牌完成
 CLIENT_REQ_JOIN_GAME = "join-game" # 开始游戏

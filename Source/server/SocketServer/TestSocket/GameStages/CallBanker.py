@@ -1,5 +1,7 @@
 from GameStages.GameStage import GameStage
 
+from threading import Timer
+
 
 class CallBanker(GameStage):
     COMMAND_CALL_BANKER = "call-banker"
@@ -10,6 +12,7 @@ class CallBanker(GameStage):
         self.__cur_call_action_id = ""
         self.__pre_call_action = None
         self.__timer_for_call = None
+        self.__current_player = None
 
     def is_completed(self):
         return False
@@ -29,11 +32,12 @@ class CallBanker(GameStage):
             #           "actions": call_acts_group.to_json() }
             self.start_timer_to_publish_player_call_action(call_acts_group.get_select_timeout())
             # player.send_server_command(cmd_obj)
-            tell_player_to_select_call_cations(player, call_acts_group)
+            self.tell_player_to_select_call_actions(player, call_acts_group)
 
     def tell_player_to_select_call_actions(self, player, act_group):
          cmd_obj = {"cmd": CallBanker.COMMAND_CALL_BANKER,
                        "actions": act_group.to_json() }
+         self.__current_player = player
          player.send_server_command(cmd_obj)
                  
     def get_next_call_player(self):
@@ -52,7 +56,7 @@ class CallBanker(GameStage):
 
     def publish_default_action_as_player_call(self):
         if self.__pre_call_action:
-            self.publish_player_call_action(self.__pre_call_action)
+            self.publish_player_call_action(self.__current_player, self.__pre_call_action)
 
     def tell_server_my_action(self, action):
         self.get_my_round().make_next_player_select_action(action.get_action_id())
@@ -60,12 +64,14 @@ class CallBanker(GameStage):
     def get_next_call_action_group(self, action_id):
         return self.get_my_rule().get_follow_up_action_group(action_id)
 
-    def publish_player_call_action(self, player, j_obj_action):
-        listen_players = self.get_notify_players(j_obj_action)
-        call_group = self.get_next_call_action_group(j_obj_action["act-id"])
-        for p in listen_players:
-            tell_player_to_select_call_cations(p, call_group)
+    def publish_player_call_action(self, player, action):
+        for p in self.get_notify_players():
+            info = { "info":"player-call" }
+            p.send_server_command(info)
+        next_player = self.get_next_call_player()
+        call_group = self.get_next_call_action_group(action.get_action_id())
+        # for p in listen_players:
+        self.tell_player_to_select_call_actions(p, call_group)
 
-
-    def get_notify_players(self, j_obj_action):
-        return get_next_call_player()
+    def get_notify_players(self):
+        return self.get_my_players()
