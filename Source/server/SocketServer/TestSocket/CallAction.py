@@ -9,6 +9,7 @@ class CallAction:
         self.__is_default = False
         self.__timeout_seconds = 10
         self.__following_action_group = None
+        self.__is_ending = False
 
     def add_follow_up_action(self, action):
         # self.__follow_up_actions.append(action)
@@ -26,11 +27,17 @@ class CallAction:
     def get_action_id(self):
         return self.__action_id
 
+    def get_is_ending(self):
+        return self.__is_ending
+
     def get_following_action_group(self):
         return self.__following_action_group
 
     def set_as_default(self):
         self.__is_default = True
+
+    def set_is_ending(self):
+        self.__is_ending = True
 
     def set_timeout_seconds(self, seconds):
         self.__timeout_seconds = seconds
@@ -60,7 +67,7 @@ class CallAction:
             for a in self.__following_action_group.get_actions():
                 sub_a = a.find_action_from_id(action_id)
                 if sub_a:
-                    return a
+                    return sub_a
         return None
 
     def get_is_default(self):

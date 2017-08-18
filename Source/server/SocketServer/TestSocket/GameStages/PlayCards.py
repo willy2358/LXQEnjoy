@@ -9,4 +9,4 @@ class PlayCards(GameStage):
         return False
 
     def begin(self):
-        pass
+        print("here i am")

@@ -82,11 +82,13 @@ def init_play_rules():
     a111 = a11.add_follow_up_action(CallAction("1_1_1", "Rob"))
     a112 = a11.add_follow_up_action(CallAction("1_1_2", "Not rob"))
     a11.get_following_action_group().set_select_timeout(20)
+    a11.get_following_action_group().set_is_ending()
     a112.set_as_default()
 
     a121 = a12.add_follow_up_action(CallAction("1_2_1", "Rob"))
     a122 = a12.add_follow_up_action(CallAction("1_2_2", "Not rob"))
     a12.get_following_action_group().set_select_timeout(20)
+    a12.get_following_action_group().set_is_ending()
     a122.set_as_default()
 
     a2 = CallAction("2", "Not Call")
@@ -99,11 +101,13 @@ def init_play_rules():
     a211 = a21.add_follow_up_action(CallAction("2_1_1", "Rob"))
     a212 = a21.add_follow_up_action(CallAction("2_1_2", "Not rob"))
     a21.get_following_action_group().set_select_timeout(20)
+    a21.get_following_action_group().set_is_ending()
     a212.set_as_default()
 
     a221 = a22.add_follow_up_action(CallAction("2_2_1", "Call"))
     a222 = a22.add_follow_up_action(CallAction("2_2_2", "Not call"))
     a22.get_following_action_group().set_select_timeout(20)
+    a22.get_following_action_group().set_is_ending()
     rule.add_call_action(a1)
     rule.add_call_action(a2)
     rule.set_action_call_timeout_seconds(20)

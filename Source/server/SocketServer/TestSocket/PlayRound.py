@@ -98,4 +98,5 @@ class PlayRound:
 
     def execute_player_call(self, player, call):
         # if type(self.__cure_stage) == type(CallBanker.CallBanker):
-        self.__cure_stage.publish_player_call_action(player, call)
+        action = self.__play_rule.get_action_by_id(call["act-id"])
+        self.__cur_stage.publish_player_call_action(player, action)
