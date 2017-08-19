@@ -24,6 +24,7 @@ class DealCards(GameStage):
         cards = self.get_my_rule().get_cards()
         cards_b = cards[:]  # copy this list
         remain_cards = random.sample(cards_b, self.get_my_rule().get_cards_number_not_deal())
+        self.get_my_round().set_cards_for_banker(remain_cards[:])
         Utils.list_remove_parts(cards_b, remain_cards)
         players = self.get_my_round().get_players()
         player_num = len(players)

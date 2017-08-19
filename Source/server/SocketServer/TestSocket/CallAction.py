@@ -9,6 +9,7 @@ class CallAction:
         self.__is_default = False
         self.__timeout_seconds = 10
         self.__following_action_group = None
+        self.__is_bank_action = False
         self.__is_ending = False
 
     def add_follow_up_action(self, action):
@@ -30,6 +31,9 @@ class CallAction:
     def get_is_ending(self):
         return self.__is_ending
 
+    def get_is_bank_action(self):
+        return self.__is_bank_action
+
     def get_following_action_group(self):
         return self.__following_action_group
 
@@ -38,6 +42,9 @@ class CallAction:
 
     def set_is_ending(self):
         self.__is_ending = True
+
+    def set_is_bank_action(self):
+        self.__is_bank_action = True
 
     def set_timeout_seconds(self, seconds):
         self.__timeout_seconds = seconds

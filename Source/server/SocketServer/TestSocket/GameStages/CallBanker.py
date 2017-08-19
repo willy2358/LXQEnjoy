@@ -69,8 +69,12 @@ class CallBanker(GameStage):
             info = {"info": "player-call"}
             p.send_server_command(info)
 
+        if action.get_is_bank_action():
+            self.get_my_round().set_bank_player(player)
+
         if action.get_is_ending():
             self.__reached_ending_action = True
+            self.get_my_round().test_and_update_current_stage()
 
         self.make_next_player_select_action(action.get_action_id())
         # next_player = self.get_next_call_player()

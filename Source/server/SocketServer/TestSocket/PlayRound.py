@@ -11,6 +11,8 @@ class PlayRound:
         self.__cur_call_player_idx = -1
         self.__cur_call_action_id = ""
         self.__cur_stage = play_rule.get_next_game_stage()
+        self.__bank_player = None
+        self.__cards_for_banker = None
         for s in self.__play_rule.get_game_stages():
             s.set_my_round(self)
 
@@ -19,6 +21,12 @@ class PlayRound:
 
     def get_players_count(self):
         return len(self.__players)
+
+    def get_bank_player(self):
+        return self.__bank_player
+
+    def get_cards_for_banker(self):
+        return self.__cards_for_banker
 
     def add_player(self, player):
         self.__players.append(player)
@@ -93,6 +101,9 @@ class PlayRound:
         else:
             return None
 
+    def set_bank_player(self, player):
+        self.__bank_player = player
+
     def get_next_call_action_group(self, action_id):
         return self.__play_rule.get_follow_up_action_group(action_id)
 
@@ -100,3 +111,9 @@ class PlayRound:
         # if type(self.__cure_stage) == type(CallBanker.CallBanker):
         action = self.__play_rule.get_action_by_id(call["act-id"])
         self.__cur_stage.publish_player_call_action(player, action)
+
+    def set_cards_for_banker(self, cards):
+        self.__cards_for_banker = cards
+
+    def process_no_bank_player(self):
+        pass
