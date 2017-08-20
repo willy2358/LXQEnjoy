@@ -14,7 +14,7 @@ class PlayRule:
 
         # self.__call_actions = []
         self.__head_action_group = ActionGroup()
-
+        self.__player_idx_of_play_card = -1
         self.__cur_game_stage_idx = -1;
 
     def get_head_action_group(self):
@@ -41,6 +41,18 @@ class PlayRule:
 
     def get_cards(self):
         return self.__cards
+
+    def order_play_card_players(self, play_round):
+        players = play_round.get_players()
+        banker = play_round.get_bank_player()
+        if banker:
+            idx = players.index(banker)
+            ordered_players = players[idx:]
+            for i in range(0,idx):
+                ordered_players.append(players[i])
+            return ordered_players
+        else:
+            pass
 
     def get_follow_up_action_group(self, action_id):
         if not action_id:
@@ -76,6 +88,8 @@ class PlayRule:
 
     def get_cards_number_not_deal(self):
         return self.__cards_num_not_deal
+
+
 
     def set_cards(self, cards):
         self.__cards = cards

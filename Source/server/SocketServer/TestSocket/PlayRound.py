@@ -13,6 +13,7 @@ class PlayRound:
         self.__cur_stage = play_rule.get_next_game_stage()
         self.__bank_player = None
         self.__cards_for_banker = None
+        self.__player_idx_of_play_card = -1
         for s in self.__play_rule.get_game_stages():
             s.set_my_round(self)
 

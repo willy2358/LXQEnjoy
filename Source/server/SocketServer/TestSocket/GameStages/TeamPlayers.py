@@ -3,6 +3,7 @@ from GameStages.GameStage import GameStage
 
 class TeamPlayers(GameStage):
     COMMAND_BANK_CARDS = "bank-cards"
+
     def __init__(self, rule):
         super(TeamPlayers, self).__init__(rule)
         self.__players_teamed = False
