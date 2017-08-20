@@ -27,6 +27,24 @@ class PlayRule:
         else:
             return None
 
+    @staticmethod
+    def get_is_round_end(self, game_round):
+        players = game_round.get_players()
+        for p in players:
+            if len(p.get_remained_cards() < 1):
+                return True
+
+        return False
+
+    def get_player_default_cards(self, player):
+        rem_cards = player.get_remained_cards()
+        if rem_cards and len(rem_cards):
+            c = rem_cards[0]
+            rem_cards.remove(c)
+            return c
+        else:
+            return None
+
     def get_game_stages(self):
         return self.__game_stages
 
@@ -41,6 +59,9 @@ class PlayRule:
 
     def get_cards(self):
         return self.__cards
+
+    def get_play_card_command_options(self, player):
+        return ["play", "not-play"]
 
     def order_play_card_players(self, play_round):
         players = play_round.get_players()

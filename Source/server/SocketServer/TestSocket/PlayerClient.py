@@ -18,6 +18,19 @@ class PlayerClient:
         self.__my_call_action = None
         self.__timer_for_call = None
         self.__recv_resps = []
+        self.__dealed_cards = []
+        self.__remained_cards = []
+
+    def get_remained_cards(self):
+        return self.__remained_cards
+
+    def get_default_play_cards(self):
+        if len(self.__dealed_cards) > 0:
+            c = self.__dealed_cards[0]
+            self.__dealed_cards.remove(c)
+            return c
+        else:
+            return None
 
     def set_wait_play_rule_id(self, rule_id):
         self.__playing_rule_id = rule_id
@@ -121,6 +134,8 @@ class PlayerClient:
             self.__timer_for_call = None
         self.get_game_round().make_next_player_select_action(action_id)
 
+    def add_dealed_cards(self, cards):
+        self.__dealed_cards = self.__dealed_cards + cards
 """
 join_game#{"rule_id":"1212"}
 {"req":"join-game", "rule_id":"1212"}

@@ -72,9 +72,11 @@ class CallBanker(GameStage):
         if action.get_is_bank_action():
             self.get_my_round().set_bank_player(player)
 
-        if action.get_is_ending():
+        call_acts_group = self.get_next_call_action_group(action.get_action_id())
+        if not call_acts_group:
             self.__reached_ending_action = True
             self.get_my_round().test_and_update_current_stage()
+            return
 
         self.make_next_player_select_action(action.get_action_id())
         # next_player = self.get_next_call_player()
