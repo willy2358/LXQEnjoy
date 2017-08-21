@@ -2,6 +2,7 @@ import random
 
 import Utils
 from GameStages import PlayCards
+from Judger import Judger
 
 
 class PlayRound:
@@ -15,6 +16,7 @@ class PlayRound:
         self.__bank_player = None
         self.__cards_for_banker = None
         self.__player_idx_of_play_card = -1
+        self.__my_judger = Judger(self)
         for s in self.__play_rule.get_game_stages():
             s.set_my_round(self)
 
@@ -125,3 +127,9 @@ class PlayRound:
 
     def process_no_bank_player(self):
         pass
+
+    def process_player_select_action(self, player, resp_obj):
+        if self.__my_judger:
+            self.__my_judger.process_player_select_action(player, resp_obj["act-id"])
+
+        self.test_and_update_current_stage()

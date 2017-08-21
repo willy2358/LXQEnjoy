@@ -35,6 +35,7 @@ CLIENT_REQ_PLAYER_RESP = "player-resp"
 CLIENT_REQ_PLAYER_CALL = "call"
 CLIENT_CMD_PLAY_CARD = "play_card"
 CLIENT_CMD_SELECT_ACTION = "select_call"
+CLIENT_REQ_SELECT_CMD = "select-cmd"
 
 
 # command:开始发牌: deal_begin
@@ -187,6 +188,8 @@ def dispatch_player_commands(conn, comm_text):
             process_req_player_call(conn, j_obj)
         if j_obj["req"] == CLIENT_CMD_PLAY_CARD.lower():
             process_player_play_cards(conn, j_obj)
+        if j_obj["req"] == CLIENT_REQ_SELECT_CMD.lower():
+            process_player_select_action(conn, j_obj)
 
 
         update_round_stage(conn)
@@ -244,6 +247,12 @@ def process_player_play_cards(conn, j_obj):
     player = get_player_client_from_conn(conn)
     round = player.get_game_round()
     round.execute_player_played_cards(player, j_obj)
+
+
+def process_player_select_action(conn, j_obj):
+    player = get_player_client_from_conn(conn)
+    round = player.get_game_round()
+    round.process_player_select_action(player, j_obj["resp"])
 
 # command samples: join_game#"{\"rule_id\":\"1212\"}"
 def process_req_join_game(conn, j_req):
