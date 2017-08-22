@@ -17,6 +17,7 @@ class PlayRound:
         self.__cards_for_banker = None
         self.__player_idx_of_play_card = -1
         self.__my_judger = Judger(self)
+        self.__cur_action = None
         for s in self.__play_rule.get_game_stages():
             s.set_my_round(self)
 
@@ -32,6 +33,12 @@ class PlayRound:
     def get_cards_for_banker(self):
         return self.__cards_for_banker
 
+    def get_judger(self):
+        return self.__my_judger
+
+    def get_current_action(self):
+        return self.__cur_action
+
     def add_player(self, player):
         self.__players.append(player)
         player.set_game_round(self)
@@ -40,9 +47,12 @@ class PlayRound:
         # self.test_and_update_current_stage()
 
     def test_and_update_current_stage(self):
-        if self.__cur_stage and self.__cur_stage.is_completed():
-            self.__cur_stage = self.__play_rule.get_next_game_stage()
-            self.__cur_stage.begin()
+        if self.__cur_stage:
+            if self.__cur_stage.is_completed():
+                self.__cur_stage = self.__play_rule.get_next_game_stage()
+                self.__cur_stage.begin()
+            else:
+                self.__cur_stage.continue_execute()
 
     def begin_game(self):
         self.__started = True
@@ -130,6 +140,7 @@ class PlayRound:
 
     def process_player_select_action(self, player, resp_obj):
         if self.__my_judger:
+            self.__cur_action = self.__play_rule.get_action_by_id(resp_obj["act-id"])
             self.__my_judger.process_player_select_action(player, resp_obj["act-id"])
 
         self.test_and_update_current_stage()

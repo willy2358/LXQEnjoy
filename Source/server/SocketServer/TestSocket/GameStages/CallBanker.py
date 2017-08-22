@@ -21,16 +21,34 @@ class CallBanker(GameStage):
     def begin(self):
         self.begin_players_call_process()
 
+    def continue_execute(self):
+        play_round = self.get_my_round()
+        if play_round:
+            act = play_round.get_current_action()
+            if act:
+                self.make_next_player_select_action(act.get_act_id())
+            else:
+                pass
+        else:
+            pass
+
     def begin_players_call_process(self):
         self.make_next_player_select_action(None)
 
     def make_next_player_select_action(self, prev_action_id):
         player = self.get_next_call_player()
         call_acts_group = self.get_next_call_action_group(prev_action_id)
-        if player and call_acts_group:
-            self.__pre_call_action = call_acts_group.get_default_action()
-            self.start_timer_to_publish_player_call_action(call_acts_group.get_select_timeout())
-            self.tell_player_to_select_call_actions(player, call_acts_group)
+        players = self.get_notify_players()
+        play_round = self.get_my_round()
+        if play_round:
+            judger = play_round.get_my_judger()
+            if judger:
+                judger.send_player_action_group(player, call_acts_group, players)
+
+        # if player and call_acts_group:
+        #     self.__pre_call_action = call_acts_group.get_default_action()
+        #     self.start_timer_to_publish_player_call_action(call_acts_group.get_select_timeout())
+        #     self.tell_player_to_select_call_actions(player, call_acts_group)
 
     def tell_player_to_select_call_actions(self, player, act_group):
         cmd_obj = {"cmd": CallBanker.COMMAND_CALL_BANKER,

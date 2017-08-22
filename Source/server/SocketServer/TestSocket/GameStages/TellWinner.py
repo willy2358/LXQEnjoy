@@ -10,3 +10,6 @@ class TellWinner(GameStage):
 
     def begin(self):
         pass
+
+    def continue_execute(self):
+        pass

@@ -29,6 +29,9 @@ class PlayCards(GameStage):
             self.create_timer_to_play_default_cards()
             self.send_play_card_commands()
 
+    def continue_execute(self):
+        pass
+
     def get_notify_players(self):
         return self.get_my_players()
 

@@ -22,5 +22,6 @@ class TeamPlayers(GameStage):
         else:
             self.get_my_round().process_no_bank_player()
 
-
+    def continue_execute(self):
+        pass
 

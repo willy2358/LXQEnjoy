@@ -28,6 +28,9 @@ class CallAction:
     def get_action_id(self):
         return self.__action_id
 
+    def get_act_id(self):
+        return self.__action_id
+
     def get_is_ending(self):
         return self.__is_ending
 

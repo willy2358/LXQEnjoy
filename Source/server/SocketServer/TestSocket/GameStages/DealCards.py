@@ -7,18 +7,21 @@ from GameStages.GameStage import GameStage
 
 class DealCards(GameStage):
     COMMAND_DEAL_CARD = "deal-cards"
+
     def __init__(self, rule):
         super(DealCards, self).__init__(rule)
+        self.__cards_sent = False
 
     def is_completed(self):
-        all_resp = True
-        players = self.get_my_round().get_players()
-        for p in players:
-            if not p.has_received_resp("resp-" + PlayManager.SERVER_CMD_DEAL_FINISH):
-                all_resp = False
-                break;
-
-        return all_resp
+        return self.__cards_sent
+        # all_resp = True
+        # players = self.get_my_round().get_players()
+        # for p in players:
+        #     if not p.has_received_resp("resp-" + PlayManager.SERVER_CMD_DEAL_FINISH):
+        #         all_resp = False
+        #         break;
+        #
+        # return all_resp
 
     def begin(self):
         cards = self.get_my_rule().get_cards()
@@ -39,3 +42,8 @@ class DealCards(GameStage):
             Utils.list_remove_parts(cards_b, cards_one_deal)
         for p in players:
             p.finish_new_deal()
+
+        self.__cards_sent = True
+
+    def continue_execute(self):
+        pass
