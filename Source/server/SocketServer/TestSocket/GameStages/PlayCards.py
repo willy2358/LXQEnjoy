@@ -22,8 +22,8 @@ class PlayCards(GameStage):
 
     def begin(self):
         rule = self.get_my_rule()
-        round = self.get_my_round()
-        self.__ordered_players = rule.order_play_card_players(round)
+        my_round = self.get_my_round()
+        self.__ordered_players = rule.order_play_card_players(my_round)
         first_player = self.get_next_player()
         if first_player:
             self.create_timer_to_play_default_cards()

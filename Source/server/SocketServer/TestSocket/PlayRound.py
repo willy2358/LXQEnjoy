@@ -139,8 +139,10 @@ class PlayRound:
         pass
 
     def process_player_select_action(self, player, resp_obj):
-        if self.__my_judger:
-            self.__cur_action = self.__play_rule.get_action_by_id(resp_obj["act-id"])
-            self.__my_judger.process_player_select_action(player, resp_obj["act-id"])
+        if self.__cur_stage:
+            self.__cur_stage.process_player_selected_action_id(resp_obj["act-id"])
+        if self.__my_judger and self.__cur_stage:
+            # self.__cur_action = self.__play_rule.get_action_by_id(resp_obj["act-id"])
+            self.__my_judger.process_player_select_action(player, self.__cur_stage.get_action_by_id(resp_obj["act-id"]))
 
         self.test_and_update_current_stage()

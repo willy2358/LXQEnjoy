@@ -24,7 +24,7 @@ class Judger:
             self.__default_player_action = act_group.get_default_action()
             self.start_timer_to_wait_player_response(act_group.get_select_timeout())
             cmd_obj = {"cmd": Judger.COMMAND_OPTIONS,
-                       "opts": act_group.to_json()}
+                       "opts": act_group.to_json_object()}
             player.send_server_command(cmd_obj)
 
     def start_timer_to_wait_player_response(self, timeout_seconds):
