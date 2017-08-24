@@ -127,7 +127,7 @@ class PlayRound:
         self.__cur_stage.publish_player_call_action(player, action)
 
     def execute_player_played_cards(self, player, cards):
-        if isinstance(self.__cur_stage, PlayCards):
+        if isinstance(self.__cur_stage, type(PlayCards)):
             self.__cur_stage.publish_player_play_cards(player, cards["cards"])
         else:
             pass
@@ -138,11 +138,11 @@ class PlayRound:
     def process_no_bank_player(self):
         pass
 
-    def process_player_select_action(self, player, resp_obj):
+    def process_player_select_action(self, player, act_id):
         if self.__cur_stage:
-            self.__cur_stage.process_player_selected_action_id(resp_obj["act-id"])
+            self.__cur_stage.process_player_selected_action_id(act_id)
         if self.__my_judger and self.__cur_stage:
             # self.__cur_action = self.__play_rule.get_action_by_id(resp_obj["act-id"])
-            self.__my_judger.process_player_select_action(player, self.__cur_stage.get_action_by_id(resp_obj["act-id"]))
+            self.__my_judger.process_player_select_action(player, self.__cur_stage.get_action_by_id(act_id))
 
         self.test_and_update_current_stage()

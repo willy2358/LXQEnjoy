@@ -5,10 +5,10 @@ import PlayRound
 
 class Judger:
     COMMAND_OPTIONS = "cmd-opts"
-    CLIENT_RESP_SELECT_ACTION = "select-act"
+    CLIENT_RESP_SELECT_ACTION = "player-act"
 
     def __init__(self, play_round):
-        assert isinstance(play_round, PlayRound)
+        # assert isinstance(play_round, type(PlayRound))
         self.__my_play_round = play_round
         self.__timer_wait_player = None
         self.__default_player_action = None
@@ -32,7 +32,12 @@ class Judger:
         self.__timer_wait_player.start()
 
     def select_default_action(self):
-        self.process_player_select_action(self.__player_accept_command, self.__default_player_action)
+        # self.process_player_select_action(self.__player_accept_command, self.__default_player_action)
+        # self.__my_play_round.test_and_update_current_stage()
+        player = self.__player_accept_command
+        act = self.__default_player_action
+        if act:
+            self.__my_play_round.process_player_select_action(player, act.get_act_id())
 
     def process_player_select_action_of_id(self, player, action_id):
         action = self.get_action_by_id(action_id)
@@ -42,7 +47,8 @@ class Judger:
     def process_player_select_action(self, player, action):
         self.reset_timer()
         if self.__select_action_publish_players:
-            resp = {"resp": Judger.CLIENT_RESP_SELECT_ACTION }
+            resp = {"resp": Judger.CLIENT_RESP_SELECT_ACTION,
+                    "sel-act": action.to_json_object()}
             for p in self.__select_action_publish_players:
                 p.send_server_command(resp)
 

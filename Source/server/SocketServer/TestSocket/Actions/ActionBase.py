@@ -1,4 +1,4 @@
-from ActionGroup import ActionGroup
+from Actions.ActionGroup import ActionGroup
 
 
 class ActionBase:
@@ -6,6 +6,7 @@ class ActionBase:
         self.__act_text = text
         self.__act_id = act_id
         self.__follow_up_action_group = None
+        self.__is_call_banker = False
 
     def get_act_text(self):
         return self.__act_text
@@ -15,6 +16,9 @@ class ActionBase:
 
     def get_follow_up_action_group(self):
         return self.__follow_up_action_group
+
+    def get_is_call_banker(self):
+        return self.__is_call_banker
 
     def find_follow_action_from_id(self, action_id):
         if self.get_act_id() == action_id:
@@ -35,6 +39,7 @@ class ActionBase:
             self.__follow_up_action_group = ActionGroup()
 
         self.__follow_up_action_group.add_action(action, as_default_action)
+        return action
 
     def to_json_object(self):
         return {"act-id":self.__act_id, "act-text":self.__act_text};

@@ -44,6 +44,7 @@ class DealCards(GameStage):
             p.finish_new_deal()
 
         self.__cards_sent = True
+        self.get_my_round().test_and_update_current_stage()
 
     def continue_execute(self):
         pass

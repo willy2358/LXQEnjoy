@@ -6,7 +6,7 @@ class ActionGroup:
 
     def get_action_by_id(self, action_id):
         for a in self.__actions:
-            a = a.find_action_from_id(action_id)
+            a = a.find_follow_action_from_id(action_id)
             if a:
                 return a
 

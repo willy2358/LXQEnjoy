@@ -10,7 +10,7 @@ while line != 'exit':
 """
 
 {"req":"join-game", "rule_id":"1212"}
-{"req":"player-resp","resp":"resp-deal_finish"}
+{"req":"sel-act", "act-id":"1"}
 {"req":"call", "act-id":"2"}
 
 cards_sorted

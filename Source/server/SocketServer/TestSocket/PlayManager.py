@@ -36,8 +36,8 @@ CLIENT_REQ_JOIN_GAME = "join-game" # 开始游戏
 CLIENT_REQ_PLAYER_RESP = "player-resp"
 CLIENT_REQ_PLAYER_CALL = "call"
 CLIENT_CMD_PLAY_CARD = "play_card"
-CLIENT_CMD_SELECT_ACTION = "select_call"
-CLIENT_REQ_SELECT_CMD = "select-cmd"
+#CLIENT_CMD_SELECT_ACTION = "select_call"
+CLIENT_REQ_SELECT_ACTION = "sel-act"
 
 
 # command:开始发牌: deal_begin
@@ -216,11 +216,10 @@ def dispatch_player_commands(conn, comm_text):
             process_req_player_call(conn, j_obj)
         if j_obj["req"] == CLIENT_CMD_PLAY_CARD.lower():
             process_player_play_cards(conn, j_obj)
-        if j_obj["req"] == CLIENT_REQ_SELECT_CMD.lower():
+        if j_obj["req"] == CLIENT_REQ_SELECT_ACTION.lower():
             process_player_select_action(conn, j_obj)
 
 
-        update_round_stage(conn)
 
     except Exception as ex:
         print(ex)
@@ -280,7 +279,7 @@ def process_player_play_cards(conn, j_obj):
 def process_player_select_action(conn, j_obj):
     player = get_player_client_from_conn(conn)
     round = player.get_game_round()
-    round.process_player_select_action(player, j_obj["resp"])
+    round.process_player_select_action(player, j_obj["act-id"])
 
 # command samples: join_game#"{\"rule_id\":\"1212\"}"
 def process_req_join_game(conn, j_req):
@@ -295,6 +294,7 @@ def process_req_join_game(conn, j_req):
         #     __Waiting_Players[rule_id] = []
         # __Waiting_Players[rule_id].append(get_player_client_from_conn(conn))
         # update_players_waiting_state()
+        update_round_stage(conn)
     except Exception as ex:
         print(ex)
 
@@ -308,7 +308,6 @@ def process_req_player_call(client_conn, j_obj):
     round = player.get_game_round()
     round.execute_player_call(player, j_obj)
 
-# command : select_call#"{\"action_id\":"1"}"
 def process_player_select_call_action(client_conn, command_text):
     try:
         client = get_player_client_from_conn(client_conn)
