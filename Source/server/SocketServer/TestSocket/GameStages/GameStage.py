@@ -27,9 +27,9 @@ class GameStage:
         else:
             return None
 
-    def get_round_judger(self):
+    def get_round_dealer(self):
         if self.__my_round:
-            return self.__my_round.get_judger()
+            return self.__my_round.get_my_dealer()
 
     def set_my_round(self, my_round):
         self.__my_round = my_round

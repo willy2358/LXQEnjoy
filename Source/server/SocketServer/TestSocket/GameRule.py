@@ -3,7 +3,7 @@ from Actions.PassPlay import PassPlay
 from Actions.PlayCard import PlayCard
 
 
-class PlayRule:
+class GameRule:
     def __init__(self, rule_id):
         self.__player_num_min = 0;
         self.__player_num_max = 0;
@@ -97,7 +97,7 @@ class PlayRule:
     def get_play_cards_commands_for_player(player, game_round):
         if not player or not game_round:
             return None
-        dealer = game_round.get_judger()
+        dealer = game_round.get_my_dealer()
         if not dealer:
             return None
         act_group = ActionGroup()
@@ -105,7 +105,7 @@ class PlayRule:
         if not pre_player or pre_player is player:
             play_card = PlayCard("Play cards", "1")
             play_card.set_execute_context(player, game_round)
-            play_card.set_cards(PlayRule.get_player_default_cards(player))
+            play_card.set_cards(GameRule.get_player_default_cards(player))
             act_group.add_action(play_card, True)
         else:
             play_card = PlayCard("Play cards", "1")

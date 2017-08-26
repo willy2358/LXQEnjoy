@@ -13,11 +13,8 @@ class PlayCard(ActionBase):
         player = self.get_my_player()
         if player and self.__cards and len(self.__cards) > 0:
             player.play_out_cards(self.__cards)
-            dealer = self.get_my_round().get_judger()
+            dealer = self.get_my_round().get_my_dealer()
             dealer.record_player_cards_history(player, self.__cards)
-
-    # def to_json_object(self):
-    #     return {"resp": "play-cards", "cards": self.__cards}
 
     def to_broadcast_json_object(self):
         return {"act": "play-cards", "cards": self.__cards}

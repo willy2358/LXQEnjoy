@@ -14,14 +14,6 @@ class DealCards(GameStage):
 
     def is_completed(self):
         return self.__cards_sent
-        # all_resp = True
-        # players = self.get_my_round().get_players()
-        # for p in players:
-        #     if not p.has_received_resp("resp-" + PlayManager.SERVER_CMD_DEAL_FINISH):
-        #         all_resp = False
-        #         break;
-        #
-        # return all_resp
 
     def begin(self):
         cards = self.get_my_rule().get_cards()
