@@ -44,10 +44,11 @@ class CallBanker(GameStage):
             player = self.get_next_call_player()
             players = self.get_notify_players()
             self.__current_player = player
-            if play_round:
-                judger = play_round.get_judger()
-                if judger:
-                    judger.send_player_action_group(player, call_acts_group, players)
+            dealer = self.get_round_judger()
+            if dealer:
+                for act in call_acts_group.get_actions():
+                    act.set_execute_context(player, play_round)
+                dealer.send_player_action_group(player, call_acts_group, players)
         else:
             self.__reached_ending_action = True
             if play_round:
@@ -130,5 +131,5 @@ class CallBanker(GameStage):
     def process_player_selected_action_id(self, action_id):
         if self.get_head_action_group():
             self.__cur_selected_action = self.get_head_action_group().get_action_by_id(action_id)
-            if self.__cur_selected_action and self.__cur_selected_action.get_is_call_banker():
-                self.get_my_round().set_bank_player(self.__current_player)
+            if self.__cur_selected_action :
+                self.__cur_selected_action.execute()

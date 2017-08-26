@@ -27,9 +27,19 @@ class GameStage:
         else:
             return None
 
+    def get_round_judger(self):
+        if self.__my_round:
+            return self.__my_round.get_judger()
+
     def set_my_round(self, my_round):
         self.__my_round = my_round
         self.__my_players = self.__my_round.get_players()
+
+    def set_action_group(self, act_group):
+        self.__head_action_group = act_group
+
+    def reset_action_group(self):
+        self.__head_action_group = None
 
     def add_player_action(self, action, as_default_action=False):
         if not self.__head_action_group:

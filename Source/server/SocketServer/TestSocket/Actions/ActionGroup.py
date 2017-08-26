@@ -35,5 +35,8 @@ class ActionGroup:
         return action
 
     def to_json_object(self):
-        acts = [act.to_json_object() for act in self.__actions]
-        return {"actions": acts, "default": self.__default_action.to_json_object()}
+        if self.__actions and self.__default_action:
+            acts = [act.to_json_object() for act in self.__actions]
+            return {"actions": acts, "default": self.__default_action.to_json_object()}
+        else:
+            return None

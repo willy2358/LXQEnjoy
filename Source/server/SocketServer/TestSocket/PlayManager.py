@@ -158,23 +158,22 @@ def set_call_banker_action_options(call_banker_stage):
 
     c11 = call_bank.add_follow_up_action(CallBank("Rob", "1-1"))
     c111 = c11.add_follow_up_action(CallBank("Rob", "1-1-1"))
-    c112 = c11.add_follow_up_action(CallBank("Not Rob", "1-1-2"), True)
+    c112 = c11.add_follow_up_action(PassCall("Not Rob", "1-1-2"), True)
 
     c12 = call_bank.add_follow_up_action(PassCall("Not Rob", "1-2"), True)
     c121 = c12.add_follow_up_action(CallBank("Rob", "1-2-1"))
-    c122 = c12.add_follow_up_action(CallBank("Not Rob", "1-2-2"), True)
+    c122 = c12.add_follow_up_action(PassCall("Not Rob", "1-2-2"), True)
 
     not_call = PassCall("Not Call", "2")
     call_banker_stage.add_player_action(not_call, True)
 
     c21 = not_call.add_follow_up_action(CallBank("Call", "2-1"))
     c211 = c21.add_follow_up_action(CallBank("Rob", "2-1-1"))
-    c212 = c21.add_follow_up_action(CallBank("Not Rob", "2-1-2"), True)
+    c212 = c21.add_follow_up_action(PassCall("Not Rob", "2-1-2"), True)
 
     c22 = not_call.add_follow_up_action(PassCall("Not Call", "2-2"), True)
     c221 = c22.add_follow_up_action(CallBank("Call", "2-2-1"))
-    c222 = c22.add_follow_up_action(CallBank("Not Call", "2-2-2"), True)
-
+    c222 = c22.add_follow_up_action(PassCall("Not Call", "2-2-2"), True)
 
 def create_command_packet(command, command_data):
     return command + "#" + command_data

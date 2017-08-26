@@ -3,12 +3,23 @@
   <component name="ChangeListManager">
     <list default="true" id="834e515e-663f-4605-b96a-36a4b7d59f13" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PlayRound.py" afterPath="$PROJECT_DIR$/PlayRound.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PlayManager.py" afterPath="$PROJECT_DIR$/PlayManager.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Actions/ActionBase.py" afterPath="$PROJECT_DIR$/Actions/ActionBase.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Actions/ActionGroup.py" afterPath="$PROJECT_DIR$/Actions/ActionGroup.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Actions/CallBank.py" afterPath="$PROJECT_DIR$/Actions/CallBank.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Actions/PassCall.py" afterPath="$PROJECT_DIR$/Actions/PassCall.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Actions/PassPlay.py" afterPath="$PROJECT_DIR$/Actions/PassPlay.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Actions/PlayCard.py" afterPath="$PROJECT_DIR$/Actions/PlayCard.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/GameStages/CallBanker.py" afterPath="$PROJECT_DIR$/GameStages/CallBanker.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/GameStages/DealCards.py" afterPath="$PROJECT_DIR$/GameStages/DealCards.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/GameStages/GameStage.py" afterPath="$PROJECT_DIR$/GameStages/GameStage.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/GameStages/PlayCards.py" afterPath="$PROJECT_DIR$/GameStages/PlayCards.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/GameStages/TeamPlayers.py" afterPath="$PROJECT_DIR$/GameStages/TeamPlayers.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/GameStages/TellWinner.py" afterPath="$PROJECT_DIR$/GameStages/TellWinner.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Judger.py" afterPath="$PROJECT_DIR$/Judger.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PlayManager.py" afterPath="$PROJECT_DIR$/PlayManager.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PlayRule.py" afterPath="$PROJECT_DIR$/PlayRule.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PlayerClient.py" afterPath="$PROJECT_DIR$/PlayerClient.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/TestSocket.iml" afterPath="$PROJECT_DIR$/.idea/TestSocket.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/TestClient.py" afterPath="$PROJECT_DIR$/TestClient.py" />
     </list>
     <ignored path="TestSocket.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -27,98 +38,22 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="PlayManager.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/PlayManager.py">
+      <file leaf-file-name="TestClient.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/TestClient.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="350">
-              <caret line="282" column="29" lean-forward="false" selection-start-line="282" selection-start-column="29" selection-end-line="282" selection-end-column="29" />
+            <state relative-caret-position="237">
+              <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="31" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DealCards.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/GameStages/DealCards.py">
+      <file leaf-file-name="TellWinner.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/GameStages/TellWinner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="20" column="0" lean-forward="false" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
+            <state relative-caret-position="196">
+              <caret line="19" column="38" lean-forward="true" selection-start-line="19" selection-start-column="38" selection-end-line="19" selection-end-column="38" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PlayCards.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/GameStages/PlayCards.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="527">
-              <caret line="33" column="0" lean-forward="true" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CallBanker.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/GameStages/CallBanker.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="600">
-              <caret line="84" column="0" lean-forward="false" selection-start-line="84" selection-start-column="0" selection-end-line="90" selection-end-column="51" />
-              <folding>
-                <element signature="e#0#42#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ActionBase.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Actions/ActionBase.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="646">
-              <caret line="38" column="22" lean-forward="false" selection-start-line="38" selection-start-column="8" selection-end-line="38" selection-end-column="22" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GameStage.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/GameStages/GameStage.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="22" column="24" lean-forward="false" selection-start-line="22" selection-start-column="8" selection-end-line="22" selection-end-column="24" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CallAction.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/CallAction.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1190">
-              <caret line="70" column="0" lean-forward="true" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PlayRound.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/PlayRound.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="762">
-              <caret line="145" column="49" lean-forward="true" selection-start-line="145" selection-start-column="49" selection-end-line="145" selection-end-column="49" />
-              <folding>
-                <element signature="e#0#13#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Judger.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Judger.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="592">
-              <caret line="41" column="59" lean-forward="true" selection-start-line="41" selection-start-column="59" selection-end-line="41" selection-end-column="59" />
-              <folding>
-                <element signature="e#0#27#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -126,9 +61,87 @@
       <file leaf-file-name="ActionGroup.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Actions/ActionGroup.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="612">
-              <caret line="36" column="22" lean-forward="false" selection-start-line="36" selection-start-column="8" selection-end-line="36" selection-end-column="22" />
+            <state relative-caret-position="209">
+              <caret line="26" column="26" lean-forward="false" selection-start-line="26" selection-start-column="8" selection-end-line="26" selection-end-column="26" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PlayerClient.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/PlayerClient.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="154">
+              <caret line="117" column="27" lean-forward="false" selection-start-line="117" selection-start-column="8" selection-end-line="117" selection-end-column="27" />
+              <folding>
+                <element signature="e#14#25#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PlayRound.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/PlayRound.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="246">
+              <caret line="147" column="0" lean-forward="false" selection-start-line="147" selection-start-column="0" selection-end-line="147" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#13#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GameStage.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/GameStages/GameStage.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="212">
+              <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Judger.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Judger.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="120">
+              <caret line="52" column="0" lean-forward="false" selection-start-line="52" selection-start-column="0" selection-end-line="52" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#27#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="threading.py" pinned="false" current-in-tab="false">
+        <entry file="file://C:/Python3.5/Lib/threading.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="293">
+              <caret line="1191" column="25" lean-forward="true" selection-start-line="1191" selection-start-column="25" selection-end-line="1191" selection-end-column="25" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PlayCards.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/GameStages/PlayCards.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="120">
+              <caret line="45" column="0" lean-forward="false" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PlayRule.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/PlayRule.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="71">
+              <caret line="30" column="0" lean-forward="true" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#43#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -158,6 +171,12 @@
       <find>start_timer_to_tell_server_my_action</find>
       <find>get_next_call_action_group</find>
       <find>tell_player_to_select_call_actions</find>
+      <find>test_and_update_current_stage</find>
+      <find>isinstance</find>
+      <find>get_play_card_command_options</find>
+      <find>__remained_cards</find>
+      <find>add_dealed_cards</find>
+      <find>__current_act_group</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -184,27 +203,32 @@
         <option value="$PROJECT_DIR$/GameStages/GameStage_Call_Banker.py" />
         <option value="$PROJECT_DIR$/GameStages/CalScores.py" />
         <option value="$PROJECT_DIR$/GameStages/PublishScores.py" />
-        <option value="$PROJECT_DIR$/GameStages/TellWinner.py" />
         <option value="$PROJECT_DIR$/GameStages/GroupPlayers.py" />
-        <option value="$PROJECT_DIR$/TestClient.py" />
-        <option value="$PROJECT_DIR$/GameStages/DealCards.py" />
-        <option value="$PROJECT_DIR$/PlayerClient.py" />
-        <option value="$PROJECT_DIR$/PlayRule.py" />
         <option value="$PROJECT_DIR$/ActionGroup.py" />
         <option value="$PROJECT_DIR$/CallAction.py" />
         <option value="$PROJECT_DIR$/Actions/ActionGroup.ipynb" />
+        <option value="$PROJECT_DIR$/PlayRound.py" />
+        <option value="$PROJECT_DIR$/TestClient.py" />
+        <option value="$PROJECT_DIR$/Actions/PassPlay.py" />
+        <option value="$PROJECT_DIR$/Actions/PassCall.py" />
+        <option value="$PROJECT_DIR$/Actions/CallBank.py" />
+        <option value="$PROJECT_DIR$/Actions/ActionGroup.py" />
         <option value="$PROJECT_DIR$/PlayManager.py" />
+        <option value="$PROJECT_DIR$/GameStages/DealCards.py" />
         <option value="$PROJECT_DIR$/GameStages/CallBanker.py" />
         <option value="$PROJECT_DIR$/GameStages/GameStage.py" />
-        <option value="$PROJECT_DIR$/PlayRound.py" />
+        <option value="$PROJECT_DIR$/PlayerClient.py" />
+        <option value="$PROJECT_DIR$/GameStages/TeamPlayers.py" />
         <option value="$PROJECT_DIR$/Actions/ActionBase.py" />
-        <option value="$PROJECT_DIR$/Actions/ActionGroup.py" />
+        <option value="$PROJECT_DIR$/Actions/PlayCard.py" />
         <option value="$PROJECT_DIR$/Judger.py" />
+        <option value="$PROJECT_DIR$/PlayRule.py" />
         <option value="$PROJECT_DIR$/GameStages/PlayCards.py" />
+        <option value="$PROJECT_DIR$/GameStages/TellWinner.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-8" />
     <option name="y" value="-8" />
     <option name="width" value="1936" />
@@ -244,6 +268,22 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope">
+        <subPane subId="Project Files">
+          <expand>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="TestSocket" type="cbb8eebc:String" user="TestSocket" />
+            </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="TestSocket" type="cbb8eebc:String" user="TestSocket" />
+              <item name="GameStages" type="cbb8eebc:String" user="GameStages" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -265,7 +305,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
       <pane id="Scratches" />
     </panes>
   </component>
@@ -297,7 +336,7 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Python35\python.exe" />
+      <option name="SDK_HOME" value="C:\Python3.5\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -314,7 +353,7 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Python35\python.exe" />
+      <option name="SDK_HOME" value="C:\Python3.5\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -348,7 +387,7 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Python35\python.exe" />
+      <option name="SDK_HOME" value="C:\Python3.5\python.exe" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -363,7 +402,7 @@
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs />
-      <option name="SDK_HOME" value="C:\Python35\python.exe" />
+      <option name="SDK_HOME" value="C:\Python3.5\python.exe" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -508,21 +547,29 @@
     </task>
     <servers />
   </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="0" />
-    <editor active="true" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.125" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22768533" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.47791797" sideWeight="0.4509517" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25291005" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3308668" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.31314623" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31314623" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295082" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30327868" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24962178" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295082" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40697673" sideWeight="0.5490483" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3229508" sideWeight="0.5490483" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18229954" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -546,65 +593,100 @@
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/CallAction.py</url>
           <line>51</line>
           <option name="timeStamp" value="26" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
+        <line-breakpoint type="python-line">
           <url>file://$PROJECT_DIR$/PlayManager.py</url>
-          <line>240</line>
+          <line>238</line>
           <option name="timeStamp" value="30" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
+        <line-breakpoint type="python-line">
           <url>file://$PROJECT_DIR$/PlayRound.py</url>
           <line>83</line>
           <option name="timeStamp" value="31" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/PlayManager.py</url>
-          <line>298</line>
+          <line>297</line>
           <option name="timeStamp" value="37" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/PlayManager.py</url>
-          <line>296</line>
+          <line>294</line>
           <option name="timeStamp" value="43" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/GameStages/CallBanker.py</url>
-          <line>93</line>
+          <line>98</line>
           <option name="timeStamp" value="48" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/GameStages/CallBanker.py</url>
-          <line>96</line>
+          <line>101</line>
           <option name="timeStamp" value="49" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/GameStages/CallBanker.py</url>
-          <line>109</line>
+          <line>114</line>
           <option name="timeStamp" value="50" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
+        <line-breakpoint type="python-line">
           <url>file://$PROJECT_DIR$/PlayManager.py</url>
-          <line>219</line>
+          <line>218</line>
           <option name="timeStamp" value="54" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/GameStages/PlayCards.py</url>
-          <line>23</line>
-          <option name="timeStamp" value="55" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
+        <line-breakpoint type="python-line">
           <url>file://$PROJECT_DIR$/GameStages/CallBanker.py</url>
-          <line>19</line>
-          <option name="timeStamp" value="56" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/GameStages/CallBanker.py</url>
-          <line>105</line>
+          <line>110</line>
           <option name="timeStamp" value="59" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Judger.py</url>
+          <line>10</line>
+          <option name="timeStamp" value="60" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/PlayRound.py</url>
+          <line>147</line>
+          <option name="timeStamp" value="62" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/GameStages/TeamPlayers.py</url>
+          <line>21</line>
+          <option name="timeStamp" value="63" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/GameStages/DealCards.py</url>
+          <line>46</line>
+          <option name="timeStamp" value="65" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/GameStages/TeamPlayers.py</url>
+          <line>14</line>
+          <option name="timeStamp" value="71" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/GameStages/CallBanker.py</url>
+          <line>132</line>
+          <option name="timeStamp" value="73" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/PlayRound.py</url>
+          <line>118</line>
+          <option name="timeStamp" value="75" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/PlayRound.py</url>
+          <line>143</line>
+          <option name="timeStamp" value="82" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/GameStages/TellWinner.py</url>
+          <line>12</line>
+          <option name="timeStamp" value="88" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -617,7 +699,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="60" />
+      <option name="time" value="90" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
@@ -628,21 +710,6 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/TestClient.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
-          <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="29070">
@@ -714,18 +781,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/Python3.5/Lib/socketserver.py" />
     <entry file="file://$PROJECT_DIR$/RecvSocketThread.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="136">
           <caret line="8" column="12" lean-forward="false" selection-start-line="8" selection-start-column="12" selection-end-line="8" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
         </state>
       </provider>
     </entry>
@@ -763,8 +822,8 @@
     <entry file="file://C:/Python3.5/Lib/codecs.py" />
     <entry file="file://$PROJECT_DIR$/GameStages/PublishScores.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="95">
-          <caret line="5" column="49" lean-forward="false" selection-start-line="5" selection-start-column="8" selection-end-line="5" selection-end-column="49" />
+        <state relative-caret-position="285">
+          <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
         </state>
       </provider>
     </entry>
@@ -775,28 +834,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/GameStages/TellWinner.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="209">
-          <caret line="11" column="12" lean-forward="false" selection-start-line="11" selection-start-column="12" selection-end-line="11" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SocketClient.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="969">
-          <caret line="53" column="31" lean-forward="false" selection-start-line="53" selection-start-column="31" selection-end-line="53" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/GameStages/GroupPlayers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="23" lean-forward="false" selection-start-line="9" selection-start-column="23" selection-end-line="9" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://C:/Python3.5/Lib/threading.py" />
     <entry file="file://$PROJECT_DIR$/GameStages/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -804,175 +841,230 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PlayerClient.py">
+    <entry file="file://C:/Python35/Lib/socketserver.py" />
+    <entry file="file://$PROJECT_DIR$/Actions/ActionGroup.ipynb" />
+    <entry file="file://$PROJECT_DIR$/ActionGroup.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="100" column="0" lean-forward="false" selection-start-line="100" selection-start-column="0" selection-end-line="100" selection-end-column="0" />
+        <state relative-caret-position="204">
+          <caret line="12" column="0" lean-forward="false" selection-start-line="12" selection-start-column="0" selection-end-line="18" selection-end-column="19" />
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/Python35/Lib/socketserver.py">
+    <entry file="file://C:/Python3.5/Lib/socketserver.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="11543">
-          <caret line="682" column="12" lean-forward="false" selection-start-line="682" selection-start-column="12" selection-end-line="682" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PlayRule.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1547">
-          <caret line="91" column="0" lean-forward="false" selection-start-line="91" selection-start-column="0" selection-end-line="91" selection-end-column="0" />
+        <state relative-caret-position="127">
+          <caret line="683" column="0" lean-forward="false" selection-start-line="683" selection-start-column="0" selection-end-line="683" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/MyServer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
+        <state relative-caret-position="181">
           <caret line="18" column="0" lean-forward="false" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
           <folding>
-            <element signature="e#0#19#0" expanded="true" />
+            <element signature="e#0#19#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/TestClient.py">
+    <entry file="file://$PROJECT_DIR$/GameStages/GroupPlayers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="13" column="0" lean-forward="false" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="28" />
-          <folding />
+        <state relative-caret-position="323">
+          <caret line="17" column="12" lean-forward="false" selection-start-line="17" selection-start-column="12" selection-end-line="17" selection-end-column="12" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Actions/PassCall.py">
+    <entry file="file://C:/Python3.5/Lib/selectors.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="670">
+          <caret line="313" column="23" lean-forward="false" selection-start-line="313" selection-start-column="23" selection-end-line="313" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CallAction.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="589">
+          <caret line="31" column="31" lean-forward="false" selection-start-line="31" selection-start-column="31" selection-end-line="31" selection-end-column="31" />
+          <folding>
+            <marker date="1503416640514" expanded="true" signature="100:325" ph="..." />
+            <marker date="1503416640514" expanded="true" signature="2429:2430" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SocketClient.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="627">
+          <caret line="53" column="31" lean-forward="false" selection-start-line="53" selection-start-column="31" selection-end-line="53" selection-end-column="31" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Actions/PassPlay.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="171">
+          <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Actions/PlayCard.py">
+    <entry file="file://$PROJECT_DIR$/Actions/PassCall.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="190">
+          <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Actions/ActionGroup.ipynb">
-      <provider selected="true" editor-type-id="ipnb-editor">
-        <state>
-          <selected id="0" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Actions/CallBank.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="228">
+          <caret line="12" column="0" lean-forward="true" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ActionGroup.py">
+    <entry file="file://$PROJECT_DIR$/Utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="12" column="0" lean-forward="false" selection-start-line="12" selection-start-column="0" selection-end-line="18" selection-end-column="19" />
+        <state relative-caret-position="38">
+          <caret line="2" column="21" lean-forward="false" selection-start-line="2" selection-start-column="4" selection-end-line="2" selection-end-column="21" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/GameStages/DealCards.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="20" column="0" lean-forward="false" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
+        <state relative-caret-position="348">
+          <caret line="46" column="0" lean-forward="false" selection-start-line="46" selection-start-column="0" selection-end-line="46" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GameStages/TeamPlayers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="296">
+          <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GameStages/CallBanker.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="386">
+          <caret line="132" column="0" lean-forward="false" selection-start-line="132" selection-start-column="0" selection-end-line="132" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Actions/ActionBase.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="405">
+          <caret line="54" column="0" lean-forward="false" selection-start-line="54" selection-start-column="0" selection-end-line="55" selection-end-column="69" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Actions/PlayCard.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="228">
+          <caret line="21" column="32" lean-forward="false" selection-start-line="21" selection-start-column="8" selection-end-line="21" selection-end-column="32" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/PlayManager.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="350">
-          <caret line="282" column="29" lean-forward="false" selection-start-line="282" selection-start-column="29" selection-end-line="282" selection-end-column="29" />
+        <state relative-caret-position="1585">
+          <caret line="218" column="0" lean-forward="false" selection-start-line="218" selection-start-column="0" selection-end-line="218" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PlayerClient.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="154">
+          <caret line="117" column="27" lean-forward="false" selection-start-line="117" selection-start-column="8" selection-end-line="117" selection-end-column="27" />
+          <folding>
+            <element signature="e#14#25#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Actions/ActionGroup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="209">
+          <caret line="26" column="26" lean-forward="false" selection-start-line="26" selection-start-column="8" selection-end-line="26" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TestClient.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="237">
+          <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="31" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/GameStages/GameStage.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="22" column="24" lean-forward="false" selection-start-line="22" selection-start-column="8" selection-end-line="22" selection-end-column="24" />
+        <state relative-caret-position="212">
+          <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CallAction.py">
+    <entry file="file://$PROJECT_DIR$/PlayRule.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1190">
-          <caret line="70" column="0" lean-forward="true" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PlayRound.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="762">
-          <caret line="145" column="49" lean-forward="true" selection-start-line="145" selection-start-column="49" selection-end-line="145" selection-end-column="49" />
+        <state relative-caret-position="71">
+          <caret line="30" column="0" lean-forward="true" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
           <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Actions/ActionBase.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="646">
-          <caret line="38" column="22" lean-forward="false" selection-start-line="38" selection-start-column="8" selection-end-line="38" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Actions/ActionGroup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="612">
-          <caret line="36" column="22" lean-forward="false" selection-start-line="36" selection-start-column="8" selection-end-line="36" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Judger.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="592">
-          <caret line="41" column="59" lean-forward="true" selection-start-line="41" selection-start-column="59" selection-end-line="41" selection-end-column="59" />
-          <folding>
-            <element signature="e#0#27#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/GameStages/CallBanker.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="600">
-          <caret line="84" column="0" lean-forward="false" selection-start-line="84" selection-start-column="0" selection-end-line="90" selection-end-column="51" />
-          <folding>
-            <element signature="e#0#42#0" expanded="true" />
+            <element signature="e#0#43#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/GameStages/PlayCards.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="527">
-          <caret line="33" column="0" lean-forward="true" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
+        <state relative-caret-position="120">
+          <caret line="45" column="0" lean-forward="false" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PlayRound.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="246">
+          <caret line="147" column="0" lean-forward="false" selection-start-line="147" selection-start-column="0" selection-end-line="147" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Judger.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="52" column="0" lean-forward="false" selection-start-line="52" selection-start-column="0" selection-end-line="52" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#27#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python3.5/Lib/threading.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="293">
+          <caret line="1191" column="25" lean-forward="true" selection-start-line="1191" selection-start-column="25" selection-end-line="1191" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GameStages/TellWinner.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="19" column="38" lean-forward="true" selection-start-line="19" selection-start-column="38" selection-end-line="19" selection-end-column="38" />
           <folding />
         </state>
       </provider>

@@ -6,7 +6,8 @@ class ActionBase:
         self.__act_text = text
         self.__act_id = act_id
         self.__follow_up_action_group = None
-        self.__is_call_banker = False
+        self.__my_player = None
+        self.__my_game_round = None
 
     def get_act_text(self):
         return self.__act_text
@@ -14,11 +15,14 @@ class ActionBase:
     def get_act_id(self):
         return self.__act_id
 
+    def get_my_player(self):
+        return self.__my_player
+
+    def get_my_round(self):
+        return self.__my_game_round
+
     def get_follow_up_action_group(self):
         return self.__follow_up_action_group
-
-    def get_is_call_banker(self):
-        return self.__is_call_banker
 
     def find_follow_action_from_id(self, action_id):
         if self.get_act_id() == action_id:
@@ -34,6 +38,10 @@ class ActionBase:
     def set_act_text(self, text):
         self.__act_text = text
 
+    def set_execute_context(self, player, game_round):
+        self.__my_game_round = game_round
+        self.__my_player = player
+
     def add_follow_up_action(self, action, as_default_action=False):
         if not self.__follow_up_action_group:
             self.__follow_up_action_group = ActionGroup()
@@ -43,3 +51,10 @@ class ActionBase:
 
     def to_json_object(self):
         return {"act-id":self.__act_id, "act-text":self.__act_text};
+
+    def to_broadcast_json_object(self):
+        return {"act-id": self.__act_id, "act-text": self.__act_text}
+
+    def execute(self):
+        pass
+

@@ -1,4 +1,6 @@
-from ActionGroup import ActionGroup
+from Actions.ActionGroup import ActionGroup
+from Actions.PassPlay import PassPlay
+from Actions.PlayCard import PlayCard
 
 
 class PlayRule:
@@ -28,22 +30,50 @@ class PlayRule:
             return None
 
     @staticmethod
-    def get_is_round_end(self, game_round):
+    def get_is_round_end(game_round):
         players = game_round.get_players()
         for p in players:
-            if len(p.get_remained_cards() < 1):
+            if len(p.get_remained_cards()) < 1:
                 return True
 
         return False
 
-    def get_player_default_cards(self, player):
+    @staticmethod
+    def get_player_default_cards(player):
         rem_cards = player.get_remained_cards()
         if rem_cards and len(rem_cards):
             c = rem_cards[0]
-            rem_cards.remove(c)
             return c
         else:
             return None
+
+    @staticmethod
+    def get_winners_for_round(game_round):
+        winners = []
+        players = game_round.get_players()
+        banker = game_round.get_bank_player()
+        if len(banker.get_remained_cards()) < 1:
+            winners.append(banker)
+        else:
+            for p in players:
+                if p is not banker:
+                    winners.append(p)
+
+        return winners
+
+    @staticmethod
+    def get_losers_for_round(game_round):
+        losers = []
+        players = game_round.get_players()
+        banker = game_round.get_bank_player()
+        if len(banker.get_remained_cards()) > 0:
+            losers.append(banker)
+        else:
+            for p in players:
+                if p is not banker:
+                    losers.append(p)
+
+        return losers
 
     def get_game_stages(self):
         return self.__game_stages
@@ -63,7 +93,31 @@ class PlayRule:
     def get_play_card_command_options(self, player):
         return ["play", "not-play"]
 
-    def order_play_card_players(self, play_round):
+    @staticmethod
+    def get_play_cards_commands_for_player(player, game_round):
+        if not player or not game_round:
+            return None
+        dealer = game_round.get_judger()
+        if not dealer:
+            return None
+        act_group = ActionGroup()
+        pre_player, pre_cards = dealer.get_previous_played_cards()
+        if not pre_player or pre_player is player:
+            play_card = PlayCard("Play cards", "1")
+            play_card.set_execute_context(player, game_round)
+            play_card.set_cards(PlayRule.get_player_default_cards(player))
+            act_group.add_action(play_card, True)
+        else:
+            play_card = PlayCard("Play cards", "1")
+            play_card.set_execute_context(player, game_round)
+            act_group.add_action(play_card)
+            pass_play = PassPlay("Not Play", "2")
+            pass_play.set_execute_context(player, game_round)
+            act_group.add_action(pass_play, True)
+        return act_group
+
+    @staticmethod
+    def order_play_card_players(play_round):
         players = play_round.get_players()
         banker = play_round.get_bank_player()
         if banker:

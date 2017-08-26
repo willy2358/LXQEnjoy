@@ -15,6 +15,7 @@ class TeamPlayers(GameStage):
         bank_player = self.get_my_round().get_bank_player()
         if bank_player:
             cards = self.get_my_round().get_cards_for_banker()
+            bank_player.set_bank_cards(cards)
             cmd_obj = {"cmd": TeamPlayers.COMMAND_BANK_CARDS, "cards": cards}
             bank_player.send_server_command(cmd_obj)
             self.__players_teamed = True

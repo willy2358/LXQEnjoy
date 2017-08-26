@@ -5,6 +5,8 @@ import PlayManager
 
 from threading import Timer
 
+import Utils
+
 
 class PlayerClient:
     def __init__(self, conn):
@@ -90,6 +92,9 @@ class PlayerClient:
         cmd_pack = PlayManager.create_command_packet(PlayManager.SERVER_CMD_CALL_ACTIONS, cmd)
         self.send_command_message(cmd_pack)
 
+    def set_bank_cards(self, cards):
+        self.add_dealed_cards(cards)
+
     def set_cards_sorted(self):
         self.__cards_arranged = True
 
@@ -135,12 +140,20 @@ class PlayerClient:
         self.get_game_round().make_next_player_select_action(action_id)
 
     def add_dealed_cards(self, cards):
-        self.__dealed_cards = self.__dealed_cards + cards
-"""
-join_game#{"rule_id":"1212"}
-{"req":"join-game", "rule_id":"1212"}
- 
-cards_sorted
-select_call#{"action_id":"1"}
-"""
+        if isinstance(cards, list):
+            self.__dealed_cards += cards
+        elif isinstance(cards, str):
+            self.__dealed_cards.append(cards)
+
+        self.__remained_cards = self.__dealed_cards[:]
+
+    def play_out_cards(self, cards):
+        if isinstance(cards, str):
+            self.__remained_cards.remove(cards)
+        elif isinstance(cards, list):
+            Utils.list_remove_parts(self.__remained_cards, cards)
+        else:
+            pass
+
+
 
