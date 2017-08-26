@@ -131,19 +131,19 @@ def add_player_client(conn):
 def begin_player_inter_actions(players):
     pass
 
-
-def record_player_cards_sorted(conn):
-    client = get_player_client_from_conn(conn)
-    client.set_cards_arranged()
-    partners = client.get_play_partners()
-    all_arranged = True
-    for p in partners:
-        if not p.is_cards_sorted():
-            all_arranged = False
-            break
-    if all_arranged:
-        all_players = [client] + partners
-        begin_player_inter_actions(all_players)
+#
+# def record_player_cards_sorted(conn):
+#     client = get_player_client_from_conn(conn)
+#     client.set_cards_arranged()
+#     partners = client.get_play_partners()
+#     all_arranged = True
+#     for p in partners:
+#         if not p.is_cards_sorted():
+#             all_arranged = False
+#             break
+#     if all_arranged:
+#         all_players = [client] + partners
+#         begin_player_inter_actions(all_players)
 
 
 def dispatch_player_commands(conn, comm_text):
@@ -159,31 +159,14 @@ def dispatch_player_commands(conn, comm_text):
             process_player_play_cards(conn, j_obj)
         if j_obj["req"] == CLIENT_REQ_SELECT_ACTION.lower():
             process_player_select_action(conn, j_obj)
-
-
-
     except Exception as ex:
         print(ex)
-
-    # parts = comm_text.split('#')
-    # if len(parts) == 2:
-    #     if parts[0].lower() == CLIENT_CMD_BEGIN_PLAY.lower() :
-    #         process_command_join_game(conn, parts[1])
-    #     if parts[0].lower() == CLIENT_CMD_PLAY_CARD.lower() :
-    #         process_command_play_card(conn, parts[1])
-    #     if parts[0].lower() == CLIENT_CMD_SELECT_ACTION.lower():
-    #         process_player_select_call_action(conn, parts[1])
-    # elif len(parts) == 1:
-    #     if parts[0].lower() == "play_leave":
-    #         process_command_play_leave(conn)
-    #     if parts[0].lower() == CLIENT_CMD_CARDS_SORTED.lower():
-    #         player = get_player_client_from_conn(conn)
-    #         player.process_cards_sorted()
 
 def update_round_stage(client_conn):
     player = get_player_client_from_conn(client_conn)
     round = player.get_game_round()
     round.test_and_update_current_stage()
+
 
 def get_player_client_from_conn(conn):
     for c in __Players:
@@ -222,19 +205,13 @@ def process_player_select_action(conn, j_obj):
     round = player.get_game_round()
     round.process_player_select_action(player, j_obj["act-id"])
 
-# command samples: join_game#"{\"rule_id\":\"1212\"}"
+
+# command samples: {"req":"join-game", "rule_id":"1212"}
 def process_req_join_game(conn, j_req):
     try:
-        # j_obj = json.loads(j_req)
-        # if isinstance(j_obj, type(" ")):
-        #     j_obj = json.loads(j_obj)
         rule_id = j_req["rule_id"]
         play_round = get_available_game_round(rule_id)
         play_round.add_player(get_player_client_from_conn(conn))
-        # if rule_id not in __Waiting_Players:
-        #     __Waiting_Players[rule_id] = []
-        # __Waiting_Players[rule_id].append(get_player_client_from_conn(conn))
-        # update_players_waiting_state()
         update_round_stage(conn)
     except Exception as ex:
         print(ex)
@@ -248,69 +225,61 @@ def process_req_player_call(client_conn, j_obj):
     player = get_player_client_from_conn(client_conn)
     round = player.get_game_round()
     round.execute_player_call(player, j_obj)
-
-def process_player_select_call_action(client_conn, command_text):
-    try:
-        client = get_player_client_from_conn(client_conn)
-        j_obj = json.loads(command_text)
-        if isinstance(j_obj, type(" ")):
-            j_obj = json.loads(j_obj)
-        action_id = j_obj["action_id"]
-        client.update_my_call_action(action_id)
-    except Exception as ex:
-        print(ex)
-
-
-def update_players_waiting_state():
-    for item in __Waiting_Players:
-        play_rule = __PlayRules[item]
-        rule_id = play_rule.get_rule_id()
-        min_player_num = play_rule.get_player_min_number()
-        if len(__Waiting_Players[item]) >= min_player_num:
-            players = get_players_of_waiting_rule_id(rule_id, min_player_num)
-            for p in players:
-                p.set_playing_rule_id(rule_id)
-                p.set_player_partners(players)
-            remove_waiting_players(rule_id, players)
-            begin_new_deal(rule_id, players)
+#
+# def process_player_select_call_action(client_conn, command_text):
+#     try:
+#         client = get_player_client_from_conn(client_conn)
+#         j_obj = json.loads(command_text)
+#         if isinstance(j_obj, type(" ")):
+#             j_obj = json.loads(j_obj)
+#         action_id = j_obj["action_id"]
+#         client.update_my_call_action(action_id)
+#     except Exception as ex:
+#         print(ex)
 
 
-def remove_waiting_players(rule_id, players):
-    for p in players:
-        __Waiting_Players[rule_id].remove(p)
+# def update_players_waiting_state():
+#     for item in __Waiting_Players:
+#         play_rule = __PlayRules[item]
+#         rule_id = play_rule.get_rule_id()
+#         min_player_num = play_rule.get_player_min_number()
+#         if len(__Waiting_Players[item]) >= min_player_num:
+#             players = get_players_of_waiting_rule_id(rule_id, min_player_num)
+#             for p in players:
+#                 p.set_playing_rule_id(rule_id)
+#                 p.set_player_partners(players)
+#             remove_waiting_players(rule_id, players)
+#             begin_new_deal(rule_id, players)
 
 
-def begin_new_deal(rule_id, players):
-    rule = __PlayRules[rule_id]
-    cards = rule.get_cards()
-    cards_b = cards[:]
-    remain_cards = random.sample(cards_b, rule.get_cards_number_not_deal())
-    Utils.list_remove_parts(cards_b, remain_cards)
-    player_num = len(players)
-    for p in players:
-        p.begin_new_deal()
-
-    while len(cards_b) > 0:
-        cards_one_deal = random.sample(cards_b, player_num)
-        for j in range(player_num):
-            players[j].deal_one_card(cards_one_deal[j])
-        Utils.list_remove_parts(cards_b, cards_one_deal)
-
-    for p in players:
-        p.finish_new_deal()
+# def remove_waiting_players(rule_id, players):
+#     for p in players:
+#         __Waiting_Players[rule_id].remove(p)
 
 
-def get_players_of_waiting_rule_id(rule_id, num):
-    players = []
-    for i in range(0,num):
-        players.append(__Waiting_Players[rule_id][i])
+# def begin_new_deal(rule_id, players):
+#     rule = __PlayRules[rule_id]
+#     cards = rule.get_cards()
+#     cards_b = cards[:]
+#     remain_cards = random.sample(cards_b, rule.get_cards_number_not_deal())
+#     Utils.list_remove_parts(cards_b, remain_cards)
+#     player_num = len(players)
+#     for p in players:
+#         p.begin_new_deal()
+#
+#     while len(cards_b) > 0:
+#         cards_one_deal = random.sample(cards_b, player_num)
+#         for j in range(player_num):
+#             players[j].deal_one_card(cards_one_deal[j])
+#         Utils.list_remove_parts(cards_b, cards_one_deal)
+#
+#     for p in players:
+#         p.finish_new_deal()
 
-    return players
 
-
-def process_command_play_card(conn, command_text):
-    pass
-
-
-def process_command_play_leave(conn):
-    pass
+# def get_players_of_waiting_rule_id(rule_id, num):
+#     players = []
+#     for i in range(0,num):
+#         players.append(__Waiting_Players[rule_id][i])
+#
+#     return players
