@@ -36,7 +36,7 @@ class PlayCards(GameStage):
             player = self.get_next_player()
             act_group = rule.get_play_cards_commands_for_player(player, self.get_my_round())
             act_group.set_select_timeout(2)
-            dealer = self.get_round_judger()
+            dealer = self.get_round_dealer()
             if dealer and act_group:
                 self.set_action_group(act_group)
                 self.__cur_player = player

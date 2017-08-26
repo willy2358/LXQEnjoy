@@ -42,7 +42,7 @@ class CallBanker(GameStage):
             player = self.get_next_call_player()
             players = self.get_notify_players()
             self.__current_player = player
-            dealer = self.get_round_judger()
+            dealer = self.get_round_dealer()
             if dealer:
                 for act in call_acts_group.get_actions():
                     act.set_execute_context(player, play_round)

@@ -2,10 +2,10 @@ import random
 
 import Utils
 from GameStages import PlayCards
-from Judger import Judger
+from Dealer import Dealer
 
 
-class PlayRound:
+class GameRound:
     def __init__(self, play_rule):
         self.__play_rule = play_rule
         self.__players = []
@@ -16,7 +16,7 @@ class PlayRound:
         self.__bank_player = None
         self.__cards_for_banker = None
         self.__player_idx_of_play_card = -1
-        self.__my_judger = Judger(self)
+        self.__my_judger = Dealer(self)
         self.__cur_action = None
         for s in self.__play_rule.get_game_stages():
             s.set_my_round(self)

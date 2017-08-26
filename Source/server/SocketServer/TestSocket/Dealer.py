@@ -1,9 +1,9 @@
 from threading import Timer
 
-import PlayRound
+import GameRound
 
 
-class Judger:
+class Dealer:
     COMMAND_OPTIONS = "cmd-opts"
     CLIENT_RESP_SELECT_ACTION = "player-act"
 
@@ -36,7 +36,7 @@ class Judger:
             self.__sent_action_group = act_group
             self.__default_player_action = act_group.get_default_action()
             self.start_timer_to_wait_player_response(act_group.get_select_timeout())
-            cmd_obj = {"cmd": Judger.COMMAND_OPTIONS,
+            cmd_obj = {"cmd": Dealer.COMMAND_OPTIONS,
                        "opts": act_group.to_json_object()}
             player.send_server_command(cmd_obj)
 
@@ -60,7 +60,7 @@ class Judger:
     def process_player_select_action(self, player, action):
         self.reset_timer()
         if self.__select_action_publish_players:
-            resp = {"resp": Judger.CLIENT_RESP_SELECT_ACTION,
+            resp = {"resp": Dealer.CLIENT_RESP_SELECT_ACTION,
                     "sel-act": action.to_broadcast_json_object()}
             for p in self.__select_action_publish_players:
                 p.send_server_command(resp)

@@ -1,7 +1,7 @@
 import json
 import random
 
-import PlayRule
+import GameRule
 import PlayerClient
 import Utils
 from Actions.CallBank import CallBank
@@ -14,7 +14,7 @@ from GameStages.PlayCards import PlayCards
 from GameStages.PublishScores import PublishScores
 from GameStages.TeamPlayers import TeamPlayers
 from GameStages.TellWinner import TellWinner
-from PlayRound import PlayRound
+from GameRound import GameRound
 
 __Players = []
 __Waiting_Players = {}
@@ -44,7 +44,7 @@ CLIENT_REQ_SELECT_ACTION = "sel-act"
 
 def init_play_rules():
     rule_id = "1212"
-    rule = PlayRule.PlayRule(rule_id)
+    rule = GameRule.GameRule(rule_id)
     rule.set_player_min_number(3)
     rule.set_player_max_number(3)
     rule.set_cards_number_not_deal(3)
@@ -206,7 +206,7 @@ def get_available_game_round(rule_id):
             continue
         if r.can_new_player_in():
             return r
-    r = PlayRound(get_rule_by_id(rule_id))
+    r = GameRound(get_rule_by_id(rule_id))
     __game_rounds.append(r)
     return r
 
