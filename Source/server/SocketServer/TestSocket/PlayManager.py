@@ -5,8 +5,17 @@ import PlayRule
 import PlayerClient
 import Utils
 from ActionGroup import ActionGroup
+from Actions.CallBank import CallBank
+from Actions.PassCall import PassCall
 from CallAction import CallAction
-from GameStage import GameStage
+from GameStages.CalScores import CalScores
+from GameStages.CallBanker import CallBanker
+from GameStages.DealCards import DealCards
+from GameStages.GroupPlayers import GroupPlayers
+from GameStages.PlayCards import PlayCards
+from GameStages.PublishScores import PublishScores
+from GameStages.TeamPlayers import TeamPlayers
+from GameStages.TellWinner import TellWinner
 from PlayRound import PlayRound
 
 __Players = []
@@ -20,11 +29,15 @@ SERVER_CMD_DEAL_BEGIN = "deal_begin"  # 开始发牌
 SERVER_CMD_DEAL_FINISH = "deal_finish"   # 结束发牌
 SERVER_CMD_DEAL_CARD = "deal_card"   # 发牌
 SERVER_CMD_CALL_ACTIONS = "call_actions"  # 叫牌
+SERVER_INFO = "info"
 
 CLIENT_CMD_CARDS_SORTED = "cards_sorted"  # 理牌完成
-CLIENT_CMD_BEGIN_PLAY = "join_game" # 开始游戏
+CLIENT_REQ_JOIN_GAME = "join-game" # 开始游戏
+CLIENT_REQ_PLAYER_RESP = "player-resp"
+CLIENT_REQ_PLAYER_CALL = "call"
 CLIENT_CMD_PLAY_CARD = "play_card"
-CLIENT_CMD_SELECT_ACTION = "select_call"
+#CLIENT_CMD_SELECT_ACTION = "select_call"
+CLIENT_REQ_SELECT_ACTION = "sel-act"
 
 
 # command:开始发牌: deal_begin
@@ -53,70 +66,114 @@ def init_play_rules():
              "poker_joker_moon", "poker_joker_sun"]
     rule.set_cards(cards)
 
-    stages = ["server_group_players",
-              "server_deal_cards",
-              "client_sort_cards",
-              "server_ask_player_call",
-              "client_call",
-              "server_publish_banker"
-              "client_play_cards"
-              "server_publish_winner"
-              "server_update_players_score"
-              ]
+    # stages = ["server_group_players",
+    #           "server_deal_cards",
+    #           "client_sort_cards",
+    #           "server_ask_player_call",
+    #           "client_call",
+    #           "server_publish_banker"
+    #           "client_play_cards"
+    #           "server_publish_winner"
+    #           "server_update_players_score"
+    #           ]
 
-    a1 = CallAction("1", "Call")
-    a11 = a1.add_follow_up_action(CallAction("1_1", "Rob"))
-    a12 = a1.add_follow_up_action(CallAction("1_2", "Not Rob"))
-    a1.get_following_action_group().set_select_timeout(20)
-    a12.set_as_default()
+    # a1 = CallAction("1", "Call")
+    # a11 = a1.add_follow_up_action(CallAction("1_1", "Rob"))
+    # a11.set_is_bank_action()
+    # a12 = a1.add_follow_up_action(CallAction("1_2", "Not Rob"))
+    # a1.get_following_action_group().set_select_timeout(20)
+    # a12.set_as_default()
+    #
+    # a111 = a11.add_follow_up_action(CallAction("1_1_1", "Rob"))
+    # a111.set_is_bank_action()
+    # a112 = a11.add_follow_up_action(CallAction("1_1_2", "Not rob"))
+    # a11.get_following_action_group().set_select_timeout(20)
+    # a11.get_following_action_group().set_is_ending()
+    # a112.set_as_default()
+    #
+    # a121 = a12.add_follow_up_action(CallAction("1_2_1", "Rob"))
+    # a121.set_is_bank_action()
+    # a122 = a12.add_follow_up_action(CallAction("1_2_2", "Not rob"))
+    # a12.get_following_action_group().set_select_timeout(20)
+    # a12.get_following_action_group().set_is_ending()
+    # a122.set_as_default()
+    #
+    # a2 = CallAction("2", "Not Call")
+    # a2.set_as_default()
+    # a21 = a2.add_follow_up_action(CallAction("2_1", "Call"))
+    # a21.set_is_bank_action()
+    # a22 = a2.add_follow_up_action(CallAction("2_2","Not call"))
+    # a2.get_following_action_group().set_select_timeout(20)
+    # a22.set_as_default()
+    #
+    # a211 = a21.add_follow_up_action(CallAction("2_1_1", "Rob"))
+    # a211.set_is_bank_action()
+    # a212 = a21.add_follow_up_action(CallAction("2_1_2", "Not rob"))
+    # a21.get_following_action_group().set_select_timeout(20)
+    # a21.get_following_action_group().set_is_ending()
+    # a212.set_as_default()
+    #
+    # a221 = a22.add_follow_up_action(CallAction("2_2_1", "Call"))
+    # a221.set_is_bank_action()
+    # a222 = a22.add_follow_up_action(CallAction("2_2_2", "Not call"))
+    # a22.get_following_action_group().set_select_timeout(20)
+    # a22.get_following_action_group().set_is_ending()
+    # rule.add_call_action(a1)
+    # rule.add_call_action(a2)
+    # rule.set_action_call_timeout_seconds(20)
 
-    a111 = a11.add_follow_up_action(CallAction("1_1_1", "Rob"))
-    a112 = a11.add_follow_up_action(CallAction("1_1_2", "Not rob"))
-    a11.get_following_action_group().set_select_timeout(20)
-    a112.set_as_default()
-
-    a121 = a12.add_follow_up_action(CallAction("1_2_1", "Rob"))
-    a122 = a12.add_follow_up_action(CallAction("1_2_2", "Not rob"))
-    a12.get_following_action_group().set_select_timeout(20)
-    a122.set_as_default()
-
-    a2 = CallAction("2", "Not Call")
-    a2.set_as_default()
-    a21 = a2.add_follow_up_action(CallAction("2_1", "Call"))
-    a22 = a2.add_follow_up_action(CallAction("2_2","Not call"))
-    a2.get_following_action_group().set_select_timeout(20)
-    a22.set_as_default()
-
-    a211 = a21.add_follow_up_action(CallAction("2_1_1", "Rob"))
-    a212 = a21.add_follow_up_action(CallAction("2_1_2", "Not rob"))
-    a21.get_following_action_group().set_select_timeout(20)
-    a212.set_as_default()
-
-    a221 = a22.add_follow_up_action(CallAction("2_2_1", "Call"))
-    a222 = a22.add_follow_up_action(CallAction("2_2_2", "Not call"))
-    a22.get_following_action_group().set_select_timeout(20)
-    rule.add_call_action(a1)
-    rule.add_call_action(a2)
-    rule.set_action_call_timeout_seconds(20)
-
-    stage = GameStage("group-players")
-    stage.add_complete_condition(GameStage.CONDITION_PROPERTY_PLAYER_COUNT, rule.get_player_min_number())
-    stage.add_complete_condition(GameStage.CONDITION_PROPERTY_TIME_OUT, 20)
-
+    stage = GroupPlayers(rule)
     rule.add_game_stage(stage)
 
-    stage = GameStage("deal-cards")
-    stage.add_complete_condition(GameStage.CONDITION_CARDS_DEAL_RESPONSE, "count-rount-players")
+    stage = DealCards(rule)
     rule.add_game_stage(stage)
 
+    stage = CallBanker(rule)
+    rule.add_game_stage(stage)
+    set_call_banker_action_options(stage)
 
+    stage = TeamPlayers(rule)
+    rule.add_game_stage(stage)
 
+    stage = PlayCards(rule)
+    rule.add_game_stage(stage)
 
+    stage = TellWinner(rule)
+    rule.add_game_stage(stage)
 
+    stage = CalScores(rule)
+    rule.add_game_stage(stage)
+
+    stage = PublishScores(rule)
+    rule.add_game_stage(stage)
 
     # rule.set_stages(stages)
     __PlayRules[rule_id] = rule
 
+
+def set_call_banker_action_options(call_banker_stage):
+    call_bank = CallBank("Call", "1")
+
+    call_banker_stage.add_player_action(call_bank)
+
+    c11 = call_bank.add_follow_up_action(CallBank("Rob", "1-1"))
+    c111 = c11.add_follow_up_action(CallBank("Rob", "1-1-1"))
+    c112 = c11.add_follow_up_action(PassCall("Not Rob", "1-1-2"), True)
+
+    c12 = call_bank.add_follow_up_action(PassCall("Not Rob", "1-2"), True)
+    c121 = c12.add_follow_up_action(CallBank("Rob", "1-2-1"))
+    c122 = c12.add_follow_up_action(PassCall("Not Rob", "1-2-2"), True)
+
+    not_call = PassCall("Not Call", "2")
+    call_banker_stage.add_player_action(not_call, True)
+
+    c21 = not_call.add_follow_up_action(CallBank("Call", "2-1"))
+    c211 = c21.add_follow_up_action(CallBank("Rob", "2-1-1"))
+    c212 = c21.add_follow_up_action(PassCall("Not Rob", "2-1-2"), True)
+
+    c22 = not_call.add_follow_up_action(PassCall("Not Call", "2-2"), True)
+    c221 = c22.add_follow_up_action(CallBank("Call", "2-2-1"))
+    c222 = c22.add_follow_up_action(PassCall("Not Call", "2-2-2"), True)
 
 def create_command_packet(command, command_data):
     return command + "#" + command_data
@@ -148,21 +205,43 @@ def record_player_cards_sorted(conn):
 
 
 def dispatch_player_commands(conn, comm_text):
-    parts = comm_text.split('#')
-    if len(parts) == 2:
-        if parts[0].lower() == CLIENT_CMD_BEGIN_PLAY.lower() :
-            process_command_join_game(conn, parts[1])
-        if parts[0].lower() == CLIENT_CMD_PLAY_CARD.lower() :
-            process_command_play_card(conn, parts[1])
-        if parts[0].lower() == CLIENT_CMD_SELECT_ACTION.lower():
-            process_player_select_call_action(conn, parts[1])
-    elif len(parts) == 1:
-        if parts[0].lower() == "play_leave":
-            process_command_play_leave(conn)
-        if parts[0].lower() == CLIENT_CMD_CARDS_SORTED.lower():
-            player = get_player_client_from_conn(conn)
-            player.process_cards_sorted()
+    try:
+        j_obj = json.loads(comm_text)
+        if j_obj["req"] == CLIENT_REQ_JOIN_GAME.lower():
+            process_req_join_game(conn, j_obj)
+        if j_obj["req"] == CLIENT_REQ_PLAYER_RESP.lower():
+            process_player_resp(conn, j_obj)
+        if j_obj["req"] == CLIENT_REQ_PLAYER_CALL.lower():
+            process_req_player_call(conn, j_obj)
+        if j_obj["req"] == CLIENT_CMD_PLAY_CARD.lower():
+            process_player_play_cards(conn, j_obj)
+        if j_obj["req"] == CLIENT_REQ_SELECT_ACTION.lower():
+            process_player_select_action(conn, j_obj)
 
+
+
+    except Exception as ex:
+        print(ex)
+
+    # parts = comm_text.split('#')
+    # if len(parts) == 2:
+    #     if parts[0].lower() == CLIENT_CMD_BEGIN_PLAY.lower() :
+    #         process_command_join_game(conn, parts[1])
+    #     if parts[0].lower() == CLIENT_CMD_PLAY_CARD.lower() :
+    #         process_command_play_card(conn, parts[1])
+    #     if parts[0].lower() == CLIENT_CMD_SELECT_ACTION.lower():
+    #         process_player_select_call_action(conn, parts[1])
+    # elif len(parts) == 1:
+    #     if parts[0].lower() == "play_leave":
+    #         process_command_play_leave(conn)
+    #     if parts[0].lower() == CLIENT_CMD_CARDS_SORTED.lower():
+    #         player = get_player_client_from_conn(conn)
+    #         player.process_cards_sorted()
+
+def update_round_stage(client_conn):
+    player = get_player_client_from_conn(client_conn)
+    round = player.get_game_round()
+    round.test_and_update_current_stage()
 
 def get_player_client_from_conn(conn):
     for c in __Players:
@@ -190,24 +269,44 @@ def get_available_game_round(rule_id):
     return r
 
 
+def process_player_play_cards(conn, j_obj):
+    player = get_player_client_from_conn(conn)
+    round = player.get_game_round()
+    round.execute_player_played_cards(player, j_obj)
+
+
+def process_player_select_action(conn, j_obj):
+    player = get_player_client_from_conn(conn)
+    round = player.get_game_round()
+    round.process_player_select_action(player, j_obj["act-id"])
+
 # command samples: join_game#"{\"rule_id\":\"1212\"}"
-def process_command_join_game(conn, command_text):
+def process_req_join_game(conn, j_req):
     try:
-        j_obj = json.loads(command_text)
-        if isinstance(j_obj, type(" ")):
-            j_obj = json.loads(j_obj)
-        rule_id = j_obj["rule_id"]
+        # j_obj = json.loads(j_req)
+        # if isinstance(j_obj, type(" ")):
+        #     j_obj = json.loads(j_obj)
+        rule_id = j_req["rule_id"]
         play_round = get_available_game_round(rule_id)
         play_round.add_player(get_player_client_from_conn(conn))
         # if rule_id not in __Waiting_Players:
         #     __Waiting_Players[rule_id] = []
         # __Waiting_Players[rule_id].append(get_player_client_from_conn(conn))
         # update_players_waiting_state()
+        update_round_stage(conn)
     except Exception as ex:
         print(ex)
 
+def process_player_resp(client_conn, j_obj):
+    player = get_player_client_from_conn(client_conn)
+    player.add_recv_resp(j_obj["resp"])
 
-# command : select_call#"{\"action_id\":"1"}"
+
+def process_req_player_call(client_conn, j_obj):
+    player = get_player_client_from_conn(client_conn)
+    round = player.get_game_round()
+    round.execute_player_call(player, j_obj)
+
 def process_player_select_call_action(client_conn, command_text):
     try:
         client = get_player_client_from_conn(client_conn)
