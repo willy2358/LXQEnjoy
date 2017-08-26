@@ -60,15 +60,15 @@ class GameRound:
     def set_bank_player(self, player):
         self.__bank_player = player
 
-    def execute_player_call(self, player, call):
-        action = self.__play_rule.get_action_by_id(call["act-id"])
-        self.__cur_stage.publish_player_call_action(player, action)
+    # def execute_player_call(self, player, call):
+    #     action = self.__play_rule.get_action_by_id(call["act-id"])
+    #     self.__cur_stage.publish_player_call_action(player, action)
 
-    def execute_player_played_cards(self, player, cards):
-        if isinstance(self.__cur_stage, type(PlayCards)):
-            self.__cur_stage.publish_player_play_cards(player, cards["cards"])
-        else:
-            pass
+    # def execute_player_played_cards(self, player, cards):
+    #     if isinstance(self.__cur_stage, type(PlayCards)):
+    #         self.__cur_stage.publish_player_play_cards(player, cards["cards"])
+    #     else:
+    #         pass
 
     def set_cards_for_banker(self, cards):
         self.__cards_for_banker = cards
