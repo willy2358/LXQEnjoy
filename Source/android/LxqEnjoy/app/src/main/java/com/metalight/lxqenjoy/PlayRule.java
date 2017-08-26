@@ -81,10 +81,10 @@ public class PlayRule {
 
     public void LoadCards()
     {
-        _cards.add(new Card("poker_3_c", 1));
-        _cards.add(new Card("poker_3_d", 1));
-        _cards.add(new Card("poker_3_h", 1));
-        _cards.add(new Card("poker_3_s", 1));
+        _cards.add(new Card("poker_3_c", 1));   //梅花 club
+        _cards.add(new Card("poker_3_d", 1));   //方片:diamond
+        _cards.add(new Card("poker_3_h", 1));   //红桃:heart
+        _cards.add(new Card("poker_3_s", 1));   //黑桃:spade
 
         _cards.add(new Card("poker_4_c", 2));
         _cards.add(new Card("poker_4_d", 2));

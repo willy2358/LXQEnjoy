@@ -1,8 +1,7 @@
 import socketserver
 
-import Player
-
-waiting_players = {}
+import PlayManager
+import PlayerClient
 
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
@@ -10,18 +9,17 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
         conn = self.request
-        player = Player.Player(conn)
-        MyTCPHandler.__Players.append({conn, player})
-        print('client:' + str(len(MyTCPHandler.__Players)))
-        print(MyTCPHandler.__Players)
+        # player = Player.Player(conn)
+        # MyTCPHandler.__Players.append({conn, player})
 
-        print(self.client_address)
+        PlayManager.add_player_client(conn)
 
         flag = True
         while flag:
             data = conn.recv(1024)
-            self.dispatch_player_commands(conn, data);
             print('received:' + data.decode())
+            PlayManager.dispatch_player_commands(conn, data.decode());
+
             # print(conn)
             # print(MyTCPHandler.__Clients.index(conn))
             # if data == 'exit':
@@ -34,27 +32,11 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
             #     except Exception as x:
             #         print('Send exception:' + x.message)
 
-    def dispatch_player_commands(self, conn, comm_text):
-        parts = comm_text.split('#')
-        if len(parts) == 2:
-            if parts[0].lower() == "play_rule":
-                self.process_command_play_rule(conn, comm_text)
-            if parts[0].lower() == "play_card":
-                self.process_command_play_card(conn, comm_text)
-            if parts[0].lower() == "play_leave":
-                self.process_command_play_leave(conn)
-
-    def process_command_play_rule(self, command_text):
-        pass
-
-    def process_command_play_card(self, conn, command_text):
-        pass
-
-    def process_command_play_leave(self, conn):
-        pass
-
 
 if __name__ == "__main__":
+
+    PlayManager.init_play_rules()
+
     HOST, PORT = "127.0.0.1", 9229
 
     # Create the server, binding to localhost on port 9999
