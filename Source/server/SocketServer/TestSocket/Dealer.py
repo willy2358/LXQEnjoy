@@ -8,7 +8,6 @@ class Dealer:
     CLIENT_RESP_SELECT_ACTION = "player-act"
 
     def __init__(self, play_round):
-        # assert isinstance(play_round, type(PlayRound))
         self.__my_play_round = play_round
         self.__timer_wait_player = None
         self.__default_player_action = None
@@ -45,8 +44,6 @@ class Dealer:
         self.__timer_wait_player.start()
 
     def select_default_action(self):
-        # self.process_player_select_action(self.__player_accept_command, self.__default_player_action)
-        # self.__my_play_round.test_and_update_current_stage()
         player = self.__player_accept_command
         act = self.__default_player_action
         if act:
