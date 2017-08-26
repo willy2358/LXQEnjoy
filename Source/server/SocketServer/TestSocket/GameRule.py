@@ -97,7 +97,7 @@ class GameRule:
     def get_play_cards_commands_for_player(player, game_round):
         if not player or not game_round:
             return None
-        dealer = game_round.get_judger()
+        dealer = game_round.get_my_dealer()
         if not dealer:
             return None
         act_group = ActionGroup()
