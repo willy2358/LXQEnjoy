@@ -25,21 +25,10 @@ __game_rounds = []
 
 SERVER_CMD_DEAL_BEGIN = "deal_begin"  # 开始发牌
 SERVER_CMD_DEAL_FINISH = "deal_finish"   # 结束发牌
-SERVER_CMD_DEAL_CARD = "deal_card"   # 发牌
-SERVER_CMD_CALL_ACTIONS = "call_actions"  # 叫牌
-SERVER_INFO = "info"
 
 CLIENT_REQ_JOIN_GAME = "join-game" # 开始游戏
-# CLIENT_REQ_PLAYER_RESP = "player-resp"
-CLIENT_REQ_PLAYER_CALL = "call"
-CLIENT_CMD_PLAY_CARD = "play_card"
-#CLIENT_CMD_SELECT_ACTION = "select_call"
 CLIENT_REQ_SELECT_ACTION = "sel-act"
 
-
-# command:开始发牌: deal_begin
-# command:结束发牌: deal_finish
-# commands 发牌: deal#{"deal":card}. ex: deal#{"deal":"poker_1_h"}
 
 def init_play_rules():
     rule_id = "1212"
@@ -116,10 +105,6 @@ def set_call_banker_action_options(call_banker_stage):
     c221 = c22.add_follow_up_action(CallBank("Call", "2-2-1"))
     c222 = c22.add_follow_up_action(PassCall("Not Call", "2-2-2"), True)
 
-# def create_command_packet(command, command_data):
-#     return command + "#" + command_data
-
-
 def add_player_client(conn):
     player = PlayerClient.PlayerClient(conn)
     __Players.append(player)
@@ -132,16 +117,11 @@ def dispatch_player_commands(conn, comm_text):
         j_obj = json.loads(comm_text)
         if j_obj["req"] == CLIENT_REQ_JOIN_GAME.lower():
             process_req_join_game(conn, j_obj)
-        # if j_obj["req"] == CLIENT_REQ_PLAYER_RESP.lower():
-        #     process_player_resp(conn, j_obj)
-        # if j_obj["req"] == CLIENT_REQ_PLAYER_CALL.lower():
-        #     process_req_player_call(conn, j_obj)
-        # if j_obj["req"] == CLIENT_CMD_PLAY_CARD.lower():
-        #     process_player_play_cards(conn, j_obj)
         if j_obj["req"] == CLIENT_REQ_SELECT_ACTION.lower():
             process_player_select_action(conn, j_obj)
     except Exception as ex:
         print(ex)
+
 
 def update_round_stage(client_conn):
     player = get_player_client_from_conn(client_conn)
@@ -175,12 +155,6 @@ def get_available_game_round(rule_id):
     return r
 
 
-# def process_player_play_cards(conn, j_obj):
-#     player = get_player_client_from_conn(conn)
-#     round = player.get_game_round()
-#     round.execute_player_played_cards(player, j_obj)
-
-
 def process_player_select_action(conn, j_obj):
     player = get_player_client_from_conn(conn)
     round = player.get_game_round()
@@ -196,14 +170,4 @@ def process_req_join_game(conn, j_req):
         update_round_stage(conn)
     except Exception as ex:
         print(ex)
-
-# def process_player_resp(client_conn, j_obj):
-#     player = get_player_client_from_conn(client_conn)
-#     player.add_recv_resp(j_obj["resp"])
-
-
-# def process_req_player_call(client_conn, j_obj):
-#     player = get_player_client_from_conn(client_conn)
-#     round = player.get_game_round()
-#     round.execute_player_call(player, j_obj)
 

@@ -15,6 +15,5 @@ while line != 'exit':
 {"req":"join-game", "rule_id":"1212"}
 {"req":"sel-act", "act-id":"1"}
 
-cards_sorted
-select_call#{"action_id":"1"}
+
 """
