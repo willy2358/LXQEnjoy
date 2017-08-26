@@ -16,8 +16,5 @@ class PlayCard(ActionBase):
             dealer = self.get_my_round().get_judger()
             dealer.record_player_cards_history(player, self.__cards)
 
-    # def to_json_object(self):
-    #     return {"resp": "play-cards", "cards": self.__cards}
-
     def to_broadcast_json_object(self):
         return {"act": "play-cards", "cards": self.__cards}

@@ -64,62 +64,6 @@ def init_play_rules():
              "poker_joker_moon", "poker_joker_sun"]
     rule.set_cards(cards)
 
-    # stages = ["server_group_players",
-    #           "server_deal_cards",
-    #           "client_sort_cards",
-    #           "server_ask_player_call",
-    #           "client_call",
-    #           "server_publish_banker"
-    #           "client_play_cards"
-    #           "server_publish_winner"
-    #           "server_update_players_score"
-    #           ]
-
-    # a1 = CallAction("1", "Call")
-    # a11 = a1.add_follow_up_action(CallAction("1_1", "Rob"))
-    # a11.set_is_bank_action()
-    # a12 = a1.add_follow_up_action(CallAction("1_2", "Not Rob"))
-    # a1.get_following_action_group().set_select_timeout(20)
-    # a12.set_as_default()
-    #
-    # a111 = a11.add_follow_up_action(CallAction("1_1_1", "Rob"))
-    # a111.set_is_bank_action()
-    # a112 = a11.add_follow_up_action(CallAction("1_1_2", "Not rob"))
-    # a11.get_following_action_group().set_select_timeout(20)
-    # a11.get_following_action_group().set_is_ending()
-    # a112.set_as_default()
-    #
-    # a121 = a12.add_follow_up_action(CallAction("1_2_1", "Rob"))
-    # a121.set_is_bank_action()
-    # a122 = a12.add_follow_up_action(CallAction("1_2_2", "Not rob"))
-    # a12.get_following_action_group().set_select_timeout(20)
-    # a12.get_following_action_group().set_is_ending()
-    # a122.set_as_default()
-    #
-    # a2 = CallAction("2", "Not Call")
-    # a2.set_as_default()
-    # a21 = a2.add_follow_up_action(CallAction("2_1", "Call"))
-    # a21.set_is_bank_action()
-    # a22 = a2.add_follow_up_action(CallAction("2_2","Not call"))
-    # a2.get_following_action_group().set_select_timeout(20)
-    # a22.set_as_default()
-    #
-    # a211 = a21.add_follow_up_action(CallAction("2_1_1", "Rob"))
-    # a211.set_is_bank_action()
-    # a212 = a21.add_follow_up_action(CallAction("2_1_2", "Not rob"))
-    # a21.get_following_action_group().set_select_timeout(20)
-    # a21.get_following_action_group().set_is_ending()
-    # a212.set_as_default()
-    #
-    # a221 = a22.add_follow_up_action(CallAction("2_2_1", "Call"))
-    # a221.set_is_bank_action()
-    # a222 = a22.add_follow_up_action(CallAction("2_2_2", "Not call"))
-    # a22.get_following_action_group().set_select_timeout(20)
-    # a22.get_following_action_group().set_is_ending()
-    # rule.add_call_action(a1)
-    # rule.add_call_action(a2)
-    # rule.set_action_call_timeout_seconds(20)
-
     stage = GroupPlayers(rule)
     rule.add_game_stage(stage)
 
