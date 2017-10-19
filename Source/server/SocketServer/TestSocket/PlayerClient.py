@@ -58,6 +58,11 @@ class PlayerClient:
         j_str = json.dumps(cmd_obj)
         self.send_command_message(j_str)
 
+    def send_error_message(self, error):
+        msg = {"msg": error, "msg-type":"error"}
+        j_str = json.dumps(msg)
+        self.send_command_message(j_str)
+
     def add_dealed_cards(self, cards):
         if isinstance(cards, list):
             self.__dealed_cards += cards

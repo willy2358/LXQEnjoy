@@ -164,10 +164,15 @@ def process_player_select_action(conn, j_obj):
 # command samples: {"req":"join-game", "rule_id":"1212"}
 def process_req_join_game(conn, j_req):
     try:
-        rule_id = j_req["rule_id"]
-        play_round = get_available_game_round(rule_id)
-        play_round.add_player(get_player_client_from_conn(conn))
-        update_round_stage(conn)
+        player = get_player_client_from_conn(conn)
+        if None != player.get_game_round():
+            print("Player has already in a game")
+            player.send_error_message("Already in a game")
+        else:
+            rule_id = j_req["rule_id"]
+            play_round = get_available_game_round(rule_id)
+            play_round.add_player(get_player_client_from_conn(conn))
+            update_round_stage(conn)
     except Exception as ex:
         print(ex)
 

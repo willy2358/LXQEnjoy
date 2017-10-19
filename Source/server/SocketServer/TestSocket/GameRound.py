@@ -40,8 +40,9 @@ class GameRound:
         return self.__cur_action
 
     def add_player(self, player):
-        self.__players.append(player)
-        player.set_game_round(self)
+        if player not in self.__players:
+            self.__players.append(player)
+            player.set_game_round(self)
 
     def test_and_update_current_stage(self):
         if self.__cur_stage:
