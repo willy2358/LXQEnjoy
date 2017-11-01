@@ -1,6 +1,7 @@
 from threading import Timer
 
 from GameStages.GameStage import GameStage
+from Actions.PlayCard import PlayCard
 
 
 class PlayCards(GameStage):
@@ -16,6 +17,7 @@ class PlayCards(GameStage):
         self.__timeout_seconds = 10
         self.__cur_player = None
         self.__reached_round_end = False
+        self.__expecting_resp_player = None
 
     def is_completed(self):
         return self.__reached_round_end
@@ -57,7 +59,11 @@ class PlayCards(GameStage):
         else:
             return None
 
-    def process_player_selected_action_id(self, action_id):
+    def process_player_selected_action_id(self, player, action_id, action_params=None):
+        if player != self.__cur_player:
+            return
         act = self.get_action_by_id(action_id)
+        if isinstance(act, PlayCard) and action_params:
+            act.set_cards(action_params)
         if act:
             act.execute()

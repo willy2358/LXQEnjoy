@@ -73,7 +73,7 @@ class CallBanker(GameStage):
     def get_notify_players(self):
         return self.get_my_players()
 
-    def process_player_selected_action_id(self, action_id):
+    def process_player_selected_action_id(self, player, action_id, action_params=None):
         if self.get_head_action_group():
             self.__cur_selected_action = self.get_head_action_group().get_action_by_id(action_id)
             if self.__cur_selected_action :

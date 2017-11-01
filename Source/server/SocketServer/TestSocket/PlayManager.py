@@ -15,6 +15,7 @@ from GameStages.PublishScores import PublishScores
 from GameStages.TeamPlayers import TeamPlayers
 from GameStages.TellWinner import TellWinner
 from GameRound import GameRound
+import Cards
 
 __Players = []
 __Waiting_Players = {}
@@ -36,20 +37,7 @@ def init_play_rules():
     rule.set_player_min_number(3)
     rule.set_player_max_number(3)
     rule.set_cards_number_not_deal(3)
-    cards = ["poker_1_c","poker_1_d", "poker_1_h", "poker_1_s",
-             "poker_2_c", "poker_2_d", "poker_2_h", "poker_2_s",
-             "poker_3_c", "poker_3_d", "poker_3_h", "poker_3_s",
-             "poker_4_c", "poker_4_d", "poker_4_h", "poker_4_s",
-             "poker_5_c", "poker_5_d", "poker_5_h", "poker_5_s",
-             "poker_6_c", "poker_6_d", "poker_6_h", "poker_6_s",
-             "poker_7_c", "poker_7_d", "poker_7_h", "poker_7_s",
-             "poker_8_c", "poker_8_d", "poker_8_h", "poker_8_s",
-             "poker_9_c", "poker_9_d", "poker_9_h", "poker_9_s",
-             "poker_10_c", "poker_10_d", "poker_10_h", "poker_10_s",
-             "poker_11_c", "poker_11_d", "poker_11_h", "poker_11_s",
-             "poker_12_c", "poker_12_d", "poker_12_h", "poker_12_s",
-             "poker_13_c", "poker_13_d", "poker_13_h", "poker_13_s",
-             "poker_joker_moon", "poker_joker_sun"]
+    cards = Cards.Pokers
     rule.set_cards(cards)
 
     stage = GroupPlayers(rule)
@@ -105,6 +93,7 @@ def set_call_banker_action_options(call_banker_stage):
     c221 = c22.add_follow_up_action(CallBank("Call", "2-2-1"))
     c222 = c22.add_follow_up_action(PassCall("Not Call", "2-2-2"), True)
 
+
 def add_player_client(conn):
     player = PlayerClient.PlayerClient(conn)
     __Players.append(player)
@@ -158,16 +147,24 @@ def get_available_game_round(rule_id):
 def process_player_select_action(conn, j_obj):
     player = get_player_client_from_conn(conn)
     round = player.get_game_round()
-    round.process_player_select_action(player, j_obj["act-id"])
+    act_param = None
+    if "act-params" in j_obj:
+        act_param = j_obj["act-params"]
+    round.process_player_select_action(player, j_obj["act-id"], act_param)
 
 
 # command samples: {"req":"join-game", "rule_id":"1212"}
 def process_req_join_game(conn, j_req):
     try:
-        rule_id = j_req["rule_id"]
-        play_round = get_available_game_round(rule_id)
-        play_round.add_player(get_player_client_from_conn(conn))
-        update_round_stage(conn)
+        player = get_player_client_from_conn(conn)
+        if None != player.get_game_round():
+            print("Player has already in a game")
+            player.send_error_message("Already in a game")
+        else:
+            rule_id = j_req["rule_id"]
+            play_round = get_available_game_round(rule_id)
+            play_round.add_player(get_player_client_from_conn(conn))
+            update_round_stage(conn)
     except Exception as ex:
         print(ex)
 

@@ -52,5 +52,5 @@ class GameStage:
     def continue_execute(self):
         pass
 
-    def process_player_selected_action_id(self, action_id):
+    def process_player_selected_action_id(self, player, action_id, action_params=None):
         pass

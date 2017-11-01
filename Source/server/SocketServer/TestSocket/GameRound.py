@@ -40,8 +40,9 @@ class GameRound:
         return self.__cur_action
 
     def add_player(self, player):
-        self.__players.append(player)
-        player.set_game_round(self)
+        if player not in self.__players:
+            self.__players.append(player)
+            player.set_game_round(self)
 
     def test_and_update_current_stage(self):
         if self.__cur_stage:
@@ -76,9 +77,9 @@ class GameRound:
     def process_no_bank_player(self):
         pass
 
-    def process_player_select_action(self, player, act_id):
+    def process_player_select_action(self, player, act_id, act_param=None):
         if self.__cur_stage:
-            self.__cur_stage.process_player_selected_action_id(act_id)
+            self.__cur_stage.process_player_selected_action_id(player, act_id, act_param)
         if self.__my_dealer and self.__cur_stage:
             self.__my_dealer.process_player_select_action(player, self.__cur_stage.get_action_by_id(act_id))
 
