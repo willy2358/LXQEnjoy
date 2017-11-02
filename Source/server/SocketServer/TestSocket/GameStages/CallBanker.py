@@ -76,5 +76,6 @@ class CallBanker(GameStage):
     def process_player_selected_action_id(self, player, action_id, action_params=None):
         if self.get_head_action_group():
             self.__cur_selected_action = self.get_head_action_group().get_action_by_id(action_id)
+            print("__cur_selected_action:" + str(type(self.__cur_selected_action)))
             if self.__cur_selected_action :
                 self.__cur_selected_action.execute()
