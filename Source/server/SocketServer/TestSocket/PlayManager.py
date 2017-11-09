@@ -1,7 +1,6 @@
 import json
 import random
 
-import GameRule
 import PlayerClient
 import Utils
 from Actions.CallBank import CallBank
@@ -15,6 +14,8 @@ from GameStages.PublishScores import PublishScores
 from GameStages.TeamPlayers import TeamPlayers
 from GameStages.TellWinner import TellWinner
 from GameRound import GameRound
+from GameRules.PokerGameRule import PokerGameRule
+from GameRules.MajiangGameRule import MajiangGameRule
 import Cards
 
 __Players = []
@@ -30,10 +31,11 @@ SERVER_CMD_DEAL_FINISH = "deal_finish"   # 结束发牌
 CLIENT_REQ_JOIN_GAME = "join-game" # 开始游戏
 CLIENT_REQ_SELECT_ACTION = "sel-act"
 
+
 # dou di zu
 def init_poker_rule_doudizu():
     rule_id = "1212"
-    rule = GameRule.GameRule(rule_id)
+    rule = PokerGameRule(rule_id)
     rule.set_player_min_number(3)
     rule.set_player_max_number(3)
     rule.set_cards_number_not_deal(3)
@@ -71,11 +73,20 @@ def init_poker_rule_doudizu():
 #da tong guai san jiao
 def init_majiang_rule_guaisanjiao():
     rule_id = "m1"
-    #rule = GameRule.GameRule_Majiang(rule_id)
+    rule = MajiangGameRule(rule_id)
+    rule.set_player_min_number(3)
+    rule.set_player_max_number(4)
+    rule.set_cards(Cards.MaJiang_Wan + Cards.MaJiang_Suo + Cards.MaJiang_Tong)
+
+
 
 
 def init_play_rules():
-    init_poker_rule_doudizu()
+    #init_poker_rule_doudizu()
+    try:
+        init_majiang_rule_guaisanjiao()
+    except Exception as ex:
+        print(ex)
 
 
 def set_call_banker_action_options(call_banker_stage):
