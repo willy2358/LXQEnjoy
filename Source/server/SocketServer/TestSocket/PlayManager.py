@@ -30,8 +30,8 @@ SERVER_CMD_DEAL_FINISH = "deal_finish"   # 结束发牌
 CLIENT_REQ_JOIN_GAME = "join-game" # 开始游戏
 CLIENT_REQ_SELECT_ACTION = "sel-act"
 
-
-def init_play_rules():
+# dou di zu
+def init_poker_rule_doudizu():
     rule_id = "1212"
     rule = GameRule.GameRule(rule_id)
     rule.set_player_min_number(3)
@@ -67,6 +67,15 @@ def init_play_rules():
 
     # rule.set_stages(stages)
     __PlayRules[rule_id] = rule
+
+#da tong guai san jiao
+def init_majiang_rule_guaisanjiao():
+    rule_id = "m1"
+    #rule = GameRule.GameRule_Majiang(rule_id)
+
+
+def init_play_rules():
+    init_poker_rule_doudizu()
 
 
 def set_call_banker_action_options(call_banker_stage):
