@@ -16,5 +16,6 @@ while line != 'exit':
 {"req":"sel-act", "act-id":"1"}
 {"req":"sel-act", "act-id":"1", "act-params":["poker_1_c","poker_1_d"]}
 
+{"cmdtype":"sockreq","sockreq":"join-game","userid":123456,	"roomid":123333,"gameid":123432}
 
 """

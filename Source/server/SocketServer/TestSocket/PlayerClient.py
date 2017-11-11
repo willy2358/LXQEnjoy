@@ -6,15 +6,17 @@ import PlayManager
 from threading import Timer
 
 import Utils
+import Log
 
 
 class PlayerClient:
-    def __init__(self, conn):
+    def __init__(self, conn, user_id):
         self.__socket__conn = conn
         self.__playing_rule_id = 0
         self.__game_round = None
         self.__dealed_cards = []
         self.__remained_cards = []
+        self.__user_id = user_id
 
     def get_remained_cards(self):
         return self.__remained_cards
@@ -59,9 +61,13 @@ class PlayerClient:
         self.send_command_message(j_str)
 
     def send_error_message(self, error):
+        Log.write_error(error)
         msg = {"msg": error, "msg-type":"error"}
         j_str = json.dumps(msg)
         self.send_command_message(j_str)
+
+    def send_success_message(self, msg):
+        pass
 
     def add_dealed_cards(self, cards):
         if isinstance(cards, list):

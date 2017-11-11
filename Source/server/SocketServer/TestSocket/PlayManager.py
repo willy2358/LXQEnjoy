@@ -13,12 +13,20 @@ from GameStages.PlayCards import PlayCards
 from GameStages.PublishScores import PublishScores
 from GameStages.TeamPlayers import TeamPlayers
 from GameStages.TellWinner import TellWinner
+from GameStages.DiceBanker import DiceBanker
 from GameRound import GameRound
 from GameRules.PokerGameRule import PokerGameRule
 from GameRules.MajiangGameRule import MajiangGameRule
-import Cards
+from Room import Room
+
+import CardsMaster
+import Log
+
 
 __Players = []
+Players={}   #{userid:player}
+Rooms = {}   #{roomid:room}
+GameRules = {} #{ruleid:rule}
 __Waiting_Players = {}
 __PlayRules = {}
 
@@ -30,6 +38,7 @@ SERVER_CMD_DEAL_FINISH = "deal_finish"   # 结束发牌
 
 CLIENT_REQ_JOIN_GAME = "join-game" # 开始游戏
 CLIENT_REQ_SELECT_ACTION = "sel-act"
+CLIENT_REQ_RECONNECT = "reconnect" #断线重连
 
 
 # dou di zu
@@ -39,7 +48,7 @@ def init_poker_rule_doudizu():
     rule.set_player_min_number(3)
     rule.set_player_max_number(3)
     rule.set_cards_number_not_deal(3)
-    cards = Cards.Pokers
+    cards = CardsMaster.Pokers
     rule.set_cards(cards)
 
     stage = GroupPlayers(rule)
@@ -67,8 +76,8 @@ def init_poker_rule_doudizu():
     stage = PublishScores(rule)
     rule.add_game_stage(stage)
 
-    # rule.set_stages(stages)
-    __PlayRules[rule_id] = rule
+    #__PlayRules[rule_id] = rule
+    GameRules[rule_id] = rule
 
 #da tong guai san jiao
 def init_majiang_rule_guaisanjiao():
@@ -76,10 +85,12 @@ def init_majiang_rule_guaisanjiao():
     rule = MajiangGameRule(rule_id)
     rule.set_player_min_number(3)
     rule.set_player_max_number(4)
-    rule.set_cards(Cards.MaJiang_Wan + Cards.MaJiang_Suo + Cards.MaJiang_Tong)
+    rule.set_cards(CardsMaster.MaJiang_Wan + CardsMaster.MaJiang_Suo + CardsMaster.MaJiang_Tong)
 
+    stage = DiceBanker(rule)
+    rule.add_game_stage(stage)
 
-
+    GameRules[rule_id] = rule
 
 def init_play_rules():
     #init_poker_rule_doudizu()
@@ -128,9 +139,22 @@ def dispatch_player_commands(conn, comm_text):
             process_req_join_game(conn, j_obj)
         if j_obj["req"] == CLIENT_REQ_SELECT_ACTION.lower():
             process_player_select_action(conn, j_obj)
+        if j_obj["cmdtype"] == "sockreq":
+            process_client_request(conn, j_obj)
     except Exception as ex:
         print(ex)
 
+
+def process_client_request(conn, req_json):
+    try:
+
+        if req_json["sockreq"] == CLIENT_REQ_JOIN_GAME.lower():
+            process_req_join_game(req_json)
+        if req_json["sock"] == CLIENT_REQ_RECONNECT.lower():
+            pass
+
+    except Exception as ex:
+        print(ex)
 
 def update_round_stage(client_conn):
     player = get_player_client_from_conn(client_conn)
@@ -173,18 +197,63 @@ def process_player_select_action(conn, j_obj):
     round.process_player_select_action(player, j_obj["act-id"], act_param)
 
 
-# command samples: {"req":"join-game", "rule_id":"1212"}
-def process_req_join_game(conn, j_req):
+# command samples: {"cmdtype":"sockreq","sockreq":"join-game","userid":123456,	"roomid":123333,"gameid":123432}
+def process_req_join_game(conn, req_json):
     try:
-        player = get_player_client_from_conn(conn)
-        if None != player.get_game_round():
-            print("Player has already in a game")
-            player.send_error_message("Already in a game")
+
+        user_id = req_json["userid"]
+
+        player = None
+        if user_id not in Players:
+            player = PlayerClient(conn, user_id)
+            Players[user_id] = player
         else:
-            rule_id = j_req["rule_id"]
-            play_round = get_available_game_round(rule_id)
-            play_round.add_player(get_player_client_from_conn(conn))
-            update_round_stage(conn)
+            player = Players[user_id]
+
+        if "roomid" not in req_json or req_json["roomid"] < 10:
+            process_join_lobby_game(player, req_json["gameid"])
+        else:
+            process_join_room_game(player, req_json["gameid"], req_json["roomid"])
+
+    except Exception as ex:
+        Log.write_exception(ex)
+
+def process_join_lobby_game(player, rule_id):
+    if None != player.get_game_round():
+            player.send_error_message("Already in a game")
+    else:
+        play_round = get_available_game_round(rule_id)
+        play_round.add_player(player)
+        update_round_stage(player.get_socket_conn())
+
+def process_join_room_game(player, game_rule_id, room_id):
+    try:
+        if room_id not in Rooms:
+            create_room_from_db(room_id, game_rule_id)
+
+        if room_id not in Rooms:
+            error = "failed to create room, room_id:" + str(room_id)
+            player.send_error_message(error)
+            return
+        room = Rooms[room_id]
+        if not room.can_new_player_seated():
+            player.send_error_message("Room is full")
+            return
+        if room.is_player_in(player):
+            player.send_error_message("Already in room")
+            return
+        room.add_seated_player(player)
+        player.send_success_message("")
+
     except Exception as ex:
         print(ex)
+
+#ToDo : create Room from database
+def create_room_from_db(room_id, rule_id):
+    game_rule = GameRules[rule_id]
+
+    room = Room(room_id, game_rule)
+    room.set_min_seated_player_num(3)
+    room.set_max_seated_player_num(3)
+    Rooms[room_id] = room
 
