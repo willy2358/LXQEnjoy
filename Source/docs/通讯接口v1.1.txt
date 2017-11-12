@@ -184,6 +184,7 @@ bankerid是userid，客户端可使用此ID向web服务器查询用户信息。
 	"cmdtype":"sockpush",
 	"sockpush":"req-opts",
 	"req-opts":["pen","chi","hu","gang","mopai","zimo"],
+	"resp-timeout":30 //用户响应超时时间，单位：秒，值为-1时为没有超时，一直等待用户响应
 	"def-opt":"hu"
 }
 
