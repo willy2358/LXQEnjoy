@@ -1,27 +1,24 @@
 import json
-import random
 
+import CardsMaster
+import Log
 import PlayerClient
-import Utils
 from Actions.CallBank import CallBank
 from Actions.PassCall import PassCall
+from GameRound import GameRound
+from GameRules.MajiangGameRule import MajiangGameRule
+from GameRules.PokerGameRule import PokerGameRule
 from GameStages.CalScores import CalScores
 from GameStages.CallBanker import CallBanker
 from GameStages.DealCards import DealCards
+from GameStages.DiceBanker import DiceBanker
 from GameStages.GroupPlayers import GroupPlayers
 from GameStages.PlayCards import PlayCards
 from GameStages.PublishScores import PublishScores
 from GameStages.TeamPlayers import TeamPlayers
 from GameStages.TellWinner import TellWinner
-from GameStages.DiceBanker import DiceBanker
-from GameRound import GameRound
-from GameRules.PokerGameRule import PokerGameRule
-from GameRules.MajiangGameRule import MajiangGameRule
-from Room import Room
-
-import CardsMaster
-import Log
-
+from Rooms.Room import Room
+from Rooms import Room_Majiang
 
 __Players = []
 Players={}   #{userid:player}
@@ -156,10 +153,10 @@ def process_client_request(conn, req_json):
     except Exception as ex:
         print(ex)
 
-def update_round_stage(client_conn):
-    player = get_player_client_from_conn(client_conn)
-    round = player.get_game_round()
-    round.test_and_update_current_stage()
+# def update_round_stage(client_conn):
+#     player = get_player_client_from_conn(client_conn)
+#     round = player.get_game_round()
+#     round.test_and_update_current_stage()
 
 
 def get_player_client_from_conn(conn):
@@ -218,13 +215,17 @@ def process_req_join_game(conn, req_json):
     except Exception as ex:
         Log.write_exception(ex)
 
+
 def process_join_lobby_game(player, rule_id):
     if None != player.get_game_round():
             player.send_error_message("Already in a game")
     else:
         play_round = get_available_game_round(rule_id)
         play_round.add_player(player)
-        update_round_stage(player.get_socket_conn())
+        #update_round_stage(player.get_socket_conn())
+        player.send_success_messsage(CLIENT_REQ_JOIN_GAME)
+        play_round.test_and_update_current_stage()
+
 
 def process_join_room_game(player, game_rule_id, room_id):
     try:
@@ -233,26 +234,28 @@ def process_join_room_game(player, game_rule_id, room_id):
 
         if room_id not in Rooms:
             error = "failed to create room, room_id:" + str(room_id)
-            player.send_error_message(error)
+            player.send_error_message(CLIENT_REQ_JOIN_GAME, error)
             return
         room = Rooms[room_id]
         if not room.can_new_player_seated():
-            player.send_error_message("Room is full")
+            player.send_error_message(CLIENT_REQ_JOIN_GAME, "Room is full")
             return
         if room.is_player_in(player):
-            player.send_error_message("Already in room")
+            player.send_error_message(CLIENT_REQ_JOIN_GAME, "Already in room")
             return
         room.add_seated_player(player)
-        player.send_success_message("")
-
+        player.send_success_message(CLIENT_REQ_JOIN_GAME)
+        room.test_update_room_state()
     except Exception as ex:
         print(ex)
 
-#ToDo : create Room from database
+
+# TODO create Room from database
 def create_room_from_db(room_id, rule_id):
     game_rule = GameRules[rule_id]
+    if isinstance(game_rule, MajiangGameRule):
+        room = Room_Majiang(room_id, game_rule)
 
-    room = Room(room_id, game_rule)
     room.set_min_seated_player_num(3)
     room.set_max_seated_player_num(3)
     Rooms[room_id] = room

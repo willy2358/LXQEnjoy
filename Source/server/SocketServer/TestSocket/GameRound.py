@@ -18,6 +18,7 @@ class GameRound:
         self.__player_idx_of_play_card = -1
         self.__my_dealer = Dealer(self)
         self.__cur_action = None
+        self.__game_end = False
         for s in self.__play_rule.get_game_stages():
             s.set_my_round(self)
 
@@ -39,6 +40,9 @@ class GameRound:
     def get_current_action(self):
         return self.__cur_action
 
+    def get_is_game_end(self):
+        return self.__game_end
+
     def add_player(self, player):
         if player not in self.__players:
             self.__players.append(player)
@@ -48,7 +52,10 @@ class GameRound:
         if self.__cur_stage:
             if self.__cur_stage.is_completed():
                 self.__cur_stage = self.__play_rule.get_next_game_stage()
-                self.__cur_stage.begin()
+                if not self.__cur_stage:
+                    self.__game_end = True
+                else :
+                    self.__cur_stage.begin()
             else:
                 self.__cur_stage.continue_execute()
 

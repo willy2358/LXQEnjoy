@@ -60,12 +60,12 @@ class PlayerClient:
         j_str = json.dumps(cmd_obj)
         self.send_command_message(j_str)
 
-    def send_error_message(self, error, req_cmd):
-        Log.write_error(error)
+    def send_error_message(self, req_cmd, errmsg):
+        Log.write_error(errmsg)
         msg = {"cmdtype": "sockresp",
                "sockresp":req_cmd,
                "result":"ERROR",
-               "errmsg":error}
+               "errmsg":errmsg}
         j_str = json.dumps(msg)
         self.send_command_message(j_str)
 
