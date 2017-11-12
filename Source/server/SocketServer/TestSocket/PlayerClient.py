@@ -60,14 +60,22 @@ class PlayerClient:
         j_str = json.dumps(cmd_obj)
         self.send_command_message(j_str)
 
-    def send_error_message(self, error):
+    def send_error_message(self, error, req_cmd):
         Log.write_error(error)
-        msg = {"msg": error, "msg-type":"error"}
+        msg = {"cmdtype": "sockresp",
+               "sockresp":req_cmd,
+               "result":"ERROR",
+               "errmsg":error}
         j_str = json.dumps(msg)
         self.send_command_message(j_str)
 
-    def send_success_message(self, msg):
-        pass
+    def send_success_message(self, req_cmd):
+        msg = {"cmdtype": "sockresp",
+                    "sockresp":req_cmd,
+                    "result":"OK",
+                    "errmsg":""}
+        j_str = json.dumps(msg)
+        self.send_command_message(j_str)
 
     def add_dealed_cards(self, cards):
         if isinstance(cards, list):
