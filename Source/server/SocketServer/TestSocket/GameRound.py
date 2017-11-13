@@ -65,6 +65,9 @@ class GameRound:
     def can_new_player_in(self):
         return not self.__started and len(self.__players) < self.__play_rule.get_player_max_number()
 
+    def reset_bank_player(self):
+        self.__bank_player = None
+
     def set_bank_player(self, player):
         self.__bank_player = player
 

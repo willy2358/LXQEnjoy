@@ -1,4 +1,5 @@
 from GameRound import GameRound
+import InterProtocol
 
 class Room:
     def __init__(self, room_id, game_rule):
@@ -39,6 +40,24 @@ class Room:
             return True
         else:
             return False
+
+    def process_player_cmd_request(self, player, req_json):
+        if req_json[InterProtocol.SOCK_REQ_CMD].lower() == InterProtocol.CLIENT_REQ_JOIN_GAME:
+            self.process_join_game(player)
+
+    def process_join_game(self, player):
+        try:
+            if not self.can_new_player_seated():
+                player.send_error_message(InterProtocol.CLIENT_REQ_JOIN_GAME, "Room is full")
+                return
+            if self.is_player_in(player):
+                player.send_error_message(InterProtocol.CLIENT_REQ_JOIN_GAME, "Already in room")
+                return
+            self.add_seated_player(player)
+            player.send_success_message(InterProtocol.CLIENT_REQ_JOIN_GAME)
+            self.test_update_room_state()
+        except Exception as ex:
+            print(ex)
 
     def test_update_room_state(self):
         if self.get_seated_player_count() >= self.__min_seated_players:

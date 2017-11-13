@@ -10,3 +10,6 @@ class Room_Majiang(Room):
 
     def close_room(self):
         pass
+
+    def process_player_cmd_request(self, player, req_json):
+        pass

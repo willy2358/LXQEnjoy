@@ -17,6 +17,7 @@ class PlayerClient:
         self.__dealed_cards = []
         self.__remained_cards = []
         self.__user_id = user_id
+        self.__room_id = 0
 
     def get_remained_cards(self):
         return self.__remained_cards
