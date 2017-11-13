@@ -222,6 +222,7 @@ winners和losers可有多个，win-score和lose-score表示赢或输的分数，
 	"cmdtype":"sockreq",
 	"sockreq":"play-cards",
 	"userid":124242,
+	"roomid":123|0
 	"cards:"["majiang_tong_2"]
 }
 5.2玩家响应
@@ -230,6 +231,7 @@ winners和losers可有多个，win-score和lose-score表示赢或输的分数，
 	"cmdtype":"sockreq",
 	"sockreq":"exe-cmd",  //执行命令
 	"userid":124122,
+	"roomid",123|0
 	“cmd":"peng", //此命令来自服务器推送的命令列表
 	"cmd-data":"" //命令数据，预留
 }
