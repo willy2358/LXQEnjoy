@@ -159,8 +159,6 @@ class GameRule:
     def get_cards_number_not_deal(self):
         return self.__cards_num_not_deal
 
-
-
     def set_cards(self, cards):
         self.__cards = cards
 

@@ -17,6 +17,7 @@ from GameStages.PlayCards import PlayCards
 from GameStages.PublishScores import PublishScores
 from GameStages.TeamPlayers import TeamPlayers
 from GameStages.TellWinner import TellWinner
+from GameStages.DealMaJiangs import DealMaJiangs
 from Rooms import Room_Majiang
 import InterProtocol
 from Rooms import Lobby
@@ -85,6 +86,9 @@ def init_majiang_rule_guaisanjiao():
 
     stage = RandomBanker(rule)
     rule.add_game_stage(stage)
+    stage = DealMaJiangs(rule)
+    rule.add_game_stage(stage)
+
 
     GameRules[rule_id] = rule
 
