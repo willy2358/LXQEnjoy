@@ -6,6 +6,17 @@ class DealMaJiangs(GameStage):
     def __init__(self, rule):
         super(DealMaJiangs, self).__init__(rule)
 
+    @staticmethod
+    def execute(game_round):
+        rule = game_round.get_rule()
+        banker_cards_num = rule.get_cards_number_for_banker()
+        player_cards_num = rule.get_cards_number_for_non_banker()
+        for p in game_round.get_players():
+            if p.is_banker():
+                game_round.deal_cards_for_player(p, banker_cards_num)
+            else:
+                game_round.deal_cards_for_player(p, player_cards_num)
+
     def is_completed(self):
         return self.__cards_sent
 

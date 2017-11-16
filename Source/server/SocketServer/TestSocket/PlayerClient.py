@@ -14,18 +14,22 @@ class PlayerClient:
         self.__socket__conn = conn
         self.__playing_rule_id = 0
         self.__game_round = None
-        self.__dealed_cards = []
-        self.__remained_cards = []
+        self.__initial_cards = []
+        self.__cards_in_hand = []
         self.__user_id = user_id
         self.__room_id = 0
+        self.__is_banker = False
+
+    def is_banker(self):
+        return self.__is_banker
 
     def get_remained_cards(self):
-        return self.__remained_cards
+        return self.__cards_in_hand
 
     def get_default_play_cards(self):
-        if len(self.__dealed_cards) > 0:
-            c = self.__dealed_cards[0]
-            self.__dealed_cards.remove(c)
+        if len(self.__initial_cards) > 0:
+            c = self.__initial_cards[0]
+            self.__initial_cards.remove(c)
             return c
         else:
             return None
@@ -78,21 +82,30 @@ class PlayerClient:
         j_str = json.dumps(msg)
         self.send_command_message(j_str)
 
-    def add_dealed_cards(self, cards):
-        if isinstance(cards, list):
-            self.__dealed_cards += cards
-        elif isinstance(cards, str):
-            self.__dealed_cards.append(cards)
+    def set_initial_cards(self, cards):
+        self.__initial_cards = cards[:]
+        self.__cards_in_hand = self.__initial_cards[:]
 
-        self.__remained_cards = self.__dealed_cards[:]
+    def add_dealt_cards(self, cards):
+        if isinstance(cards, list):
+            self.__initial_cards += cards
+        elif isinstance(cards, str):
+            self.__initial_cards.append(cards)
+
+        self.__cards_in_hand = self.__initial_cards[:]
 
     def play_out_cards(self, cards):
         if isinstance(cards, str):
-            self.__remained_cards.remove(cards)
+            self.__cards_in_hand.remove(cards)
         elif isinstance(cards, list):
-            Utils.list_remove_parts(self.__remained_cards, cards)
+            Utils.list_remove_parts(self.__cards_in_hand, cards)
         else:
             pass
 
+    def set_banker(self):
+        self.__is_banker = True
+
+    def reset_banker(self):
+        self.__is_banker = False
 
 

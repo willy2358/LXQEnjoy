@@ -46,6 +46,10 @@ class GameStage:
             self.__head_action_group = ActionGroup()
         self.__head_action_group.add_action(action, as_default_action)
 
+    @staticmethod
+    def execute(self, game_round):
+        pass
+
     def begin(self):
         pass
 

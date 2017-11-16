@@ -3,12 +3,15 @@ import random
 import Utils
 from GameStages import PlayCards
 from Dealer import Dealer
+import InterProtocol
 
 
 class GameRound:
     def __init__(self, play_rule):
         self.__play_rule = play_rule
+        self.__cards_on_table = play_rule.get_cards()[:]   # cards in dealer hand, will be dealt from dealer to players
         self.__players = []
+
         self.__started = False
         self.__cur_call_player_idx = -1
         self.__cur_call_action_id = ""
@@ -70,16 +73,14 @@ class GameRound:
 
     def set_bank_player(self, player):
         self.__bank_player = player
+        player.set_banker()
 
-    # def execute_player_call(self, player, call):
-    #     action = self.__play_rule.get_action_by_id(call["act-id"])
-    #     self.__cur_stage.publish_player_call_action(player, action)
-
-    # def execute_player_played_cards(self, player, cards):
-    #     if isinstance(self.__cur_stage, type(PlayCards)):
-    #         self.__cur_stage.publish_player_play_cards(player, cards["cards"])
-    #     else:
-    #         pass
+    def deal_cards_for_player(self, player, card_number):
+        cards = random.sample(self.__cards_on_table, card_number)
+        player.set_initial_cards(cards)
+        Utils.list_remove_parts(self.__cards_on_table, cards)
+        packet = InterProtocol.create_deal_cards_json_packet(player, cards)
+        player.send_server_command(packet)
 
     def set_cards_for_banker(self, cards):
         self.__cards_for_banker = cards

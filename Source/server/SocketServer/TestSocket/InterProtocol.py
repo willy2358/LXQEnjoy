@@ -12,3 +12,8 @@ USER_ID = "userid"
 GAME_ID = "gameid"
 
 min_room_id = 10   #valid room id should > 10
+
+
+def create_deal_cards_json_packet(player, cards):
+    pass
+
