@@ -1,7 +1,7 @@
 
 import InterProtocol
-import GameRound
 import PlayManager
+from GameRounds import GameRound
 
 __game_rounds = []
 

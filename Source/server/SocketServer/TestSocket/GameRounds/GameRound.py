@@ -11,6 +11,7 @@ class GameRound:
         self.__play_rule = play_rule
         self.__cards_on_table = play_rule.get_cards()[:]   # cards in dealer hand, will be dealt from dealer to players
         self.__players = []
+        self.__cur_player_idx = -1
 
         self.__started = False
         self.__cur_call_player_idx = -1
@@ -33,6 +34,19 @@ class GameRound:
 
     def get_bank_player(self):
         return self.__bank_player
+
+    def get_next_player(self):
+        self.__cur_player_idx += 1
+        if self.__cur_player_idx >= len(self.__players):
+            self.__cur_player_idx = 0
+
+        if self.__cur_player_idx < len(self.__players):
+            return self.__players[self.__cur_player_idx]
+        else:
+            return None
+
+    def set_current_player(self, player):
+        pass
 
     def get_cards_for_banker(self):
         return self.__cards_for_banker

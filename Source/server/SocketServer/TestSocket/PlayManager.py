@@ -1,26 +1,25 @@
 import json
 
 import CardsMaster
-import Log
+import InterProtocol
 import PlayerClient
 from Actions.CallBank import CallBank
 from Actions.PassCall import PassCall
-from GameRound import GameRound
 from GameRules.MajiangGameRule import MajiangGameRule
 from GameRules.PokerGameRule import PokerGameRule
 from GameStages.CalScores import CalScores
 from GameStages.CallBanker import CallBanker
 from GameStages.DealCards import DealCards
-from GameStages.RandomBanker import RandomBanker
+from GameStages.DealMaJiangs import DealMaJiangs
 from GameStages.GroupPlayers import GroupPlayers
 from GameStages.PlayCards import PlayCards
+from GameStages.PlayMajiang import PlayMajiang
 from GameStages.PublishScores import PublishScores
+from GameStages.RandomBanker import RandomBanker
 from GameStages.TeamPlayers import TeamPlayers
 from GameStages.TellWinner import TellWinner
-from GameStages.DealMaJiangs import DealMaJiangs
-from Rooms import Room_Majiang
-import InterProtocol
 from Rooms import Lobby
+from Rooms import Room_Majiang
 
 __Players = []
 Players={}   #{userid:player}
@@ -87,6 +86,8 @@ def init_majiang_rule_guaisanjiao():
     stage = RandomBanker(rule)
     rule.add_game_stage(stage)
     stage = DealMaJiangs(rule)
+    rule.add_game_stage(stage)
+    stage = PlayMajiang(rule)
     rule.add_game_stage(stage)
 
 

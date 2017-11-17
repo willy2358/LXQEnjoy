@@ -11,9 +11,20 @@ ROOM_ID = "roomid"
 USER_ID = "userid"
 GAME_ID = "gameid"
 
+majiang_player_act_peng = "peng"
+majiang_player_act_hu = "hu"
+majiang_player_act_eat = "chi"
+majiang_player_act_zimo = "zi mo"
+majiang_player_act_fetch_card = "mo pai"
+majiang_player_act_pass = "guo"
+
 min_room_id = 10   #valid room id should > 10
 
 
 def create_deal_cards_json_packet(player, cards):
+    pass
+
+
+def create_cmd_options_json_packet(player, cmd_options):
     pass
 

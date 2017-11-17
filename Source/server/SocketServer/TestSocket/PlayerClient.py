@@ -23,7 +23,7 @@ class PlayerClient:
     def is_banker(self):
         return self.__is_banker
 
-    def get_remained_cards(self):
+    def get_in_hand_cards(self):
         return self.__cards_in_hand
 
     def get_default_play_cards(self):

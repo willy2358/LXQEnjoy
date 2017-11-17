@@ -21,3 +21,11 @@ class MajiangGameRule(GameRule):
 
     def set_cards_number_for_non_banker(self, number):
         self.__non_banker_cards_number = number
+
+    def get_cmd_options_for_cards(self, cards):
+        pass
+
+    def get_first_cards_player(self, players):
+        for p in players:
+            if p.is_banker:
+                return p

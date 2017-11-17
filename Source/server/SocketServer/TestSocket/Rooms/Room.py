@@ -1,5 +1,6 @@
-from GameRound import GameRound
 import InterProtocol
+from GameRounds.GameRound import GameRound
+
 
 class Room:
     def __init__(self, room_id, game_rule):
