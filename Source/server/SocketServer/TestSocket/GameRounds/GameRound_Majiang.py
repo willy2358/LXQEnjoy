@@ -26,5 +26,21 @@ class GameRound_Majiang(GameRound):
         listeners = self.__players[idx + 1:] +  self.__players[:idx]
         return listeners
 
-    def add_peng_card(self, card_peng):
+    def player_select_peng(self, player, card):
         pass
+
+    def player_select_gang(self, player, card):
+        pass
+
+    # def test_and_update_current_stage(self):
+    #     if not self.get_cur_game_stage():
+    #         stage = self.get_next_game_stage()
+    #         self.set_cur_game_stage(stage)
+    #
+    #     cur_stage = self.get_cur_game_stage()
+    #     if cur_stage:
+    #         if cur_stage.is_ended_in_round(self):
+    #             cur_stage = self.get_next_game_stage()
+    #
+    #     if cur_stage:
+    #         cur_stage.execute(self)

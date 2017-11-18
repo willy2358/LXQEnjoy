@@ -12,19 +12,21 @@ class GameRound:
         self.__cards_on_table = play_rule.get_cards()[:]   # cards in dealer hand, will be dealt from dealer to players
         self.__players = []
         self.__cur_player_idx = -1
+        self.__winners = []
 
         self.__started = False
         self.__cur_call_player_idx = -1
         self.__cur_call_action_id = ""
-        self.__cur_stage = play_rule.get_next_game_stage()
+        self.__cur_stage = None
+        self.__cur_stage_idx = -1
         self.__bank_player = None
         self.__cards_for_banker = None
         self.__player_idx_of_play_card = -1
         self.__my_dealer = Dealer(self)
         self.__cur_action = None
         self.__game_end = False
-        for s in self.__play_rule.get_game_stages():
-            s.set_my_round(self)
+        # for s in self.__play_rule.get_game_stages():
+        #     s.set_my_round(self)
 
     def get_players(self):
         return self.__players
@@ -44,6 +46,23 @@ class GameRound:
             return self.__players[self.__cur_player_idx]
         else:
             return None
+
+    def get_next_game_stage(self):
+        self.__cur_player_idx += 1
+        game_stages = self.__play_rule.get_game_stages()
+        if self.__cur_player_idx < len(game_stages):
+            return game_stages[self.__cur_player_idx]
+        else:
+            return None
+
+    def get_cur_game_stage(self):
+        return self.__cur_stage
+
+    def get_winners(self):
+        return self.__winners
+
+    def set_cur_game_stage(self, stage):
+        self.__cur_stage = stage
 
     def set_current_player(self, player):
         pass
@@ -66,15 +85,17 @@ class GameRound:
             player.set_game_round(self)
 
     def test_and_update_current_stage(self):
-        if self.__cur_stage:
-            if self.__cur_stage.is_completed():
-                self.__cur_stage = self.__play_rule.get_next_game_stage()
-                if not self.__cur_stage:
-                    self.__game_end = True
-                else :
-                    self.__cur_stage.begin()
-            else:
-                self.__cur_stage.continue_execute()
+        if not self.get_cur_game_stage():
+            stage = self.get_next_game_stage()
+            self.set_cur_game_stage(stage)
+
+        cur_stage = self.get_cur_game_stage()
+        if cur_stage:
+            if cur_stage.is_ended_in_round(self):
+                cur_stage = self.get_next_game_stage()
+
+        if cur_stage:
+            cur_stage.execute(self)
 
     def get_rule(self):
         return self.__play_rule
@@ -98,6 +119,9 @@ class GameRound:
 
     def set_cards_for_banker(self, cards):
         self.__cards_for_banker = cards
+
+    def set_winners(self, players):
+        self.__winners = players
 
     def process_no_bank_player(self):
         pass

@@ -34,6 +34,9 @@ class PlayerClient:
         else:
             return None
 
+    def get_init_cards(self):
+        return self.__initial_cards
+
     def update_connection(self, conn):
         self.__socket__conn = conn
 

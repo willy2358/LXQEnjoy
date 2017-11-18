@@ -12,11 +12,12 @@ room_id = "roomid"
 user_id = "userid"
 game_id = "gameid"
 
+majiang_player_act_gang = "gang"
 majiang_player_act_peng = "peng"
 majiang_player_act_hu = "hu"
 majiang_player_act_eat = "chi"
 majiang_player_act_zimo = "zi mo"
-majiang_player_act_fetch_card = "mo pai"
+majiang_player_act_new_card = "mo pai"
 majiang_player_act_pass = "guo"
 
 min_room_id = 10   # valid room id should > 10

@@ -17,12 +17,12 @@ class GameRule:
     def get_head_action_group(self):
         return self.__head_action_group
 
-    def get_next_game_stage(self):
-        self.__cur_game_stage_idx += 1
-        if self.__cur_game_stage_idx < len(self.__game_stages):
-            return self.__game_stages[self.__cur_game_stage_idx]
-        else:
-            return None
+    # def get_next_game_stage(self):
+    #     self.__cur_game_stage_idx += 1
+    #     if self.__cur_game_stage_idx < len(self.__game_stages):
+    #         return self.__game_stages[self.__cur_game_stage_idx]
+    #     else:
+    #         return None
 
     @staticmethod
     def get_is_round_end(game_round):

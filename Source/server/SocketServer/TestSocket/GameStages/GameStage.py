@@ -58,3 +58,7 @@ class GameStage:
 
     def process_player_selected_action_id(self, player, action_id, action_params=None):
         pass
+
+    @staticmethod
+    def is_ended_in_round(game_round):
+        pass

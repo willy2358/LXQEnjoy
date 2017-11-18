@@ -14,3 +14,12 @@ class RandomBanker(GameStage):
         idx = random.randint(0, len(players))
         banker = players[idx]
         game_round.set_bank_player(banker)
+
+    @staticmethod
+    def is_ended_in_round(game_round):
+        banker = game_round.get_bank_player()
+        if not banker:
+            return False
+        else:
+            return True
+

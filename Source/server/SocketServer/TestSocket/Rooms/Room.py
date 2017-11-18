@@ -1,5 +1,5 @@
 import InterProtocol
-from GameRounds.GameRound import GameRound
+from GameRounds.GameRound_Majiang import GameRound_Majiang
 
 
 class Room:
@@ -46,7 +46,6 @@ class Room:
         req_cmd = req_json[InterProtocol.sock_req_cmd].lower()
         if req_cmd == InterProtocol.client_req_join_game:
             self.process_join_game(player)
-        
 
     def process_join_game(self, player):
         try:
@@ -67,15 +66,14 @@ class Room:
 
     def test_update_room_state(self):
         if self.get_seated_player_count() >= self.__min_seated_players:
-            game_round = GameRound(self.__game_rule)
+            game_round = GameRound_Majiang(self.__game_rule)
             for p in self.__seated_players:
                 game_round.add_player(p)
             self.__current_round = game_round
         if self.__current_round:
             self.__current_round.test_and_update_current_stage()
-
-        if not game_round.get_is_game_end():
-            return
+            if not self.__current_round.get_is_game_end():
+                return
 
         if self.__current_round_order < self.__round_num:
             self.begin_next_game_round()
