@@ -75,7 +75,8 @@ def init_poker_rule_doudizu():
     #__PlayRules[rule_id] = rule
     GameRules[rule_id] = rule
 
-#da tong guai san jiao
+
+# da tong guai san jiao
 def init_majiang_rule_guaisanjiao():
     rule_id = "m1"
     rule = MajiangGameRule(rule_id)
@@ -90,11 +91,11 @@ def init_majiang_rule_guaisanjiao():
     stage = PlayMajiang(rule)
     rule.add_game_stage(stage)
 
-
     GameRules[rule_id] = rule
 
+
 def init_play_rules():
-    #init_poker_rule_doudizu()
+    # init_poker_rule_doudizu()
     try:
         init_majiang_rule_guaisanjiao()
     except Exception as ex:

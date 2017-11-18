@@ -28,3 +28,6 @@ def create_deal_cards_json_packet(player, cards):
 def create_cmd_options_json_packet(player, cmd_options):
     pass
 
+
+def create_error_json_packet(player, err_msg):
+    pass

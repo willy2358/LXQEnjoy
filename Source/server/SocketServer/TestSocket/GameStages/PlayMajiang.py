@@ -39,14 +39,15 @@ class PlayMajiang(GameStage):
                 player_can_get_card = True
 
         if not player_can_get_card:
-            game_round.deal_cards_for_player(listeners[0], 1)
-            game_round.set_one_player_starter(listeners[0])
-            PlayMajiang.begin_one_play(game_round, listeners[0])
+            next_player = listeners[0]
+            game_round.deal_cards_for_player(next_player, 1)
+            game_round.set_one_player_starter(next_player)
+            PlayMajiang.begin_one_play(game_round, next_player)
 
     @staticmethod
-    def on_player_cmd_action(game_round, player, cmd, cmd_data):
+    def on_player_selected_action(game_round, player, cmd, cmd_data):
         if cmd == InterProtocol.majiang_player_act_peng:
-            card = 111
+            card = cmd_data
             player.add_pend_card(card)
             game_round.set_one_player_starter(player)
             PlayMajiang.begin_one_play(game_round, player)
@@ -58,11 +59,3 @@ class PlayMajiang(GameStage):
             next_player = listeners[0]
             game_round.deal_cards_for_player(next_player, 1)
             PlayMajiang.begin_one_play(game_round, next_player)
-
-        #banker
-        #push cmd to let banker play one card or hu
-        #listen player playing card event
-        #if one player can peng
-           #push to let player peng or pass
-        #else
-           #deal a new card to next player
