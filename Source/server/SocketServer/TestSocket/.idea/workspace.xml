@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/PlayManager.py" line="150" />
+    <bookmark url="file://$PROJECT_DIR$/PlayManager.py" line="156" />
     <bookmark url="file://$PROJECT_DIR$/PlayManager.py" line="91" />
   </component>
   <component name="ChangeListManager">
@@ -30,8 +30,18 @@
       <file leaf-file-name="PlayManager.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PlayManager.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="93" column="29" lean-forward="true" selection-start-line="93" selection-start-column="29" selection-end-line="93" selection-end-column="29" />
+            <state relative-caret-position="416">
+              <caret line="106" column="27" lean-forward="true" selection-start-line="106" selection-start-column="27" selection-end-line="106" selection-end-column="27" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TellWinner.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/GameStages/TellWinner.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="390">
+              <caret line="26" column="0" lean-forward="true" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -119,16 +129,6 @@
               <folding>
                 <element signature="e#14#25#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GameRule.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/GameRules/GameRule.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2430">
-              <caret line="162" column="28" lean-forward="true" selection-start-line="162" selection-start-column="28" selection-end-line="162" selection-end-column="28" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -295,7 +295,7 @@
             <path>
               <item name="TestSocket" type="b2602c69:ProjectViewProjectNode" />
               <item name="TestSocket" type="462c0819:PsiDirectoryNode" />
-              <item name="Rooms" type="462c0819:PsiDirectoryNode" />
+              <item name="GameStages" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -788,14 +788,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/GameStages/TellWinner.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="26" column="0" lean-forward="true" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/GameStages/TeamPlayers.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="315">
@@ -1028,10 +1020,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/GameStages/TellWinner.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="26" column="0" lean-forward="true" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/PlayManager.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="93" column="29" lean-forward="true" selection-start-line="93" selection-start-column="29" selection-end-line="93" selection-end-column="29" />
+        <state relative-caret-position="416">
+          <caret line="106" column="27" lean-forward="true" selection-start-line="106" selection-start-column="27" selection-end-line="106" selection-end-column="27" />
           <folding />
         </state>
       </provider>

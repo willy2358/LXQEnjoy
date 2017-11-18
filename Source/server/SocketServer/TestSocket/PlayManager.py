@@ -90,6 +90,12 @@ def init_majiang_rule_guaisanjiao():
     rule.add_game_stage(stage)
     stage = PlayMajiang(rule)
     rule.add_game_stage(stage)
+    stage = TellWinner(rule)
+    rule.add_game_stage(stage)
+    stage = CalScores(stage)
+    rule.add_game_stage(stage)
+    stage = PublishScores(rule)
+    rule.add_game_stage(stage)
 
     GameRules[rule_id] = rule
 
