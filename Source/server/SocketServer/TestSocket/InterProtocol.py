@@ -3,13 +3,14 @@ SOCK_REQ_CMD = "sockreq"
 CMD_TYPE = "cmdtype"
 
 
-CLIENT_REQ_JOIN_GAME = "join-game" # 开始游戏
-CLIENT_REQ_SELECT_ACTION = "sel-act"
-CLIENT_REQ_RECONNECT = "reconnect" #断线重连
+client_req_join_game = "join-game"   # 开始游戏
+client_req_select_action = "sel-act"
+client_req_reconnect = "reconnect"   # 断线重连
+client_req_exe_cmd = "exe-cmd"
 
-ROOM_ID = "roomid"
-USER_ID = "userid"
-GAME_ID = "gameid"
+room_id = "roomid"
+user_id = "userid"
+game_id = "gameid"
 
 majiang_player_act_peng = "peng"
 majiang_player_act_hu = "hu"

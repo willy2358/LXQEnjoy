@@ -1,9 +1,9 @@
 from GameRules.GameRule import GameRule
 
 
-class MajiangGameRule(GameRule):
+class GameRule_Majiang(GameRule):
     def __init__(self, rule_id):
-        super(MajiangGameRule, self).__init__(rule_id)
+        super(GameRule_Majiang, self).__init__(rule_id)
         self.__banker_cards_number = 14
         self.__non_banker_cards_number = 13
 

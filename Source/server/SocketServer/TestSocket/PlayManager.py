@@ -5,8 +5,8 @@ import InterProtocol
 import PlayerClient
 from Actions.CallBank import CallBank
 from Actions.PassCall import PassCall
-from GameRules.MajiangGameRule import MajiangGameRule
-from GameRules.PokerGameRule import PokerGameRule
+from GameRules.GameRule_Majiang import GameRule_Majiang
+from GameRules.GameRule_Poker import GameRule_Poker
 from GameStages.CalScores import CalScores
 from GameStages.CallBanker import CallBanker
 from GameStages.DealCards import DealCards
@@ -40,7 +40,7 @@ CLIENT_REQ_SELECT_ACTION = "sel-act"
 # dou di zu
 def init_poker_rule_doudizu():
     rule_id = "1212"
-    rule = PokerGameRule(rule_id)
+    rule = GameRule_Poker(rule_id)
     rule.set_player_min_number(3)
     rule.set_player_max_number(3)
     rule.set_cards_number_not_deal(3)
@@ -79,7 +79,7 @@ def init_poker_rule_doudizu():
 # da tong guai san jiao
 def init_majiang_rule_guaisanjiao():
     rule_id = "m1"
-    rule = MajiangGameRule(rule_id)
+    rule = GameRule_Majiang(rule_id)
     rule.set_player_min_number(3)
     rule.set_player_max_number(4)
     rule.set_cards(CardsMaster.MaJiang_Wan + CardsMaster.MaJiang_Suo + CardsMaster.MaJiang_Tong)
@@ -156,20 +156,20 @@ def dispatch_player_commands(conn, comm_text):
 def process_client_request(conn, req_json):
     try:
         player = None
-        user_id = req_json[InterProtocol.USER_ID]
+        user_id = req_json[InterProtocol.user_id]
         if user_id not in Players:
             player = PlayerClient(conn, user_id)
             Players[user_id] = player
         else:
             player = Players[user_id]
 
-        if req_json[InterProtocol.ROOM_ID] > InterProtocol.min_room_id:
-            if req_json[InterProtocol.SOCK_REQ_CMD].lower() == InterProtocol.CLIENT_REQ_JOIN_GAME \
-                    and req_json[InterProtocol.ROOM_ID] not in Rooms:
-                create_room_from_db(req_json[InterProtocol.ROOM_ID], req_json[InterProtocol.GAME_ID])
+        if req_json[InterProtocol.room_id] > InterProtocol.min_room_id:
+            if req_json[InterProtocol.SOCK_REQ_CMD].lower() == InterProtocol.client_req_join_game \
+                    and req_json[InterProtocol.room_id] not in Rooms:
+                create_room_from_db(req_json[InterProtocol.room_id], req_json[InterProtocol.game_id])
 
-            if req_json[InterProtocol.ROOM_ID] in Rooms:
-                Rooms[req_json[InterProtocol.ROOM_ID]].process_player_cmd_request(player, req_json)
+            if req_json[InterProtocol.room_id] in Rooms:
+                Rooms[req_json[InterProtocol.room_id]].process_player_cmd_request(player, req_json)
         else:
             #process_lobby_player_request(player, req_json)
             Lobby.process_player_request(player, req_json)
@@ -238,7 +238,7 @@ def process_player_select_action(conn, j_obj):
 # TODO create Room from database
 def create_room_from_db(room_id, rule_id):
     game_rule = GameRules[rule_id]
-    if isinstance(game_rule, MajiangGameRule):
+    if isinstance(game_rule, GameRule_Majiang):
         room = Room_Majiang(room_id, game_rule)
 
     room.set_min_seated_player_num(3)

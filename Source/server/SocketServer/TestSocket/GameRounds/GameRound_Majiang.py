@@ -9,9 +9,9 @@ from GameRounds.GameRound import GameRound
 # this listener become the starter of new one-play, new one-play begins
 
 
-class GameRoundOfMajiang(GameRound):
+class GameRound_Majiang(GameRound):
     def __init__(self, rule):
-        super(GameRoundOfMajiang, self).__init__(rule)
+        super(GameRound_Majiang, self).__init__(rule)
 
         self.__one_play_starter = None
 

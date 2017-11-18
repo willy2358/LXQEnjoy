@@ -6,19 +6,19 @@ from GameRounds import GameRound
 __game_rounds = []
 
 def process_player_join_game(player, req_json):
-    user_id = req_json[InterProtocol.USER_ID]
+    user_id = req_json[InterProtocol.user_id]
 
     if player.get_game_round():
         player.send_error_message("Already in a game")
     else:
-        play_round = get_available_game_round(req_json[InterProtocol.GAME_ID])
+        play_round = get_available_game_round(req_json[InterProtocol.game_id])
         play_round.add_player(player)
-        player.send_success_messsage(InterProtocol.CLIENT_REQ_JOIN_GAME)
+        player.send_success_messsage(InterProtocol.client_req_join_game)
         play_round.test_and_update_current_stage()
 
 
 def process_player_request(player, req_json):
-    if req_json[InterProtocol.SOCK_REQ_CMD].lower() == InterProtocol.CLIENT_REQ_JOIN_GAME:
+    if req_json[InterProtocol.SOCK_REQ_CMD].lower() == InterProtocol.client_req_join_game:
         process_player_join_game(player, req_json)
 
 

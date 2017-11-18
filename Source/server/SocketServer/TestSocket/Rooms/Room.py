@@ -43,19 +43,19 @@ class Room:
             return False
 
     def process_player_cmd_request(self, player, req_json):
-        if req_json[InterProtocol.SOCK_REQ_CMD].lower() == InterProtocol.CLIENT_REQ_JOIN_GAME:
+        if req_json[InterProtocol.SOCK_REQ_CMD].lower() == InterProtocol.client_req_join_game:
             self.process_join_game(player)
 
     def process_join_game(self, player):
         try:
             if not self.can_new_player_seated():
-                player.send_error_message(InterProtocol.CLIENT_REQ_JOIN_GAME, "Room is full")
+                player.send_error_message(InterProtocol.client_req_join_game, "Room is full")
                 return
             if self.is_player_in(player):
-                player.send_error_message(InterProtocol.CLIENT_REQ_JOIN_GAME, "Already in room")
+                player.send_error_message(InterProtocol.client_req_join_game, "Already in room")
                 return
             self.add_seated_player(player)
-            player.send_success_message(InterProtocol.CLIENT_REQ_JOIN_GAME)
+            player.send_success_message(InterProtocol.client_req_join_game)
             self.test_update_room_state()
         except Exception as ex:
             print(ex)
