@@ -147,7 +147,7 @@ def dispatch_player_commands(conn, comm_text):
         #     process_req_join_game(conn, j_obj)
         # if j_obj["req"] == CLIENT_REQ_SELECT_ACTION.lower():
         #     process_player_select_action(conn, j_obj)
-        if j_obj[InterProtocol.CMD_TYPE].lower() == InterProtocol.SOCK_REQ_CMD.lower():
+        if j_obj[InterProtocol.cmd_type].lower() == InterProtocol.sock_req_cmd.lower():
             process_client_request(conn, j_obj)
     except Exception as ex:
         print(ex)
@@ -163,8 +163,11 @@ def process_client_request(conn, req_json):
         else:
             player = Players[user_id]
 
+        if req_json[InterProtocol.sock_req_cmd].lower() == InterProtocol.client_req_reconnect:
+            player.update_connection(conn)
+
         if req_json[InterProtocol.room_id] > InterProtocol.min_room_id:
-            if req_json[InterProtocol.SOCK_REQ_CMD].lower() == InterProtocol.client_req_join_game \
+            if req_json[InterProtocol.sock_req_cmd].lower() == InterProtocol.client_req_join_game \
                     and req_json[InterProtocol.room_id] not in Rooms:
                 create_room_from_db(req_json[InterProtocol.room_id], req_json[InterProtocol.game_id])
 

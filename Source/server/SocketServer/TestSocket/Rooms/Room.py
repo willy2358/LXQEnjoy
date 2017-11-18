@@ -43,8 +43,10 @@ class Room:
             return False
 
     def process_player_cmd_request(self, player, req_json):
-        if req_json[InterProtocol.SOCK_REQ_CMD].lower() == InterProtocol.client_req_join_game:
+        req_cmd = req_json[InterProtocol.sock_req_cmd].lower()
+        if req_cmd == InterProtocol.client_req_join_game:
             self.process_join_game(player)
+        
 
     def process_join_game(self, player):
         try:
@@ -59,6 +61,9 @@ class Room:
             self.test_update_room_state()
         except Exception as ex:
             print(ex)
+
+    def process_player_reconnect(self, player):
+        pass
 
     def test_update_room_state(self):
         if self.get_seated_player_count() >= self.__min_seated_players:

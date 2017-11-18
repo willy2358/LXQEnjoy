@@ -1,6 +1,6 @@
 
-SOCK_REQ_CMD = "sockreq"
-CMD_TYPE = "cmdtype"
+sock_req_cmd = "sockreq"
+cmd_type = "cmdtype"
 
 
 client_req_join_game = "join-game"   # 开始游戏
@@ -19,7 +19,7 @@ majiang_player_act_zimo = "zi mo"
 majiang_player_act_fetch_card = "mo pai"
 majiang_player_act_pass = "guo"
 
-min_room_id = 10   #valid room id should > 10
+min_room_id = 10   # valid room id should > 10
 
 
 def create_deal_cards_json_packet(player, cards):

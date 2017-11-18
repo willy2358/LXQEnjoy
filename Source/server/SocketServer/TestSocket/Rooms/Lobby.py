@@ -18,7 +18,7 @@ def process_player_join_game(player, req_json):
 
 
 def process_player_request(player, req_json):
-    if req_json[InterProtocol.SOCK_REQ_CMD].lower() == InterProtocol.client_req_join_game:
+    if req_json[InterProtocol.sock_req_cmd].lower() == InterProtocol.client_req_join_game:
         process_player_join_game(player, req_json)
 
 

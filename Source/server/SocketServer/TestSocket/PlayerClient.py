@@ -34,6 +34,9 @@ class PlayerClient:
         else:
             return None
 
+    def update_connection(self, conn):
+        self.__socket__conn = conn
+
     def set_playing_rule_id(self, rule_id):
         self.__playing_rule_id = rule_id
 
