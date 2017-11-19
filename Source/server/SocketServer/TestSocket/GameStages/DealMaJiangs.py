@@ -1,10 +1,10 @@
 
-from GameStages import GameStage
+from GameStages.GameStage import GameStage
 
 
 class DealMaJiangs(GameStage):
 
-    def __init__(self):
+    def __init__(self, rule):
         pass
 
     @staticmethod

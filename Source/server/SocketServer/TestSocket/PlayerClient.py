@@ -26,6 +26,9 @@ class PlayerClient:
     def get_in_hand_cards(self):
         return self.__cards_in_hand
 
+    def get_user_id(self):
+        return self.__user_id
+
     def get_default_play_cards(self):
         if len(self.__initial_cards) > 0:
             c = self.__initial_cards[0]

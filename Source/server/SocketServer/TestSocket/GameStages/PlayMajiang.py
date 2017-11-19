@@ -10,7 +10,7 @@ import InterProtocol
 # one listener got the played card or got a new card from table
 # this listener become the starter of new one-play, new one-play begins
 class PlayMajiang(GameStage):
-    def __init__(self):
+    def __init__(self, rule):
         pass
 
     @staticmethod

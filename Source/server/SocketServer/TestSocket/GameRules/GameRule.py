@@ -10,9 +10,9 @@ class GameRule:
         self.__game_stages = []
 
         # self.__call_actions = []
-        self.__head_action_group = ActionGroup()
-        self.__player_idx_of_play_card = -1
-        self.__cur_game_stage_idx = -1;
+        # self.__head_action_group = ActionGroup()
+        # self.__player_idx_of_play_card = -1
+        # self.__cur_game_stage_idx = -1;
 
     def get_head_action_group(self):
         return self.__head_action_group

@@ -12,7 +12,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         # player = Player.Player(conn)
         # MyTCPHandler.__Players.append({conn, player})
 
-        PlayManager.add_player_client(conn)
+        # PlayManager.add_player_client(conn)
 
         flag = True
         while flag:

@@ -8,6 +8,13 @@ client_req_select_action = "sel-act"
 client_req_reconnect = "reconnect"   # 断线重连
 client_req_exe_cmd = "exe-cmd"
 
+server_cmd_type_push = "sockpush"
+server_push_new_banker = "new-banker"
+server_push_deal_cards = "deal-cards"
+
+cmd_data_cards = "cards"
+
+
 room_id = "roomid"
 user_id = "userid"
 game_id = "gameid"
@@ -24,7 +31,12 @@ min_room_id = 10   # valid room id should > 10
 
 
 def create_deal_cards_json_packet(player, cards):
-    pass
+    packet = {
+        cmd_type: server_cmd_type_push,
+        server_cmd_type_push: server_push_deal_cards,
+        cmd_data_cards:cards
+    }
+    return packet
 
 
 def create_cmd_options_json_packet(player, cmd_options):
@@ -33,3 +45,11 @@ def create_cmd_options_json_packet(player, cmd_options):
 
 def create_error_json_packet(player, err_msg):
     pass
+
+
+def create_publish_bank_player_json_packet(bank_player):
+    packet = {cmd_type: server_cmd_type_push,
+           server_cmd_type_push: server_push_new_banker,
+           user_id: bank_player.get_user_id()
+           }
+    return packet

@@ -4,7 +4,7 @@ import Utils
 from GameStages import PlayCards
 from Dealer import Dealer
 import InterProtocol
-
+from threading import Timer
 
 class GameRound:
     def __init__(self, play_rule):
@@ -13,6 +13,9 @@ class GameRound:
         self.__players = []
         self.__cur_player_idx = -1
         self.__winners = []
+        self._round_end_callback = None
+        self._timer_run_round = None
+        self.start_timer_run_round()
 
         self.__started = False
         self.__cur_call_player_idx = -1
@@ -25,8 +28,6 @@ class GameRound:
         self.__my_dealer = Dealer(self)
         self.__cur_action = None
         self.__game_end = False
-        # for s in self.__play_rule.get_game_stages():
-        #     s.set_my_round(self)
 
     def get_players(self):
         return self.__players
@@ -93,9 +94,13 @@ class GameRound:
         if cur_stage:
             if cur_stage.is_ended_in_round(self):
                 cur_stage = self.get_next_game_stage()
+                if not cur_stage and self._round_end_callback:
+                    self._round_end_callback()
 
         if cur_stage:
             cur_stage.execute(self)
+
+        self.start_timer_run_round()
 
     def get_rule(self):
         return self.__play_rule
@@ -109,6 +114,11 @@ class GameRound:
     def set_bank_player(self, player):
         self.__bank_player = player
         player.set_banker()
+        banker_json = InterProtocol.create_publish_bank_player_json_packet(player)
+        self.publish_round_states(banker_json)
+
+    def set_round_end_callback(self, func):
+        self._round_end_callback = func
 
     def deal_cards_for_player(self, player, card_number):
         cards = random.sample(self.__cards_on_table, card_number)
@@ -133,3 +143,11 @@ class GameRound:
             self.__my_dealer.process_player_select_action(player, self.__cur_stage.get_action_by_id(act_id))
 
         self.test_and_update_current_stage()
+
+    def start_timer_run_round(self):
+        self._timer_run_round = Timer(10, self.test_and_update_current_stage)
+        self._timer_run_round.start()
+
+    def publish_round_states(self, json_state):
+        for p in self.__players:
+            p.send_server_command(json_state)

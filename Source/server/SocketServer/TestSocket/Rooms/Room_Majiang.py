@@ -1,4 +1,4 @@
-from Rooms import Room
+from Rooms.Room import Room
 
 
 class Room_Majiang(Room):
@@ -12,4 +12,4 @@ class Room_Majiang(Room):
         pass
 
     def process_player_cmd_request(self, player, req_json):
-        pass
+        super(Room_Majiang, self).process_player_cmd_request(player, req_json)

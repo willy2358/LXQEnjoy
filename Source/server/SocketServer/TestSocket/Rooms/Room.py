@@ -1,3 +1,5 @@
+import threading
+
 import InterProtocol
 from GameRounds.GameRound_Majiang import GameRound_Majiang
 
@@ -15,9 +17,10 @@ class Room:
         self.__current_round_order = 0
         self.__current_round = None
         self.__last_winners = []
+        self._lock_join_game = threading.Lock()
 
     def is_player_in(self, player):
-        return player in self.__players
+        return player in self.__seated_players
 
     def get_seated_player_count(self):
         return len(self.__seated_players)
@@ -30,7 +33,7 @@ class Room:
 
     def add_seated_player(self, player):
         if self.can_new_player_seated():
-            self.__players.append(player)
+            self.__seated_players.append(player)
             return True
         else:
             return False
@@ -49,36 +52,34 @@ class Room:
 
     def process_join_game(self, player):
         try:
-            if not self.can_new_player_seated():
-                player.send_error_message(InterProtocol.client_req_join_game, "Room is full")
-                return
-            if self.is_player_in(player):
-                player.send_error_message(InterProtocol.client_req_join_game, "Already in room")
-                return
-            self.add_seated_player(player)
-            player.send_success_message(InterProtocol.client_req_join_game)
-            self.test_update_room_state()
+            if self._lock_join_game.acquire(5): # timeout 5 seconds
+                if not self.can_new_player_seated():
+                    player.send_error_message(InterProtocol.client_req_join_game, "Room is full")
+                    return
+                if self.is_player_in(player):
+                    player.send_error_message(InterProtocol.client_req_join_game, "Already in room")
+                    return
+                self.add_seated_player(player)
+                player.send_success_message(InterProtocol.client_req_join_game)
+
+                if self.get_seated_player_count() >= self.__min_seated_players:
+                    game_round = GameRound_Majiang(self.__game_rule)
+                    game_round.set_round_end_callback(self.test_continue_next_round)
+                    for p in self.__seated_players:
+                        game_round.add_player(p)
+                    self.__current_round = game_round
+
         except Exception as ex:
             print(ex)
+        finally:
+            self._lock_join_game.release()
 
-    def process_player_reconnect(self, player):
-        pass
-
-    def test_update_room_state(self):
-        if self.get_seated_player_count() >= self.__min_seated_players:
-            game_round = GameRound_Majiang(self.__game_rule)
-            for p in self.__seated_players:
-                game_round.add_player(p)
-            self.__current_round = game_round
-        if self.__current_round:
-            self.__current_round.test_and_update_current_stage()
-            if not self.__current_round.get_is_game_end():
-                return
-
-        if self.__current_round_order < self.__round_num:
-            self.begin_next_game_round()
-        else:
-            self.close_room()
+    def test_continue_next_round(self):
+        if self.__current_round.get_is_game_end():
+            if self.__current_round_order < self.__round_num:
+                self.begin_next_game_round()
+            else:
+                self.close_room()
 
     def begin_next_game_round(self):
         pass

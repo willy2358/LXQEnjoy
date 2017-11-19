@@ -2,7 +2,6 @@ import json
 
 import CardsMaster
 import InterProtocol
-import PlayerClient
 from Actions.CallBank import CallBank
 from Actions.PassCall import PassCall
 from GameRules.GameRule_Majiang import GameRule_Majiang
@@ -19,7 +18,9 @@ from GameStages.RandomBanker import RandomBanker
 from GameStages.TeamPlayers import TeamPlayers
 from GameStages.TellWinner import TellWinner
 from Rooms import Lobby
-from Rooms import Room_Majiang
+from Rooms.Room_Majiang import Room_Majiang
+
+from PlayerClient import PlayerClient
 
 __Players = []
 Players={}   #{userid:player}
@@ -132,12 +133,12 @@ def set_call_banker_action_options(call_banker_stage):
     c221 = c22.add_follow_up_action(CallBank("Call", "2-2-1"))
     c222 = c22.add_follow_up_action(PassCall("Not Call", "2-2-2"), True)
 
-
-def add_player_client(conn):
-    player = PlayerClient.PlayerClient(conn)
-    __Players.append(player)
-    print('player clients:' + str(len(__Players)))
-    print('new player:' + str(conn))
+#
+# def add_player_client(conn):
+#     player = PlayerClient.PlayerClient(conn)
+#     __Players.append(player)
+#     print('player clients:' + str(len(__Players)))
+#     print('new player:' + str(conn))
 
 
 def dispatch_player_commands(conn, comm_text):
@@ -160,6 +161,7 @@ def process_client_request(conn, req_json):
         if user_id not in Players:
             player = PlayerClient(conn, user_id)
             Players[user_id] = player
+            print("new player:" + str(user_id))
         else:
             player = Players[user_id]
 
@@ -174,7 +176,7 @@ def process_client_request(conn, req_json):
             if req_json[InterProtocol.room_id] in Rooms:
                 Rooms[req_json[InterProtocol.room_id]].process_player_cmd_request(player, req_json)
         else:
-            #process_lobby_player_request(player, req_json)
+            # process_lobby_player_request(player, req_json)
             Lobby.process_player_request(player, req_json)
 
     except Exception as ex:
