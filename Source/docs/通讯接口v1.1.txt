@@ -173,10 +173,10 @@ post
 {
 	"cmdtype":"sockpush",
 	"sockpush":"new-banker",
-	"bankerid":122443
+	"userid":122443
 }
 说明：
-bankerid是userid，客户端可使用此ID向web服务器查询用户信息。
+此userid为庄家玩家的id，客户端可使用此ID向web服务器查询用户信息。
 
 4.3 玩家操作命令列表
 推送参数：
@@ -201,7 +201,7 @@ bankerid是userid，客户端可使用此ID向web服务器查询用户信息。
 	"cmdtype":"sockpush",
 	"sockpush":"play-cards",
 	"cards":["majiang_wan_3"],
-	"playerid":11234
+	"userid":11234.  #出牌玩家的userid
 }
 4.6.游戏结束，广播胜负各方
 推送参数：
