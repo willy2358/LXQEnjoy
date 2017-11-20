@@ -83,7 +83,7 @@ def init_majiang_rule_guaisanjiao():
     rule = GameRule_Majiang(rule_id)
     rule.set_player_min_number(3)
     rule.set_player_max_number(4)
-    rule.set_cards(CardsMaster.MaJiang_Wan + CardsMaster.MaJiang_Suo + CardsMaster.MaJiang_Tong)
+    rule.set_cards(CardsMaster.majiang_wans + CardsMaster.majiang_suos + CardsMaster.majiang_tons)
 
     stage = RandomBanker(rule)
     rule.add_game_stage(stage)
