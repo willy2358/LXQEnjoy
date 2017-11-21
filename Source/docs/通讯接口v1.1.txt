@@ -182,10 +182,11 @@ post
 推送参数：
 {
 	"cmdtype":"sockpush",
-	"sockpush":"req-opts",
-	"req-opts":["pen","chi","hu","gang","mopai","zimo"],
+	"sockpush":"cmd-opts",
+	"cmd-opts":["pen","chi","hu","gang","mopai","zimo"],
 	"resp-timeout":30 //用户响应超时时间，单位：秒，值为-1时为没有超时，一直等待用户响应
-	"def-opt":"hu"
+	"def-cmd":"hu",  
+        "cmd-param":""   //当def-opt为chupai时，此参数为使用逗号分隔的牌
 }
 
 4.4. 发牌／摸牌，服务器向玩家手里发牌
@@ -207,7 +208,7 @@ post
 推送参数：
 {
 	"cmdtype":"sockpush",
-	"sockpush":"end-game",
+	"sockpush":"game-result",
 	"winners":[{"playerid":1224, "win-score":12},]
 	"losers":[{"playerid":122,"lose-score":12}]
 }
