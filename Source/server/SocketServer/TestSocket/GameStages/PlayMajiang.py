@@ -18,9 +18,12 @@ class PlayMajiang(GameStage):
         rule = game_round.get_rule()
         starter = game_round.get_bank_player()
         # PlayMajiang.begin_one_play(game_round, starter)
-        cmd_opts = rule.get_player_cmd_options_for_cards(starter, [], False, False)
+        cmd_opts, def_cmd, cmd_param = rule.get_player_cmd_options_for_cards(starter, [], False, False)
         packet = InterProtocol.create_cmd_options_json_packet(starter, cmd_opts)
         starter.send_server_command(packet)
+        timeout = rule.get_default_cmd_resp_timeout()
+        if def_cmd and timeout > 1:
+            game_round.setup_timer_to_select_default_act_for_player(starter, def_cmd, cmd_param, timeout)
 
     @staticmethod
     def is_ended_in_round(game_round):

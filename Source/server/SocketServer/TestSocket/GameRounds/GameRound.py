@@ -6,6 +6,7 @@ from Dealer import Dealer
 import InterProtocol
 from threading import Timer
 
+
 class GameRound:
     def __init__(self, play_rule):
         self.__play_rule = play_rule
@@ -72,6 +73,9 @@ class GameRound:
     def set_current_player(self, player):
         pass
 
+    def setup_timer_to_select_default_act_for_player(self, player, default_cmd, cmd_param, timeout_seconds):
+        pass
+
     def get_cards_for_banker(self):
         return self.__cards_for_banker
 
@@ -104,7 +108,8 @@ class GameRound:
         if cur_stage:
             cur_stage.execute(self)
 
-        self.start_timer_run_round()
+        if cur_stage and cur_stage.is_ended_in_round(self):
+            self.start_timer_run_round()
 
     def get_rule(self):
         return self.__play_rule

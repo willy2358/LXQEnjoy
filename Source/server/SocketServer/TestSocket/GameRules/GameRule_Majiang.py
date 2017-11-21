@@ -27,6 +27,8 @@ class GameRule_Majiang(GameRule):
     @staticmethod
     def get_player_cmd_options_for_cards(player, new_cards, is_next_player = False, is_cards_from_other_player = True):
         cmd_opts = []
+        def_cmd = None
+        cmd_param = None
         cards = player.get_in_hand_cards() + new_cards
         if GameRule_Majiang.can_cards_hu(cards):
             if is_cards_from_other_player:
@@ -35,34 +37,40 @@ class GameRule_Majiang(GameRule):
                 cmd_opts.append(InterProtocol.majiang_player_act_zimo)
 
             if len(new_cards) == 0: # banker initially zi mo
-                pass
+                def_cmd = InterProtocol.majiang_player_act_zimo
             else:
                 if is_next_player:
                     cmd_opts.append(InterProtocol.majiang_player_act_mopai)
+                    def_cmd = InterProtocol.majiang_player_act_mopai
                 else:
                     cmd_opts.append(InterProtocol.majiang_player_act_pass)
+                    def_cmd = InterProtocol.majiang_player_act_pass
         else:
             if len(new_cards) == 0:
                 cmd_opts.append(InterProtocol.majiang_player_act_play_card)
+                def_cmd = InterProtocol.majiang_player_act_play_card
+                cmd_param = cards[0]  # default card to play out is at head.
             else:
                 num = cards.count(new_cards[0])
                 if num >= 3:
                     if is_next_player:
                         cmd_opts.append(InterProtocol.majiang_player_act_mopai)
+                        def_cmd = InterProtocol.majiang_player_act_mopai
                     else:
                         cmd_opts.append(InterProtocol.majiang_player_act_pass)
+                        def_cmd = InterProtocol.majiang_player_act_pass
 
                     cmd_opts.append(InterProtocol.majiang_player_act_peng)
 
                     if num == 4:
                         cmd_opts.append(InterProtocol.majiang_player_act_gang)
 
-        return cmd_opts
+        return cmd_opts, def_cmd, cmd_param
 
-    def get_first_cards_player(self, players):
-        for p in players:
-            if p.is_banker:
-                return p
+    # def get_first_cards_player(self, players):
+    #     for p in players:
+    #         if p.is_banker:
+    #             return p
 
     @staticmethod
     def can_cards_hu(cards):
