@@ -38,21 +38,24 @@ class GameRule_Majiang(GameRule):
                 pass
             else:
                 if is_next_player:
-                    cmd_opts.append(InterProtocol.majiang_player_act_new_card)
+                    cmd_opts.append(InterProtocol.majiang_player_act_mopai)
                 else:
                     cmd_opts.append(InterProtocol.majiang_player_act_pass)
         else:
-            num = cards.count(new_cards[0])
-            if num >= 3:
-                if is_next_player:
-                    cmd_opts.append(InterProtocol.majiang_player_act_new_card)
-                else:
-                    cmd_opts.append(InterProtocol.majiang_player_act_pass)
+            if len(new_cards) == 0:
+                cmd_opts.append(InterProtocol.majiang_player_act_play_card)
+            else:
+                num = cards.count(new_cards[0])
+                if num >= 3:
+                    if is_next_player:
+                        cmd_opts.append(InterProtocol.majiang_player_act_mopai)
+                    else:
+                        cmd_opts.append(InterProtocol.majiang_player_act_pass)
 
-                cmd_opts.append(InterProtocol.majiang_player_act_peng)
+                    cmd_opts.append(InterProtocol.majiang_player_act_peng)
 
-                if num == 4:
-                    cmd_opts.append(InterProtocol.majiang_player_act_gang)
+                    if num == 4:
+                        cmd_opts.append(InterProtocol.majiang_player_act_gang)
 
         return cmd_opts
 
@@ -111,9 +114,10 @@ class GameRule_Majiang(GameRule):
 
     @staticmethod
     def get_forward_bad_cards(cards):
-        remainTests = cards[:].sort()
+        remainTests = cards[:]
+        remainTests.sort()
         bads = []
-        while len(remainTests) > 0:
+        while remainTests and len(remainTests) > 0:
             head = remainTests[0]
             if (head + 1) in remainTests and (head + 2) in remainTests:
                 remainTests.remove(head)

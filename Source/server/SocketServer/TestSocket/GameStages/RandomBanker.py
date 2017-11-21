@@ -11,7 +11,7 @@ class RandomBanker(GameStage):
     @staticmethod
     def execute(game_round):
         players = game_round.get_players()
-        idx = random.randint(0, len(players))
+        idx = random.randint(0, len(players) - 1)
         banker = players[idx]
         game_round.set_bank_player(banker)
 

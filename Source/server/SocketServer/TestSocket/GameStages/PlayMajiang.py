@@ -19,7 +19,7 @@ class PlayMajiang(GameStage):
         starter = game_round.get_bank_player()
         # PlayMajiang.begin_one_play(game_round, starter)
         cmd_opts = rule.get_player_cmd_options_for_cards(starter, [], False, False)
-        packet = InterProtocol.create_cmd_options_json_packet(cmd_opts)
+        packet = InterProtocol.create_cmd_options_json_packet(starter, cmd_opts)
         starter.send_server_command(packet)
 
     @staticmethod
@@ -34,7 +34,7 @@ class PlayMajiang(GameStage):
     def begin_one_play(game_round, starter):
         rule = game_round.get_rule()
         cmd_opts = rule.get_cmd_options_for_cards(starter.get_in_hand_cards())
-        packet = InterProtocol.create_cmd_options_json_packet(cmd_opts)
+        packet = InterProtocol.create_cmd_options_json_packet(starter, cmd_opts)
         starter.send_server_command(packet)
 
     @staticmethod
@@ -45,7 +45,7 @@ class PlayMajiang(GameStage):
         for p in listeners:
             cmd_opts = rule.get_player_cmd_options_for_cards(p, [played_card], p == listeners[0], True)
             if len(cmd_opts) > 0:
-                packet = InterProtocol.create_cmd_options_json_packet(cmd_opts)
+                packet = InterProtocol.create_cmd_options_json_packet(p, cmd_opts)
                 p.send_server_command(packet)
                 waiting_player_act = True
 
@@ -68,7 +68,7 @@ class PlayMajiang(GameStage):
             game_round.set_one_player_starter(player)
             PlayMajiang.begin_one_play(game_round, player)
         elif cmd == InterProtocol.majiang_player_act_pass\
-                or cmd == InterProtocol.majiang_player_act_new_card:
+                or cmd == InterProtocol.majiang_player_act_mopai:
             # in the case, the player give up the peng
             # the next player get chance to fetch one new card
             starter = game_round.get_cur_play_starter()

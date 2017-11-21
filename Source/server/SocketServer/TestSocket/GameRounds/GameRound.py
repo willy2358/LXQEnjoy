@@ -13,6 +13,7 @@ class GameRound:
         self.__players = []
         self.__cur_player_idx = -1
         self.__winners = []
+        self.__losers = []
         self._round_end_callback = None
         self._timer_run_round = None
         self.start_timer_run_round()
@@ -61,6 +62,9 @@ class GameRound:
 
     def get_winners(self):
         return self.__winners
+
+    def get_losers(self):
+        return  self.__losers
 
     def set_cur_game_stage(self, stage):
         self.__cur_stage = stage
