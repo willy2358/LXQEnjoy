@@ -165,11 +165,11 @@ def process_client_request(conn, req_json):
         else:
             player = Players[user_id]
 
-        if req_json[InterProtocol.sock_req_cmd].lower() == InterProtocol.client_req_reconnect:
+        if req_json[InterProtocol.sock_req_cmd].lower() == InterProtocol.client_req_type_reconnect:
             player.update_connection(conn)
 
         if req_json[InterProtocol.room_id] > InterProtocol.min_room_id:
-            if req_json[InterProtocol.sock_req_cmd].lower() == InterProtocol.client_req_join_game \
+            if req_json[InterProtocol.sock_req_cmd].lower() == InterProtocol.client_req_type_join_game \
                     and req_json[InterProtocol.room_id] not in Rooms:
                 create_room_from_db(req_json[InterProtocol.room_id], req_json[InterProtocol.game_id])
 

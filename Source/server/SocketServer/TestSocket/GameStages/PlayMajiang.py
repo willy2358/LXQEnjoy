@@ -1,5 +1,4 @@
-from GameStages.GameStage import GameStage
-
+from GameStages.PlayInTurn import PlayInTurn
 import InterProtocol
 
 
@@ -9,7 +8,7 @@ import InterProtocol
 # letting other players response to the played card, these players are called listeners
 # one listener got the played card or got a new card from table
 # this listener become the starter of new one-play, new one-play begins
-class PlayMajiang(GameStage):
+class PlayMajiang(PlayInTurn):
     def __init__(self, rule):
         pass
 
@@ -36,7 +35,7 @@ class PlayMajiang(GameStage):
     @staticmethod
     def begin_one_play(game_round, starter):
         rule = game_round.get_rule()
-        cmd_opts = rule.get_cmd_options_for_cards(starter.get_in_hand_cards())
+        cmd_opts, def_cmd, cmd_param = rule.get_cmd_options_for_cards(starter.get_in_hand_cards())
         packet = InterProtocol.create_cmd_options_json_packet(starter, cmd_opts)
         starter.send_server_command(packet)
 
@@ -46,7 +45,7 @@ class PlayMajiang(GameStage):
         rule = game_round.get_rule()
         waiting_player_act = False
         for p in listeners:
-            cmd_opts = rule.get_player_cmd_options_for_cards(p, [played_card], p == listeners[0], True)
+            cmd_opts, def_cmd, cmd_param = rule.get_player_cmd_options_for_cards(p, [played_card], p == listeners[0], True)
             if len(cmd_opts) > 0:
                 packet = InterProtocol.create_cmd_options_json_packet(p, cmd_opts)
                 p.send_server_command(packet)
@@ -59,7 +58,7 @@ class PlayMajiang(GameStage):
             PlayMajiang.begin_one_play(game_round, next_player)
 
     @staticmethod
-    def on_player_selected_action(game_round, player, cmd, cmd_data):
+    def on_player_selected_action(game_round, player, cmd, cmd_data = None, silent_cmd = False):
         if cmd == InterProtocol.majiang_player_act_peng:
             card = cmd_data
             game_round.player_select_peng(player, card)
@@ -81,3 +80,6 @@ class PlayMajiang(GameStage):
             PlayMajiang.begin_one_play(game_round, next_player)
         elif cmd == InterProtocol.majiang_player_act_hu:
             game_round.set_winners([player])
+            game_round.test_and_update_current_stage()
+        elif cmd == InterProtocol.majiang_player_act_play_card:
+            PlayMajiang.on_one_card_played_out(game_round, player, cmd_data)

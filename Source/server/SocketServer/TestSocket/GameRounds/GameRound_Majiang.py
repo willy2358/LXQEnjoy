@@ -22,8 +22,8 @@ class GameRound_Majiang(GameRound):
         return self.__one_play_starter
 
     def get_one_play_listeners(self, starter):
-        idx = self.__players.index(starter)
-        listeners = self.__players[idx + 1:] +  self.__players[:idx]
+        idx = self._players.index(starter)
+        listeners = self._players[idx + 1:] + self._players[:idx]
         return listeners
 
     def player_select_peng(self, player, card):

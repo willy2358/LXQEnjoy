@@ -47,20 +47,29 @@ class Room:
 
     def process_player_cmd_request(self, player, req_json):
         req_cmd = req_json[InterProtocol.sock_req_cmd].lower()
-        if req_cmd == InterProtocol.client_req_join_game:
+        if req_cmd == InterProtocol.client_req_type_join_game:
             self.process_join_game(player)
+        elif req_cmd == InterProtocol.client_req_type_exe_cmd:
+            if InterProtocol.client_req_exe_cmd not in req_json:
+                err = InterProtocol.create_request_error_packet(req_cmd)
+                player.send_server_command(err)
+            if self.__current_round:
+                cmd = req_json[InterProtocol.sock_req_cmd]
+                const_param = InterProtocol.clien_req_cmd_param
+                cmd_param = req_json[const_param] if const_param in req_json else None
+                self.__current_round.process_player_execute_command(player, cmd, cmd_param)
 
     def process_join_game(self, player):
         try:
             if self._lock_join_game.acquire(5): # timeout 5 seconds
                 if not self.can_new_player_seated():
-                    player.send_error_message(InterProtocol.client_req_join_game, "Room is full")
+                    player.send_error_message(InterProtocol.client_req_type_join_game, "Room is full")
                     return
                 if self.is_player_in(player):
-                    player.send_error_message(InterProtocol.client_req_join_game, "Already in room")
+                    player.send_error_message(InterProtocol.client_req_type_join_game, "Already in room")
                     return
                 self.add_seated_player(player)
-                player.send_success_message(InterProtocol.client_req_join_game)
+                player.send_success_message(InterProtocol.client_req_type_join_game)
 
                 if self.get_seated_player_count() >= self.__min_seated_players:
                     game_round = GameRound_Majiang(self.__game_rule)
