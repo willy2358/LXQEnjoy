@@ -180,7 +180,10 @@ class GameRound:
             player.send_server_command(err)
         else:
             if isinstance(self.__cur_stage, PlayInTurn):
-                self.__cur_stage.on_player_selected_action(self, player, cmd, cmd_param, silent_cmd)
+                try:
+                    self.__cur_stage.on_player_selected_action(self, player, cmd, cmd_param, silent_cmd)
+                except Exception as ex:
+                    player.send_command_message(str(ex))
 
     def process_player_select_action(self, player, act_id, act_param=None):
         if self.__cur_stage:

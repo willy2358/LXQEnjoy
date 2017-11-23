@@ -15,7 +15,9 @@ class PlayerClient:
         self.__playing_rule_id = 0
         self.__game_round = None
         self.__initial_cards = []
-        self.__cards_in_hand = []
+        self.__cards_in_hand = []   # _cards_in_hand == __active_cards + __freezed_cards
+        self.__active_cards = []  # These cards are active, that, these cards can be played out
+        self.__freezed_cards = []   # These cards are freezed, that is, these cards can not be played out, or used by other purpose
         self.__user_id = user_id
         self.__room_id = 0
         self.__is_banker = False
@@ -25,6 +27,9 @@ class PlayerClient:
 
     def get_in_hand_cards(self):
         return self.__cards_in_hand
+
+    def get_active_cards(self):
+        return self.__active_cards
 
     def get_user_id(self):
         return self.__user_id

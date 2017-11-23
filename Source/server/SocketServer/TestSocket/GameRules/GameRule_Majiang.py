@@ -29,7 +29,7 @@ class GameRule_Majiang(GameRule):
         cmd_opts = []
         def_cmd = None
         cmd_param = None
-        cards = player.get_in_hand_cards() + new_cards
+        cards = player.get_active_cards() + new_cards
         if GameRule_Majiang.can_cards_hu(cards):
             if is_cards_from_other_player:
                 cmd_opts.append(InterProtocol.majiang_player_act_hu)

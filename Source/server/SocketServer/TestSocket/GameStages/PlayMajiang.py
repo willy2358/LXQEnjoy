@@ -16,13 +16,7 @@ class PlayMajiang(PlayInTurn):
     def execute(game_round):
         rule = game_round.get_rule()
         starter = game_round.get_bank_player()
-        # PlayMajiang.begin_one_play(game_round, starter)
-        cmd_opts, def_cmd, cmd_param = rule.get_player_cmd_options_for_cards(starter, [], False, False)
-        packet = InterProtocol.create_cmd_options_json_packet(starter, cmd_opts)
-        starter.send_server_command(packet)
-        timeout = rule.get_default_cmd_resp_timeout()
-        if def_cmd and timeout > 1:
-            game_round.setup_timer_to_select_default_act_for_player(starter, def_cmd, cmd_param, timeout)
+        PlayMajiang.begin_one_play(game_round, starter,[], True, False)
 
     @staticmethod
     def is_ended_in_round(game_round):
@@ -33,11 +27,14 @@ class PlayMajiang(PlayInTurn):
             return False
 
     @staticmethod
-    def begin_one_play(game_round, starter):
+    def begin_one_play(game_round, starter, new_cards, is_turn_ordered, is_played_out_cards):
         rule = game_round.get_rule()
-        cmd_opts, def_cmd, cmd_param = rule.get_cmd_options_for_cards(starter.get_in_hand_cards())
+        cmd_opts, def_cmd, cmd_param = rule.get_player_cmd_options_for_cards(starter, new_cards, is_turn_ordered, is_played_out_cards)
         packet = InterProtocol.create_cmd_options_json_packet(starter, cmd_opts)
         starter.send_server_command(packet)
+        timeout = rule.get_default_cmd_resp_timeout()
+        if def_cmd and timeout > 1:
+            game_round.setup_timer_to_select_default_act_for_player(starter, def_cmd, cmd_param, timeout)
 
     @staticmethod
     def on_one_card_played_out(game_round, player, played_card):
@@ -54,21 +51,20 @@ class PlayMajiang(PlayInTurn):
         if not waiting_player_act:
             next_player = listeners[0]
             game_round.deal_cards_for_player(next_player, 1)
-            game_round.set_one_player_starter(next_player)
-            PlayMajiang.begin_one_play(game_round, next_player)
+            PlayMajiang.begin_one_play(game_round, next_player, [], True, False)
 
     @staticmethod
     def on_player_selected_action(game_round, player, cmd, cmd_data = None, silent_cmd = False):
         if cmd == InterProtocol.majiang_player_act_peng:
             card = cmd_data
             game_round.player_select_peng(player, card)
-            game_round.set_one_player_starter(player)
-            PlayMajiang.begin_one_play(game_round, player)
+            # game_round.set_one_player_starter(player)
+            PlayMajiang.begin_one_play(game_round, player, [], True, False)
         elif cmd == InterProtocol.majiang_player_act_gang:
             card = cmd_data
             game_round.player_select_gang(player, card)
-            game_round.set_one_player_starter(player)
-            PlayMajiang.begin_one_play(game_round, player)
+            # game_round.set_one_player_starter(player)
+            PlayMajiang.begin_one_play(game_round, player, [], True, False)
         elif cmd == InterProtocol.majiang_player_act_pass\
                 or cmd == InterProtocol.majiang_player_act_mopai:
             # in the case, the player give up the peng
@@ -77,7 +73,7 @@ class PlayMajiang(PlayInTurn):
             listeners = game_round.get_one_play_listeners(starter)
             next_player = listeners[0]
             game_round.deal_cards_for_player(next_player, 1)
-            PlayMajiang.begin_one_play(game_round, next_player)
+            PlayMajiang.begin_one_play(game_round, next_player, [], True, False)
         elif cmd == InterProtocol.majiang_player_act_hu:
             game_round.set_winners([player])
             game_round.test_and_update_current_stage()
