@@ -16,7 +16,7 @@ class ActionGroup:
         return self.__actions
 
     def get_select_timeout(self):
-        return self.__player_select_timeout_seconds
+        return self.__player_select_timeout_seconds  #test
 
     def get_default_action(self):
         return self.__default_action

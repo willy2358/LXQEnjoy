@@ -1,8 +1,3 @@
-from Actions.ActionGroup import ActionGroup
-from Actions.PassPlay import PassPlay
-from Actions.PlayCard import PlayCard
-
-
 class GameRule:
     def __init__(self, rule_id):
         self.__player_num_min = 0;
@@ -13,21 +8,25 @@ class GameRule:
         self.__cards = []
         # self.__stages = []
         self.__game_stages = []
+        self.__default_cmd_resp_timeout = 30  # timeout in seconds for player to pick up a command
 
         # self.__call_actions = []
-        self.__head_action_group = ActionGroup()
-        self.__player_idx_of_play_card = -1
-        self.__cur_game_stage_idx = -1;
+        # self.__head_action_group = ActionGroup()
+        # self.__player_idx_of_play_card = -1
+        # self.__cur_game_stage_idx = -1;
+
+    def get_default_cmd_resp_timeout(self):
+        return self.__default_cmd_resp_timeout
 
     def get_head_action_group(self):
         return self.__head_action_group
 
-    def get_next_game_stage(self):
-        self.__cur_game_stage_idx += 1
-        if self.__cur_game_stage_idx < len(self.__game_stages):
-            return self.__game_stages[self.__cur_game_stage_idx]
-        else:
-            return None
+    # def get_next_game_stage(self):
+    #     self.__cur_game_stage_idx += 1
+    #     if self.__cur_game_stage_idx < len(self.__game_stages):
+    #         return self.__game_stages[self.__cur_game_stage_idx]
+    #     else:
+    #         return None
 
     @staticmethod
     def get_is_round_end(game_round):
@@ -164,8 +163,6 @@ class GameRule:
     def get_cards_number_not_deal(self):
         return self.__cards_num_not_deal
 
-
-
     def set_cards(self, cards):
         self.__cards = cards
 
@@ -174,9 +171,3 @@ class GameRule:
 
     def add_game_stage(self, stage):
         self.__game_stages.append(stage)
-
-
-
-
-
-

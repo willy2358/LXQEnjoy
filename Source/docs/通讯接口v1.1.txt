@@ -1,0 +1,247 @@
+
+一、用户信息
+1.用户注册：
+客户端请求：
+通道：http
+请求接口：http://serverid/service
+请求类型：post
+请求参数：
+{
+	"cmdtype":"httpreq",
+	"httpreq":"newuser",
+	"username":"124323", //此ID可以是用户手机号，昵称,客户端设备设别码等
+	"password":"pwd", //此为客户端密码md5加密后的值
+}
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"result":"OK|ERROR",
+	"errmsg":"",
+	"result-data":{"userid":124232}
+}
+说明：
+注册成功：result 为 “OK”，result-data中含有玩家的userid，此userid将用作玩家的唯一标识，用于后续与服务器通信的玩家唯一识别码。
+注册失败：result 为“ERROR”，errmsg是错误信息。
+此接口也可用于用户作为游客身份的快速注册，登录，或无账户登录（其实对于服务器来说，这个用户还是有username和password的，只不过这些信息是由客户端按规则默认生成了，以后提供更新用户信息接口，绑定手机号，微信号等。
+
+
+2.用户登录：
+客户端请求：
+通道：http
+请求接口：http://serverid/service
+请求类型：post
+请求参数：
+{
+	"cmdtype":"httpreq",
+	"httpreq":"login",
+	"username":"124323", //此ID可以是用户手机号，昵称等
+	"password":"pwd", //此为客户端密码md5加密后的值
+}
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"httpresp":"login",
+	"result":"OK",
+	"errmsg":""
+	"result-data":{"user-info":
+	          		{"userid":124422,"image":"用户头像web路径", "assets":"用户资产"}
+	              }
+}
+说明：
+登录成功：result 为 OK，errmsg为空
+登录失败：result 为 "ERROR", errmsg为失败原因，可能值：用户不存在，密码错误
+用户信息具体待定
+
+3.用户信息查询，此接口用于查询用户的可公开信息
+客户端请求：
+通道：http
+请求接口：http://serverid/service
+请求类型：post
+请求参数：
+{
+	"cmdtype":"httpreq",
+	"httpreq":"user-info",
+	"userid":"124323",
+}
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"httpresp":"user-info",
+	"result":"OK|ERROR"
+	"err-msg":""
+	"result-data":{
+	  "userinfo":{
+	  "image":"http://webserverip//userimg/12322.png"
+	  "asset":"1222"
+	  }
+	} 
+}
+说明：
+查询成功：用户信息在result-data中
+查询失败：错误信息在err-msg中
+
+
+
+二、进入游戏
+
+1.创建房间
+客户端请求：
+
+通道：http
+接口：http://serverip/service
+post
+参数：
+{
+	"cmdtype":"httpreq",
+	"httpreq":"newroom",
+	"userid":123456
+}
+
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"httpresp":"newroom",
+	"result":"OK",
+	"errmsg":""
+}
+说明：
+服务器执行成功：result = "OK", errmsg：无内容
+服务器执行失败：result = "ERROR"，errmsg:错误原因，可能值：用户未登录，用户已创建房间
+
+
+2.进入房间
+通道：http
+接口：http://serverip/service
+请求参数：
+{
+	"cmdtype":"httpreq",
+	"httpreq":"enter-room",
+	"userid",123456,
+	"roomid",122424，//roomid为0，-1，或空时，为进入游戏大厅
+}
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"httpresp":"enter-room",
+	"result":"OK"
+	"errmsg":""
+	"result-data":{"game-server":"123.23.45.88","port":8992}
+}
+说明：
+
+用户可成功进入房间，result 为“OK", result-data中包含socket服务器的IP,和port
+不可进入房间：result 为“error”， errmsg：错误原因，可能值：用户未登录，房间不存在,房间已满人
+
+3.进入游戏(入座)
+通道：socket
+请求参数：
+{
+	"cmdtype":"sockreq",
+	"sockreq":"join-game"
+	"userid":123456,
+	"roomid":123333,
+	"gameid":123432
+}
+服务器返回：
+{
+	"cmdtype":"sockresp"
+	"sockresp":"join-game",
+	"result":"OK"
+	"errmsg":""
+	"result-data":{"state":""}
+}
+说明：
+成功时：state 取值：“等待新玩家“，”组局成功，马上开始“，”智能匹配玩家“ 等
+
+4.服务器推送：
+4.1组局成功：玩家信息：
+推送信息：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"game-players",
+	"players":["userid1","userid2","userid3"]
+}
+4.2组局成功，发牌
+推送参数：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"deal-cards"   
+	"cards":["majiang_wan_1","majiang_wan_2",.....]
+}
+4.2确定庄家
+推送参数：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"new-banker",
+	"userid":122443
+}
+说明：
+此userid为庄家玩家的id，客户端可使用此ID向web服务器查询用户信息。
+
+4.3 玩家操作命令列表
+推送参数：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"cmd-opts",
+	"cmd-opts":["pen","chi","hu","gang","mopai","zimo"],
+	"resp-timeout":30 //用户响应超时时间，单位：秒，值为-1时为没有超时，一直等待用户响应
+	"def-cmd":"hu",  
+        "cmd-param":""   //当def-opt为chupai时，此参数为使用逗号分隔的牌
+}
+
+4.4. 发牌／摸牌，服务器向玩家手里发牌
+推送参数：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"deal-cards",
+	"cards":["majiang_tong_1"]
+}
+4.5 玩家出牌，此用于通知其他玩家
+推送参数：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"play-cards",
+	"cards":["majiang_wan_3"],
+	"userid":11234.  #出牌玩家的userid
+}
+4.6.游戏结束，广播胜负各方
+推送参数：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"game-result",
+	"winners":[{"playerid":1224, "win-score":12},]
+	"losers":[{"playerid":122,"lose-score":12}]
+}
+说明：
+winners和losers可有多个，win-score和lose-score表示赢或输的分数，客户端根据此数字更新玩家代币数
+
+
+5.玩家发送
+5.1出牌
+请求参数：
+{
+	"cmdtype":"sockreq",
+	"sockreq":"play-cards",
+	"userid":124242,
+	"roomid":123|0
+	"cards:"["majiang_tong_2"]
+}
+5.2玩家响应
+请求参数：
+{
+	"cmdtype":"sockreq",
+	"sockreq":"exe-cmd",  //执行命令
+	"userid":124122,
+	"roomid",123|0
+	“cmd":"peng", //此命令来自服务器推送的命令列表
+	"cmd-data":"" //命令数据，预留
+}
+5.3玩家断网重连
+请求参数：
+{
+	"cmdtype":"sockreq",
+	"sockreq":"reconnect",
+	"userid":123456,
+	"gameid":324243,
+	"roomid":324242
+}

@@ -1,7 +1,5 @@
 from threading import Timer
 
-import GameRound
-
 
 class Dealer:
     COMMAND_OPTIONS = "cmd-opts"

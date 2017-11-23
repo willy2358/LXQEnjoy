@@ -46,6 +46,10 @@ class GameStage:
             self.__head_action_group = ActionGroup()
         self.__head_action_group.add_action(action, as_default_action)
 
+    @staticmethod
+    def execute(self, game_round):
+        pass
+
     def begin(self):
         pass
 
@@ -53,4 +57,8 @@ class GameStage:
         pass
 
     def process_player_selected_action_id(self, player, action_id, action_params=None):
+        pass
+
+    @staticmethod
+    def is_ended_in_round(game_round):
         pass

@@ -6,26 +6,47 @@ import PlayManager
 from threading import Timer
 
 import Utils
+import Log
 
 
 class PlayerClient:
-    def __init__(self, conn):
+    def __init__(self, conn, user_id):
         self.__socket__conn = conn
         self.__playing_rule_id = 0
         self.__game_round = None
-        self.__dealed_cards = []
-        self.__remained_cards = []
+        self.__initial_cards = []
+        self.__cards_in_hand = []   # _cards_in_hand == __active_cards + __freezed_cards
+        self.__active_cards = []  # These cards are active, that, these cards can be played out
+        self.__freezed_cards = []   # These cards are freezed, that is, these cards can not be played out, or used by other purpose
+        self.__user_id = user_id
+        self.__room_id = 0
+        self.__is_banker = False
 
-    def get_remained_cards(self):
-        return self.__remained_cards
+    def is_banker(self):
+        return self.__is_banker
+
+    def get_in_hand_cards(self):
+        return self.__cards_in_hand
+
+    def get_active_cards(self):
+        return self.__active_cards
+
+    def get_user_id(self):
+        return self.__user_id
 
     def get_default_play_cards(self):
-        if len(self.__dealed_cards) > 0:
-            c = self.__dealed_cards[0]
-            self.__dealed_cards.remove(c)
+        if len(self.__initial_cards) > 0:
+            c = self.__initial_cards[0]
+            self.__initial_cards.remove(c)
             return c
         else:
             return None
+
+    def get_init_cards(self):
+        return self.__initial_cards
+
+    def update_connection(self, conn):
+        self.__socket__conn = conn
 
     def set_playing_rule_id(self, rule_id):
         self.__playing_rule_id = rule_id
@@ -58,26 +79,47 @@ class PlayerClient:
         j_str = json.dumps(cmd_obj)
         self.send_command_message(j_str)
 
-    def send_error_message(self, error):
-        msg = {"msg": error, "msg-type":"error"}
+    def send_error_message(self, req_cmd, errmsg):
+        Log.write_error(errmsg)
+        msg = {"cmdtype": "sockresp",
+               "sockresp":req_cmd,
+               "result":"ERROR",
+               "errmsg":errmsg}
         j_str = json.dumps(msg)
         self.send_command_message(j_str)
 
-    def add_dealed_cards(self, cards):
-        if isinstance(cards, list):
-            self.__dealed_cards += cards
-        elif isinstance(cards, str):
-            self.__dealed_cards.append(cards)
+    def send_success_message(self, req_cmd):
+        msg = {"cmdtype": "sockresp",
+                    "sockresp":req_cmd,
+                    "result":"OK",
+                    "errmsg":""}
+        j_str = json.dumps(msg)
+        self.send_command_message(j_str)
 
-        self.__remained_cards = self.__dealed_cards[:]
+    def set_initial_cards(self, cards):
+        self.__initial_cards = cards[:]
+        self.__cards_in_hand = self.__initial_cards[:]
+
+    def add_dealt_cards(self, cards):
+        if isinstance(cards, list):
+            self.__initial_cards += cards
+        elif isinstance(cards, str):
+            self.__initial_cards.append(cards)
+
+        self.__cards_in_hand = self.__initial_cards[:]
 
     def play_out_cards(self, cards):
         if isinstance(cards, str):
-            self.__remained_cards.remove(cards)
+            self.__cards_in_hand.remove(cards)
         elif isinstance(cards, list):
-            Utils.list_remove_parts(self.__remained_cards, cards)
+            Utils.list_remove_parts(self.__cards_in_hand, cards)
         else:
             pass
 
+    def set_banker(self):
+        self.__is_banker = True
+
+    def reset_banker(self):
+        self.__is_banker = False
 
 
