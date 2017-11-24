@@ -43,6 +43,12 @@ majiang_player_act_mopai = "mo pai"
 majiang_player_act_pass = "guo"
 majiang_player_act_play_card = "chu pai"
 
+# the cmd with less index has the higher priority. that is  majiang_player_act_zimo has the highest priority.
+majiang_acts_priorities = [majiang_player_act_zimo, majiang_player_act_hu,
+                           majiang_player_act_gang, majiang_player_act_peng,
+                           majiang_player_act_chi, majiang_player_act_mopai,
+                           majiang_player_act_play_card, majiang_player_act_pass ]
+
 min_room_id = 10   # valid room id should > 10
 
 
@@ -55,17 +61,19 @@ def create_deal_cards_json_packet(player, cards):
     return packet
 
 
-def create_cmd_options_json_packet(player, cmd_options, resp_timeout=-1, def_cmd=None, cmd_param=None):
+def create_cmd_options_json_packet(player, cmd_options, def_cmd=None, resp_timeout=-1):
+    opts = []
+    for v in cmd_options:
+        opts.append({"cmd":v.get_cmd(),"cmd-param":v.get_cmd_param()})
+
     packet = {
         cmd_type: server_cmd_type_push,
         server_cmd_type_push: server_push_cmd_opts,
-        server_push_cmd_opts:cmd_options,
+        server_push_cmd_opts:opts,
         server_push_cmd_resp_timeout:resp_timeout
     }
     if def_cmd:
-        packet[server_push_def_cmd] = def_cmd
-    if cmd_param:
-        packet[server_push_cmd_param] = cmd_param
+        packet[server_push_def_cmd] = {"cmd":def_cmd.get_cmd(), "cmd-param":def_cmd.get_cmd_param()}
 
     return packet
 

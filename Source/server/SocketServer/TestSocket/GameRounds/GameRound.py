@@ -27,7 +27,7 @@ class GameRound:
         # if False, the execution will only noticed to the owning player
         self.__default_cmd_silent = False
 
-        self.__allowed_cmds = {}
+        self.__allowed_cmds = []
         self.__allowed_cmds_player = None
 
 
@@ -87,12 +87,12 @@ class GameRound:
     def set_current_player(self, player):
         pass
 
-    def setup_timer_to_select_default_act_for_player(self, player, default_cmd, cmd_param, timeout_seconds, cmd_silent = False):
+    def setup_timer_to_select_default_act_for_player(self, player, default_cmd, timeout_seconds, cmd_silent = False):
         self.__player_for_default_cmd = player
         self.__default_cmd = default_cmd
-        self.__cmd_param = cmd_param
+        self.__cmd_param = default_cmd.get_cmd_param()
         self.__default_cmd_silent = cmd_silent
-        self.add_allowed_cmd(default_cmd, cmd_param)
+        self.add_allowed_cmd(default_cmd)
         self.__allowed_cmds_player = player
 
         self.__timer_exec_default_cmd = Timer(timeout_seconds, self.execute_default_player_cmd)
@@ -173,9 +173,7 @@ class GameRound:
             self.__timer_exec_default_cmd.cancel()
             self.__timer_exec_default_cmd = None
 
-        if player != self.__allowed_cmds_player \
-                or cmd not in self.__allowed_cmds\
-                or self.__allowed_cmds[cmd] != cmd_param:
+        if not self.is_player_cmd_valid(player, cmd, cmd_param):
             err = InterProtocol.create_request_error_packet(cmd)
             player.send_server_command(err)
         else:
@@ -184,6 +182,14 @@ class GameRound:
                     self.__cur_stage.on_player_selected_action(self, player, cmd, cmd_param, silent_cmd)
                 except Exception as ex:
                     player.send_command_message(str(ex))
+
+    def is_player_cmd_valid(self, player, cmd, cmd_param):
+        if player != self.__allowed_cmds_player:
+            return False
+        for c in self.__allowed_cmds:
+            if c.get_cmd() == cmd and c.get_cmd_param() == cmd_param:
+                return True
+        return False
 
     def process_player_select_action(self, player, act_id, act_param=None):
         if self.__cur_stage:
@@ -203,11 +209,11 @@ class GameRound:
 
     def execute_default_player_cmd(self):
         if self.__player_for_default_cmd and self.__default_cmd:
-            self.process_player_execute_command(self.__player_for_default_cmd, self.__default_cmd, self.__cmd_param)
+            self.process_player_execute_command(self.__player_for_default_cmd, self.__default_cmd.get_cmd(), self.__default_cmd.get_cmd_param())
             self.reset_default_cmd()
 
-    def add_allowed_cmd(self, cmd, cmd_param = None):
-        self.__allowed_cmds[cmd] = cmd_param
+    def add_allowed_cmd(self, cmd):
+        self.__allowed_cmds.append(cmd)
 
     def reset_default_cmd(self):
         self.__default_cmd = None

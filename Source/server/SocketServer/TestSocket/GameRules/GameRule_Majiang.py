@@ -1,6 +1,7 @@
 from GameRules.GameRule import GameRule
 
 import InterProtocol
+from PlayCmd import PlayCmd
 
 
 class GameRule_Majiang(GameRule):
@@ -28,44 +29,23 @@ class GameRule_Majiang(GameRule):
     def get_player_cmd_options_for_cards(player, new_cards, is_next_player = False, is_cards_from_other_player = True):
         cmd_opts = []
         def_cmd = None
-        cmd_param = None
         cards = player.get_active_cards() + new_cards
         if GameRule_Majiang.can_cards_hu(cards):
             if is_cards_from_other_player:
-                cmd_opts.append(InterProtocol.majiang_player_act_hu)
+                cmd_opts.append(PlayCmd(player, InterProtocol.majiang_player_act_hu))
             else:
-                cmd_opts.append(InterProtocol.majiang_player_act_zimo)
+                cmd_opts.append(PlayCmd(player, InterProtocol.majiang_player_act_zimo))
+        if new_cards and cards.count(new_cards[0]) == 3 and is_cards_from_other_player:
+            cmd_opts.append(PlayCmd(player, InterProtocol.majiang_player_act_peng))
+        # gang can be execute any time
+        uniq_cards = set(cards)
+        for c in uniq_cards:
+            if cards.count(c) == 4:
+                gang = PlayCmd(player, InterProtocol.majiang_player_act_gang)
+                gang.set_cmd_param([c])
+                cmd_opts.append(gang)
 
-            if len(new_cards) == 0: # banker initially zi mo
-                def_cmd = InterProtocol.majiang_player_act_zimo
-            else:
-                if is_next_player:
-                    cmd_opts.append(InterProtocol.majiang_player_act_mopai)
-                    def_cmd = InterProtocol.majiang_player_act_mopai
-                else:
-                    cmd_opts.append(InterProtocol.majiang_player_act_pass)
-                    def_cmd = InterProtocol.majiang_player_act_pass
-        else:
-            if len(new_cards) == 0:
-                cmd_opts.append(InterProtocol.majiang_player_act_play_card)
-                def_cmd = InterProtocol.majiang_player_act_play_card
-                cmd_param = cards[0]  # default card to play out is at head.
-            else:
-                num = cards.count(new_cards[0])
-                if num >= 3:
-                    if is_next_player:
-                        cmd_opts.append(InterProtocol.majiang_player_act_mopai)
-                        def_cmd = InterProtocol.majiang_player_act_mopai
-                    else:
-                        cmd_opts.append(InterProtocol.majiang_player_act_pass)
-                        def_cmd = InterProtocol.majiang_player_act_pass
-
-                    cmd_opts.append(InterProtocol.majiang_player_act_peng)
-
-                    if num == 4:
-                        cmd_opts.append(InterProtocol.majiang_player_act_gang)
-
-        return cmd_opts, def_cmd, cmd_param
+        return cmd_opts
 
     # def get_first_cards_player(self, players):
     #     for p in players:
