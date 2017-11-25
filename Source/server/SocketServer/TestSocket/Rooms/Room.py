@@ -53,9 +53,9 @@ class Room:
             if InterProtocol.client_req_exe_cmd not in req_json:
                 err = InterProtocol.create_request_error_packet(req_cmd)
                 player.send_server_command(err)
-            if self.__current_round:
-                cmd = req_json[InterProtocol.sock_req_cmd]
-                const_param = InterProtocol.clien_req_cmd_param
+            elif self.__current_round:
+                cmd = req_json[InterProtocol.client_req_exe_cmd]
+                const_param = InterProtocol.client_req_cmd_param
                 cmd_param = req_json[const_param] if const_param in req_json else None
                 self.__current_round.process_player_execute_command(player, cmd, cmd_param)
 

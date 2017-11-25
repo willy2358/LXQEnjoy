@@ -14,10 +14,10 @@ class PlayerClient:
         self.__socket__conn = conn
         self.__playing_rule_id = 0
         self.__game_round = None
-        self.__initial_cards = []
+        # self.__initial_cards = []
         self.__cards_in_hand = []   # _cards_in_hand == __active_cards + __freezed_cards
         self.__active_cards = []  # These cards are active, that, these cards can be played out
-        self.__freezed_cards = []   # These cards are freezed, that is, these cards can not be played out, or used by other purpose
+        self.__freezed_card_groups = []   # These cards are freezed, that is, these cards can not be played out, or used by other purpose
         self.__user_id = user_id
         self.__room_id = 0
         self.__is_banker = False
@@ -34,16 +34,16 @@ class PlayerClient:
     def get_user_id(self):
         return self.__user_id
 
-    def get_default_play_cards(self):
-        if len(self.__initial_cards) > 0:
-            c = self.__initial_cards[0]
-            self.__initial_cards.remove(c)
-            return c
-        else:
-            return None
+    # def get_default_play_cards(self):
+    #     if len(self.__initial_cards) > 0:
+    #         c = self.__initial_cards[0]
+    #         self.__initial_cards.remove(c)
+    #         return c
+    #     else:
+    #         return None
 
-    def get_init_cards(self):
-        return self.__initial_cards
+    # def get_init_cards(self):
+    #     return self.__initial_cards
 
     def update_connection(self, conn):
         self.__socket__conn = conn
@@ -75,7 +75,25 @@ class PlayerClient:
     def set_bank_cards(self, cards):
         self.add_dealed_cards(cards)
 
+    def send_cards_state(self):
+        cards1 = self.__active_cards[:]
+        cards1.sort()
+        str1 = "active cards:" + str(cards1)
+        cards2 = self.__freezed_card_groups[:]
+        cards2.sort()
+        str2 = ";freezed cards:" + str(cards2)
+        self.send_command_message(str1 + str2)
+
+    def move_cards_to_freeze_group(self, cards_in_hand, cards_not_in_hand):
+        group = cards_in_hand + cards_not_in_hand
+        self.__freezed_card_groups.append(group)
+        for c in cards_in_hand:
+            self.__active_cards.remove(c)
+        self.__cards_in_hand = self.__cards_in_hand + cards_not_in_hand
+
     def send_server_command(self, cmd_obj):
+        self.send_cards_state() # for viewing data in test client
+
         j_str = json.dumps(cmd_obj)
         self.send_command_message(j_str)
 
@@ -96,25 +114,34 @@ class PlayerClient:
         j_str = json.dumps(msg)
         self.send_command_message(j_str)
 
-    def set_initial_cards(self, cards):
-        self.__initial_cards = cards[:]
-        self.__cards_in_hand = self.__initial_cards[:]
+    # def set_initial_cards(self, cards):
+    #     self.__initial_cards = cards[:]
+    #     self.__cards_in_hand = self.__initial_cards[:]
+    #     self.__active_cards = self.__initial_cards[:]
 
     def add_dealt_cards(self, cards):
         if isinstance(cards, list):
-            self.__initial_cards += cards
-        elif isinstance(cards, str):
-            self.__initial_cards.append(cards)
-
-        self.__cards_in_hand = self.__initial_cards[:]
+            self.__cards_in_hand += cards
+            self.__active_cards += cards
+        elif isinstance(cards, int):
+            self.__cards_in_hand.append(cards)
+            self.__active_cards.append(cards)
 
     def play_out_cards(self, cards):
-        if isinstance(cards, str):
-            self.__cards_in_hand.remove(cards)
-        elif isinstance(cards, list):
-            Utils.list_remove_parts(self.__cards_in_hand, cards)
-        else:
-            pass
+        try:
+            if isinstance(cards, int):
+                self.__cards_in_hand.remove(cards)
+                self.__active_cards.remove(cards)
+            elif isinstance(cards, list):
+                Utils.list_remove_parts(self.__cards_in_hand, cards)
+                for c in cards:
+                    self.__active_cards.remove(c)
+                    self.__cards_in_hand.remove(c)
+            else:
+                pass
+        except Exception as ex:
+            print(ex)
+            self.send_command_message(str(ex))
 
     def set_banker(self):
         self.__is_banker = True

@@ -14,7 +14,7 @@ client_req_select_action = "sel-act"
 client_req_type_reconnect = "reconnect"   # 断线重连
 client_req_type_exe_cmd = "exe-cmd"
 client_req_exe_cmd = "cmd"
-clien_req_cmd_param = "cmd-data"
+client_req_cmd_param = "cmd-data"
 
 server_cmd_type_push = "sockpush"
 server_push_new_banker = "new-banker"
@@ -26,6 +26,7 @@ server_push_cmd_resp_timeout = "resp-timeout"
 server_push_game_end = "game-end"
 server_push_winners = "winners"
 server_push_losers = "losers"
+server_push_player_exed_cmd = "exed-cmd"
 
 cmd_data_cards = "cards"
 
@@ -60,6 +61,15 @@ def create_deal_cards_json_packet(player, cards):
     }
     return packet
 
+def create_player_exed_cmd_json_packet(player, cmd, cmd_data):
+    packet = {
+        cmd_type: server_cmd_type_push,
+        server_cmd_type_push: server_push_player_exed_cmd,
+        server_push_player_exed_cmd: cmd,
+        server_push_cmd_param:cmd_data,
+        user_id:player.get_user_id()
+    }
+    return packet
 
 def create_cmd_options_json_packet(player, cmd_options, def_cmd=None, resp_timeout=-1):
     opts = []

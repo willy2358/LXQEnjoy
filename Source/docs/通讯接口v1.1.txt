@@ -1,4 +1,4 @@
-
+﻿
 一、用户信息
 1.用户注册：
 客户端请求：
@@ -215,6 +215,16 @@ post
 说明：
 winners和losers可有多个，win-score和lose-score表示赢或输的分数，客户端根据此数字更新玩家代币数
 
+4.7 广播玩家的操作
+推送参数：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"exed-cmd",
+	"exed-cmd":"hu"
+	"cmd-param":null
+        "userid":123, #执行操作的用户ID
+}
+
 
 5.玩家发送
 5.1出牌
@@ -233,7 +243,7 @@ winners和losers可有多个，win-score和lose-score表示赢或输的分数，
 	"sockreq":"exe-cmd",  //执行命令
 	"userid":124122,
 	"roomid",123|0
-	“cmd":"peng", //此命令来自服务器推送的命令列表
+	"cmd":"peng", //此命令来自服务器推送的命令列表
 	"cmd-data":"" //命令数据，预留
 }
 5.3玩家断网重连

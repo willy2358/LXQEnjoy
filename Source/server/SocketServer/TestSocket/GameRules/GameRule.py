@@ -8,7 +8,7 @@ class GameRule:
         self.__cards = []
         # self.__stages = []
         self.__game_stages = []
-        self.__default_cmd_resp_timeout = 30  # timeout in seconds for player to pick up a command
+        self.__default_cmd_resp_timeout = -1  # timeout in seconds for player to pick up a command
 
         # self.__call_actions = []
         # self.__head_action_group = ActionGroup()
