@@ -140,7 +140,12 @@ class PlayMajiang(PlayInTurn):
                 cmd_opts = [play_card]
                 game_round.send_player_cmd_options(player, cmd_opts, cmd_opts[0])
         elif cmd == InterProtocol.majiang_player_act_hu:
+            losers = []
+            for p in game_round.get_players():
+                if p != player:
+                    losers.append(p)
             game_round.set_winners([player])
+            game_round.set_losers(losers)
             game_round.test_and_update_current_stage()
         elif cmd == InterProtocol.majiang_player_act_play_card:
             player.play_out_cards(cmd_data)

@@ -125,5 +125,5 @@ class GameRule_Majiang(GameRule):
 
     @staticmethod
     def get_pair_count(cards):
-        dual = [x for x in cards if cards.count(x) == 2]
+        dual = set([x for x in cards if cards.count(x) == 2])
         return len(dual)

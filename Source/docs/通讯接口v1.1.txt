@@ -209,8 +209,8 @@ post
 {
 	"cmdtype":"sockpush",
 	"sockpush":"game-result",
-	"winners":[{"playerid":1224, "win-score":12},]
-	"losers":[{"playerid":122,"lose-score":12}]
+	"winners":[{"userid":1224, "win-score":12},]
+	"losers":[{"userid":122,"lose-score":12}]
 }
 说明：
 winners和losers可有多个，win-score和lose-score表示赢或输的分数，客户端根据此数字更新玩家代币数

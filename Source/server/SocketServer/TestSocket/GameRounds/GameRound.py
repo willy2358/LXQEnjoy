@@ -174,6 +174,9 @@ class GameRound:
     def set_winners(self, players):
         self.__winners = players
 
+    def set_losers(self, losers):
+        self.__losers = losers
+
     def set_player_waiting_for_cmd_resp(self, player, cmd_opts):
         self.__player_waiting_for_cmd_resp = player
         self.__cmds_opts_waiting_for_resp = cmd_opts

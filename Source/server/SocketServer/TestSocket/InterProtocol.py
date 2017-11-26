@@ -101,11 +101,17 @@ def create_publish_bank_player_json_packet(bank_player):
 
 
 def create_winners_losers_json_packet(winners, losers):
+    ws = []
+    for p in winners:
+        ws.append({user_id:p.get_user_id(), "score":0})
+    ls = []
+    for p in losers:
+        ls.append({user_id:p.get_user_id(),"score":0})
     packet = {
         cmd_type: server_cmd_type_push,
         server_cmd_type_push: server_push_game_end,
-        server_push_winners:winners,
-        server_push_losers:losers
+        server_push_winners:ws,
+        server_push_losers:ls
     }
     return packet
 

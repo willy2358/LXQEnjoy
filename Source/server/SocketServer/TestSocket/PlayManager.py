@@ -93,7 +93,7 @@ def init_majiang_rule_guaisanjiao():
     rule.add_game_stage(stage)
     stage = TellWinner(rule)
     rule.add_game_stage(stage)
-    stage = CalScores(stage)
+    stage = CalScores(rule)
     rule.add_game_stage(stage)
     stage = PublishScores(rule)
     rule.add_game_stage(stage)
