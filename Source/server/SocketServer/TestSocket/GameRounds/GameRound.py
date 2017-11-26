@@ -19,8 +19,7 @@ class GameRound:
         self.__timer_run_round = None
 
         self.__timer_exec_default_cmd = None
-        self.__default_cmd = ""
-        self.__default_cmd_param = None
+        self.__default_cmd = None
         self.__player_for_default_cmd = None
 
         # if True, when default_cmd is executed, this execution will be broardcasted to other players
@@ -34,7 +33,6 @@ class GameRound:
         self.__cmds_opts_waiting_for_resp = None
 
         self.__pending_player_cmds = queue.Queue(maxsize=10)
-        self.__sending_player_cmds = None
 
         self.start_timer_run_round()
 
@@ -95,7 +93,6 @@ class GameRound:
     def setup_timer_to_select_default_act_for_player(self, player, default_cmd, timeout_seconds, cmd_silent = False):
         self.__player_for_default_cmd = player
         self.__default_cmd = default_cmd
-        self.__default_cmd_param = default_cmd.get_cmd_param()
         self.__default_cmd_silent = cmd_silent
         self.set_player_waiting_for_cmd_resp(player, [default_cmd])
         # self.add_allowed_cmd(default_cmd)
@@ -187,17 +184,16 @@ class GameRound:
 
     def reset_pending_player_cmds(self):
         self.__pending_player_cmds.empty()
-        self.__sending_player_cmds = None
 
     def move_next_pending_player_cmds(self):
         if self.__pending_player_cmds.qsize() < 1:
             return
-
-        self.__sending_player_cmds = self.__pending_player_cmds.get()
-        player = self.__sending_player_cmds["player"]
-        cmds = self.__sending_player_cmds["cmds"]
+        player_cmds = self.__pending_player_cmds.get()
+        player = player_cmds["player"]
+        cmds = player_cmds["cmds"]
         timeout = self.get_rule().get_default_cmd_resp_timeout()
-        def_cmd = self.__sending_player_cmds["def-cmd"]
+        def_cmd = player_cmds["def-cmd"]
+        self.set_player_waiting_for_cmd_resp(player, cmds)
         packet = InterProtocol.create_cmd_options_json_packet(player, cmds, def_cmd, timeout)
         player.send_server_command(packet)
         if def_cmd and timeout > 1:
@@ -257,7 +253,6 @@ class GameRound:
     def reset_default_cmd(self):
         self.__default_cmd = None
         self.__default_cmd_silent = False
-        self.__default_cmd_param = ""
         self.__player_for_default_cmd = None
 
     # def reset_allowed_cmds(self):

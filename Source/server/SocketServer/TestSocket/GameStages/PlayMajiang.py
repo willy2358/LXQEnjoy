@@ -146,4 +146,5 @@ class PlayMajiang(PlayInTurn):
             game_round.set_winners([player])
             game_round.test_and_update_current_stage()
         elif cmd == InterProtocol.majiang_player_act_play_card:
+            player.play_out_cards(cmd_data)
             PlayMajiang.on_one_card_played_out(game_round, player, cmd_data)

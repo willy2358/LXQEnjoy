@@ -48,7 +48,7 @@ class SocketClient:
     def __waitSockReceive__(self):
         while self.__isRun:
             try:
-                buf = self.__mySock.recv(128)
+                buf = self.__mySock.recv(1024)
                 data = buf.decode('utf-8')
                 print('Received:' + data)
             except Exception as ex:
