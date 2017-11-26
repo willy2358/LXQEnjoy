@@ -28,7 +28,7 @@ class PlayMajiang(PlayInTurn):
             def_cmd.set_cmd_param(PlayMajiang.get_player_default_play_card(starter))
             cmd_opts.append(def_cmd)
 
-        PlayMajiang.send_player_cmd_options(game_round, starter, cmd_opts, cmd_opts[0])
+        game_round.send_player_cmd_options(starter, cmd_opts, cmd_opts[0])
 
     @staticmethod
     def is_ended_in_round(game_round):
@@ -38,15 +38,15 @@ class PlayMajiang(PlayInTurn):
         else:
             return False
 
-    @staticmethod
-    def send_player_cmd_options(game_round, player, cmd_opts, def_cmd):
-        rule = game_round.get_rule()
-        timeout = rule.get_default_cmd_resp_timeout()
-        game_round.set_player_waiting_for_cmd_resp(player, cmd_opts)
-        packet = InterProtocol.create_cmd_options_json_packet(player, cmd_opts, def_cmd, timeout)
-        player.send_server_command(packet)
-        if def_cmd and timeout > 1:
-            game_round.setup_timer_to_select_default_act_for_player(player, def_cmd, timeout)
+    # @staticmethod
+    # def send_player_cmd_options(game_round, player, cmd_opts, def_cmd):
+    #     rule = game_round.get_rule()
+    #     timeout = rule.get_default_cmd_resp_timeout()
+    #     game_round.set_player_waiting_for_cmd_resp(player, cmd_opts)
+    #     packet = InterProtocol.create_cmd_options_json_packet(player, cmd_opts, def_cmd, timeout)
+    #     player.send_server_command(packet)
+    #     if def_cmd and timeout > 1:
+    #         game_round.setup_timer_to_select_default_act_for_player(player, def_cmd, timeout)
 
     @staticmethod
     def on_one_card_played_out(game_round, player, played_card):
@@ -70,7 +70,7 @@ class PlayMajiang(PlayInTurn):
                 def_cmd = PlayCmd(next_player, InterProtocol.majiang_player_act_play_card)
                 def_cmd.set_cmd_param(PlayMajiang.get_player_default_play_card(next_player))
                 cmd_opts.append(def_cmd)
-            PlayMajiang.send_player_cmd_options(game_round, next_player, cmd_opts, cmd_opts[0])
+                game_round.send_player_cmd_options(next_player, cmd_opts, cmd_opts[0])
         else:
             PlayMajiang.process_prioritized_player_cmds(game_round, players_cmd_opts, listeners[0])
 
@@ -115,33 +115,30 @@ class PlayMajiang(PlayInTurn):
         if cmd == InterProtocol.majiang_player_act_peng:
             card = cmd_data
             game_round.player_select_peng(player, card)
-            cmd_opts = []
             play_card = PlayCmd(player, InterProtocol.majiang_player_act_play_card)
-            play_card.set_cmd_param(player.get_active_cards()[0])
-            cmd_opts.append(play_card)
-            PlayMajiang.send_player_cmd_options(game_round, player, cmd_opts, cmd_opts[0])
+            play_card.set_cmd_param(PlayMajiang.get_player_default_play_card(player))
+            cmd_opts = [play_card]
+            game_round.send_player_cmd_options(player, cmd_opts, cmd_opts[0])
         elif cmd == InterProtocol.majiang_player_act_gang:
             card = cmd_data
             game_round.player_select_gang(player, card)
             game_round.deal_cards_for_player(player, 1)
             cmd_opts = game_round.get_rule().get_player_cmd_options_for_cards(player, [], True, False)
             if not cmd_opts:
-                cmd_opts = []
                 play_card = PlayCmd(player, InterProtocol.majiang_player_act_play_card)
                 play_card.set_cmd_param(PlayMajiang.get_player_default_play_card(player))
-                cmd_opts.append(play_card)
-                PlayMajiang.send_player_cmd_options(game_round, player, cmd_opts, cmd_opts[0])
+                cmd_opts = [play_card]
+                game_round.send_player_cmd_options(player, cmd_opts, cmd_opts[0])
         elif cmd == InterProtocol.majiang_player_act_pass:
             game_round.move_next_pending_player_cmds()
         elif cmd == InterProtocol.majiang_player_act_mopai:
             game_round.deal_cards_for_player(player, 1)
             cmd_opts = game_round.get_rule().get_player_cmd_options_for_cards(player, [], True, False)
             if not cmd_opts:
-                cmd_opts = []
                 play_card = PlayCmd(player, InterProtocol.majiang_player_act_play_card)
                 play_card.set_cmd_param(PlayMajiang.get_player_default_play_card(player))
-                cmd_opts.append(play_card)
-                PlayMajiang.send_player_cmd_options(game_round, player, cmd_opts, cmd_opts[0])
+                cmd_opts = [play_card]
+                game_round.send_player_cmd_options(player, cmd_opts, cmd_opts[0])
         elif cmd == InterProtocol.majiang_player_act_hu:
             game_round.set_winners([player])
             game_round.test_and_update_current_stage()

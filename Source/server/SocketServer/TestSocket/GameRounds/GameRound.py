@@ -191,13 +191,8 @@ class GameRound:
         player_cmds = self.__pending_player_cmds.get()
         player = player_cmds["player"]
         cmds = player_cmds["cmds"]
-        timeout = self.get_rule().get_default_cmd_resp_timeout()
         def_cmd = player_cmds["def-cmd"]
-        self.set_player_waiting_for_cmd_resp(player, cmds)
-        packet = InterProtocol.create_cmd_options_json_packet(player, cmds, def_cmd, timeout)
-        player.send_server_command(packet)
-        if def_cmd and timeout > 1:
-            self.setup_timer_to_select_default_act_for_player(player, def_cmd, timeout)
+        self.send_player_cmd_options(player, cmds, def_cmd)
 
     def process_no_bank_player(self):
         pass
@@ -219,11 +214,23 @@ class GameRound:
                     player.send_command_message(str(ex))
 
     def is_player_cmd_valid(self, player, cmd, cmd_param):
+        if not self.__player_waiting_for_cmd_resp:
+            err = "Invalid player:" + str(player.get_user_id())
+            player.send_command_message(err)
+            print(err)
+            return False
         if player != self.__player_waiting_for_cmd_resp:
+            err = "Invalid player:" + str(player.get_user_id())  \
+                 + ",expected:" + str(self.__player_waiting_for_cmd_resp.get_user_id())
+            player.send_command_message(err)
+            print(err)
             return False
         for c in self.__cmds_opts_waiting_for_resp:
             if c.get_cmd() == cmd:
                 return True
+        err = "Invalid cmd:" + cmd
+        player.send_command_message(err)
+        print(err)
         return False
 
     def process_player_select_action(self, player, act_id, act_param=None):
@@ -262,3 +269,12 @@ class GameRound:
     def publish_round_states(self, json_state):
         for p in self._players:
             p.send_server_command(json_state)
+
+    def send_player_cmd_options(self, player, cmd_opts, def_cmd):
+        rule = self.get_rule()
+        timeout = rule.get_default_cmd_resp_timeout()
+        self.set_player_waiting_for_cmd_resp(player, cmd_opts)
+        packet = InterProtocol.create_cmd_options_json_packet(player, cmd_opts, def_cmd, timeout)
+        player.send_server_command(packet)
+        if def_cmd and timeout > 1:
+            self.setup_timer_to_select_default_act_for_player(player, def_cmd, timeout)
