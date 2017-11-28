@@ -21,6 +21,7 @@ from Rooms import Lobby
 from Rooms.Room_Majiang import Room_Majiang
 
 from PlayerClient import PlayerClient
+from GameRules.CardsPattern_Majiang import CardsPattern_Majiang
 
 __Players = []
 Players={}   #{userid:player}
@@ -97,6 +98,22 @@ def init_majiang_rule_guaisanjiao():
     rule.add_game_stage(stage)
     stage = PublishScores(rule)
     rule.add_game_stage(stage)
+
+    pat = CardsPattern_Majiang()
+    pat.add_condition("(11 12 13),(14 15 16),(17 18 19)")
+    pat.add_condition("(n n):11-19")
+    pat.add_condition("(n n n):11-19|(n n+1 n+2):11-19")
+    pat.set_score(10)
+    rule.add_cards_pattern(pat)
+
+    pat = CardsPattern_Majiang()
+    pat.add_condition("(11 12 13),(14 15 16),(17 18 19)")
+    pat.add_condition("(n n):*")
+    pat.add_condition("(n n n):*|(n n+1 n+2):*")
+    pat.set_score(5)
+    rule.add_cards_pattern(pat)
+
+
 
     GameRules[rule_id] = rule
 

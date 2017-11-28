@@ -3,12 +3,28 @@ from GameRules.GameRule import GameRule
 import InterProtocol
 from PlayCmd import PlayCmd
 
+from enum import Enum
+
+class WinType(Enum):
+    dian_pao = 1
+    win_3_others = 2
 
 class GameRule_Majiang(GameRule):
     def __init__(self, rule_id):
         super(GameRule_Majiang, self).__init__(rule_id)
         self.__banker_cards_number = 14
         self.__non_banker_cards_number = 13
+
+        self.__max_card_types = 3
+        self.__min_card_types = 1
+        self.__main_type_min_cards_number = 8
+        self.__allow_all_pairs = True
+        self.__win_type = WinType.dian_pao
+        self.__is_guo_shui_hu = False
+        self.__versatile_cards = []
+        self.__random_versatile_cards_count = 0
+
+
 
     def is_player_win(self, player):
         pass
@@ -24,6 +40,8 @@ class GameRule_Majiang(GameRule):
 
     def set_cards_number_for_non_banker(self, number):
         self.__non_banker_cards_number = number
+
+
 
     @staticmethod
     def get_player_cmd_options_for_cards(player, new_cards, is_next_player = False, is_cards_from_other_player = True):

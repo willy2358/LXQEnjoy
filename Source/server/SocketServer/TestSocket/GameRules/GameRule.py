@@ -14,6 +14,7 @@ class GameRule:
         # self.__head_action_group = ActionGroup()
         # self.__player_idx_of_play_card = -1
         # self.__cur_game_stage_idx = -1;
+        self.__cards_patterns = []
 
     def get_default_cmd_resp_timeout(self):
         return self.__default_cmd_resp_timeout
@@ -27,6 +28,8 @@ class GameRule:
     #         return self.__game_stages[self.__cur_game_stage_idx]
     #     else:
     #         return None
+    def add_cards_pattern(self, pattern):
+        self.__cards_patterns.append(pattern)
 
     @staticmethod
     def get_is_round_end(game_round):
