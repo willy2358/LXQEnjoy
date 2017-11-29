@@ -22,6 +22,8 @@ from Rooms.Room_Majiang import Room_Majiang
 
 from PlayerClient import PlayerClient
 from GameRules.CardsPattern_Majiang import CardsPattern_Majiang
+from GameRules.Condition import Condition
+from GameRules.Condition_OneOption import Condition_OneOption
 
 __Players = []
 Players={}   #{userid:player}
@@ -99,10 +101,38 @@ def init_majiang_rule_guaisanjiao():
     stage = PublishScores(rule)
     rule.add_game_stage(stage)
 
-    pat = CardsPattern_Majiang()
-    pat.add_condition("(11 12 13),(14 15 16),(17 18 19)")
-    pat.add_condition("(n n):11-19")
-    pat.add_condition("(n n n):11-19|(n n+1 n+2):11-19")
+    wan_s = CardsMaster.def_wans["wan-1"] - 1
+    suo_s = CardsMaster.def_suos["suo-1"] - 1
+    ton_s = CardsMaster.def_tons["ton-1"] - 1
+    card_types = [wan_s, suo_s, ton_s]
+
+    for i in range(card_types):
+        s = card_types[i]
+        pat = CardsPattern_Majiang("qing-feng-long" + str(s), 10)
+        pat.add_condition(Condition((s + 1, s + 2, s + 3)))
+        pat.add_condition(Condition((s + 4, s + 5, s + 6)))
+        pat.add_condition(Condition((s + 7, s + 8, s + 9)))
+        cond_jiang = Condition_OneOption()
+        cond_left = Condition_OneOption()
+        for i in range(s + 1, s + 9 + 1):
+            cond_jiang.add_option((i,i))
+            cond_left.add_option((i,i,i))
+            cond_left.add_option((i,i,i,i))
+            cond_left.add_option((i + 1, i + 2, i + 3))
+        pat.add_condition(cond_jiang)
+        pat.add_condition(cond_left)
+        rule.add_cards_pattern(pat)
+
+        pat = CardsPattern_Majiang("qing-feng-" + str(s), 5)
+        pat.add_condition(Condition((s + 1, s + 2, s + 3)))
+        pat.add_condition(Condition((s + 4, s + 5, s + 6)))
+        pat.add_condition(Condition((s + 7, s + 8, s + 9)))
+        # if i == 0:
+
+
+
+
+
     pat.set_score(10)
     rule.add_cards_pattern(pat)
 
