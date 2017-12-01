@@ -22,12 +22,15 @@ class GameRound:
         self.__default_cmd = None
         self.__player_for_default_cmd = None
 
+        self.__base_score = 1
+
+
+
+
         # if True, when default_cmd is executed, this execution will be broardcasted to other players
         # if False, the execution will only noticed to the owning player
         self.__default_cmd_silent = False
 
-        # self.__allowed_cmds = []
-        # self.__allowed_cmds_player = None
 
         self.__player_waiting_for_cmd_resp = None
         self.__cmds_opts_waiting_for_resp = None
@@ -56,6 +59,9 @@ class GameRound:
 
     def get_bank_player(self):
         return self.__bank_player
+
+    def get_base_score(self):
+        return self.__base_score
 
     def get_next_player(self):
         self.__cur_player_idx += 1
@@ -167,6 +173,9 @@ class GameRound:
         for i in range(0, len(player_cmds)):
             self.__pending_player_cmds.put(player_cmds[i])
         self.move_next_pending_player_cmds()
+
+    def set_base_score(self, score):
+        self.__base_score = score
 
     def set_cards_for_banker(self, cards):
         self.__cards_for_banker = cards

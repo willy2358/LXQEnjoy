@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/PlayManager.py" line="204" />
-    <bookmark url="file://$PROJECT_DIR$/PlayManager.py" line="95" />
-    <bookmark url="file://$PROJECT_DIR$/GameRounds/GameRound.py" line="230" />
-    <bookmark url="file://$PROJECT_DIR$/GameRounds/GameRound.py" line="191" />
+    <bookmark url="file://$PROJECT_DIR$/PlayManager.py" line="264" />
+    <bookmark url="file://$PROJECT_DIR$/PlayManager.py" line="104" />
+    <bookmark url="file://$PROJECT_DIR$/GameRounds/GameRound.py" line="239" />
+    <bookmark url="file://$PROJECT_DIR$/GameRounds/GameRound.py" line="200" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="834e515e-663f-4605-b96a-36a4b7d59f13" name="Default" comment="">
@@ -33,91 +33,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="PlayManager.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/PlayManager.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="136">
+              <caret line="120" column="41" lean-forward="true" selection-start-line="118" selection-start-column="4" selection-end-line="120" selection-end-column="41" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="GameRound.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/GameRounds/GameRound.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="74">
-              <caret line="92" column="52" lean-forward="false" selection-start-line="92" selection-start-column="52" selection-end-line="92" selection-end-column="52" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PlayMajiang.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/GameStages/PlayMajiang.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="380">
-              <caret line="47" column="37" lean-forward="true" selection-start-line="47" selection-start-column="37" selection-end-line="47" selection-end-column="37" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Mode_Single.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/CardsPattern/Mode_Single.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Mode_Squd.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/CardsPattern/Mode_Squd.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GameRule_Majiang.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/GameRules/GameRule_Majiang.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="450">
-              <caret line="72" column="0" lean-forward="false" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="WinTester_Majiang.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/GameRules/WinTester_Majiang.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="225">
-              <caret line="15" column="48" lean-forward="true" selection-start-line="15" selection-start-column="48" selection-end-line="15" selection-end-column="48" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Room_Majiang.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Rooms/Room_Majiang.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="12" lean-forward="true" selection-start-line="0" selection-start-column="12" selection-end-line="0" selection-end-column="12" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Mode_Triple.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/CardsPattern/Mode_Triple.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PatternModes.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/CardsPattern/PatternModes.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
-              <caret line="18" column="30" lean-forward="true" selection-start-line="18" selection-start-column="30" selection-end-line="18" selection-end-column="30" />
+            <state relative-caret-position="193">
+              <caret line="165" column="26" lean-forward="false" selection-start-line="165" selection-start-column="26" selection-end-line="165" selection-end-column="26" />
               <folding />
             </state>
           </provider>
@@ -126,9 +58,83 @@
       <file leaf-file-name="GameRound_Majiang.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/GameRounds/GameRound_Majiang.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="26" column="0" lean-forward="false" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+            <state relative-caret-position="296">
+              <caret line="38" column="32" lean-forward="true" selection-start-line="38" selection-start-column="32" selection-end-line="38" selection-end-column="32" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PlayMajiang.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/GameStages/PlayMajiang.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="117">
+              <caret line="113" column="38" lean-forward="true" selection-start-line="113" selection-start-column="38" selection-end-line="113" selection-end-column="38" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PatternModes.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/CardsPattern/PatternModes.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="375">
+              <caret line="25" column="0" lean-forward="true" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CalScores_Majiang.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/GameStages/CalScores_Majiang.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="425">
+              <caret line="45" column="27" lean-forward="false" selection-start-line="45" selection-start-column="27" selection-end-line="45" selection-end-column="27" />
+              <folding>
+                <element signature="e#0#42#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CardsMaster.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/CardsMaster.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="409">
+              <caret line="38" column="0" lean-forward="true" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="WinTester_Majiang.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/GameRules/WinTester_Majiang.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="71">
+              <caret line="7" column="43" lean-forward="true" selection-start-line="7" selection-start-column="43" selection-end-line="7" selection-end-column="43" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PlayerClient.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/PlayerClient.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="307">
+              <caret line="110" column="32" lean-forward="false" selection-start-line="110" selection-start-column="32" selection-end-line="110" selection-end-column="32" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GameRule.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/GameRules/GameRule.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1524">
+              <caret line="167" column="0" lean-forward="true" selection-start-line="167" selection-start-column="0" selection-end-line="167" selection-end-column="0" />
+              <folding>
+                <marker date="1512139992837" expanded="true" signature="48:337" ph="..." />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -183,8 +189,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Log.py" />
-        <option value="$PROJECT_DIR$/Room.py" />
         <option value="$PROJECT_DIR$/Room_Majiang.py" />
         <option value="$PROJECT_DIR$/Rooms/MajiangRoom.py" />
         <option value="$PROJECT_DIR$/Rooms/Lobby.py" />
@@ -207,21 +211,15 @@
         <option value="$PROJECT_DIR$/TestPlayer1.py" />
         <option value="$PROJECT_DIR$/TestPlayer2.py" />
         <option value="$PROJECT_DIR$/TestPlayer3.py" />
-        <option value="$PROJECT_DIR$/GameRounds/GameRound_Majiang.py" />
         <option value="$PROJECT_DIR$/GameStages/DealMaJiangs.py" />
-        <option value="$PROJECT_DIR$/PlayerClient.py" />
         <option value="$PROJECT_DIR$/SocketClient.py" />
-        <option value="$PROJECT_DIR$/GameStages/PlayMajiang.py" />
         <option value="$PROJECT_DIR$/InterProtocol.py" />
-        <option value="$PROJECT_DIR$/GameRounds/GameRound.py" />
-        <option value="$PROJECT_DIR$/GameRules/GameRule.py" />
         <option value="$PROJECT_DIR$/GameRules/CardsPattern.py" />
         <option value="$PROJECT_DIR$/GameRules/PatternCondition.py" />
         <option value="$PROJECT_DIR$/GameRules/Condition.py" />
         <option value="$PROJECT_DIR$/GameRules/CardsPattern_Majiang.py" />
         <option value="$PROJECT_DIR$/GameRules/Condition_OneOption.py" />
         <option value="$PROJECT_DIR$/GameRules/Condition_Range.py" />
-        <option value="$PROJECT_DIR$/PlayManager.py" />
         <option value="$PROJECT_DIR$/CardsPattern/Mode_AllInRange.py" />
         <option value="$PROJECT_DIR$/CardsPattern/Mode_AllOutRange.py" />
         <option value="$PROJECT_DIR$/CardsPattern/Mode_AllPairs.py" />
@@ -232,8 +230,16 @@
         <option value="$PROJECT_DIR$/CardsPattern/Mode_Single.py" />
         <option value="$PROJECT_DIR$/CardsPattern/Mode_Squd.py" />
         <option value="$PROJECT_DIR$/CardsPattern/Mode_Triple.py" />
+        <option value="$PROJECT_DIR$/GameRounds/GameRound.py" />
         <option value="$PROJECT_DIR$/GameRules/GameRule_Majiang.py" />
+        <option value="$PROJECT_DIR$/GameRounds/GameRound_Majiang.py" />
+        <option value="$PROJECT_DIR$/GameRules/GameRule.py" />
+        <option value="$PROJECT_DIR$/CardsPattern/PatternModes.py" />
+        <option value="$PROJECT_DIR$/GameStages/PlayMajiang.py" />
         <option value="$PROJECT_DIR$/GameRules/WinTester_Majiang.py" />
+        <option value="$PROJECT_DIR$/PlayManager.py" />
+        <option value="$PROJECT_DIR$/PlayerClient.py" />
+        <option value="$PROJECT_DIR$/GameStages/CalScores_Majiang.py" />
       </list>
     </option>
   </component>
@@ -333,11 +339,6 @@
               <item name="TestSocket" type="b2602c69:ProjectViewProjectNode" />
               <item name="TestSocket" type="462c0819:PsiDirectoryNode" />
               <item name="GameStages" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="TestSocket" type="b2602c69:ProjectViewProjectNode" />
-              <item name="TestSocket" type="462c0819:PsiDirectoryNode" />
-              <item name="Rooms" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -646,7 +647,7 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22916667" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.21921515" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.47791797" sideWeight="0.4509517" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3301759" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26792964" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26116374" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.31314623" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295082" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -711,7 +712,7 @@
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/GameRounds/GameRound.py</url>
-          <line>149</line>
+          <line>155</line>
           <option name="timeStamp" value="75" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -721,17 +722,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/GameRounds/GameRound.py</url>
-          <line>49</line>
+          <line>52</line>
           <option name="timeStamp" value="107" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/GameRounds/GameRound.py</url>
-          <line>93</line>
+          <line>99</line>
           <option name="timeStamp" value="115" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/GameRounds/GameRound.py</url>
-          <line>256</line>
+          <line>265</line>
           <option name="timeStamp" value="117" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -741,7 +742,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/GameStages/PlayMajiang.py</url>
-          <line>142</line>
+          <line>132</line>
           <option name="timeStamp" value="137" />
         </line-breakpoint>
       </breakpoints>
@@ -769,20 +770,6 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Actions/CallBank.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Actions/PassCall.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/GameStages/GroupPlayers.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
@@ -801,13 +788,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
           <caret line="6" column="0" lean-forward="true" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/GameStages/CalScores.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="42" />
         </state>
       </provider>
     </entry>
@@ -874,13 +854,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/GameStages/DealMaJiangs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="40">
-          <caret line="26" column="50" lean-forward="true" selection-start-line="26" selection-start-column="50" selection-end-line="26" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/MyServer.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="506">
@@ -927,13 +900,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PlayerClient.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2926">
-          <caret line="140" column="0" lean-forward="false" selection-start-line="140" selection-start-column="0" selection-end-line="140" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/GameStages/TellWinner.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="110">
@@ -941,64 +907,6 @@
           <folding>
             <element signature="e#0#42#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/GameRules/GameRule.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="18" column="36" lean-forward="false" selection-start-line="18" selection-start-column="36" selection-end-line="18" selection-end-column="36" />
-          <folding>
-            <marker date="1512051012358" expanded="true" signature="48:337" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="1172:1339" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="1241:1317" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="1400:1577" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="1489:1539" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="1639:1975" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="1847:1951" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="1877:1951" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="2036:2368" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="2242:2345" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="2272:2345" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="2400:2434" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="2472:2509" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="2547:2584" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="2612:2642" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="2668:2696" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="2750:2786" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="2869:3775" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="3177:3416" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="3430:3750" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="3839:4183" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="3947:4152" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="4237:4752" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="4325:4732" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="4428:4732" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="4505:4732" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="4796:4864" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="4904:5001" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="5047:5086" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="5132:5171" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="5221:5264" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="5321:5382" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="5424:5465" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="5498:5527" ph="..." />
-            <marker date="1512051012358" expanded="true" signature="5533:5597" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CardsMaster.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="402">
-          <caret line="38" column="0" lean-forward="true" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/GameRules/CardsPattern.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="44">
-          <caret line="2" column="38" lean-forward="false" selection-start-line="2" selection-start-column="21" selection-end-line="2" selection-end-column="38" />
         </state>
       </provider>
     </entry>
@@ -1030,36 +938,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PlayManager.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="572">
-          <caret line="122" column="36" lean-forward="true" selection-start-line="122" selection-start-column="36" selection-end-line="122" selection-end-column="36" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/GameStages/RandomBanker.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
           <caret line="18" column="38" lean-forward="true" selection-start-line="18" selection-start-column="38" selection-end-line="18" selection-end-column="38" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CardsPattern/Mode.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CardsPattern/Mode_AllInRange.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="34" />
           <folding />
         </state>
       </provider>
@@ -1136,59 +1018,155 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CardsPattern/PatternModes.py">
+    <entry file="file://$PROJECT_DIR$/Rooms/Room_Majiang.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="18" column="30" lean-forward="true" selection-start-line="18" selection-start-column="30" selection-end-line="18" selection-end-column="30" />
+        <state relative-caret-position="165">
+          <caret line="11" column="12" lean-forward="true" selection-start-line="11" selection-start-column="12" selection-end-line="11" selection-end-column="12" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/GameRounds/GameRound_Majiang.py">
+    <entry file="file://$PROJECT_DIR$/GameRounds/GameRound_Poker.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="26" column="0" lean-forward="false" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/GameRounds/GameRound.py">
+    <entry file="file://$PROJECT_DIR$/GameStages/CalScores.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="74">
-          <caret line="92" column="52" lean-forward="false" selection-start-line="92" selection-start-column="52" selection-end-line="92" selection-end-column="52" />
+        <state relative-caret-position="225">
+          <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/GameStages/PlayMajiang.py">
+    <entry file="file://$PROJECT_DIR$/GameRules/CardsPattern.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="47" column="37" lean-forward="true" selection-start-line="47" selection-start-column="37" selection-end-line="47" selection-end-column="37" />
+        <state relative-caret-position="30">
+          <caret line="2" column="38" lean-forward="false" selection-start-line="2" selection-start-column="21" selection-end-line="2" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CardsPattern/Mode.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CardsPattern/Mode_AllInRange.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="34" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/GameRules/GameRule_Majiang.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="72" column="0" lean-forward="false" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
+        <state relative-caret-position="186">
+          <caret line="50" column="42" lean-forward="false" selection-start-line="50" selection-start-column="42" selection-end-line="50" selection-end-column="42" />
+          <folding>
+            <element signature="e#0#39#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GameStages/DealMaJiangs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="21" column="38" lean-forward="true" selection-start-line="20" selection-start-column="4" selection-end-line="21" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CardsPattern/PatternModes.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="375">
+          <caret line="25" column="0" lean-forward="true" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GameRounds/GameRound.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="193">
+          <caret line="165" column="26" lean-forward="false" selection-start-line="165" selection-start-column="26" selection-end-line="165" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GameStages/PlayMajiang.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="117">
+          <caret line="113" column="38" lean-forward="true" selection-start-line="113" selection-start-column="38" selection-end-line="113" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GameRounds/GameRound_Majiang.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="296">
+          <caret line="38" column="32" lean-forward="true" selection-start-line="38" selection-start-column="32" selection-end-line="38" selection-end-column="32" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/GameRules/WinTester_Majiang.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="15" column="48" lean-forward="true" selection-start-line="15" selection-start-column="48" selection-end-line="15" selection-end-column="48" />
+        <state relative-caret-position="71">
+          <caret line="7" column="43" lean-forward="true" selection-start-line="7" selection-start-column="43" selection-end-line="7" selection-end-column="43" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Rooms/Room_Majiang.py">
+    <entry file="file://$PROJECT_DIR$/GameRules/GameRule.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="12" lean-forward="true" selection-start-line="0" selection-start-column="12" selection-end-line="0" selection-end-column="12" />
+        <state relative-caret-position="1524">
+          <caret line="167" column="0" lean-forward="true" selection-start-line="167" selection-start-column="0" selection-end-line="167" selection-end-column="0" />
+          <folding>
+            <marker date="1512139992837" expanded="true" signature="48:337" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PlayManager.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="120" column="41" lean-forward="true" selection-start-line="118" selection-start-column="4" selection-end-line="120" selection-end-column="41" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CardsMaster.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="409">
+          <caret line="38" column="0" lean-forward="true" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PlayerClient.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="307">
+          <caret line="110" column="32" lean-forward="false" selection-start-line="110" selection-start-column="32" selection-end-line="110" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GameStages/CalScores_Majiang.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="45" column="27" lean-forward="false" selection-start-line="45" selection-start-column="27" selection-end-line="45" selection-end-column="27" />
+          <folding>
+            <element signature="e#0#42#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

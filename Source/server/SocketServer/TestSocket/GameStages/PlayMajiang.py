@@ -38,16 +38,6 @@ class PlayMajiang(PlayInTurn):
         else:
             return False
 
-    # @staticmethod
-    # def send_player_cmd_options(game_round, player, cmd_opts, def_cmd):
-    #     rule = game_round.get_rule()
-    #     timeout = rule.get_default_cmd_resp_timeout()
-    #     game_round.set_player_waiting_for_cmd_resp(player, cmd_opts)
-    #     packet = InterProtocol.create_cmd_options_json_packet(player, cmd_opts, def_cmd, timeout)
-    #     player.send_server_command(packet)
-    #     if def_cmd and timeout > 1:
-    #         game_round.setup_timer_to_select_default_act_for_player(player, def_cmd, timeout)
-
     @staticmethod
     def on_one_card_played_out(game_round, player, played_card):
         listeners = game_round.get_one_play_listeners(player)
@@ -140,6 +130,15 @@ class PlayMajiang(PlayInTurn):
                 cmd_opts = [play_card]
                 game_round.send_player_cmd_options(player, cmd_opts, cmd_opts[0])
         elif cmd == InterProtocol.majiang_player_act_hu:
+            losers = []
+            card = cmd_data
+            for p in game_round.get_players():
+                if p != player:
+                    losers.append(p)
+            game_round.set_winners([player])
+            game_round.set_losers(losers)
+            game_round.test_and_update_current_stage()
+        elif cmd == InterProtocol.majiang_player_act_zimo:
             losers = []
             for p in game_round.get_players():
                 if p != player:

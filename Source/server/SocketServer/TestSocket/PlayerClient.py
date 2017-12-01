@@ -21,6 +21,9 @@ class PlayerClient:
         self.__user_id = user_id
         self.__room_id = 0
         self.__is_banker = False
+        self.__final_cards = None
+        self.__final_cards_from_dealer = False   #True, the cards are from dealer, or from the undealed cards, False, these cards from other players
+        self.__won_score = 0  # positive, win, negative, lose
 
     def is_banker(self):
         return self.__is_banker
@@ -33,6 +36,9 @@ class PlayerClient:
 
     def get_user_id(self):
         return self.__user_id
+
+    def get_won_score(self):
+        return self.__won_score
 
     # def get_default_play_cards(self):
     #     if len(self.__initial_cards) > 0:
@@ -56,6 +62,12 @@ class PlayerClient:
 
     def get_game_round(self):
         return self.__game_round
+
+    def get_final_cards_is_from_dealer(self):
+        return self.__final_cards_from_dealer
+
+    def get_final_cards(self):
+        return self.__final_cards
 
     def get_socket_conn(self):
         return self.__socket__conn
@@ -90,6 +102,13 @@ class PlayerClient:
         for c in cards_in_hand:
             self.__active_cards.remove(c)
         self.__cards_in_hand = self.__cards_in_hand + cards_not_in_hand
+        self.__final_cards = cards_not_in_hand
+
+    def set_final_cards_from_dealer(self, from_dealer = True):
+        self.__final_cards_from_dealer = from_dealer
+
+    def set_won_score(self, score):
+        self.__won_score = score
 
     def send_server_command(self, cmd_obj):
         self.send_cards_state() # for viewing data in test client
@@ -126,6 +145,8 @@ class PlayerClient:
         elif isinstance(cards, int):
             self.__cards_in_hand.append(cards)
             self.__active_cards.append(cards)
+        self.__final_cards = cards
+        self.set_final_cards_from_dealer(True)
 
     def play_out_cards(self, cards):
         try:

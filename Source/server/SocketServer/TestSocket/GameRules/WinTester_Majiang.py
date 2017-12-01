@@ -5,11 +5,22 @@ class WinTester_Majiang:
         pass
 
     @staticmethod
-    def can_cards_win(cards):
+    def is_card_win_for_cards(card, cards):
+        if cards.count(card) >=  1:
+            return WinTester_Majiang.can_cards_win(cards + card)
+        if card + 1 in cards and card + 2 in cards:
+            return WinTester_Majiang.can_cards_win(cards + card)
+        if card - 2 in cards and card - 1 in cards:
+            return WinTester_Majiang.can_cards_win(cards + card)
+        if cards - 1 in cards and card + 1 in cards:
+            return WinTester_Majiang.can_cards_win(cards + card)
+        return False
 
-        if WinTester_Majiang.get_pair_count(cards) == len(cards) / 2 and len(cards) % 2 == 0:  # 7 pairs
+    @staticmethod
+    def can_cards_win(cards):
+        if WinTester_Majiang.__get_pair_count(cards) == len(cards) / 2 and len(cards) % 2 == 0:  # 7 pairs
             return True
-        jiang_opts = WinTester_Majiang.get_jiang_options(cards)  # jiang is a must
+        jiang_opts = WinTester_Majiang.__get_jiang_options(cards)  # jiang is a must
         if len(jiang_opts) < 1:
             return False
 
@@ -30,23 +41,23 @@ class WinTester_Majiang:
                 tons_2.remove(opt)
                 tons_2.remove(opt)
             # the remained cards may be all gang or peng, this if test also honored this case
-            if WinTester_Majiang.are_cards_all_grouped(wans_2) \
-                    and WinTester_Majiang.are_cards_all_grouped(suos_2) \
-                    and WinTester_Majiang.are_cards_all_grouped(tons_2):
+            if WinTester_Majiang.__are_cards_all_grouped(wans_2) \
+                    and WinTester_Majiang.__are_cards_all_grouped(suos_2) \
+                    and WinTester_Majiang.__are_cards_all_grouped(tons_2):
                 return True
 
         return False
 
     @staticmethod
-    def are_cards_all_grouped(cards):
-        lefts = WinTester_Majiang.get_forward_bad_cards(cards)
-        if WinTester_Majiang.get_single_count(lefts) > 0 or WinTester_Majiang.get_pair_count(lefts) > 0:
+    def __are_cards_all_grouped(cards):
+        lefts = WinTester_Majiang.__get_forward_bad_cards(cards)
+        if WinTester_Majiang.__get_single_count(lefts) > 0 or WinTester_Majiang.__get_pair_count(lefts) > 0:
             return False
         else:
             return True
 
     @staticmethod
-    def get_jiang_options(cards):
+    def __get_jiang_options(cards):
         opts = []
         for c in cards:
             if cards.count(c) >= 2 and c not in opts:
@@ -54,7 +65,7 @@ class WinTester_Majiang:
         return opts
 
     @staticmethod
-    def get_forward_bad_cards(cards):
+    def __get_forward_bad_cards(cards):
         remainTests = cards[:]
         remainTests.sort()
         bads = []
@@ -71,12 +82,12 @@ class WinTester_Majiang:
         return bads
 
     @staticmethod
-    def get_single_count(cards):
+    def __get_single_count(cards):
         # uniq = set(cards)
         uniqs = [x for x in cards if cards.count(x) == 1]
         return len(uniqs)
 
     @staticmethod
-    def get_pair_count(cards):
+    def __get_pair_count(cards):
         dual = set([x for x in cards if cards.count(x) == 2])
         return len(dual)

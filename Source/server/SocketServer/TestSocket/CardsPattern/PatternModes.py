@@ -15,6 +15,9 @@ class PatternModes(object):
     def get_score(self):
         return self.__score
 
+    def get_name(self):
+        return self.__name
+
     def is_match(self, faces):
         for m in self.__modes:
             if not m.is_match(faces):

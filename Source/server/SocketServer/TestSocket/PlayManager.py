@@ -6,7 +6,7 @@ from Actions.CallBank import CallBank
 from Actions.PassCall import PassCall
 from GameRules.GameRule_Majiang import GameRule_Majiang
 from GameRules.GameRule_Poker import GameRule_Poker
-from GameStages.CalScores import CalScores
+from GameStages.CalScores_Majiang import CalScores_Majiang
 from GameStages.CallBanker import CallBanker
 from GameStages.DealCards import DealCards
 from GameStages.DealMaJiangs import DealMaJiangs
@@ -20,10 +20,19 @@ from GameStages.TellWinner import TellWinner
 from Rooms import Lobby
 from Rooms.Room_Majiang import Room_Majiang
 
+from GameStages.CalScores import CalScores
+
 from PlayerClient import PlayerClient
-from GameRules.CardsPattern_Majiang import CardsPattern_Majiang
-from GameRules.Condition import Condition
-from GameRules.Condition_OneOption import Condition_OneOption
+
+from CardsPattern.PatternModes import PatternModes
+from CardsPattern.Mode_AllInRange import Mode_AllInRange
+from CardsPattern.Mode_AllPairs import Mode_AllPairs
+from CardsPattern.Mode_AnyInRange import Mode_AnyInRange
+from CardsPattern.Mode_AnyOutRange import Mode_AnyOutRange
+from CardsPattern.Mode_Pair import Mode_Pair
+from CardsPattern.Mode_Seq import Mode_Seq
+from CardsPattern.Mode_Triple import Mode_Triple
+
 
 __Players = []
 Players={}   #{userid:player}
@@ -96,56 +105,107 @@ def init_majiang_rule_guaisanjiao():
     rule.add_game_stage(stage)
     stage = TellWinner(rule)
     rule.add_game_stage(stage)
-    stage = CalScores(rule)
+    stage = CalScores_Majiang(rule)
     rule.add_game_stage(stage)
     stage = PublishScores(rule)
     rule.add_game_stage(stage)
 
-    wan_s = CardsMaster.def_wans["wan-1"] - 1
-    suo_s = CardsMaster.def_suos["suo-1"] - 1
-    ton_s = CardsMaster.def_tons["ton-1"] - 1
-    card_types = [wan_s, suo_s, ton_s]
-
-    for i in range(card_types):
-        s = card_types[i]
-        pat = CardsPattern_Majiang("qing-feng-long" + str(s), 10)
-        pat.add_condition(Condition((s + 1, s + 2, s + 3)))
-        pat.add_condition(Condition((s + 4, s + 5, s + 6)))
-        pat.add_condition(Condition((s + 7, s + 8, s + 9)))
-        cond_jiang = Condition_OneOption()
-        cond_left = Condition_OneOption()
-        for i in range(s + 1, s + 9 + 1):
-            cond_jiang.add_option((i,i))
-            cond_left.add_option((i,i,i))
-            cond_left.add_option((i,i,i,i))
-            cond_left.add_option((i + 1, i + 2, i + 3))
-        pat.add_condition(cond_jiang)
-        pat.add_condition(cond_left)
-        rule.add_cards_pattern(pat)
-
-        pat = CardsPattern_Majiang("qing-feng-" + str(s), 5)
-        pat.add_condition(Condition((s + 1, s + 2, s + 3)))
-        pat.add_condition(Condition((s + 4, s + 5, s + 6)))
-        pat.add_condition(Condition((s + 7, s + 8, s + 9)))
-        # if i == 0:
-
-
-
-
-
-    pat.set_score(10)
-    rule.add_cards_pattern(pat)
-
-    pat = CardsPattern_Majiang()
-    pat.add_condition("(11 12 13),(14 15 16),(17 18 19)")
-    pat.add_condition("(n n):*")
-    pat.add_condition("(n n n):*|(n n+1 n+2):*")
-    pat.set_score(5)
-    rule.add_cards_pattern(pat)
-
-
+    load_majiang_patterns(rule)
 
     GameRules[rule_id] = rule
+
+
+def load_majiang_patterns(majiang_rule):
+    wan_s = CardsMaster.def_wans["wan-1"]
+    suo_s = CardsMaster.def_suos["suo-1"]
+    ton_s = CardsMaster.def_tons["ton-1"]
+
+
+    pat = PatternModes("qing-long", 10)
+    pat.add_mode(Mode_Seq(wan_s, 3))
+    pat.add_mode(Mode_Seq(wan_s + 3, 3))
+    pat.add_mode(Mode_Seq(wan_s + 6, 3))
+    pat.add_mode(Mode_AllInRange(wan_s, wan_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("qing-long", 10)
+    pat.add_mode(Mode_Seq(suo_s, 3))
+    pat.add_mode(Mode_Seq(suo_s + 3, 3))
+    pat.add_mode(Mode_Seq(suo_s + 6, 3))
+    pat.add_mode(Mode_AllInRange(suo_s, suo_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("qing-long", 10)
+    pat.add_mode(Mode_Seq(ton_s, 3))
+    pat.add_mode(Mode_Seq(ton_s + 3, 3))
+    pat.add_mode(Mode_Seq(ton_s + 6, 3))
+    pat.add_mode(Mode_AllInRange(ton_s, ton_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("qing-feng", 5)
+    pat.add_mode(Mode_AllInRange(wan_s, wan_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("qing-feng", 5)
+    pat.add_mode(Mode_AllInRange(suo_s, suo_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("qing-feng", 5)
+    pat.add_mode(Mode_AllInRange(ton_s, ton_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("long", 5)
+    pat.add_mode(Mode_Seq(wan_s, 3))
+    pat.add_mode(Mode_Seq(wan_s + 3, 3))
+    pat.add_mode(Mode_Seq(wan_s + 6, 3))
+    pat.add_mode(Mode_AnyOutRange(wan_s, wan_s + 8))
+
+    pat = PatternModes("long", 5)
+    pat.add_mode(Mode_Seq(suo_s, 3))
+    pat.add_mode(Mode_Seq(suo_s + 3, 3))
+    pat.add_mode(Mode_Seq(suo_s + 6, 3))
+    pat.add_mode(Mode_AnyOutRange(suo_s, suo_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("long", 5)
+    pat.add_mode(Mode_Seq(ton_s, 3))
+    pat.add_mode(Mode_Seq(ton_s + 3, 3))
+    pat.add_mode(Mode_Seq(ton_s + 6, 3))
+    pat.add_mode(Mode_AnyOutRange(ton_s, suo_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("qing-pairs", 10)
+    pat.add_mode(Mode_AllPairs())
+    pat.add_mode(Mode_AllInRange(wan_s, wan_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("qing-pairs", 10)
+    pat.add_mode(Mode_AllPairs())
+    pat.add_mode(Mode_AllInRange(suo_s, suo_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("qing-pairs", 10)
+    pat.add_mode(Mode_AllPairs())
+    pat.add_mode(Mode_AllInRange(ton_s, ton_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("pairs", 5)
+    pat.add_mode(Mode_AllPairs())
+    pat.add_mode(Mode_AnyInRange(wan_s, wan_s + 8))
+    pat.add_mode(Mode_AnyInRange(ton_s, ton_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("pairs", 5)
+    pat.add_mode(Mode_AllPairs())
+    pat.add_mode(Mode_AnyInRange(wan_s, wan_s + 8))
+    pat.add_mode(Mode_AnyInRange(suo_s, suo_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("pairs", 5)
+    pat.add_mode(Mode_AllPairs())
+    pat.add_mode(Mode_AnyInRange(suo_s, suo_s + 8))
+    pat.add_mode(Mode_AnyInRange(ton_s, ton_s + 8))
+    majiang_rule.add_win_pattern(pat)
 
 
 def init_play_rules():

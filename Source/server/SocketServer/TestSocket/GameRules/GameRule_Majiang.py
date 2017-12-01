@@ -4,6 +4,7 @@ import InterProtocol
 from PlayCmd import PlayCmd
 
 from enum import Enum
+from GameRules.WinTester_Majiang import WinTester_Majiang
 
 class WinType(Enum):
     dian_pao = 1
@@ -23,7 +24,6 @@ class GameRule_Majiang(GameRule):
         self.__is_guo_shui_hu = False
         self.__versatile_cards = []
         self.__random_versatile_cards_count = 0
-
 
 
     def is_player_win(self, player):
@@ -48,7 +48,7 @@ class GameRule_Majiang(GameRule):
         cmd_opts = []
         def_cmd = None
         cards = player.get_active_cards() + new_cards
-        if GameRule_Majiang.can_cards_hu(cards):
+        if WinTester_Majiang.can_cards_win(cards):
             if is_cards_from_other_player:
                 cmd_opts.append(PlayCmd(player, InterProtocol.majiang_player_act_hu))
             else:
@@ -64,9 +64,4 @@ class GameRule_Majiang(GameRule):
                 cmd_opts.append(gang)
 
         return cmd_opts
-
-    # def get_first_cards_player(self, players):
-    #     for p in players:
-    #         if p.is_banker:
-    #             return p
 
