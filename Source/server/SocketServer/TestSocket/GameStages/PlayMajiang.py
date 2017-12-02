@@ -1,6 +1,7 @@
 from GameStages.PlayInTurn import PlayInTurn
 from PlayCmd import PlayCmd
 import InterProtocol
+from GameRules.GameRule_Majiang import WinType
 
 
 # terms: one-play: includes:
@@ -129,23 +130,20 @@ class PlayMajiang(PlayInTurn):
                 play_card.set_cmd_param(PlayMajiang.get_player_default_play_card(player))
                 cmd_opts = [play_card]
                 game_round.send_player_cmd_options(player, cmd_opts, cmd_opts[0])
-        elif cmd == InterProtocol.majiang_player_act_hu:
+        elif cmd == InterProtocol.majiang_player_act_hu or cmd == InterProtocol.majiang_player_act_zimo:
             losers = []
             card = cmd_data
-            for p in game_round.get_players():
-                if p != player:
-                    losers.append(p)
+            if cmd == InterProtocol.majiang_player_act_hu and game_round.get_win_type() == WinType.dian_pao:
+                losers.append(game_round.get_last_out_cards_player())
+            else:
+                for p in game_round.get_players():
+                    if p != player:
+                        losers.append(p)
             game_round.set_winners([player])
             game_round.set_losers(losers)
             game_round.test_and_update_current_stage()
-        elif cmd == InterProtocol.majiang_player_act_zimo:
-            losers = []
-            for p in game_round.get_players():
-                if p != player:
-                    losers.append(p)
-            game_round.set_winners([player])
-            game_round.set_losers(losers)
-            game_round.test_and_update_current_stage()
+
         elif cmd == InterProtocol.majiang_player_act_play_card:
             player.play_out_cards(cmd_data)
+            game_round.record_last_out_cards(player, cmd_data)
             PlayMajiang.on_one_card_played_out(game_round, player, cmd_data)

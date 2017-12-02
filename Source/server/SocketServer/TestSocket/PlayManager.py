@@ -110,16 +110,29 @@ def init_majiang_rule_guaisanjiao():
     stage = PublishScores(rule)
     rule.add_game_stage(stage)
 
+    rule.ScoreRule.set_base_score(3)
+    rule.ScoreRule.set_zimo_score(2)
+    rule.ScoreRule.set_ting_kou_count_score(1, 2)
+    rule.ScoreRule.set_ting_kou_count_score(2, 1)
+    rule.ScoreRule.set_ting_kou_count_score(3, 1)
+    rule.ScoreRule.set_ting_kou_count_score(4, 1)
+    rule.ScoreRule.set_ting_kou_count_score(5, 1)
+    rule.ScoreRule.set_ting_kou_count_score(6, 1)
+    rule.ScoreRule.set_ting_kou_count_score(7, 1)
+    rule.ScoreRule.set_score_formular("(B + N) * P * W")
+
+
     load_majiang_patterns(rule)
 
     GameRules[rule_id] = rule
 
 
 def load_majiang_patterns(majiang_rule):
+
+
     wan_s = CardsMaster.def_wans["wan-1"]
     suo_s = CardsMaster.def_suos["suo-1"]
     ton_s = CardsMaster.def_tons["ton-1"]
-
 
     pat = PatternModes("qing-long", 10)
     pat.add_mode(Mode_Seq(wan_s, 3))
@@ -141,18 +154,36 @@ def load_majiang_patterns(majiang_rule):
     pat.add_mode(Mode_Seq(ton_s + 6, 3))
     pat.add_mode(Mode_AllInRange(ton_s, ton_s + 8))
     majiang_rule.add_win_pattern(pat)
+    majiang_rule.ScoreRule.set_pattern_score("qing-long", 10)
 
-    pat = PatternModes("qing-feng", 5)
+    pat = PatternModes("qing-pairs", 10)
+    pat.add_mode(Mode_AllPairs())
     pat.add_mode(Mode_AllInRange(wan_s, wan_s + 8))
     majiang_rule.add_win_pattern(pat)
 
-    pat = PatternModes("qing-feng", 5)
+    pat = PatternModes("qing-pairs", 10)
+    pat.add_mode(Mode_AllPairs())
     pat.add_mode(Mode_AllInRange(suo_s, suo_s + 8))
     majiang_rule.add_win_pattern(pat)
 
-    pat = PatternModes("qing-feng", 5)
+    pat = PatternModes("qing-pairs", 10)
+    pat.add_mode(Mode_AllPairs())
     pat.add_mode(Mode_AllInRange(ton_s, ton_s + 8))
     majiang_rule.add_win_pattern(pat)
+    majiang_rule.ScoreRule.set_pattern_score("qing-pairs", 10)
+
+    pat = PatternModes("qing", 5)
+    pat.add_mode(Mode_AllInRange(wan_s, wan_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("qing", 5)
+    pat.add_mode(Mode_AllInRange(suo_s, suo_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("qing", 5)
+    pat.add_mode(Mode_AllInRange(ton_s, ton_s + 8))
+    majiang_rule.add_win_pattern(pat)
+    majiang_rule.ScoreRule.set_pattern_score("qing", 5)
 
     pat = PatternModes("long", 5)
     pat.add_mode(Mode_Seq(wan_s, 3))
@@ -173,21 +204,7 @@ def load_majiang_patterns(majiang_rule):
     pat.add_mode(Mode_Seq(ton_s + 6, 3))
     pat.add_mode(Mode_AnyOutRange(ton_s, suo_s + 8))
     majiang_rule.add_win_pattern(pat)
-
-    pat = PatternModes("qing-pairs", 10)
-    pat.add_mode(Mode_AllPairs())
-    pat.add_mode(Mode_AllInRange(wan_s, wan_s + 8))
-    majiang_rule.add_win_pattern(pat)
-
-    pat = PatternModes("qing-pairs", 10)
-    pat.add_mode(Mode_AllPairs())
-    pat.add_mode(Mode_AllInRange(suo_s, suo_s + 8))
-    majiang_rule.add_win_pattern(pat)
-
-    pat = PatternModes("qing-pairs", 10)
-    pat.add_mode(Mode_AllPairs())
-    pat.add_mode(Mode_AllInRange(ton_s, ton_s + 8))
-    majiang_rule.add_win_pattern(pat)
+    majiang_rule.ScoreRule.set_pattern_score("long", 5)
 
     pat = PatternModes("pairs", 5)
     pat.add_mode(Mode_AllPairs())
@@ -206,6 +223,7 @@ def load_majiang_patterns(majiang_rule):
     pat.add_mode(Mode_AnyInRange(suo_s, suo_s + 8))
     pat.add_mode(Mode_AnyInRange(ton_s, ton_s + 8))
     majiang_rule.add_win_pattern(pat)
+    majiang_rule.ScoreRule.set_pattern_score("pairs", 5)
 
 
 def init_play_rules():
@@ -240,21 +258,10 @@ def set_call_banker_action_options(call_banker_stage):
     c221 = c22.add_follow_up_action(CallBank("Call", "2-2-1"))
     c222 = c22.add_follow_up_action(PassCall("Not Call", "2-2-2"), True)
 
-#
-# def add_player_client(conn):
-#     player = PlayerClient.PlayerClient(conn)
-#     __Players.append(player)
-#     print('player clients:' + str(len(__Players)))
-#     print('new player:' + str(conn))
-
-
 def dispatch_player_commands(conn, comm_text):
     try:
         j_obj = json.loads(comm_text)
-        # if j_obj["req"] == CLIENT_REQ_JOIN_GAME.lower():
-        #     process_req_join_game(conn, j_obj)
-        # if j_obj["req"] == CLIENT_REQ_SELECT_ACTION.lower():
-        #     process_player_select_action(conn, j_obj)
+
         if j_obj[InterProtocol.cmd_type].lower() == InterProtocol.sock_req_cmd.lower():
             process_client_request(conn, j_obj)
     except Exception as ex:

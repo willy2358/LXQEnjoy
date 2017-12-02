@@ -5,6 +5,7 @@ from PlayCmd import PlayCmd
 
 from enum import Enum
 from GameRules.WinTester_Majiang import WinTester_Majiang
+from GameRules.ScoreRule_Majiang import ScoreRule_Majiang
 
 class WinType(Enum):
     dian_pao = 1
@@ -24,6 +25,7 @@ class GameRule_Majiang(GameRule):
         self.__is_guo_shui_hu = False
         self.__versatile_cards = []
         self.__random_versatile_cards_count = 0
+        self.ScoreRule = ScoreRule_Majiang()
 
 
     def is_player_win(self, player):
@@ -35,12 +37,17 @@ class GameRule_Majiang(GameRule):
     def get_cards_number_for_non_banker(self):
         return self.__non_banker_cards_number
 
+    def get_win_type(self):
+        return self.__win_type
+
     def set_cards_number_for_banker(self, number):
         self.__banker_cards_number = number
 
     def set_cards_number_for_non_banker(self, number):
         self.__non_banker_cards_number = number
 
+    def set_win_type(self, win_type = WinType.dian_pao):
+        self.__win_type = win_type
 
 
     @staticmethod

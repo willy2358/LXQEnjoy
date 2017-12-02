@@ -11,8 +11,8 @@ class GameRound_Majiang(GameRound):
         self.__pattern_default_score = 1
         self.__ting_kou_num_score = {}
 
-        # B: base_score, P:patter_score, S:zi mo or hu, N:ting kou su, ping hu/kan hu
-        self.__final_score = "B * P * S * N"
+        self.__last_out_cards = None
+        self.__last_out_cards_player = None
 
     def get_cur_play_starter(self):
         return self.__one_play_starter
@@ -24,6 +24,13 @@ class GameRound_Majiang(GameRound):
 
     def get_pattern_default_score(self):
         return self.__pattern_default_score
+
+    def get_last_out_cards_player(self):
+        return self.__last_out_cards_player
+
+    def record_last_out_cards(self, player, cards):
+        self.__last_out_cards = cards
+        self.__last_out_cards_player = player
 
     def set_one_play_starter(self, player):
         self.__one_play_starter = player
