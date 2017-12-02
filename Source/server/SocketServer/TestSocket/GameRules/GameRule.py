@@ -176,10 +176,10 @@ class GameRule:
             if pattern.get_score() < self.__win_patterns[0].get_score():
                 self.__win_patterns.append(pattern)
             else:
-                self.__win_patterns.index(0, pattern)
+                self.__win_patterns.insert(0, pattern)
         else:
             for i in range(0, len(self.__win_patterns) - 1):
-                if self.__win_patterns[i].get_score() > pattern.get_score() >= self.__win_patterns[i + 1]:
+                if self.__win_patterns[i].get_score() > pattern.get_score() >= self.__win_patterns[i + 1].get_score():
                     self.__win_patterns.insert(i + 1, pattern)
             else:
                 self.__win_patterns.append(pattern)

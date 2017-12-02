@@ -309,18 +309,6 @@ def get_rule_by_id(rule_id):
     else:
         return None
 
-#
-# def get_available_game_round(rule_id):
-#     for r in __game_rounds:
-#         if r.get_rule().get_rule_id() != rule_id:
-#             continue
-#         if r.can_new_player_in():
-#             return r
-#     r = GameRound(get_rule_by_id(rule_id))
-#     __game_rounds.append(r)
-#     return r
-
-
 def process_player_select_action(conn, j_obj):
     player = get_player_client_from_conn(conn)
     round = player.get_game_round()
@@ -328,24 +316,6 @@ def process_player_select_action(conn, j_obj):
     if "act-params" in j_obj:
         act_param = j_obj["act-params"]
     round.process_player_select_action(player, j_obj["act-id"], act_param)
-
-#
-# def process_lobby_player_request(conn, req_json):
-#     if req_json[InterProtocol.SOCK_REQ_CMD].lower() == InterProtocol.CLIENT_REQ_JOIN_GAME:
-#         process_join_lobby_game(conn, req_json)
-#
-#
-# def process_join_lobby_game(player, req_json):
-#     user_id = req_json[InterProtocol.USER_ID]
-#
-#     if player.get_game_round():
-#             player.send_error_message("Already in a game")
-#     else:
-#         play_round = get_available_game_round(req_json[InterProtocol.GAME_ID])
-#         play_round.add_player(player)
-#         player.send_success_messsage(InterProtocol.CLIENT_REQ_JOIN_GAME)
-#         play_round.test_and_update_current_stage()
-
 
 # TODO create Room from database
 def create_room_from_db(room_id, rule_id):
@@ -357,3 +327,5 @@ def create_room_from_db(room_id, rule_id):
     room.set_max_seated_player_num(3)
     Rooms[room_id] = room
 
+def process_client_disconnected(conn):
+    pass

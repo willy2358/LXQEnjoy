@@ -3,8 +3,8 @@ import CardsMaster
 from GameRules.WinTester_Majiang import WinTester_Majiang
 
 class CalScores_Majiang(CalScores):
-    def __init__(self):
-        pass
+    def __init__(self, rule):
+        super(CalScores_Majiang, self).__init__(rule)
 
     @staticmethod
     def execute(game_round):

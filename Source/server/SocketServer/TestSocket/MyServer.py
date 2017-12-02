@@ -4,37 +4,23 @@ import PlayManager
 import PlayerClient
 
 
-class MyTCPHandler(socketserver.BaseRequestHandler):
+class MyTCPHandler(socketserver.StreamRequestHandler):
     __Players = []
 
     def handle(self):
         conn = self.request
-        # player = Player.Player(conn)
-        # MyTCPHandler.__Players.append({conn, player})
 
-        # PlayManager.add_player_client(conn)
-
-        flag = True
-        while flag:
+        while True:
             try:
                 data = conn.recv(1024)
-                print('received:' + data.decode())
-                PlayManager.dispatch_player_commands(conn, data.decode())
+                if not data:
+                    print("client closed")
+                    PlayManager.process_client_disconnected(conn)
+                else:
+                    print('received:' + data.decode())
+                    PlayManager.dispatch_player_commands(conn, data.decode())
             except Exception as e:
                 print(e)
-
-            # print(conn)
-            # print(MyTCPHandler.__Clients.index(conn))
-            # if data == 'exit':
-            #     flag = False
-            # else:
-            #     resp = 'your input :' + data.decode()
-            #     print('response:' + resp)
-            #     try:
-            #         conn.sendall(resp.encode(encoding="utf-8"))
-            #     except Exception as x:
-            #         print('Send exception:' + x.message)
-
 
 if __name__ == "__main__":
 
