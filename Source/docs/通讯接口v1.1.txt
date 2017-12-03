@@ -1,4 +1,4 @@
-﻿
+
 一、用户信息
 1.用户注册：
 客户端请求：
@@ -202,6 +202,7 @@ post
 	"cmdtype":"sockpush",
 	"sockpush":"play-cards",
 	"cards":["majiang_wan_3"],
+	"player-state":"normal|offline|robot-play" //玩家状态，normal:正常，offline：离线，robot-play:机器人托管，normal与offline是互斥出现的，robot-play可与normal或offline组合出现，中间以竖线“|”分隔。
 	"userid":11234.  #出牌玩家的userid
 }
 4.6.游戏结束，广播胜负各方
@@ -254,4 +255,31 @@ winners和losers可有多个，win-score和lose-score表示赢或输的分数，
 	"userid":123456,
 	"gameid":324243,
 	"roomid":324242
+}
+socket服务器返回：
+{
+	"cmdtype":"sockresp"
+	"sockresp":"reconnect",
+	"result":"OK"
+	"errmsg":""
+	"result-data":{"player-state":"normal|offline|robot-play"} #player-state: 玩家状态，normal:正常，offline：离线，robot-play:机器人托管，normal与offline是互斥出现的，robot-play可与normal或offline组合出现，中间以竖线“|”分隔。
+
+}
+5.4 玩家设置机器人托管
+请求参数：
+{
+	"cmdtype":"sockreq",
+	"sockreq":"robot-play",
+	"robot-play":"yes|no"
+	"userid":123
+        "Roomie":123
+}
+socket服务器返回：
+{
+	"cmdtype":"sockresp"
+	"sockresp":"robot-play",
+	"result":"OK"
+	"errmsg":""
+	"result-data":{"player-state":"normal|offline|robot-play"} #player-state: 玩家状态，normal:正常，offline：离线，robot-play:机器人托管，normal与offline是互斥出现的，robot-play可与normal或offline组合出现，中间以竖线“|”分隔。
+
 }
