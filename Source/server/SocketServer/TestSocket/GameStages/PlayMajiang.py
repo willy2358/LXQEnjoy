@@ -142,15 +142,19 @@ class PlayMajiang(PlayInTurn):
         elif cmd == InterProtocol.majiang_player_act_mopai:
             game_round.deal_cards_for_player(player, 1)
             cmd_opts = game_round.get_rule().get_player_cmd_options_for_cards(player, [], True, False)
+            def_cmd = None
             if not cmd_opts:
                 play_card = PlayCmd(player, InterProtocol.majiang_player_act_play_card)
                 play_card.set_cmd_param(PlayMajiang.get_player_default_play_card(player))
                 cmd_opts = [play_card]
-                game_round.send_player_cmd_options(player, cmd_opts, cmd_opts[0])
-        elif cmd == InterProtocol.majiang_player_act_hu or cmd == InterProtocol.majiang_player_act_zimo:
+                def_cmd = play_card
+            def_cmd = PlayMajiang.get_better_default_cmd_for_player(player,cmd_opts, cmd_opts[0])
+            game_round.send_player_cmd_options(player, cmd_opts, def_cmd)
+        elif cmd == InterProtocol.majiang_player_act_hu:
             losers = []
             card = cmd_data
-            if cmd == InterProtocol.majiang_player_act_hu and game_round.get_win_type() == WinType.dian_pao:
+            player.set_newest_cards([card],False, True)
+            if game_round.get_rule().get_win_type() == WinType.dian_pao:
                 losers.append(game_round.get_last_out_cards_player())
             else:
                 for p in game_round.get_players():
@@ -159,7 +163,17 @@ class PlayMajiang(PlayInTurn):
             game_round.set_winners([player])
             game_round.set_losers(losers)
             game_round.test_and_update_current_stage()
+        elif cmd == InterProtocol.majiang_player_act_zimo:
+            losers = []
+            card = cmd_data
+            # player.set_newest_cards([card], True)
+            for p in game_round.get_players():
+                if p != player:
+                    losers.append(p)
 
+            game_round.set_winners([player])
+            game_round.set_losers(losers)
+            game_round.test_and_update_current_stage()
         elif cmd == InterProtocol.majiang_player_act_play_card:
             player.play_out_cards(cmd_data)
             game_round.record_last_out_cards(player, cmd_data)

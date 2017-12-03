@@ -5,7 +5,10 @@ from Dealer import Dealer
 import InterProtocol
 from threading import Timer
 from GameStages.PlayInTurn import PlayInTurn
+import Log
+import os.path
 
+timeout_seconds_to_run_round = 5
 
 class GameRound:
     def __init__(self, play_rule):
@@ -24,7 +27,9 @@ class GameRound:
 
         self.__base_score = 1
 
+        self.__my_room = None
 
+        self.__is_final_scores_published = False
 
 
         # if True, when default_cmd is executed, this execution will be broardcasted to other players
@@ -37,7 +42,7 @@ class GameRound:
 
         self.__pending_player_cmds = queue.Queue(maxsize=10)
 
-        self.start_timer_run_round()
+        # self.start_timer_run_round()
 
         self.__started = False
         self.__cur_call_player_idx = -1
@@ -50,6 +55,9 @@ class GameRound:
         self.__my_dealer = Dealer(self)
         self.__cur_action = None
         self.__game_end = False
+
+    def begin_run(self):
+        self.start_timer_run_round()
 
     def get_players(self):
         return self._players
@@ -89,6 +97,12 @@ class GameRound:
 
     def get_losers(self):
         return  self.__losers
+
+    def get_my_room(self):
+        return self.__my_room
+
+    def get_is_final_scores_published(self):
+        return self.__is_final_scores_published
 
     def set_cur_game_stage(self, stage):
         self.__cur_stage = stage
@@ -134,8 +148,9 @@ class GameRound:
             if cur_stage.is_ended_in_round(self):
                 cur_stage = self.get_next_game_stage()
                 self.set_cur_game_stage(cur_stage)
-                if not cur_stage and self.__round_end_callback:
-                    self.__round_end_callback()
+                if not cur_stage and self.__my_room:
+                    self.__my_room.test_continue_next_round()
+                    return
 
         if cur_stage:
             cur_stage.execute(self)
@@ -162,8 +177,26 @@ class GameRound:
         self.__round_end_callback = func
 
     def deal_cards_for_player(self, player, card_number):
-        cards = random.sample(self.__cards_on_table, card_number)
+        cards = []
+        prefile = os.path.join(os.getcwd(),"preset",str(player.get_user_id()) + ".pre")
+        if card_number > 1 and os.path.isfile(prefile):
+            try:
+                f = open(prefile)
+                pre_cards = "[" + f.readline() + "]"
+                cards = eval(pre_cards)
+                f.close()
+            except Exception as ex:
+                Log.write_exception(ex)
+
+        left = card_number - len(cards)
+        if left > 0:
+            cards = cards + random.sample(self.__cards_on_table, left)
+        else:
+            while len(cards) > card_number:
+                cards.remove(cards[-1])
+
         player.add_dealt_cards(cards)
+        player.set_newest_cards(cards, True, False)
         Utils.list_remove_parts(self.__cards_on_table, cards)
         packet = InterProtocol.create_deal_cards_json_packet(player, cards)
         player.send_server_command(packet)
@@ -182,9 +215,17 @@ class GameRound:
 
     def set_winners(self, players):
         self.__winners = players
+        if self.__my_room:
+            self.__my_room.set_last_winners(players)
 
     def set_losers(self, losers):
         self.__losers = losers
+
+    def set_my_room(self, room):
+        self.__my_room = room
+
+    def set_final_scores_published(self):
+        self.__is_final_scores_published = True
 
     def set_player_waiting_for_cmd_resp(self, player, cmd_opts):
         self.__player_waiting_for_cmd_resp = player
@@ -263,7 +304,7 @@ class GameRound:
             self.__timer_run_round.cancel()
             self.__timer_run_round = None
 
-        self.__timer_run_round = Timer(10, self.test_and_update_current_stage)
+        self.__timer_run_round = Timer(timeout_seconds_to_run_round, self.test_and_update_current_stage)
         self.__timer_run_round.start()
 
     def execute_default_player_cmd(self):
@@ -278,10 +319,6 @@ class GameRound:
         self.__default_cmd = None
         self.__default_cmd_silent = False
         self.__player_for_default_cmd = None
-
-    # def reset_allowed_cmds(self):
-    #     self.__allowed_cmds.clear()
-    #     self.__allowed_cmds_player = None
 
     def publish_round_states(self, json_state):
         for p in self._players:

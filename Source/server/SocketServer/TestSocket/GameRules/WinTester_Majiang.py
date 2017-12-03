@@ -7,13 +7,13 @@ class WinTester_Majiang:
     @staticmethod
     def is_card_win_for_cards(card, cards):
         if cards.count(card) >=  1:
-            return WinTester_Majiang.can_cards_win(cards + card)
+            return WinTester_Majiang.can_cards_win(cards + [card])
         if card + 1 in cards and card + 2 in cards:
-            return WinTester_Majiang.can_cards_win(cards + card)
+            return WinTester_Majiang.can_cards_win(cards + [card])
         if card - 2 in cards and card - 1 in cards:
-            return WinTester_Majiang.can_cards_win(cards + card)
-        if cards - 1 in cards and card + 1 in cards:
-            return WinTester_Majiang.can_cards_win(cards + card)
+            return WinTester_Majiang.can_cards_win(cards + [card])
+        if card - 1 in cards and card + 1 in cards:
+            return WinTester_Majiang.can_cards_win(cards + [card])
         return False
 
     @staticmethod

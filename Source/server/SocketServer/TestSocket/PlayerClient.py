@@ -66,6 +66,12 @@ class PlayerClient:
     def set_is_robot_play(self, robot_play = False):
         self.__is_robot_play = robot_play
 
+    def set_newest_cards(self, cards, is_from_dealer = True, add_in_hand = True):
+        self.__final_cards_from_dealer = is_from_dealer
+        self.__final_cards = cards
+        if add_in_hand:
+            self.__cards_in_hand = self.__cards_in_hand + cards
+
     def get_game_round(self):
         return self.__game_round
 
@@ -111,10 +117,7 @@ class PlayerClient:
         for c in cards_in_hand:
             self.__active_cards.remove(c)
         self.__cards_in_hand = self.__cards_in_hand + cards_not_in_hand
-        self.__final_cards = cards_not_in_hand
-
-    def set_final_cards_from_dealer(self, from_dealer = True):
-        self.__final_cards_from_dealer = from_dealer
+        # self.__final_cards = cards_not_in_hand
 
     def set_won_score(self, score):
         self.__won_score = score
@@ -154,8 +157,8 @@ class PlayerClient:
         elif isinstance(cards, int):
             self.__cards_in_hand.append(cards)
             self.__active_cards.append(cards)
-        self.__final_cards = cards
-        self.set_final_cards_from_dealer(True)
+
+        self.set_newest_cards(cards, True, False)
 
     def play_out_cards(self, cards):
         try:

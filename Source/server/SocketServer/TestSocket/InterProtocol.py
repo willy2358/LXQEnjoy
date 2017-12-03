@@ -28,6 +28,8 @@ server_push_game_end = "game-end"
 server_push_winners = "winners"
 server_push_losers = "losers"
 server_push_player_exed_cmd = "exed-cmd"
+server_push_scores = "scores"
+server_push_score = "score"
 
 cmd_data_cards = "cards"
 
@@ -75,7 +77,7 @@ def create_player_exed_cmd_json_packet(player, cmd, cmd_data):
 def create_cmd_options_json_packet(player, cmd_options, def_cmd=None, resp_timeout=-1):
     opts = []
     for v in cmd_options:
-        opts.append({"cmd":v.get_cmd(),"cmd-param":v.get_cmd_param()})
+        opts.append({client_req_exe_cmd:v.get_cmd(),server_push_cmd_param:v.get_cmd_param()})
 
     packet = {
         cmd_type: server_cmd_type_push,
@@ -84,7 +86,8 @@ def create_cmd_options_json_packet(player, cmd_options, def_cmd=None, resp_timeo
         server_push_cmd_resp_timeout:resp_timeout
     }
     if def_cmd:
-        packet[server_push_def_cmd] = {"cmd":def_cmd.get_cmd(), "cmd-param":def_cmd.get_cmd_param()}
+        packet[server_push_def_cmd] = {client_req_exe_cmd:def_cmd.get_cmd(),
+                                       server_push_cmd_param:def_cmd.get_cmd_param()}
 
     return packet
 
@@ -104,10 +107,10 @@ def create_publish_bank_player_json_packet(bank_player):
 def create_winners_losers_json_packet(winners, losers):
     ws = []
     for p in winners:
-        ws.append({user_id:p.get_user_id(), "score":p.get_won_score()})
+        ws.append({user_id:p.get_user_id(), server_push_score:p.get_won_score()})
     ls = []
     for p in losers:
-        ls.append({user_id:p.get_user_id(),"score":p.get_won_score()})
+        ls.append({user_id:p.get_user_id(),server_push_score:p.get_won_score()})
     packet = {
         cmd_type: server_cmd_type_push,
         server_cmd_type_push: server_push_game_end,
@@ -122,5 +125,30 @@ def create_request_error_packet(player_req_cmd):
         sock_resp: player_req_cmd,
         sock_result: sock_result_error,
         sock_error_message: "invalid request"
+    }
+    return packet
+
+def create_players_total_score_in_room(room):
+    scores = []
+    for p in room.get_seated_players():
+        scores.append({user_id: p.get_user_id(), server_push_score: room.get_player_total_score(p)})
+
+    packet = {
+        cmd_type: server_cmd_type_push,
+        server_cmd_type_push: server_push_scores,
+        server_push_scores: scores
+    }
+    return packet
+
+
+def create_players_total_score_in_round(game_round):
+    scores = []
+    for p in game_round.get_players():
+        scores.append({user_id: p.get_user_id(), server_push_score: p.get_won_score()})
+
+    packet = {
+        cmd_type: server_cmd_type_push,
+        server_cmd_type_push: server_push_scores,
+        server_push_scores: scores
     }
     return packet

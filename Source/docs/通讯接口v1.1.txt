@@ -183,7 +183,7 @@ post
 {
 	"cmdtype":"sockpush",
 	"sockpush":"cmd-opts",
-	"cmd-opts":["pen","chi","hu","gang","mopai","zimo"],
+	"cmd-opts":["peng","chi","hu","gang","mopai","zimo"],
 	"resp-timeout":30 //用户响应超时时间，单位：秒，值为-1时为没有超时，一直等待用户响应
 	"def-cmd":"hu",  
         "cmd-param":""   //当def-opt为chupai时，此参数为使用逗号分隔的牌
@@ -205,18 +205,28 @@ post
 	"player-state":"normal|offline|robot-play" //玩家状态，normal:正常，offline：离线，robot-play:机器人托管，normal与offline是互斥出现的，robot-play可与normal或offline组合出现，中间以竖线“|”分隔。
 	"userid":11234.  #出牌玩家的userid
 }
-4.6.游戏结束，广播胜负各方
+4.6.一局游戏结束，广播胜负各方
 推送参数：
 {
 	"cmdtype":"sockpush",
 	"sockpush":"game-result",
-	"winners":[{"userid":1224, "win-score":12},]
-	"losers":[{"userid":122,"lose-score":12}]
+	"winners":[{"userid":1224, "score":12},]
+	"losers":[{"userid":122,"score":12}]
 }
 说明：
-winners和losers可有多个，win-score和lose-score表示赢或输的分数，客户端根据此数字更新玩家代币数
+winners和losers可有多个，score > 0 赢的分数，score < 0 输的分数
 
-4.7 广播玩家的操作
+4.7 一局游戏结束，广播各玩家累积的分数
+推送参数：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"scores",
+	"scores":[{"userid":1224, "score":12},{"userid":1223, "score":-12},]
+}
+说明：
+score > 0 赢的分数，score < 0 输的分数
+
+4.8 广播玩家的操作
 推送参数：
 {
 	"cmdtype":"sockpush",

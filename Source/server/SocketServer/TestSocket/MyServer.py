@@ -16,6 +16,7 @@ class MyTCPHandler(socketserver.StreamRequestHandler):
                 if not data:
                     print("client closed")
                     PlayManager.process_client_disconnected(conn)
+                    break
                 else:
                     print('received:' + data.decode())
                     PlayManager.dispatch_player_commands(conn, data.decode())

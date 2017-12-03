@@ -20,6 +20,7 @@ from GameStages.TeamPlayers import TeamPlayers
 from GameStages.TellWinner import TellWinner
 from Rooms import Lobby
 from Rooms.Room_Majiang import Room_Majiang
+from GameStages.TellWinner_Majiang import TellWinner_Majiang
 
 from GameStages.CalScores import CalScores
 
@@ -104,9 +105,7 @@ def init_majiang_rule_guaisanjiao():
     rule.add_game_stage(stage)
     stage = PlayMajiang(rule)
     rule.add_game_stage(stage)
-    stage = TellWinner(rule)
-    rule.add_game_stage(stage)
-    stage = CalScores_Majiang(rule)
+    stage = TellWinner_Majiang(rule)
     rule.add_game_stage(stage)
     stage = PublishScores(rule)
     rule.add_game_stage(stage)
@@ -128,7 +127,6 @@ def init_majiang_rule_guaisanjiao():
 
 
 def load_majiang_patterns(majiang_rule):
-
 
     wan_s = CardsMaster.def_wans["wan-1"]
     suo_s = CardsMaster.def_suos["suo-1"]

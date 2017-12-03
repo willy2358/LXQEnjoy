@@ -1,9 +1,9 @@
 
 class PlayCmd:
-    def __init__(self, player, cmd):
+    def __init__(self, player, cmd, cmd_param = None):
         self.__player = player
         self.__cmd = cmd
-        self.__cmd_param = []
+        self.__cmd_param = cmd_param
         self.__is_silent = False
 
     def get_cmd(self):
