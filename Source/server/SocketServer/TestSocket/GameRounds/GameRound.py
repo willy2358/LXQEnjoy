@@ -253,6 +253,11 @@ class GameRound:
 
         self.test_and_update_current_stage()
 
+    def process_player_robot_play_request(self, player, robot_play = False):
+        if not player:
+            player.set_is_robot_play(robot_play)
+        # ToDo publish player states
+
     def start_timer_run_round(self):
         if self.__timer_run_round and self.__timer_run_round.isAlive():
             self.__timer_run_round.cancel()

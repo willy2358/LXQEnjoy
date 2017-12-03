@@ -24,6 +24,8 @@ class PlayerClient:
         self.__final_cards = None
         self.__final_cards_from_dealer = False   #True, the cards are from dealer, or from the undealed cards, False, these cards from other players
         self.__won_score = 0  # positive, win, negative, lose
+        self.__is_online = True
+        self.__is_robot_play = False
 
     def is_banker(self):
         return self.__is_banker
@@ -40,25 +42,29 @@ class PlayerClient:
     def get_won_score(self):
         return self.__won_score
 
-    # def get_default_play_cards(self):
-    #     if len(self.__initial_cards) > 0:
-    #         c = self.__initial_cards[0]
-    #         self.__initial_cards.remove(c)
-    #         return c
-    #     else:
-    #         return None
+    def get_is_online(self):
+        return self.__is_online
 
-    # def get_init_cards(self):
-    #     return self.__initial_cards
+    def get_is_robot_play(self):
+        return self.__is_robot_play
 
     def update_connection(self, conn):
         self.__socket__conn = conn
+        self.set_is_online(True)
 
     def set_playing_rule_id(self, rule_id):
         self.__playing_rule_id = rule_id
 
     def set_game_round(self, round):
         self.__game_round = round
+
+    def set_is_online(self, online=True):
+        self.__is_online = online
+        if not online:
+            self.set_is_robot_play(True)
+
+    def set_is_robot_play(self, robot_play = False):
+        self.__is_robot_play = robot_play
 
     def get_game_round(self):
         return self.__game_round
@@ -73,7 +79,10 @@ class PlayerClient:
         return self.__socket__conn
 
     def send_command_message(self, msg):
-        self.__socket__conn.sendall(msg.encode(encoding="utf-8"))
+        try:
+            self.__socket__conn.sendall(msg.encode(encoding="utf-8"))
+        except Exception as ex:
+            Log.write_exception(ex)
 
     def begin_new_deal(self):
         self.send_command_message(PlayManager.SERVER_CMD_DEAL_BEGIN)

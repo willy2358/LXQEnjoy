@@ -15,6 +15,7 @@ client_req_type_reconnect = "reconnect"   # 断线重连
 client_req_type_exe_cmd = "exe-cmd"
 client_req_exe_cmd = "cmd"
 client_req_cmd_param = "cmd-data"
+client_req_robot_play = "robot-play"
 
 server_cmd_type_push = "sockpush"
 server_push_new_banker = "new-banker"

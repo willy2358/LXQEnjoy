@@ -29,7 +29,18 @@ class PlayMajiang(PlayInTurn):
             def_cmd.set_cmd_param(PlayMajiang.get_player_default_play_card(starter))
             cmd_opts.append(def_cmd)
 
-        game_round.send_player_cmd_options(starter, cmd_opts, cmd_opts[0])
+        def_cmd = PlayMajiang.get_better_default_cmd_for_player(starter, cmd_opts, cmd_opts[0])
+        game_round.send_player_cmd_options(starter, cmd_opts, def_cmd)
+
+    @staticmethod
+    def get_better_default_cmd_for_player(player, cmd_opts, default_opt):
+        def_cmd = default_opt
+        if player.get_is_robot_play():
+            for c in cmd_opts:
+                if c == InterProtocol.majiang_player_act_zimo or c == InterProtocol.majiang_player_act_hu:
+                    def_cmd = c
+                    break
+        return def_cmd
 
     @staticmethod
     def is_ended_in_round(game_round):
@@ -61,7 +72,8 @@ class PlayMajiang(PlayInTurn):
                 def_cmd = PlayCmd(next_player, InterProtocol.majiang_player_act_play_card)
                 def_cmd.set_cmd_param(PlayMajiang.get_player_default_play_card(next_player))
                 cmd_opts.append(def_cmd)
-                game_round.send_player_cmd_options(next_player, cmd_opts, cmd_opts[0])
+            def_cmd = PlayMajiang.get_better_default_cmd_for_player(next_player, cmd_opts, def_cmd)
+            game_round.send_player_cmd_options(next_player, cmd_opts, def_cmd)
         else:
             PlayMajiang.process_prioritized_player_cmds(game_round, players_cmd_opts, listeners[0])
 
@@ -76,18 +88,23 @@ class PlayMajiang(PlayInTurn):
 
         for i in range(0, len(prioritized_cmds)):
             if prioritized_cmds[i]["player"] != next_player:
-                def_cmd = PlayCmd(prioritized_cmds[i]["player"], InterProtocol.majiang_player_act_pass)
-                prioritized_cmds[i]["cmds"].append(def_cmd)
+                player = prioritized_cmds[i]["player"]
+                pass_cmd = PlayCmd(player, InterProtocol.majiang_player_act_pass)
+                prioritized_cmds[i]["cmds"].append(pass_cmd)
+                cmd_opts = prioritized_cmds[i]["cmds"]
+                def_cmd = PlayMajiang.get_better_default_cmd_for_player(player, cmd_opts, pass_cmd)
                 prioritized_cmds[i]["def-cmd"] = def_cmd
 
             if i == len(prioritized_cmds) - 1:
-                def_cmd = PlayCmd(next_player, InterProtocol.majiang_player_act_mopai)
+                mopai_cmd = PlayCmd(next_player, InterProtocol.majiang_player_act_mopai)
                 if prioritized_cmds[i]["player"] == next_player:  # merge commands
-                    prioritized_cmds[i]["cmds"].append(def_cmd)
+                    prioritized_cmds[i]["cmds"].append(mopai_cmd)
+                    cmd_opts = prioritized_cmds[i]["cmds"]
+                    def_cmd = PlayMajiang.get_better_default_cmd_for_player(next_player, cmd_opts, mopai_cmd)
                     prioritized_cmds[i]["def-cmd"] = def_cmd
                 else:
-                    cmds = [def_cmd]
-                    prioritized_cmds.append({"player": next_player, "cmds": cmds, "def-cmd":def_cmd})
+                    cmds = [mopai_cmd]
+                    prioritized_cmds.append({"player": next_player, "cmds": cmds, "def-cmd":mopai_cmd})
 
         game_round.start_process_for_players_want_played_out_cards(prioritized_cmds)
 

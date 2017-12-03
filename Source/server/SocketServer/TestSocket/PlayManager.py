@@ -2,6 +2,7 @@ import json
 
 import CardsMaster
 import InterProtocol
+import Log
 from Actions.CallBank import CallBank
 from Actions.PassCall import PassCall
 from GameRules.GameRule_Majiang import GameRule_Majiang
@@ -33,7 +34,7 @@ from CardsPattern.Mode_Pair import Mode_Pair
 from CardsPattern.Mode_Seq import Mode_Seq
 from CardsPattern.Mode_Triple import Mode_Triple
 
-
+Conn_Players = {} #{connection, player}
 __Players = []
 Players={}   #{userid:player}
 Rooms = {}   #{roomid:room}
@@ -120,7 +121,6 @@ def init_majiang_rule_guaisanjiao():
     rule.ScoreRule.set_ting_kou_count_score(6, 1)
     rule.ScoreRule.set_ting_kou_count_score(7, 1)
     rule.ScoreRule.set_score_formular("(B + N) * P * W")
-
 
     load_majiang_patterns(rule)
 
@@ -265,6 +265,7 @@ def dispatch_player_commands(conn, comm_text):
         if j_obj[InterProtocol.cmd_type].lower() == InterProtocol.sock_req_cmd.lower():
             process_client_request(conn, j_obj)
     except Exception as ex:
+        Log.write_exception(ex)
         print(ex)
 
 
@@ -276,6 +277,7 @@ def process_client_request(conn, req_json):
             player = PlayerClient(conn, user_id)
             Players[user_id] = player
             print("new player:" + str(user_id))
+            Conn_Players[conn] = player
         else:
             player = Players[user_id]
 
@@ -294,6 +296,7 @@ def process_client_request(conn, req_json):
             Lobby.process_player_request(player, req_json)
 
     except Exception as ex:
+        Log.write_exception(ex)
         print(ex)
 
 # def update_round_stage(client_conn):
@@ -303,11 +306,14 @@ def process_client_request(conn, req_json):
 
 
 def get_player_client_from_conn(conn):
-    for c in __Players:
-        if c.get_socket_conn() == conn:
-            return c
+    if conn in Conn_Players:
+        return Conn_Players[conn]
+    else:
+        return None
 
-    return None
+def remove_dead_connection(conn):
+    if conn in Conn_Players:
+        Conn_Players.pop(conn)
 
 
 def get_rule_by_id(rule_id):
@@ -335,4 +341,7 @@ def create_room_from_db(room_id, rule_id):
     Rooms[room_id] = room
 
 def process_client_disconnected(conn):
-    pass
+    player = get_player_client_from_conn(conn)
+    if player:
+        player.set_is_online(False)
+        remove_dead_connection(conn)

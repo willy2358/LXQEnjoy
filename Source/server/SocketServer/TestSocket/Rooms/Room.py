@@ -58,6 +58,15 @@ class Room:
                 const_param = InterProtocol.client_req_cmd_param
                 cmd_param = req_json[const_param] if const_param in req_json else None
                 self.__current_round.process_player_execute_command(player, cmd, cmd_param)
+        elif req_cmd == InterProtocol.client_req_robot_play:
+            flag = str(req_json[InterProtocol.client_req_robot_play])
+            if flag.lower().startswith('y'):
+                self.__current_round.process_player_robot_play_request(player, True)
+            elif flag.lower().startswith('n'):
+                self.__current_round.process_player_robot_play_request(player, False)
+            else:
+                err = InterProtocol.create_request_error_packet(req_cmd)
+                player.send_server_command(err)
 
     def process_join_game(self, player):
         try:
