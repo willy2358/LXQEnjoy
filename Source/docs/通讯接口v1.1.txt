@@ -141,6 +141,7 @@ post
 	"userid":123456,
 	"roomid":123333,
 	"gameid":123432
+	"token":b'YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN'
 }
 服务器返回：
 {

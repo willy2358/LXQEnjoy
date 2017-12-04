@@ -22,6 +22,9 @@ from Rooms import Lobby
 from Rooms.Room_Majiang import Room_Majiang
 from GameStages.TellWinner_Majiang import TellWinner_Majiang
 
+from threading import Timer
+from datetime import datetime,timedelta
+
 from GameStages.CalScores import CalScores
 
 from PlayerClient import PlayerClient
@@ -36,7 +39,7 @@ from CardsPattern.Mode_Seq import Mode_Seq
 from CardsPattern.Mode_Triple import Mode_Triple
 
 Conn_Players = {} #{connection, player}
-__Players = []
+# __Players = []
 Players={}   #{userid:player}
 Rooms = {}   #{roomid:room}
 GameRules = {} #{ruleid:rule}
@@ -51,6 +54,9 @@ SERVER_CMD_DEAL_FINISH = "deal_finish"   # 结束发牌
 
 CLIENT_REQ_SELECT_ACTION = "sel-act"
 
+cycle_minutes_check_dead = 1
+dead_connect_reserve_minutes = 1
+timer_clear_dead_connection = None
 
 # dou di zu
 def init_poker_rule_doudizu():
@@ -223,6 +229,14 @@ def load_majiang_patterns(majiang_rule):
     majiang_rule.add_win_pattern(pat)
     majiang_rule.ScoreRule.set_pattern_score("pairs", 5)
 
+def initialize():
+    init_play_rules()
+
+    start_timer_to_clear_dead_connection()
+
+def start_timer_to_clear_dead_connection():
+    timer_clear_dead_connection = Timer(cycle_minutes_check_dead * 60, remove_dead_connection)
+    timer_clear_dead_connection.start()
 
 def init_play_rules():
     # init_poker_rule_doudizu()
@@ -256,15 +270,46 @@ def set_call_banker_action_options(call_banker_stage):
     c221 = c22.add_follow_up_action(CallBank("Call", "2-2-1"))
     c222 = c22.add_follow_up_action(PassCall("Not Call", "2-2-2"), True)
 
+
+def validate_player(j_obj):
+    if InterProtocol.user_id not in j_obj \
+            or InterProtocol.room_id not in j_obj \
+            or InterProtocol.sock_req_cmd not in j_obj:
+        return False
+    else:
+        return True
+
+
 def dispatch_player_commands(conn, comm_text):
+
+    j_obj = None
     try:
         j_obj = json.loads(comm_text)
+    except Exception as ex:
+        send_msg_to_client_connection("invalid request data")
+        return
 
+    if not validate_player(j_obj):
+        send_msg_to_client_connection("invalid request packet")
+        return
+
+    try:
         if j_obj[InterProtocol.cmd_type].lower() == InterProtocol.sock_req_cmd.lower():
             process_client_request(conn, j_obj)
     except Exception as ex:
         Log.write_exception(ex)
         print(ex)
+
+def send_msg_to_client_connection(conn, msg):
+    try:
+        conn.sendall(msg.encode(encoding="utf-8"))
+    except Exception as ex:
+        Log.write_exception(ex)
+
+
+def send_welcome_to_new_connection(conn):
+    welcome_msg = "welcome,just enjoy!"
+    send_msg_to_client_connection(conn, welcome_msg)
 
 
 def process_client_request(conn, req_json):
@@ -276,8 +321,16 @@ def process_client_request(conn, req_json):
             Players[user_id] = player
             print("new player:" + str(user_id))
             Conn_Players[conn] = player
+            Log.write_info("client number:" + str(len(Conn_Players)))
+            send_welcome_to_new_connection(conn)
         else:
             player = Players[user_id]
+            if player.get_socket_conn() != conn:
+                # if req_json[InterProtocol.player_auth_token] != player.get_session_token():
+                #     send_msg_to_client_connection("Wrong player token")
+                #     returnß
+                # else:
+                player.update_connection(conn)
 
         if req_json[InterProtocol.sock_req_cmd].lower() == InterProtocol.client_req_type_reconnect:
             player.update_connection(conn)
@@ -309,10 +362,22 @@ def get_player_client_from_conn(conn):
     else:
         return None
 
-def remove_dead_connection(conn):
-    if conn in Conn_Players:
-        Conn_Players.pop(conn)
+def remove_dead_connection():
+    dead = []
+    for p in Players:
+        now = datetime.now()
+        delta = now - Players[p].get_last_alive_time()
+        if delta.total_seconds() > dead_connect_reserve_minutes * 60:
+            dead.append((p, Players[p].get_socket_conn()))
 
+    for item in dead:
+        send_msg_to_client_connection(item[1],"disconnected as dead connection")
+        Players.pop(item[0])
+        Conn_Players.pop(item[1])
+        item[1].close()
+
+    Log.write_info("client number:" + str(len(Conn_Players)))
+    start_timer_to_clear_dead_connection()
 
 def get_rule_by_id(rule_id):
     if rule_id in __PlayRules:
@@ -342,4 +407,4 @@ def process_client_disconnected(conn):
     player = get_player_client_from_conn(conn)
     if player:
         player.set_is_online(False)
-        remove_dead_connection(conn)
+        # remove_dead_connection(conn)

@@ -25,7 +25,7 @@ class MyTCPHandler(socketserver.StreamRequestHandler):
 
 if __name__ == "__main__":
 
-    PlayManager.init_play_rules()
+    PlayManager.initialize()
 
     HOST, PORT = "127.0.0.1", 9229
 

@@ -8,6 +8,10 @@ from threading import Timer
 import Utils
 import Log
 
+import base64
+import os
+
+from datetime import datetime,timedelta
 
 class PlayerClient:
     def __init__(self, conn, user_id):
@@ -26,6 +30,8 @@ class PlayerClient:
         self.__won_score = 0  # positive, win, negative, lose
         self.__is_online = True
         self.__is_robot_play = False
+        self.__session_token = base64.b32encode(os.urandom(10)).decode()
+        self.__last_alive_time = datetime.now()
 
     def is_banker(self):
         return self.__is_banker
@@ -47,6 +53,9 @@ class PlayerClient:
 
     def get_is_robot_play(self):
         return self.__is_robot_play
+
+    def get_session_token(self):
+        return self.__session_token
 
     def update_connection(self, conn):
         self.__socket__conn = conn
@@ -72,6 +81,9 @@ class PlayerClient:
         if add_in_hand:
             self.__cards_in_hand = self.__cards_in_hand + cards
 
+    def set_session_token(self, token):
+        self.__session_token = token
+
     def get_game_round(self):
         return self.__game_round
 
@@ -81,12 +93,17 @@ class PlayerClient:
     def get_final_cards(self):
         return self.__final_cards
 
+    def get_last_alive_time(self):
+        return self.__last_alive_time
+
     def get_socket_conn(self):
         return self.__socket__conn
 
     def send_command_message(self, msg):
+
         try:
             self.__socket__conn.sendall(msg.encode(encoding="utf-8"))
+            self.__last_alive_time = datetime.now()
         except Exception as ex:
             Log.write_exception(ex)
 
