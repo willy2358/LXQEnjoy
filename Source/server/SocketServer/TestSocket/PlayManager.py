@@ -326,7 +326,7 @@ def process_client_request(conn, req_json):
         else:
             player = Players[user_id]
             if player.get_socket_conn() != conn:
-                send_msg_to_client_connection("Already in game, try reconnect to refresh connection")
+                send_msg_to_client_connection(conn, "Already in game, try reconnect to refresh connection")
                 return
                 # if req_json[InterProtocol.player_auth_token] != player.get_session_token():
                 #     send_msg_to_client_connection("Wrong player token")
