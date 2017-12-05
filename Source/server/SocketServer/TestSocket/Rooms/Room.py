@@ -47,9 +47,15 @@ class Room:
     def add_seated_player(self, player):
         if self.can_new_player_seated():
             self._seated_players.append(player)
+            player.set_my_room(self)
             return True
         else:
             return False
+    def remove_player(self, player):
+        if player in self._seated_players:
+            self._seated_players.remove(player)
+        if player in self._lookon_players:
+            self._lookon_players.remove(player)
         
     def add_lookon_player(self, player):
         if self.can_new_player_lookon():

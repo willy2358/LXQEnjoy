@@ -9,6 +9,10 @@ class MyTCPHandler(socketserver.StreamRequestHandler):
 
     def handle(self):
         conn = self.request
+        try:
+            conn.sendall("Welcome!Just enjoy!".encode(encoding="utf-8"))
+        except Exception as ex:
+            Log.write_exception(ex)
 
         while True:
             try:
@@ -26,8 +30,9 @@ class MyTCPHandler(socketserver.StreamRequestHandler):
 if __name__ == "__main__":
 
     PlayManager.initialize()
-
     HOST, PORT = "127.0.0.1", 9229
+    #HOST, PORT = "192.168.1.57", 9229
+	#HOST, PORT = "117.78.40.54", 9229
 
     # Create the server, binding to localhost on port 9999
     # server = socketserver.TCPServer((HOST, PORT), MyTCPHandler)

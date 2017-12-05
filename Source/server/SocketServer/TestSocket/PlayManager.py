@@ -54,7 +54,7 @@ SERVER_CMD_DEAL_FINISH = "deal_finish"   # 结束发牌
 
 CLIENT_REQ_SELECT_ACTION = "sel-act"
 
-cycle_minutes_check_dead = 1
+cycle_minutes_check_dead = 10
 dead_connect_reserve_minutes = 1
 timer_clear_dead_connection = None
 
@@ -235,7 +235,8 @@ def initialize():
     start_timer_to_clear_dead_connection()
 
 def start_timer_to_clear_dead_connection():
-    timer_clear_dead_connection = Timer(cycle_minutes_check_dead * 60, remove_dead_connection)
+    timeout = min(cycle_minutes_check_dead, dead_connect_reserve_minutes)
+    timer_clear_dead_connection = Timer(timeout * 60, remove_dead_connection)
     timer_clear_dead_connection.start()
 
 def init_play_rules():
@@ -286,11 +287,11 @@ def dispatch_player_commands(conn, comm_text):
     try:
         j_obj = json.loads(comm_text)
     except Exception as ex:
-        send_msg_to_client_connection("invalid request data")
+        send_msg_to_client_connection("Invalid request format")
         return
 
     if not validate_player(j_obj):
-        send_msg_to_client_connection("invalid request packet")
+        send_msg_to_client_connection("Invalid request parameters")
         return
 
     try:
@@ -319,18 +320,21 @@ def process_client_request(conn, req_json):
         if user_id not in Players:
             player = PlayerClient(conn, user_id)
             Players[user_id] = player
-            print("new player:" + str(user_id))
+            Log.write_info("new player:" + str(user_id))
             Conn_Players[conn] = player
             Log.write_info("client number:" + str(len(Conn_Players)))
-            send_welcome_to_new_connection(conn)
         else:
             player = Players[user_id]
             if player.get_socket_conn() != conn:
+                send_msg_to_client_connection("Already in game, try reconnect to refresh connection")
+                return
                 # if req_json[InterProtocol.player_auth_token] != player.get_session_token():
                 #     send_msg_to_client_connection("Wrong player token")
                 #     returnß
                 # else:
-                player.update_connection(conn)
+                #player.update_connection(conn)
+        if player:
+            player.update_last_alive()
 
         if req_json[InterProtocol.sock_req_cmd].lower() == InterProtocol.client_req_type_reconnect:
             player.update_connection(conn)
@@ -348,7 +352,6 @@ def process_client_request(conn, req_json):
 
     except Exception as ex:
         Log.write_exception(ex)
-        print(ex)
 
 # def update_round_stage(client_conn):
 #     player = get_player_client_from_conn(client_conn)
@@ -371,10 +374,16 @@ def remove_dead_connection():
             dead.append((p, Players[p].get_socket_conn()))
 
     for item in dead:
-        send_msg_to_client_connection(item[1],"disconnected as dead connection")
+        conn = item[1]
+        userid = item[0]
+        player = Players[userid]
+        room = player.get_my_room()
+        if room:
+            room.remove_player(player)
+        send_msg_to_client_connection(conn,"disconnected as dead connection")
         Players.pop(item[0])
         Conn_Players.pop(item[1])
-        item[1].close()
+        conn.close()
 
     Log.write_info("client number:" + str(len(Conn_Players)))
     start_timer_to_clear_dead_connection()

@@ -3,8 +3,6 @@ import json
 
 import PlayManager
 
-from threading import Timer
-
 import Utils
 import Log
 
@@ -24,6 +22,7 @@ class PlayerClient:
         self.__freezed_card_groups = []   # These cards are freezed, that is, these cards can not be played out, or used by other purpose
         self.__user_id = user_id
         self.__room_id = 0
+        self.__my_room = None
         self.__is_banker = False
         self.__final_cards = None
         self.__final_cards_from_dealer = False   #True, the cards are from dealer, or from the undealed cards, False, these cards from other players
@@ -57,6 +56,9 @@ class PlayerClient:
     def get_session_token(self):
         return self.__session_token
 
+    def get_my_room(self):
+        return self.__my_room
+
     def update_connection(self, conn):
         self.__socket__conn = conn
         self.set_is_online(True)
@@ -84,6 +86,9 @@ class PlayerClient:
     def set_session_token(self, token):
         self.__session_token = token
 
+    def set_my_room(self, room):
+        self.__my_room = room
+
     def get_game_round(self):
         return self.__game_round
 
@@ -103,7 +108,7 @@ class PlayerClient:
 
         try:
             self.__socket__conn.sendall(msg.encode(encoding="utf-8"))
-            self.__last_alive_time = datetime.now()
+            
         except Exception as ex:
             Log.write_exception(ex)
 
@@ -118,6 +123,9 @@ class PlayerClient:
 
     def set_bank_cards(self, cards):
         self.add_dealed_cards(cards)
+
+    def update_last_alive(self):
+        self.__last_alive_time = datetime.now()
 
     def send_cards_state(self):
         cards1 = self.__active_cards[:]
