@@ -57,6 +57,8 @@ class GameRound:
         self.__game_end = False
 
     def begin_run(self):
+        status = InterProtocol.create_game_status_packet("New round begins")
+        self.publish_round_states(status)
         self.start_timer_run_round()
 
     def get_players(self):

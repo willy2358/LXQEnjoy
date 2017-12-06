@@ -2,7 +2,8 @@ import SocketClient
 import InterProtocol
 import json
 
-client = SocketClient.SocketClient("117.78.40.54", 9229)
+# client = SocketClient.SocketClient("117.78.40.54", 9229)
+client = SocketClient.SocketClient("127.0.0.1", 9229)
 client.run()
 cmd = '{"cmdtype":"sockreq","sockreq":"join-game","userid":111,	"roomid":123333,"gameid":"m1"}'
 client.send_message(cmd)

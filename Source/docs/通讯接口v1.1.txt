@@ -141,7 +141,7 @@ post
 	"userid":123456,
 	"roomid":123333,
 	"gameid":123432
-	"token":b'YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN'
+	"token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN"
 }
 服务器返回：
 {
@@ -206,6 +206,7 @@ post
 	"player-state":"normal|offline|robot-play" //玩家状态，normal:正常，offline：离线，robot-play:机器人托管，normal与offline是互斥出现的，robot-play可与normal或offline组合出现，中间以竖线“|”分隔。
 	"userid":11234.  #出牌玩家的userid
 }
+
 4.6.一局游戏结束，广播胜负各方
 推送参数：
 {
@@ -237,6 +238,14 @@ score > 0 赢的分数，score < 0 输的分数
         "userid":123, #执行操作的用户ID
 }
 
+4.9 广播游戏的状态
+推送参数：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"game-status",
+	"game-status":""
+	"state-data":"1". #state-data作为扩展使用，预留
+}
 
 5.玩家发送
 5.1出牌
@@ -256,7 +265,7 @@ score > 0 赢的分数，score < 0 输的分数
 	"userid":124122,
 	"roomid",123|0
 	"cmd":"peng", //此命令来自服务器推送的命令列表
-	"cmd-data":"" //命令数据，预留
+	"cmd-data":"" //命令数据，预留 当cmd为hu, peng, gang,时cmd-data须为服务器push的牌点数
 }
 5.3玩家断网重连
 请求参数：

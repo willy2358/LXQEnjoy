@@ -32,6 +32,9 @@ server_push_losers = "losers"
 server_push_player_exed_cmd = "exed-cmd"
 server_push_scores = "scores"
 server_push_score = "score"
+server_push_game_status = "game-status"
+server_push_status_data = "status-data"
+
 
 cmd_data_cards = "cards"
 
@@ -57,6 +60,15 @@ majiang_acts_priorities = [majiang_player_act_zimo, majiang_player_act_hu,
 
 min_room_id = 10   # valid room id should > 10
 
+
+def create_game_status_packet(status, status_data = None):
+    packet = {
+        cmd_type: server_cmd_type_push,
+        server_cmd_type_push: server_push_game_status,
+        server_push_game_status: status,
+        server_push_status_data:status_data
+    }
+    return packet
 
 def create_deal_cards_json_packet(player, cards):
     packet = {

@@ -29,7 +29,7 @@ class PlayerClient:
         self.__won_score = 0  # positive, win, negative, lose
         self.__is_online = True
         self.__is_robot_play = False
-        self.__session_token = base64.b32encode(os.urandom(10)).decode()
+        self.__session_token = ""
         self.__last_alive_time = datetime.now()
 
     def is_banker(self):
@@ -88,6 +88,17 @@ class PlayerClient:
 
     def set_my_room(self, room):
         self.__my_room = room
+
+    def reset_for_next_round(self):
+        self.__cards_in_hand = []
+        self.__final_cards = []
+        self.__active_cards = []
+        self.__freezed_card_groups = []
+        self.__final_cards = None
+        self.__final_cards_from_dealer = False
+        self.__won_score = 0  # positive, win, negative, lose
+        self.__is_online = True
+        self.__is_robot_play = False
 
     def get_game_round(self):
         return self.__game_round

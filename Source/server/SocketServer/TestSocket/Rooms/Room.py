@@ -13,7 +13,7 @@ class Room:
         self._max_seated_players = 0
         self._min_seated_players = 0
         self._max_lookon_players = 0
-        self._round_num = 8
+        self._round_num = 2
         self._current_round_order = 0
         self._current_round = None
         self._last_winners = []
@@ -141,7 +141,9 @@ class Room:
         # self._current_round_order += 1
 
     def close_room(self):
-        pass
+        packet = InterProtocol.create_game_status_packet("Room will be closed")
+        if self._current_round:
+            self._current_round.publish_round_states(packet)
 
     def set_max_seated_player_num(self, max_number):
         self._max_seated_players = max_number

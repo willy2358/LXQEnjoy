@@ -55,7 +55,7 @@ SERVER_CMD_DEAL_FINISH = "deal_finish"   # 结束发牌
 CLIENT_REQ_SELECT_ACTION = "sel-act"
 
 cycle_minutes_check_dead = 10
-dead_connect_reserve_minutes = 1
+dead_connect_reserve_minutes = 5
 timer_clear_dead_connection = None
 
 # dou di zu
