@@ -24,10 +24,10 @@ class DealMaJiangs(GameStage):
         banker_cards_num = rule.get_cards_number_for_banker()
         player_cards_num = rule.get_cards_number_for_non_banker()
         for p in game_round.get_players():
-            init_cards_num = len(p.get_init_cards())
-            if p.is_banker() and init_cards_num < banker_cards_num:
+            cards_num = len(p.get_in_hand_cards())
+            if p.is_banker() and cards_num < banker_cards_num:
                 return False
-            if not p.is_banker() and init_cards_num < player_cards_num:
+            if not p.is_banker() and cards_num < player_cards_num:
                 return False
 
         return True

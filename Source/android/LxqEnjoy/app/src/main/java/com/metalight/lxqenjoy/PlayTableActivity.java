@@ -49,7 +49,8 @@ public class PlayTableActivity extends AppCompatActivity implements ServerDataLi
     }
 
     public void onTestClick(View view){
-        this._serverProxy.SendPlayMessage((new Date()).toString());
+        //this._serverProxy.SendPlayMessage((new Date()).toString());
+        showNewCard("10_c");
     }
 
     private void LoadMyImage(){

@@ -2,11 +2,12 @@ import json
 
 import CardsMaster
 import InterProtocol
+import Log
 from Actions.CallBank import CallBank
 from Actions.PassCall import PassCall
 from GameRules.GameRule_Majiang import GameRule_Majiang
 from GameRules.GameRule_Poker import GameRule_Poker
-from GameStages.CalScores import CalScores
+from GameStages.CalScores_Majiang import CalScores_Majiang
 from GameStages.CallBanker import CallBanker
 from GameStages.DealCards import DealCards
 from GameStages.DealMaJiangs import DealMaJiangs
@@ -19,10 +20,26 @@ from GameStages.TeamPlayers import TeamPlayers
 from GameStages.TellWinner import TellWinner
 from Rooms import Lobby
 from Rooms.Room_Majiang import Room_Majiang
+from GameStages.TellWinner_Majiang import TellWinner_Majiang
+
+from threading import Timer
+from datetime import datetime,timedelta
+
+from GameStages.CalScores import CalScores
 
 from PlayerClient import PlayerClient
 
-__Players = []
+from CardsPattern.PatternModes import PatternModes
+from CardsPattern.Mode_AllInRange import Mode_AllInRange
+from CardsPattern.Mode_AllPairs import Mode_AllPairs
+from CardsPattern.Mode_AnyInRange import Mode_AnyInRange
+from CardsPattern.Mode_AnyOutRange import Mode_AnyOutRange
+from CardsPattern.Mode_Pair import Mode_Pair
+from CardsPattern.Mode_Seq import Mode_Seq
+from CardsPattern.Mode_Triple import Mode_Triple
+
+Conn_Players = {} #{connection, player}
+# __Players = []
 Players={}   #{userid:player}
 Rooms = {}   #{roomid:room}
 GameRules = {} #{ruleid:rule}
@@ -37,6 +54,9 @@ SERVER_CMD_DEAL_FINISH = "deal_finish"   # 结束发牌
 
 CLIENT_REQ_SELECT_ACTION = "sel-act"
 
+cycle_minutes_check_dead = 10
+dead_connect_reserve_minutes = 5
+timer_clear_dead_connection = None
 
 # dou di zu
 def init_poker_rule_doudizu():
@@ -91,15 +111,133 @@ def init_majiang_rule_guaisanjiao():
     rule.add_game_stage(stage)
     stage = PlayMajiang(rule)
     rule.add_game_stage(stage)
-    stage = TellWinner(rule)
-    rule.add_game_stage(stage)
-    stage = CalScores(stage)
+    stage = TellWinner_Majiang(rule)
     rule.add_game_stage(stage)
     stage = PublishScores(rule)
     rule.add_game_stage(stage)
 
+    rule.ScoreRule.set_base_score(3)
+    rule.ScoreRule.set_zimo_score(2)
+    rule.ScoreRule.set_ting_kou_count_score(1, 2)
+    rule.ScoreRule.set_ting_kou_count_score(2, 1)
+    rule.ScoreRule.set_ting_kou_count_score(3, 1)
+    rule.ScoreRule.set_ting_kou_count_score(4, 1)
+    rule.ScoreRule.set_ting_kou_count_score(5, 1)
+    rule.ScoreRule.set_ting_kou_count_score(6, 1)
+    rule.ScoreRule.set_ting_kou_count_score(7, 1)
+    rule.ScoreRule.set_score_formular("(B + N) * P * W")
+
+    load_majiang_patterns(rule)
+
     GameRules[rule_id] = rule
 
+
+def load_majiang_patterns(majiang_rule):
+
+    wan_s = CardsMaster.def_wans["wan-1"]
+    suo_s = CardsMaster.def_suos["suo-1"]
+    ton_s = CardsMaster.def_tons["ton-1"]
+
+    pat = PatternModes("qing-long", 10)
+    pat.add_mode(Mode_Seq(wan_s, 3))
+    pat.add_mode(Mode_Seq(wan_s + 3, 3))
+    pat.add_mode(Mode_Seq(wan_s + 6, 3))
+    pat.add_mode(Mode_AllInRange(wan_s, wan_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("qing-long", 10)
+    pat.add_mode(Mode_Seq(suo_s, 3))
+    pat.add_mode(Mode_Seq(suo_s + 3, 3))
+    pat.add_mode(Mode_Seq(suo_s + 6, 3))
+    pat.add_mode(Mode_AllInRange(suo_s, suo_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("qing-long", 10)
+    pat.add_mode(Mode_Seq(ton_s, 3))
+    pat.add_mode(Mode_Seq(ton_s + 3, 3))
+    pat.add_mode(Mode_Seq(ton_s + 6, 3))
+    pat.add_mode(Mode_AllInRange(ton_s, ton_s + 8))
+    majiang_rule.add_win_pattern(pat)
+    majiang_rule.ScoreRule.set_pattern_score("qing-long", 10)
+
+    pat = PatternModes("qing-pairs", 10)
+    pat.add_mode(Mode_AllPairs())
+    pat.add_mode(Mode_AllInRange(wan_s, wan_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("qing-pairs", 10)
+    pat.add_mode(Mode_AllPairs())
+    pat.add_mode(Mode_AllInRange(suo_s, suo_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("qing-pairs", 10)
+    pat.add_mode(Mode_AllPairs())
+    pat.add_mode(Mode_AllInRange(ton_s, ton_s + 8))
+    majiang_rule.add_win_pattern(pat)
+    majiang_rule.ScoreRule.set_pattern_score("qing-pairs", 10)
+
+    pat = PatternModes("qing", 5)
+    pat.add_mode(Mode_AllInRange(wan_s, wan_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("qing", 5)
+    pat.add_mode(Mode_AllInRange(suo_s, suo_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("qing", 5)
+    pat.add_mode(Mode_AllInRange(ton_s, ton_s + 8))
+    majiang_rule.add_win_pattern(pat)
+    majiang_rule.ScoreRule.set_pattern_score("qing", 5)
+
+    pat = PatternModes("long", 5)
+    pat.add_mode(Mode_Seq(wan_s, 3))
+    pat.add_mode(Mode_Seq(wan_s + 3, 3))
+    pat.add_mode(Mode_Seq(wan_s + 6, 3))
+    pat.add_mode(Mode_AnyOutRange(wan_s, wan_s + 8))
+
+    pat = PatternModes("long", 5)
+    pat.add_mode(Mode_Seq(suo_s, 3))
+    pat.add_mode(Mode_Seq(suo_s + 3, 3))
+    pat.add_mode(Mode_Seq(suo_s + 6, 3))
+    pat.add_mode(Mode_AnyOutRange(suo_s, suo_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("long", 5)
+    pat.add_mode(Mode_Seq(ton_s, 3))
+    pat.add_mode(Mode_Seq(ton_s + 3, 3))
+    pat.add_mode(Mode_Seq(ton_s + 6, 3))
+    pat.add_mode(Mode_AnyOutRange(ton_s, suo_s + 8))
+    majiang_rule.add_win_pattern(pat)
+    majiang_rule.ScoreRule.set_pattern_score("long", 5)
+
+    pat = PatternModes("pairs", 5)
+    pat.add_mode(Mode_AllPairs())
+    pat.add_mode(Mode_AnyInRange(wan_s, wan_s + 8))
+    pat.add_mode(Mode_AnyInRange(ton_s, ton_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("pairs", 5)
+    pat.add_mode(Mode_AllPairs())
+    pat.add_mode(Mode_AnyInRange(wan_s, wan_s + 8))
+    pat.add_mode(Mode_AnyInRange(suo_s, suo_s + 8))
+    majiang_rule.add_win_pattern(pat)
+
+    pat = PatternModes("pairs", 5)
+    pat.add_mode(Mode_AllPairs())
+    pat.add_mode(Mode_AnyInRange(suo_s, suo_s + 8))
+    pat.add_mode(Mode_AnyInRange(ton_s, ton_s + 8))
+    majiang_rule.add_win_pattern(pat)
+    majiang_rule.ScoreRule.set_pattern_score("pairs", 5)
+
+def initialize():
+    init_play_rules()
+
+    start_timer_to_clear_dead_connection()
+
+def start_timer_to_clear_dead_connection():
+    timeout = min(cycle_minutes_check_dead, dead_connect_reserve_minutes)
+    timer_clear_dead_connection = Timer(timeout * 60, remove_dead_connection)
+    timer_clear_dead_connection.start()
 
 def init_play_rules():
     # init_poker_rule_doudizu()
@@ -133,25 +271,46 @@ def set_call_banker_action_options(call_banker_stage):
     c221 = c22.add_follow_up_action(CallBank("Call", "2-2-1"))
     c222 = c22.add_follow_up_action(PassCall("Not Call", "2-2-2"), True)
 
-#
-# def add_player_client(conn):
-#     player = PlayerClient.PlayerClient(conn)
-#     __Players.append(player)
-#     print('player clients:' + str(len(__Players)))
-#     print('new player:' + str(conn))
+
+def validate_player(j_obj):
+    if InterProtocol.user_id not in j_obj \
+            or InterProtocol.room_id not in j_obj \
+            or InterProtocol.sock_req_cmd not in j_obj:
+        return False
+    else:
+        return True
 
 
 def dispatch_player_commands(conn, comm_text):
+
+    j_obj = None
     try:
         j_obj = json.loads(comm_text)
-        # if j_obj["req"] == CLIENT_REQ_JOIN_GAME.lower():
-        #     process_req_join_game(conn, j_obj)
-        # if j_obj["req"] == CLIENT_REQ_SELECT_ACTION.lower():
-        #     process_player_select_action(conn, j_obj)
+    except Exception as ex:
+        send_msg_to_client_connection("Invalid request format")
+        return
+
+    if not validate_player(j_obj):
+        send_msg_to_client_connection("Invalid request parameters")
+        return
+
+    try:
         if j_obj[InterProtocol.cmd_type].lower() == InterProtocol.sock_req_cmd.lower():
             process_client_request(conn, j_obj)
     except Exception as ex:
+        Log.write_exception(ex)
         print(ex)
+
+def send_msg_to_client_connection(conn, msg):
+    try:
+        conn.sendall(msg.encode(encoding="utf-8"))
+    except Exception as ex:
+        Log.write_exception(ex)
+
+
+def send_welcome_to_new_connection(conn):
+    welcome_msg = "welcome,just enjoy!"
+    send_msg_to_client_connection(conn, welcome_msg)
 
 
 def process_client_request(conn, req_json):
@@ -161,9 +320,21 @@ def process_client_request(conn, req_json):
         if user_id not in Players:
             player = PlayerClient(conn, user_id)
             Players[user_id] = player
-            print("new player:" + str(user_id))
+            Log.write_info("new player:" + str(user_id))
+            Conn_Players[conn] = player
+            Log.write_info("client number:" + str(len(Conn_Players)))
         else:
             player = Players[user_id]
+            if player.get_socket_conn() != conn:
+                send_msg_to_client_connection(conn, "Already in game, try reconnect to refresh connection")
+                return
+                # if req_json[InterProtocol.player_auth_token] != player.get_session_token():
+                #     send_msg_to_client_connection("Wrong player token")
+                #     returnß
+                # else:
+                #player.update_connection(conn)
+        if player:
+            player.update_last_alive()
 
         if req_json[InterProtocol.sock_req_cmd].lower() == InterProtocol.client_req_type_reconnect:
             player.update_connection(conn)
@@ -180,7 +351,7 @@ def process_client_request(conn, req_json):
             Lobby.process_player_request(player, req_json)
 
     except Exception as ex:
-        print(ex)
+        Log.write_exception(ex)
 
 # def update_round_stage(client_conn):
 #     player = get_player_client_from_conn(client_conn)
@@ -189,30 +360,39 @@ def process_client_request(conn, req_json):
 
 
 def get_player_client_from_conn(conn):
-    for c in __Players:
-        if c.get_socket_conn() == conn:
-            return c
+    if conn in Conn_Players:
+        return Conn_Players[conn]
+    else:
+        return None
 
-    return None
+def remove_dead_connection():
+    dead = []
+    for p in Players:
+        now = datetime.now()
+        delta = now - Players[p].get_last_alive_time()
+        if delta.total_seconds() > dead_connect_reserve_minutes * 60:
+            dead.append((p, Players[p].get_socket_conn()))
 
+    for item in dead:
+        conn = item[1]
+        userid = item[0]
+        player = Players[userid]
+        room = player.get_my_room()
+        if room:
+            room.remove_player(player)
+        send_msg_to_client_connection(conn,"disconnected as dead connection")
+        Players.pop(item[0])
+        Conn_Players.pop(item[1])
+        conn.close()
+
+    Log.write_info("client number:" + str(len(Conn_Players)))
+    start_timer_to_clear_dead_connection()
 
 def get_rule_by_id(rule_id):
     if rule_id in __PlayRules:
         return __PlayRules[rule_id]
     else:
         return None
-
-#
-# def get_available_game_round(rule_id):
-#     for r in __game_rounds:
-#         if r.get_rule().get_rule_id() != rule_id:
-#             continue
-#         if r.can_new_player_in():
-#             return r
-#     r = GameRound(get_rule_by_id(rule_id))
-#     __game_rounds.append(r)
-#     return r
-
 
 def process_player_select_action(conn, j_obj):
     player = get_player_client_from_conn(conn)
@@ -221,24 +401,6 @@ def process_player_select_action(conn, j_obj):
     if "act-params" in j_obj:
         act_param = j_obj["act-params"]
     round.process_player_select_action(player, j_obj["act-id"], act_param)
-
-#
-# def process_lobby_player_request(conn, req_json):
-#     if req_json[InterProtocol.SOCK_REQ_CMD].lower() == InterProtocol.CLIENT_REQ_JOIN_GAME:
-#         process_join_lobby_game(conn, req_json)
-#
-#
-# def process_join_lobby_game(player, req_json):
-#     user_id = req_json[InterProtocol.USER_ID]
-#
-#     if player.get_game_round():
-#             player.send_error_message("Already in a game")
-#     else:
-#         play_round = get_available_game_round(req_json[InterProtocol.GAME_ID])
-#         play_round.add_player(player)
-#         player.send_success_messsage(InterProtocol.CLIENT_REQ_JOIN_GAME)
-#         play_round.test_and_update_current_stage()
-
 
 # TODO create Room from database
 def create_room_from_db(room_id, rule_id):
@@ -250,3 +412,8 @@ def create_room_from_db(room_id, rule_id):
     room.set_max_seated_player_num(3)
     Rooms[room_id] = room
 
+def process_client_disconnected(conn):
+    player = get_player_client_from_conn(conn)
+    if player:
+        player.set_is_online(False)
+        # remove_dead_connection(conn)

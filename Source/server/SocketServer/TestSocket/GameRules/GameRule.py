@@ -8,12 +8,13 @@ class GameRule:
         self.__cards = []
         # self.__stages = []
         self.__game_stages = []
-        self.__default_cmd_resp_timeout = 30  # timeout in seconds for player to pick up a command
+        self.__default_cmd_resp_timeout = -1  # timeout in seconds for player to pick up a command
 
         # self.__call_actions = []
         # self.__head_action_group = ActionGroup()
         # self.__player_idx_of_play_card = -1
         # self.__cur_game_stage_idx = -1;
+        self.__win_patterns = []
 
     def get_default_cmd_resp_timeout(self):
         return self.__default_cmd_resp_timeout
@@ -21,12 +22,8 @@ class GameRule:
     def get_head_action_group(self):
         return self.__head_action_group
 
-    # def get_next_game_stage(self):
-    #     self.__cur_game_stage_idx += 1
-    #     if self.__cur_game_stage_idx < len(self.__game_stages):
-    #         return self.__game_stages[self.__cur_game_stage_idx]
-    #     else:
-    #         return None
+    def get_win_patterns(self):
+        return self.__win_patterns
 
     @staticmethod
     def get_is_round_end(game_round):
@@ -171,3 +168,18 @@ class GameRule:
 
     def add_game_stage(self, stage):
         self.__game_stages.append(stage)
+
+    def add_win_pattern(self, pattern):
+        if len(self.__win_patterns) < 1:
+            self.__win_patterns.append(pattern)
+        elif len(self.__win_patterns) < 2:
+            if pattern.get_score() < self.__win_patterns[0].get_score():
+                self.__win_patterns.append(pattern)
+            else:
+                self.__win_patterns.insert(0, pattern)
+        else:
+            for i in range(0, len(self.__win_patterns) - 1):
+                if self.__win_patterns[i].get_score() > pattern.get_score() >= self.__win_patterns[i + 1].get_score():
+                    self.__win_patterns.insert(i + 1, pattern)
+            else:
+                self.__win_patterns.append(pattern)

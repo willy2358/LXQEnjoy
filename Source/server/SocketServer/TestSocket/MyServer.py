@@ -2,45 +2,38 @@ import socketserver
 
 import PlayManager
 import PlayerClient
+import Log
 
 
-class MyTCPHandler(socketserver.BaseRequestHandler):
+class MyTCPHandler(socketserver.StreamRequestHandler):
     __Players = []
 
     def handle(self):
         conn = self.request
-        # player = Player.Player(conn)
-        # MyTCPHandler.__Players.append({conn, player})
+        try:
+            conn.sendall("Welcome!Just enjoy!".encode(encoding="utf-8"))
+        except Exception as ex:
+            Log.write_exception(ex)
 
-        # PlayManager.add_player_client(conn)
-
-        flag = True
-        while flag:
+        while True:
             try:
                 data = conn.recv(1024)
-                print('received:' + data.decode())
-                PlayManager.dispatch_player_commands(conn, data.decode())
+                if not data:
+                    print("client closed")
+                    PlayManager.process_client_disconnected(conn)
+                    break
+                else:
+                    print('received:' + data.decode())
+                    PlayManager.dispatch_player_commands(conn, data.decode())
             except Exception as e:
                 print(e)
 
-            # print(conn)
-            # print(MyTCPHandler.__Clients.index(conn))
-            # if data == 'exit':
-            #     flag = False
-            # else:
-            #     resp = 'your input :' + data.decode()
-            #     print('response:' + resp)
-            #     try:
-            #         conn.sendall(resp.encode(encoding="utf-8"))
-            #     except Exception as x:
-            #         print('Send exception:' + x.message)
-
-
 if __name__ == "__main__":
 
-    PlayManager.init_play_rules()
-
+    PlayManager.initialize()
     HOST, PORT = "127.0.0.1", 9229
+    #HOST, PORT = "192.168.1.57", 9229
+	#HOST, PORT = "117.78.40.54", 9229
 
     # Create the server, binding to localhost on port 9999
     # server = socketserver.TCPServer((HOST, PORT), MyTCPHandler)

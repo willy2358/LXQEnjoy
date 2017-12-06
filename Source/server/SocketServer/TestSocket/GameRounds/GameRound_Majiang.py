@@ -1,22 +1,18 @@
 
 from GameRounds.GameRound import GameRound
-
-# terms: one-play: includes:
-# letting one player play one card, this play is called the starter
-# this player played one card
-# letting other players response to the played card, these players are called listeners
-# one listener got the played card or got a new card from table
-# this listener become the starter of new one-play, new one-play begins
-
+import InterProtocol
+import PlayCmd
 
 class GameRound_Majiang(GameRound):
     def __init__(self, rule):
         super(GameRound_Majiang, self).__init__(rule)
 
         self.__one_play_starter = None
+        self.__pattern_default_score = 1
+        self.__ting_kou_num_score = {}
 
-    def set_one_play_starter(self, player):
-        self.__one_play_starter = player
+        self.__last_out_cards = None
+        self.__last_out_cards_player = None
 
     def get_cur_play_starter(self):
         return self.__one_play_starter
@@ -26,21 +22,36 @@ class GameRound_Majiang(GameRound):
         listeners = self._players[idx + 1:] + self._players[:idx]
         return listeners
 
+    def get_pattern_default_score(self):
+        return self.__pattern_default_score
+
+    def get_last_out_cards_player(self):
+        return self.__last_out_cards_player
+
+    def record_last_out_cards(self, player, cards):
+        self.__last_out_cards = cards
+        self.__last_out_cards_player = player
+
+    def set_one_play_starter(self, player):
+        self.__one_play_starter = player
+
+    def set_pattern_default_score(self, score):
+        self.__pattern_default_score = score
+
+    def add_ting_kou_score(self, card_num, score):
+        self.__ting_kou_num_score[card_num] = score
+
     def player_select_peng(self, player, card):
-        pass
+        self.reset_player_waiting_for_cmd_resp()
+        player.move_cards_to_freeze_group([card, card], [card])
+        player.set_newest_cards([card], False, False)
+
 
     def player_select_gang(self, player, card):
-        pass
+        self.reset_player_waiting_for_cmd_resp()
+        player.move_cards_to_freeze_group([card, card, card], [card])
+        player.set_newest_cards([card], False, False)
 
-    # def test_and_update_current_stage(self):
-    #     if not self.get_cur_game_stage():
-    #         stage = self.get_next_game_stage()
-    #         self.set_cur_game_stage(stage)
-    #
-    #     cur_stage = self.get_cur_game_stage()
-    #     if cur_stage:
-    #         if cur_stage.is_ended_in_round(self):
-    #             cur_stage = self.get_next_game_stage()
-    #
-    #     if cur_stage:
-    #         cur_stage.execute(self)
+    def player_select_hu(self, player, card):
+        self.reset_player_waiting_for_cmd_resp()
+
