@@ -26,7 +26,8 @@ class MyTCPHandler(socketserver.StreamRequestHandler):
                     print('received:' + data.decode())
                     PlayManager.dispatch_player_commands(conn, data.decode())
             except Exception as e:
-                print(e)
+                Log.write_exception(e)
+                break
 
 if __name__ == "__main__":
 
