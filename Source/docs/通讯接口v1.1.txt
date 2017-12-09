@@ -144,7 +144,35 @@ user-info，用户信息，具体待定
 查询成功：用户信息在result-data中
 查询失败：错误信息在err-msg中
 
-
+4. 用户信息更新
+客户端请求：
+通道：http
+请求接口：http://serverid/service
+请求类型：post
+请求参数：
+{
+	"cmdtype":"httpreq",
+	"httpreq":"user-update",
+	"userid":"124323",
+	“userinfo":{"phone":12342233122,   //手机号
+                    "password":"dfsfew",   //密码
+                    "weixin":"fersgg",     //微信号
+                    "userimg":""           //用户头像
+                    “user-alias":"",        //用户昵称
+                    }          
+}
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"httpresp":"user-update",
+	"result":"OK|ERROR"
+	"err-msg":""
+	
+	} 
+}
+说明：在userinfo中信息可以是一项或多项，比如只有userimg,或是两项：phone和user-alias
+执行成功：result:OK
+执行失败：result:ERROR,错误信息在err-msg中
 
 二、进入游戏
 
