@@ -1,2 +1,7 @@
 __pycache__
 /Source/server/SocketServer/TestSocket/.idea/workspace.xml
+.DBStore/*
+/Source/server/WebServer/node_modules/*
+.DS_Store/*
+.DS_Store
+/.DS_Store/*
