@@ -276,10 +276,25 @@ post
 {
 	"cmdtype":"sockpush",
 	"sockpush":"cmd-opts",
-	"cmd-opts":["peng","chi","hu","gang","mopai","zimo"],
+	"cmd-opts":[{"cmd":"cmd1", "cmd-param":"命令参数"},{"cmd":"cmd2","cmd-param":"命令参数"}],
 	"resp-timeout":30 //用户响应超时时间，单位：秒，值为-1时为没有超时，一直等待用户响应
-	"def-cmd":"hu",  
-        "cmd-param":""   //当def-opt为chupai时，此参数为使用逗号分隔的牌
+	"def-cmd":{"cmd":"命令文本串，或命令码", "cmd-param":"命令允许的参数"},  
+        
+}
+
+说明：cmd-opts:包含1个或多个命令项，cmd1, cmd2家命令的文本串或命令码，cmd-param是服务器接受的此命令的参数。
+def-cmd 超时后服务器默认执行的命令，其必须是cmd-opts中的一项。
+
+示例：
+{
+	"cmdtype": "sockpush", 
+	"sockpush": "cmd-opts", 
+	"cmd-opts": [
+			{"cmd": "peng", "cmd-param": [14]}, 
+			{"cmd": "guo", "cmd-param": null}
+		    ], 
+	"resp-timeout": -1, 
+	"def-cmd": {"cmd": "guo", "cmd-param": null}
 }
 
 4.4. 发牌／摸牌，服务器向玩家手里发牌
