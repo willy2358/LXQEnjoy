@@ -101,6 +101,7 @@ class Room:
                     return
                 self.add_seated_player(player)
                 player.send_success_message(InterProtocol.client_req_type_join_game)
+                self.publish_seated_players()
 
                 if self.get_seated_player_count() >= self._min_seated_players:
                     # game_round = GameRound_Majiang(self._game_rule)
@@ -116,6 +117,16 @@ class Room:
             print(ex)
         finally:
             self._lock_join_game.release()
+
+    def publish_seated_players(self):
+        players = []
+        for i in range(0, len(self._seated_players)):
+            player = self._seated_players[i]
+            players.append({'userid':player.get_user_id()})
+
+        pack = InterProtocol.create_game_players_packet(players)
+        for p in self._seated_players:
+            p.send_server_command(pack)
 
     def test_continue_next_round(self):
         if self._current_round_order < self._round_num:

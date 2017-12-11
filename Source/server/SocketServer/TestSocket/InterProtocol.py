@@ -34,6 +34,8 @@ server_push_scores = "scores"
 server_push_score = "score"
 server_push_game_status = "game-status"
 server_push_status_data = "status-data"
+server_push_game_players = "game-players"
+server_push_players = "players"
 
 
 cmd_data_cards = "cards"
@@ -68,6 +70,15 @@ def create_game_status_packet(status, status_data = None):
         server_push_game_status: status,
         server_push_status_data:status_data
     }
+    return packet
+
+def create_game_players_packet(players):
+    packet = {
+        cmd_type: server_cmd_type_push,
+        server_cmd_type_push:server_push_game_players,
+        server_push_players:players,
+    }
+
     return packet
 
 def create_deal_cards_json_packet(player, cards):
