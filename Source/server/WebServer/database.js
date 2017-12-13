@@ -1,6 +1,18 @@
 'use strict'
 const database = exports
 
+const table_user = "user"
+const field_userid = "userid"
+const field_username = "username"
+
+const field_device = "device"
+const field_device_valid = "valid"
+
+const table_user_device = "user_device"
+
+const username_start_number = 122363;
+
+
 var mysql = require('mysql');
 var connection = mysql.createConnection({
     host: 'localhost',

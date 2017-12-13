@@ -86,24 +86,65 @@ function is_device_already_exist(dev_id){
 	});
 }
 
+function get_is_device_already_registered(dev_id, callback) {
+	var template = "select device from {0} where device = '{1}'";
+	sql = template.format(database.table_user_device, database.field_device);
+	console.log(sql);
+	conn.query(sql, function (err, rows, fields) {
+        if (err){
+            logger.error(err);
+            return;
+        }
+
+        if (null != callback){
+            if(rows.length > 0){
+                callback(true);
+            }
+            else{
+                callback(false);
+            }
+        }
+    });
+}
+
+// function () {
+//
+// }
+
 function add_new_user(dev_id, callback){
-	temp = "insert into users(device) values ('{0}')";
-	
-	sql = temp.format(dev_id);
+	temp = "select count({0}) as cid from {1}";
+	sql = temp.format(database.field_userid, database.table_user);
 	console.log(temp);
 	conn.query(sql, function(err, rows, fields){
 		var ret = {};
 		if (err){
 			logger.error(err);
-			ret = {'result': false, 'nid': -1}
+			// ret = {'result': false, 'nid': -1}
+            callback(-1);
 		}
 		else{
-			console.log("here");
-			console.log(rows.insertId);
-			ret = {'result': true, 'nid': rows.insertId}
+		    var username = "LX" + str((rows[0].cid + database.username_start_number + 1))
+            sql = "insert into {0}({1}) values('{2}'".format(database.table_user, database.field_username, username);
+		    conn.query(sql, function (err, rows, fields) {
+                if (err) {
+                    Logger.error(err);
+                }
+                else {
+                    var newId = rows.insertId;
+                    sql = "insert into {0}({1},{2}) values ({3},'{4}');".format(database.table_user_device,
+                        database.field_userid, database.table_user_device, newId, dev_id);
+                    conn.query(sql, function (err, rows, fields) {
+                        if (err){
+                            callback(-1);
+                        }
+                        else{
+                            callback(newId);
+                            Logger.info("new user id created:" + str(newId));
+                        }
+                    });
+                }
+            });
 		}
-
-		callback(ret);
 	});
 }
 
@@ -132,20 +173,21 @@ function dispatch_request(req_cmd, req_obj, resp){
 
 function process_new_user(req_obj, resp) {
 	var dev_id = req_obj[ApiProtocal.req_param_devid]
-	if (is_device_already_exist(dev_id)){
-		resp.end("ERROR:device already registered");
-	}
-	else{
-		add_new_user(dev_id, function(ret){
-			console.log(ret);
-			if (ret["nid"] > 0){
-				get_user_info(ret["nid"], function(data){
-					resp.end("new user:" + data);
-				});
-			}
-		});
-		
-	}
+    get_is_device_already_registered(dev_id, function (registed) {
+        if (registed){
+            resp.end(ApiProtocal.get_error_packet("device has already been registered"));
+        }
+        else{
+            add_new_user(dev_id, function(usrid){
+                		console.log(ret);
+                		if (usrid > 0){
+                			get_user_info(usrid, function(data){
+                				resp.end("new user:" + data);
+                			});
+                		}
+                	});
+        }
+    });
 }
 
 app.post('/service', function(req, res){

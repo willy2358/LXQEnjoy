@@ -31,3 +31,8 @@ module.exports = Object.freeze({
 	req_param_devid : "devid"
 
 })
+
+function get_error_packet(error) {
+	return error;
+}
+
