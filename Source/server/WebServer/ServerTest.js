@@ -7,13 +7,20 @@ var newUserReq = {
 	devid: "wqrrrq",
 }
 
+var loginReq = {
+    cmdtype:"httpreq",
+    httpreq:"login",
+    userid:20,
+    devid:"wqrrrq",
+}
+
 var myJSONObject = {"key1":"value1", "key2":"value2"};
 
 request({
     url: "http://0.0.0.0:8081/service",
     method: "POST",
     json: true,   // <--Very important!!!
-    body: newUserReq,
+    body: loginReq,
 }, function (error, response, body){
     console.log(response);
 });

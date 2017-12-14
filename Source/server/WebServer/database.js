@@ -1,44 +1,58 @@
 'use strict'
 const database = exports
 
-const table_user = "user"
-const field_userid = "userid"
-const field_username = "username"
+var table_user = "user"
+var field_userid = "userid"
+var field_username = "username"
 
-const field_device = "device"
-const field_device_valid = "valid"
+var field_device = "device"
+var field_device_valid = "valid"
 
-const table_user_device = "user_device"
+var table_user_device = "user_device"
 
-const username_start_number = 122363;
+var username_start_number = 122363;
+
+module.exports = Object.freeze({
+
+    username_start_number:122363,
+
+    table_user : "user",
+    field_userid : "userid",
+    field_username : "username",
+
+    table_user_device:"user_device",
+    field_device:"device",
+    field_device_valid : "valid",
 
 
-var mysql = require('mysql');
-var connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    database:'SqlTest'
 });
+//
+// var mysql = require('mysql');
+// var connection = mysql.createConnection({
+//     host: 'localhost',
+//     user: 'root',
+//     password: 'root',
+//     database:'SqlTest'
+// });
+//
+// connection.connect();
+//
+// exports.query = function(sql){
+//
+// }
+//
+// exports.execute = function (sql) {
+// 	// body...
+// }
 
-connection.connect();
-
-exports.query = function(sql){
-
-}
-
-exports.execute = function (sql) {
-	// body...
-}
 
 
 
-
-connection.connect();
-//查询
-connection.query('SELECT username from users', function(err, rows, fields) {
-    if (err) throw err;
-    console.log('The solution is: ', rows[0].username);
-});
-//关闭连接
-connection.end();
+// connection.connect();
+// //查询
+// connection.query('SELECT username from users', function(err, rows, fields) {
+//     if (err) throw err;
+//     console.log('The solution is: ', rows[0].username);
+// });
+// //关闭连接
+// connection.end();

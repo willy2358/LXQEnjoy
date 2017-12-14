@@ -35,14 +35,15 @@
 请求参数：
 {
 	"cmdtype":"httpreq",
-	"httpreq":"login-dev",
+	"httpreq":"login",
+	"userid":2134,
 	"dev-id":"124323", //设备识别码，PC端Mac地址
 	
 }
 服务器返回：
 {
 	"cmdtype":"httpresp",
-	"httpresp":"login-dev",
+	"httpresp":"login",
 	"session-token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN"  //这个token是后续socket辨识用户的凭证，客户端向socket服务器发送的每个数据包都必须有此token，如果token不匹配
                                                             //如果，token不匹配，将处理为非法，恶意攻击用户
 	"result":"OK",

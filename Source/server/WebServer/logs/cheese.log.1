@@ -1,11 +1,28 @@
-[2017-12-10T19:48:43.102] [ERROR] default - TypeError: Cannot read property 'id' of undefined
-    at process_new_user (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/ServerMain.js:137:11)
-    at dispatch_request (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/ServerMain.js:125:3)
-    at /Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/ServerMain.js:148:4
+[2017-12-15T00:28:30.471] [ERROR] default - { Error: ER_BAD_FIELD_ERROR: Unknown column 'device' in 'where clause'
+    at Query.Sequence._packetToError (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/protocol/sequences/Sequence.js:52:14)
+    at Query.ErrorPacket (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/protocol/sequences/Query.js:77:18)
+    at Protocol._parsePacket (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/protocol/Protocol.js:279:23)
+    at Parser.write (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/protocol/Parser.js:76:12)
+    at Protocol.write (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/protocol/Protocol.js:39:16)
+    at Socket.<anonymous> (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/Connection.js:103:28)
+    at Socket.emit (events.js:159:13)
+    at addChunk (_stream_readable.js:265:12)
+    at readableAddChunk (_stream_readable.js:252:11)
+    at Socket.Readable.push (_stream_readable.js:209:10)
+    --------------------
+    at Protocol._enqueue (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/protocol/Protocol.js:145:48)
+    at Connection.query (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/Connection.js:208:25)
+    at process_login (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/ServerMain.js:213:7)
+    at dispatch_request (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/ServerMain.js:169:3)
+    at /Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/ServerMain.js:247:4
     at Layer.handle [as handle_request] (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/express/lib/router/layer.js:95:5)
     at next (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/express/lib/router/route.js:137:13)
     at Route.dispatch (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/express/lib/router/route.js:112:3)
     at Layer.handle [as handle_request] (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/express/lib/router/layer.js:95:5)
     at /Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/express/lib/router/index.js:281:22
-    at Function.process_params (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/express/lib/router/index.js:335:12)
-    at next (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/express/lib/router/index.js:275:10)
+  code: 'ER_BAD_FIELD_ERROR',
+  errno: 1054,
+  sqlMessage: 'Unknown column \'device\' in \'where clause\'',
+  sqlState: '42S22',
+  index: 0,
+  sql: 'select userid from user where userid=20 and device=\'20\'' }

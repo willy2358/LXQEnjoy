@@ -1,11 +1,28 @@
-[2017-12-10T19:52:10.258] [ERROR] default - TypeError: Cannot read property 'nid' of undefined
-    at process_new_user (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/ServerMain.js:138:10)
-    at dispatch_request (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/ServerMain.js:126:3)
-    at /Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/ServerMain.js:149:4
-    at Layer.handle [as handle_request] (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/express/lib/router/layer.js:95:5)
-    at next (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/express/lib/router/route.js:137:13)
-    at Route.dispatch (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/express/lib/router/route.js:112:3)
-    at Layer.handle [as handle_request] (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/express/lib/router/layer.js:95:5)
-    at /Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/express/lib/router/index.js:281:22
-    at Function.process_params (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/express/lib/router/index.js:335:12)
-    at next (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/express/lib/router/index.js:275:10)
+[2017-12-15T00:53:31.614] [ERROR] default - { Error: ER_PARSE_ERROR: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '-token='fsfewer' where userid=20' at line 1
+    at Query.Sequence._packetToError (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/protocol/sequences/Sequence.js:52:14)
+    at Query.ErrorPacket (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/protocol/sequences/Query.js:77:18)
+    at Protocol._parsePacket (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/protocol/Protocol.js:279:23)
+    at Parser.write (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/protocol/Parser.js:76:12)
+    at Protocol.write (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/protocol/Protocol.js:39:16)
+    at Socket.<anonymous> (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/Connection.js:103:28)
+    at Socket.emit (events.js:159:13)
+    at addChunk (_stream_readable.js:265:12)
+    at readableAddChunk (_stream_readable.js:252:11)
+    at Socket.Readable.push (_stream_readable.js:209:10)
+    --------------------
+    at Protocol._enqueue (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/protocol/Protocol.js:145:48)
+    at Connection.query (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/Connection.js:208:25)
+    at Query._callback (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/ServerMain.js:226:9)
+    at Query.Sequence.end (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/protocol/sequences/Sequence.js:88:24)
+    at Query._handleFinalResultPacket (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/protocol/sequences/Query.js:139:8)
+    at Query.EofPacket (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/protocol/sequences/Query.js:123:8)
+    at Protocol._parsePacket (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/protocol/Protocol.js:279:23)
+    at Parser.write (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/protocol/Parser.js:76:12)
+    at Protocol.write (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/protocol/Protocol.js:39:16)
+    at Socket.<anonymous> (/Users/willy/MyCodes/lxqenjoy/Source/server/WebServer/node_modules/mysql/lib/Connection.js:103:28)
+  code: 'ER_PARSE_ERROR',
+  errno: 1064,
+  sqlMessage: 'You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'-token=\'fsfewer\' where userid=20\' at line 1',
+  sqlState: '42000',
+  index: 0,
+  sql: 'update user_login set device=\'wqrrrq\',session-token=\'fsfewer\' where userid=20' }
