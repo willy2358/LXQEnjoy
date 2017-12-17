@@ -1,5 +1,5 @@
 
-// 'use strict'
+'use strict'
 
 const ApiProtocal = exports
 
@@ -45,7 +45,7 @@ exports = module.exports = Object.freeze({
 module.exports.x = x;
 module.exports.addX = addX;
 
-var get_error_packet = function (error) {
+var get_error_packet = function (errCode) {
     return error;
 };
 

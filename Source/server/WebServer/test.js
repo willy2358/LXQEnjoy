@@ -171,10 +171,37 @@ var app = express();
 // var result1=template1.format("loogn",22);
 // console.log(result1);
 
-function test(){
-	// return {"name":"hello", "id":12};
-	return {'name':"hello", id:12};
-}
+// function test(){
+// 	// return {"name":"hello", "id":12};
+// 	return {'name':"hello", id:12};
+// }
+//
+// var ret = test();
+// console.log(ret["name"]);
 
-var ret = test();
-console.log(ret["name"]);
+
+// var errors = require("./errors");
+//
+// console.log(errors.ERROR_INVALID_USERID);
+// //
+// errors.ERROR_INVALID_USERID = 123;
+//
+// console.log(errors.ERROR_INVALID_USERID);
+
+// var db = require('./db.js');
+//
+// var conn = db.conn();
+//
+// conn.query("select count(userid) as uid from user");
+//
+// var conn2 = db.conn();
+//
+// conn2.query("select count(userid) as uid from user");
+
+// var utils = require('./utils.js');
+//
+//
+// var template = 'select {0}';
+// var sql = template.format('hello');
+// console.log(sql);
+

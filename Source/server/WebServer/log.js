@@ -1,5 +1,5 @@
-
 'use strict'
+
 const Log = exports
 
 var path = require('path')
