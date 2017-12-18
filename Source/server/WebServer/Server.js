@@ -2,6 +2,9 @@
 var log = require('./log.js');
 log.configure();
 var logger = log.logger();
+var jwt = require("jwt-simple");
+var moment = require('moment');
+
 
 var express = require('express');
 var app = express();
@@ -47,8 +50,15 @@ var server = app.listen(8081, function () {
     console.log("address visited http://%s:%s", host, port)
 });
 
-function generate_session_token() {
-    return "fsfewer";
+function generate_session_token(userid) {
+    var expires = moment().add('days', 2).valueOf();
+    var token = jwt.encode(
+        {
+            uid:userid,
+            exp:expires
+        }, app.get('lxqTokenSecret'));
+
+    return token;
 }
 
 function create_error_repsonse(errMsg) {
@@ -66,6 +76,198 @@ function dispatch_request(req_cmd, req_obj, resp){
     else if (req_cmd == api_protocal.req_cmd_login){
         process_login(req_obj, resp);
     }
+    else if (req_cmd == api_protocal.req_cmd_set_pwd){
+        process_set_password(req_obj, resp);
+    }
+    else if (req_cmd == api_protocal.req_cmd_add_dev){
+        process_add_device(req_obj, resp);
+    }
+}
+
+function process_set_password(req_obj, resp){
+    try{
+        var newPwd = req_obj[api_protocal.req_param_pwd];
+        var userid = req_obj[api_protocal.req_userid];
+        var devid = req_obj[api_protocal.req_param_devid];
+
+        is_device_valid(userid, devid,
+            function (err) {
+                resp_pack = create_error_repsonse(err);
+                resp.end(resp_pack);
+        },
+            function (ret_msg) {
+                if (ret_msg === errors.cbt_valid_device) {
+                    var temp = "update user set password = '{0}' where userid={1}";
+                    sql = temp.format(newPwd, userid);
+                    conn.query(sql, function (err, result) {
+                        if (err) {
+                            logger.error(err);
+                            var resp_pack = create_error_repsonse(err);
+                            resp.end(resp_pack);
+                        }
+                        else {
+                            var resp_pack = create_sucess_response(api_protocal.req_cmd_set_pwd);
+                            resp.end(resp_pack);
+                        }
+                    });
+                }
+                else {
+                    var resp_pack = create_error_repsonse(errors.cbt_invalid_device);
+                    resp.end(resp_pack);
+                }
+            });
+    }
+    catch (err){
+        logger.exception(err);
+    }
+}
+
+function process_add_device(req_obj, resp){
+    try{
+        var dev_id = req_obj[api_protocal.req_param_devid];
+        var userid = req_obj[api_protocal.req_userid];
+        var pwd = req_obj[api_protocal.req_param_pwd];
+
+        is_password_right(userid, password,
+            function (err) {
+                var resp_pack = create_error_repsonse(err);
+                resp.end(err);
+
+            },
+            function (ret_msg) {
+                if (ret_msg !== errors.cbt_valid_password){
+                    var resp_pack = create_error_repsonse(ret_msg);
+                    resp.end(resp_pack);
+                }
+                else {
+                    is_device_valid(userid, dev_id,
+                        function (err) {
+                            var resp_pack = create_error_repsonse(err);
+                            resp.end(resp_pack);
+                        },
+                        function (ret_msg) {
+                            if (ret_msg !==errors.cbt_valid_device){
+                                record_user_device(userid, dev_id,
+                                    function (err) {
+                                        var resp_pack = create_error_repsonse(err);
+                                        resp.end(resp_pack);
+                                    },
+                                    function (ret_msg) {
+                                        var resp_pack = create_sucess_response(ret_msg);
+                                        resp.end(resp_pack);
+                                    }
+                                );
+                            }
+                            else{
+                                var resp_pack = create_error_repsonse(api_protocal.ERROR_DEVICE_ALREADY_REGISTERED);
+                                resp.end(resp_pack);
+                            }
+                        }
+                    );
+                }
+            }
+        );
+    }
+    catch (err){
+        logger.exception(err);
+    }
+}
+
+function is_user_exist(userid, err_callback, result_callback) {
+    var temp = "select count(userid) from user where userid = {0}";
+    var sql = temp.format(userid);
+    conn.query(sql, function (err, result) {
+        if(err && err_callback){
+            err_callback(err);
+        }
+        else if (result_callback){
+            if(result.length > 0){
+                result_callback(errors.cbt_valid_userid);
+            }
+            else{
+                result_callback(errors.cbt_invalid_userid);
+            }
+        }
+    });
+}
+
+function is_device_valid(userid, devid, err_callback, result_callback) {
+    is_user_exist(userid, err_callback, function (result) {
+        if (result_callback){
+            if (result == errors.cbt_valid_userid){
+                var temp = "select count(userid) from user where userid={0} and device='{1}'";
+                var sql = temp.format(userid, devid);
+                conn.query(sql, function (err, result) {
+                    if (err){
+                        if (err_callback){
+                            err_callback(err);
+                        }
+                    }
+                    else{
+                        if (result.length > 0){
+                            result_callback(errors.cbt_valid_device);
+                        }
+                        else{
+                            result_callback(errors.cbt_invalid_device);
+                        }
+                    }
+                });
+            }
+            else{
+                result_callback(errors.cbt_invalid_userid);
+            }
+        }
+
+    });
+
+}
+
+function is_password_right(userid, password, err_callback, result_callback) {
+    is_user_exist(userid, err_callback, function (ret) {
+        if (ret == errors.cbt_valid_userid){
+            var tmp = "select count(userid) as uid from user where userid={0} and password='{1}'";
+            sql = tmp.format(userid, password);
+            conn.query(sql, function(err, result){
+               if (err){
+                   if (err_callback){
+                       err_callback(err);
+                   }
+               }
+               else if (result_callback){
+                   if (result.length > 0){
+                       result_callback(errors.cbt_valid_password);
+                   }
+                   else{
+                       result_callback(errors.cbt_invalid_pwd);
+                   }
+               }
+            });
+        }
+        else {
+            result_callback(errors.cbt_invalid_userid);
+        }
+    });
+}
+
+function is_valid_user(userid, password, callback){
+    var tmp = "select count(userid) as uid from user where userid={0} and password='{1}'";
+    sql = tmp.format(userid, password);
+    conn.query(sql, function(err, result){
+        if (err){
+            logger.error(err);
+        }
+        else if (callback){
+            callback();
+        }
+    });
+}
+
+function is_dev_register(userid, devid, callback){
+    var tmp = "select count(*) from user_device where userid={0} and device='{1}'";
+    var sql = tmp.format(userid, devid);
+    conn.query(sql, function(err, result){
+
+    })
 }
 
 function process_new_user(req_obj, resp) {
@@ -101,7 +303,7 @@ function update_user_login_token(userid, dev_id, callback) {
             // callback(err, )
         }
         else{
-            token = generate_session_token();
+            token = generate_session_token(userid);
             if (result.length > 0){
                 temp = "update user_login set device='{0}',session_token='{1}' where userid={2}";
                 sql = temp.format(dev_id, token, userid);
@@ -143,6 +345,20 @@ function get_is_device_already_registered(dev_id, callback) {
     });
 }
 
+function record_user_device(userid, dev_id, err_callback, ret_callback) {
+    var temp = "insert into user_device(userid, device) values({0},'{1}');";
+    var sql = temp.format(userid, dev_id);
+    conn.query(sql, function (err, resutl) {
+        if (err){
+            if (err_callback){
+                err_callback(err);
+            }
+        }
+        else if (ret_callback){
+            ret_callback(errors.cbt_record_device_ok);
+        }
+    });
+}
 
 function add_new_user(dev_id, callback){
     var temp = "select count({0}) as cid from {1}";
