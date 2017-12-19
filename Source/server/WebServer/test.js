@@ -205,3 +205,27 @@ var app = express();
 // var sql = template.format('hello');
 // console.log(sql);
 
+// var api_protocal = require("./api-protocal.js");
+//
+// var cmdType = api_protocal.cmd_type;
+// var reqType = api_protocal.cmd_type_httpreq;
+//
+// var myObj = {
+//     cmdType: api_protocal.cmd_type_httpreq,
+//     reqType: "adsf"
+// }
+//
+// var s = JSON.stringify(myObj);
+
+var uuid = require('uuid');
+
+var vid = uuid.v1();
+
+console.log(vid);
+
+var func = function(args){
+    console.log(args);
+}
+
+func({aa:123});
+

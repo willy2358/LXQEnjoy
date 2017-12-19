@@ -11,6 +11,8 @@ exports = module.exports = Object.freeze({
     ERROR_INVALID_USERID: 11,
     ERROR_INVALID_USERNAME: 12,
     ERROR_DEVICE_ALREADY_REGISTERED: 13,   //设备已注册
+    ERROR_FAILED_CREATE_USER: 14,          //创建新用户失败
+    ERROR_FAILED_LOGIN:15,                 //登录失败
 
     //cbt : callback return
     cbt_invalid_userid: "invalid userid",
@@ -19,6 +21,8 @@ exports = module.exports = Object.freeze({
     cbt_valid_userid: "valid userid",
     cbt_valid_password: "valid password",
     cbt_valid_device: "valid device",
+    cbt_device_found:"found device",
+    cbt_device_not_found: "not found device",
 
     cbt_record_device_ok: "record user device ok",
 
