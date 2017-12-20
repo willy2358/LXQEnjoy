@@ -1,5 +1,7 @@
 from GameStages.GameStage import GameStage
 
+import InterProtocol
+
 
 class TellWinner(GameStage):
     def __init__(self, rule):
@@ -24,3 +26,13 @@ class TellWinner(GameStage):
 
     def continue_execute(self):
         pass
+
+    @staticmethod
+    def execute(game_round):
+        winners = game_round.get_winners()
+        losers = game_round.get_losers()
+        json_packet = InterProtocol.create_winners_losers_json_packet(winners, losers)
+        for p in game_round.get_players():
+            p.send_server_command(json_packet)
+
+

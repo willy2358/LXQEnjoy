@@ -1,0 +1,474 @@
+
+一、用户信息
+1.用户注册：
+客户端请求：
+通道：http
+请求接口：http://serverid/service
+请求类型：post
+请求参数：
+{
+	"cmdtype":"httpreq",
+	"httpreq":"newuser",
+	"devid":"124323", //设备识别码，移动端的设备识别码，或是PC端的MAC地址
+}
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"result":"OK|ERROR",
+	"errmsg":"",
+	"result-data":{"userid":124232，“username”：“LX323532”}
+}
+说明：
+注册成功：result 为 “OK”，result-data中含有玩家的userid，此userid将用作玩家的唯一标识，用于后续与服务器通信的玩家唯一识别码，username是用户名，此用户名用户切换用户，密码找回等。
+注册失败：result 为“ERROR”，errmsg是错误信息。
+此接口也可用于用户作为游客身份的快速注册，登录，或无账户登录（其实对于服务器来说，这个用户还是有username和password的，只不过这些信息是由客户端按规则默认生成了，以后提供更新用户信息接口，绑定手机号，微信号等。
+设想：用户打开APP就能直接进入游戏界面，无须登录，如果将初次安装，客户端静默使用设备识别码进行注册。对于已使用设备码注过的用户，默认使用设备码登录，这样以来，设备码就成了类似userid的用户标识，也即一机一户。如果用户要再多台设备登录，须在初始的设备上设置有关密码，或绑定手机，微信。然后在其他设备上切换登录。
+
+
+
+2.用户登录：
+2.1 设备ID登录：
+客户端请求：
+通道：http
+请求接口：http://serverid/service
+请求类型：post
+请求参数：
+{
+	"cmdtype":"httpreq",
+	"httpreq":"login",
+	"userid":2134,
+	"dev-id":"124323", //设备识别码，PC端Mac地址
+	
+}
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"httpresp":"login",
+	"session-token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN"  //这个token是后续socket辨识用户的凭证，客户端向socket服务器发送的每个数据包都必须有此token，如果token不匹配
+                                                            //如果，token不匹配，将处理为非法，恶意攻击用户
+	"result":"OK",
+	"errmsg":""
+	"result-data":{"user-info":
+	          		{"userid":124422,"image":"用户头像web路径", "assets":"用户资产"}
+	              }
+}
+说明：
+登录成功：result 为 OK，errmsg为空
+登录失败：result 为 "ERROR", errmsg为失败原因，可能值：用户不存在，密码错误，session-token和result-data中都不会有数据
+user-info，用户信息，具体待定
+2.2 手机号登录
+客户端请求：
+通道：http
+请求接口：http://serverid/service
+请求类型：post
+请求参数：
+{
+	"cmdtype":"httpreq",
+	"httpreq":"login-phone",
+	"phone":"124323", //用户手机号
+	"password":"pwd", //此值为一次性的短信验证码，也可以是用户的密码，如果是密码，须为用户密码在客户端md5加密后的值
+}
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"httpresp":"llogin-phone",
+	"result":"OK",
+	"session-token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN"  //这个token是后续socket辨识用户的凭证，客户端向socket服务器发送的每个数据包都必须有此token，如果token不匹配
+                                                            //如果，token不匹配，将处理为非法，恶意攻击用户
+	
+	"errmsg":""
+	"result-data":{"user-info":
+	          		{"userid":124422,"image":"用户头像web路径", "assets":"用户资产"}
+	              }
+}
+说明：
+登录成功：result 为 OK，errmsg为空
+登录失败：result 为 "ERROR", errmsg为失败原因，可能值：用户不存在，密码错误，session-token和result-data中都不会有数据
+user-info，用户信息，具体待定
+
+2.3 用户名登录
+客户端请求：
+通道：http
+请求接口：http://serverid/service
+请求类型：post
+请求参数：
+{
+	"cmdtype":"httpreq",
+	"httpreq":"login-username",
+	"username":"124323", //用户手机号
+	"password":"pwd", //用户的密码，须为用户密码在客户端md5加密后的值
+}
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"httpresp":"login-username",
+	"result":"OK",
+	"session-token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN"  //这个token是后续socket辨识用户的凭证，客户端向socket服务器发送的每个数据包都必须有此token，如果token不匹配
+                                                            //如果，token不匹配，将处理为非法，恶意攻击用户
+	
+	"errmsg":""
+	"result-data":{"user-info":
+	          		{"userid":124422,"image":"用户头像web路径", "assets":"用户资产"}
+	              }
+}
+说明：
+登录成功：result 为 OK，errmsg为空
+登录失败：result 为 "ERROR", errmsg为失败原因，可能值：用户不存在，密码错误，session-token和result-data中都不会有数据
+user-info，用户信息，具体待定
+
+
+3.用户信息查询，此接口用于查询用户的可公开信息
+客户端请求：
+通道：http
+请求接口：http://serverid/service
+请求类型：post
+请求参数：
+{
+	"cmdtype":"httpreq",
+	"httpreq":"user-info",
+	"userid":"124323",
+}
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"httpresp":"user-info",
+	"result":"OK|ERROR"
+	"err-msg":""
+	"result-data":{
+	  "userinfo":{
+	  "image":"http://webserverip//userimg/12322.png"
+	  "asset":"1222"
+	  }
+	} 
+}
+说明：
+查询成功：用户信息在result-data中
+查询失败：错误信息在err-msg中
+
+4. 用户信息更新
+客户端请求：
+通道：http
+请求接口：http://serverid/service
+请求类型：post
+请求参数：
+{
+	"cmdtype":"httpreq",
+	"httpreq":"user-update",
+	"userid":"124323",
+	“userinfo":{"phone":12342233122,   //手机号
+                    "password":"dfsfew",   //密码
+                    "weixin":"fersgg",     //微信号
+                    "userimg":""           //用户头像
+                    “user-alias":"",        //用户昵称
+                    }          
+}
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"httpresp":"user-update",
+	"result":"OK|ERROR"
+	"err-msg":""
+	
+	} 
+}
+说明：在userinfo中信息可以是一项或多项，比如只有userimg,或是两项：phone和user-alias
+执行成功：result:OK
+执行失败：result:ERROR,错误信息在err-msg中
+
+5. 用户更新/设置密码
+
+客户端请求：
+通道：http
+请求接口：http://serverid/service
+请求类型：post
+请求参数：
+{
+	"cmdtype":"httpreq",
+	"httpreq":"set-pwd",
+    userid:22,
+    devid:"wqrrrq",   
+    password:"rwrv232",   //用户密码的MD5    
+}
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"httpresp":"set-pwd",
+	"result":"OK|ERROR"
+	"err-msg":""
+}
+
+执行成功：result:OK
+执行失败：result:ERROR,错误信息在err-msg中
+
+6.用户添加设备
+通道：http
+请求接口：http://serverid/service
+请求类型：post
+请求参数：
+{
+	"cmdtype":"httpreq",
+	httpreq:"add-dev",
+    password:"rwrv232",  //用户密码的MD5
+    userid:22,
+    devid:"22dev2",   
+}
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"httpresp":"add-dev",
+	"result":"OK|ERROR"
+	"err-msg":""
+}
+
+执行成功：result:OK
+执行失败：result:ERROR,错误信息在err-msg中
+
+二、进入游戏
+
+1.创建房间
+客户端请求：
+
+通道：http
+接口：http://serverip/service
+post
+参数：
+{
+	"cmdtype":"httpreq",
+	"httpreq":"newroom",
+	"userid":123456
+}
+
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"httpresp":"newroom",
+	"result":"OK",
+	"errmsg":""
+}
+说明：
+服务器执行成功：result = "OK", errmsg：无内容
+服务器执行失败：result = "ERROR"，errmsg:错误原因，可能值：用户未登录，用户已创建房间
+
+
+2.进入房间
+通道：http
+接口：http://serverip/service
+请求参数：
+{
+	"cmdtype":"httpreq",
+	"httpreq":"enter-room",
+	"userid",123456,
+	"roomid",122424，//roomid为0，-1，或空时，为进入游戏大厅
+}
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"httpresp":"enter-room",
+	"result":"OK"
+	"errmsg":""
+	"result-data":{"game-server":"123.23.45.88","port":8992}
+}
+说明：
+
+用户可成功进入房间，result 为“OK", result-data中包含socket服务器的IP,和port
+不可进入房间：result 为“error”， errmsg：错误原因，可能值：用户未登录，房间不存在,房间已满人
+
+3.进入游戏(入座)
+通道：socket
+请求参数：
+{
+	"cmdtype":"sockreq",
+	"sockreq":"join-game"
+	"userid":123456,
+	"roomid":123333,
+	"gameid":123432
+	"token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN"
+}
+服务器返回：
+{
+	"cmdtype":"sockresp"
+	"sockresp":"join-game",
+	"result":"OK"
+	"errmsg":""
+	"result-data":{"state":""}
+}
+说明：
+成功时：state 取值：“等待新玩家“，”组局成功，马上开始“，”智能匹配玩家“ 等
+
+4.服务器推送：
+4.1当前玩家入场情况：
+推送信息：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"game-players",
+	"players": [{"userid": 111}, {"userid": 222}, {"userid": 333}] //玩家按照入场顺序排序
+}
+示例：
+{
+	"cmdtype": "sockpush",
+ 	"sockpush": "game-players", 
+ 	"players": [{"userid": 111}, {"userid": 222}, {"userid": 333}]
+}
+
+4.2组局成功，发牌
+推送参数：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"deal-cards"   
+	"cards":["majiang_wan_1","majiang_wan_2",.....]
+}
+4.2确定庄家
+推送参数：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"new-banker",
+	"userid":122443
+}
+说明：
+此userid为庄家玩家的id，客户端可使用此ID向web服务器查询用户信息。
+
+4.3 玩家操作命令列表
+推送参数：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"cmd-opts",
+	"cmd-opts":[{"cmd":"cmd1", "cmd-param":"命令参数"},{"cmd":"cmd2","cmd-param":"命令参数"}],
+	"resp-timeout":30 //用户响应超时时间，单位：秒，值为-1时为没有超时，一直等待用户响应
+	"def-cmd":{"cmd":"命令文本串，或命令码", "cmd-param":"命令允许的参数"},  
+        
+}
+
+说明：cmd-opts:包含1个或多个命令项，cmd1, cmd2家命令的文本串或命令码，cmd-param是服务器接受的此命令的参数。
+def-cmd 超时后服务器默认执行的命令，其必须是cmd-opts中的一项。
+
+示例：
+{
+	"cmdtype": "sockpush", 
+	"sockpush": "cmd-opts", 
+	"cmd-opts": [
+			{"cmd": "peng", "cmd-param": [14]}, 
+			{"cmd": "guo", "cmd-param": null}
+		    ], 
+	"resp-timeout": -1, 
+	"def-cmd": {"cmd": "guo", "cmd-param": null}
+}
+
+4.4. 发牌／摸牌，服务器向玩家手里发牌
+推送参数：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"deal-cards",
+	"cards":["majiang_tong_1"]
+}
+4.5 玩家出牌，此用于通知其他玩家
+推送参数：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"play-cards",
+	"cards":["majiang_wan_3"],
+	"player-state":"normal|offline|robot-play" //玩家状态，normal:正常，offline：离线，robot-play:机器人托管，normal与offline是互斥出现的，robot-play可与normal或offline组合出现，中间以竖线“|”分隔。
+	"userid":11234.  #出牌玩家的userid
+}
+示例：
+{"cmdtype": "sockpush", 
+"sockpush": "play-cards", 
+"userid": 111, 
+"cards": [21], 
+"player-state": "normal"}
+
+4.6.一局游戏结束，广播胜负各方
+推送参数：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"game-result",
+	"winners":[{"userid":1224, "score":12},]
+	"losers":[{"userid":122,"score":12}]
+}
+说明：
+winners和losers可有多个，score > 0 赢的分数，score < 0 输的分数
+
+4.7 一局游戏结束，广播各玩家累积的分数
+推送参数：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"scores",
+	"scores":[{"userid":1224, "score":12},{"userid":1223, "score":-12},]
+}
+说明：
+score > 0 赢的分数，score < 0 输的分数
+
+4.8 广播玩家的操作
+推送参数：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"exed-cmd",
+	"exed-cmd":"hu"
+	"cmd-param":null
+        "userid":123, #执行操作的用户ID
+}
+
+4.9 广播游戏的状态
+推送参数：
+{
+	"cmdtype":"sockpush",
+	"sockpush":"game-status",
+	"game-status":""
+	"state-data":"1". #state-data作为扩展使用，预留
+}
+
+5.玩家发送
+5.1出牌
+请求参数：
+{
+	"cmdtype":"sockreq",
+	"sockreq":"play-cards",
+	"userid":124242,
+	"roomid":123|0
+	"cards:"["majiang_tong_2"]
+}
+5.2玩家响应
+请求参数：
+{
+	"cmdtype":"sockreq",
+	"sockreq":"exe-cmd",  //执行命令
+	"userid":124122,
+	"roomid",123|0
+	"cmd":"peng", //此命令来自服务器推送的命令列表
+	"cmd-data":"" //命令数据，预留 当cmd为hu, peng, gang,时cmd-data须为服务器push的牌点数
+}
+5.3玩家断网重连
+请求参数：
+{
+	"cmdtype":"sockreq",
+	"sockreq":"reconnect",
+	"userid":123456,
+	"gameid":324243,
+	"roomid":324242
+}
+socket服务器返回：
+{
+	"cmdtype":"sockresp"
+	"sockresp":"reconnect",
+	"result":"OK"
+	"errmsg":""
+	"result-data":{"player-state":"normal|offline|robot-play"} #player-state: 玩家状态，normal:正常，offline：离线，robot-play:机器人托管，normal与offline是互斥出现的，robot-play可与normal或offline组合出现，中间以竖线“|”分隔。
+
+}
+5.4 玩家设置机器人托管
+请求参数：
+{
+	"cmdtype":"sockreq",
+	"sockreq":"robot-play",
+	"robot-play":"yes|no"
+	"userid":123
+        "Roomie":123
+}
+socket服务器返回：
+{
+	"cmdtype":"sockresp"
+	"sockresp":"robot-play",
+	"result":"OK"
+	"errmsg":""
+	"result-data":{"player-state":"normal|offline|robot-play"} #player-state: 玩家状态，normal:正常，offline：离线，robot-play:机器人托管，normal与offline是互斥出现的，robot-play可与normal或offline组合出现，中间以竖线“|”分隔。
+
+}

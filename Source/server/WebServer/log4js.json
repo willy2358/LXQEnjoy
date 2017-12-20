@@ -1,0 +1,18 @@
+{
+  "appenders": { 
+  	"console": { "type": "console" },
+  	"cheese": { 
+  		"type": "file", 
+  		"filename": "./logs/cheese.log", 
+  		"maxLogSize": 1024, 
+		"backup": 3
+	} 
+  },
+
+  "categories": { 
+  	"default": { 
+  		"appenders": ["cheese", "console" ], 
+  		"level": "error" 
+  	} 
+  }
+}
