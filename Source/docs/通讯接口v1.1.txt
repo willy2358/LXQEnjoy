@@ -365,7 +365,7 @@ def-cmd 超时后服务器默认执行的命令，其必须是cmd-opts中的一�
 {
 	"cmdtype":"sockpush",
 	"sockpush":"play-cards",
-	"cards":["majiang_wan_3"],
+	"cards":[11,12],  //此为一个列表，即使只有一张牌时，也是一个列表，形如：[13]
 	"player-state":"normal|offline|robot-play" //玩家状态，normal:正常，offline：离线，robot-play:机器人托管，normal与offline是互斥出现的，robot-play可与normal或offline组合出现，中间以竖线“|”分隔。
 	"userid":11234.  #出牌玩家的userid
 }
