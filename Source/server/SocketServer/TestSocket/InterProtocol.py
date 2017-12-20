@@ -36,6 +36,7 @@ server_push_game_status = "game-status"
 server_push_status_data = "status-data"
 server_push_game_players = "game-players"
 server_push_players = "players"
+server_push_play_cards = "play-cards"
 
 
 cmd_data_cards = "cards"
@@ -45,6 +46,12 @@ room_id = "roomid"
 user_id = "userid"
 game_id = "gameid"
 
+
+player_state = "player-state"
+player_state_normal = "normal"
+player_state_offline = "offline"
+player_state_robot_play = "robot-play"
+
 majiang_player_act_gang = "gang"
 majiang_player_act_peng = "peng"
 majiang_player_act_hu = "hu"
@@ -52,7 +59,7 @@ majiang_player_act_chi = "chi"
 majiang_player_act_zimo = "zi mo"
 majiang_player_act_mopai = "mo pai"
 majiang_player_act_pass = "guo"
-majiang_player_act_play_card = "chu pai"
+majiang_player_act_play_card = "play-cards"
 
 # the cmd with less index has the higher priority. that is  majiang_player_act_zimo has the highest priority.
 majiang_acts_priorities = [majiang_player_act_zimo, majiang_player_act_hu,
@@ -62,6 +69,25 @@ majiang_acts_priorities = [majiang_player_act_zimo, majiang_player_act_hu,
 
 min_room_id = 10   # valid room id should > 10
 
+def create_play_cards_packet(player, cards):
+    l_cards = []
+    if isinstance(cards, type([])):
+        l_cards = cards
+    else:
+        l_cards.append(cards)
+
+    state = player_state_normal if player.get_is_online() else player_state_offline
+    if player.get_is_robot_play():
+        state += "|" + player_state_robot_play
+
+    packet = {
+        cmd_type: server_cmd_type_push,
+        server_cmd_type_push: server_push_play_cards,
+        user_id: player.get_user_id(),
+        cmd_data_cards: l_cards,
+        player_state:state
+    }
+    return packet
 
 def create_game_status_packet(status, status_data = None):
     packet = {
@@ -90,14 +116,18 @@ def create_deal_cards_json_packet(player, cards):
     return packet
 
 def create_player_exed_cmd_json_packet(player, cmd, cmd_data):
-    packet = {
-        cmd_type: server_cmd_type_push,
-        server_cmd_type_push: server_push_player_exed_cmd,
-        server_push_player_exed_cmd: cmd,
-        server_push_cmd_param:cmd_data,
-        user_id:player.get_user_id()
-    }
-    return packet
+
+    if cmd == server_push_play_cards:
+        return create_play_cards_packet(player, cmd_data)
+    else:
+        packet = {
+            cmd_type: server_cmd_type_push,
+            server_cmd_type_push: server_push_player_exed_cmd,
+            server_push_player_exed_cmd: cmd,
+            server_push_cmd_param:cmd_data,
+            user_id:player.get_user_id()
+        }
+        return packet
 
 def create_cmd_options_json_packet(player, cmd_options, def_cmd=None, resp_timeout=-1):
     opts = []
