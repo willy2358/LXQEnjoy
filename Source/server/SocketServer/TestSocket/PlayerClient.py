@@ -159,7 +159,7 @@ class PlayerClient:
         self.__won_score = score
 
     def send_server_command(self, cmd_obj):
-        self.send_cards_state() # for viewing data in test client
+        # self.send_cards_state() # for viewing data in test client
 
         j_str = json.dumps(cmd_obj)
         self.send_command_message(j_str)
