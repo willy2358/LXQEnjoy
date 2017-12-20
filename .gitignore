@@ -7,3 +7,4 @@ __pycache__
 /.DS_Store/*
 /Source/server/WebServer/.idea/*
 /Source/server/WebServer/logs/*
+./Source/server/WebServer/logs

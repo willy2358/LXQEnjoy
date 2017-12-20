@@ -175,6 +175,54 @@ user-info，用户信息，具体待定
 执行成功：result:OK
 执行失败：result:ERROR,错误信息在err-msg中
 
+5. 用户更新/设置密码
+
+客户端请求：
+通道：http
+请求接口：http://serverid/service
+请求类型：post
+请求参数：
+{
+	"cmdtype":"httpreq",
+	"httpreq":"set-pwd",
+    userid:22,
+    devid:"wqrrrq",   
+    password:"rwrv232",   //用户密码的MD5    
+}
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"httpresp":"set-pwd",
+	"result":"OK|ERROR"
+	"err-msg":""
+}
+
+执行成功：result:OK
+执行失败：result:ERROR,错误信息在err-msg中
+
+6.用户添加设备
+通道：http
+请求接口：http://serverid/service
+请求类型：post
+请求参数：
+{
+	"cmdtype":"httpreq",
+	httpreq:"add-dev",
+    password:"rwrv232",  //用户密码的MD5
+    userid:22,
+    devid:"22dev2",   
+}
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"httpresp":"add-dev",
+	"result":"OK|ERROR"
+	"err-msg":""
+}
+
+执行成功：result:OK
+执行失败：result:ERROR,错误信息在err-msg中
+
 二、进入游戏
 
 1.创建房间

@@ -13,6 +13,7 @@ exports = module.exports = Object.freeze({
     ERROR_DEVICE_ALREADY_REGISTERED: 13,   //设备已注册
     ERROR_FAILED_CREATE_USER: 14,          //创建新用户失败
     ERROR_FAILED_LOGIN:15,                 //登录失败
+    ERROR_DEVICE_NOT_REGISTERED:16,        //设备未注册
 
     //cbt : callback return
     cbt_invalid_userid: "invalid userid",

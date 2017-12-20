@@ -13,7 +13,7 @@ exports = module.exports = Object.freeze({
     req_cmd_newuser : "newuser",
     req_cmd_login:"login",
     req_cmd_set_pwd:"set-pwd",
-    req_cmd_add_dev: "add_dev",
+    req_cmd_add_dev: "add-dev",
     req_param_devid: "devid",
     req_param_pwd: "password",
     req_userid:"userid",

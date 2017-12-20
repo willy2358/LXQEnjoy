@@ -198,12 +198,17 @@ var app = express();
 //
 // conn2.query("select count(userid) as uid from user");
 
-// var utils = require('./utils.js');
-//
-//
-// var template = 'select {0}';
-// var sql = template.format('hello');
-// console.log(sql);
+var utils = require('./utils.js');
+
+
+var template = 'select {0}';
+var sql = template.format('hello');
+console.log(sql);
+
+var dev_id = "heelo";
+var template = "select device from user_device where device = '{0}'";
+var sql = template.format(dev_id);
+console.log(sql);
 
 // var api_protocal = require("./api-protocal.js");
 //

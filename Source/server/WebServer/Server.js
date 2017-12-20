@@ -2,14 +2,12 @@
 var log = require('./log.js');
 log.configure();
 var logger = log.logger();
-// var jwt = require("jwt-simple");
-// var moment = require('moment');
-var uiid = require('uuid');
+var uuid = require('uuid');
 
+var errors = require('./errors.js');
 
 var express = require('express');
 var app = express();
-// app.set("lxqTokenSecret", "metalight")
 
 app.use(log.useLog());
 
@@ -17,9 +15,6 @@ var bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
-// var api_protocal = require('./api_protocal.js');
-//
-// var database = require('./database.js');
 
 var api_protocal = require("./api-protocal.js");
 var db = require('./db.js');
@@ -122,7 +117,7 @@ function process_set_password(req_obj, resp){
             function (err) {
                 resp_pack = create_error_repsonse(cmd, err);
                 resp.end(resp_pack);
-        },
+            },
             function (ret_msg) {
                 if (ret_msg === errors.cbt_valid_device) {
                     var temp = "update user set password = '{0}' where userid={1}";
@@ -157,7 +152,7 @@ function process_add_device(req_obj, resp){
         var pwd = req_obj[api_protocal.req_param_pwd];
         var cmd = req_obj[api_protocal.cmd_type_httpreq];
 
-        is_password_right(userid, password,
+        is_password_right(userid, pwd,
             function (err) {
                 var resp_pack = create_error_repsonse(cmd, err);
                 resp.end(err);
@@ -221,30 +216,31 @@ function is_user_exist(userid, err_callback, result_callback) {
 }
 
 function is_device_valid(userid, devid, err_callback, result_callback) {
-    is_user_exist(userid, err_callback, function (result) {
-        if (result_callback){
-            if (result == errors.cbt_valid_userid){
-                var temp = "select count(userid) from user where userid={0} and device='{1}'";
-                var sql = temp.format(userid, devid);
-                conn.query(sql, function (err, result) {
-                    if (err){
-                        if (err_callback){
-                            err_callback(err);
-                        }
-                    }
-                    else{
-                        if (result.length > 0){
-                            result_callback(errors.cbt_valid_device);
+    is_user_exist(userid, err_callback,
+        function (ret_msg) {
+            if (result_callback){
+                if (ret_msg == errors.cbt_valid_userid){
+                    var temp = "select count(userid) as cid from user_device where userid={0} and device='{1}'";
+                    var sql = temp.format(userid, devid);
+                    conn.query(sql, function (err, result) {
+                        if (err){
+                            if (err_callback){
+                                err_callback(err);
+                            }
                         }
                         else{
-                            result_callback(errors.cbt_invalid_device);
+                            if (result['cid'] > 0){
+                                result_callback(errors.cbt_valid_device);
+                            }
+                            else{
+                                result_callback(errors.cbt_invalid_device);
+                            }
                         }
-                    }
-                });
-            }
-            else{
-                result_callback(errors.cbt_invalid_userid);
-            }
+                    });
+                }
+                else{
+                    result_callback(errors.cbt_invalid_userid);
+                }
         }
 
     });
@@ -297,26 +293,26 @@ function process_new_user(req_obj, resp) {
                 resp.end(resp_str);
             },
             function (ret_msg) {
-            if (ret_msg === errors.cbt_device_found){
-                resp_str = create_error_repsonse(cmd, errors.ERROR_DEVICE_ALREADY_REGISTERED);
-                logger.error(resp_str);
-                resp.end(resp_str);
-            }
-            else{
-                add_new_user(dev_id,
-                    function(err){
-                        var resp_str = create_error_repsonse(cmd, errors.ERROR_FAILED_CREATE_USER);
-                        logger.error(resp_str);
-                        resp.end(resp_str);
-                    },
-                    function(userObj){
-                        user_str = JSON.stringify(userObj);
-                        resp_str = create_success_response(cmd, user_str);
-                        resp.end(resp_str);
-                    }
-                );
-            }
-        });
+                if (ret_msg === errors.cbt_device_found){
+                    resp_str = create_error_repsonse(cmd, errors.ERROR_DEVICE_ALREADY_REGISTERED);
+                    logger.error(resp_str);
+                    resp.end(resp_str);
+                }
+                else{
+                    add_new_user(dev_id,
+                        function(err){
+                            var resp_str = create_error_repsonse(cmd, errors.ERROR_FAILED_CREATE_USER);
+                            logger.error(resp_str);
+                            resp.end(resp_str);
+                        },
+                        function(userObj){
+                            var user_str = JSON.stringify(userObj);
+                            var resp_str = create_success_response(cmd, user_str);
+                            resp.end(resp_str);
+                        }
+                    );
+                }
+            });
     }
     catch (err){
         logger.exception(err)
@@ -357,7 +353,7 @@ function update_user_login_token(userid, dev_id, err_callback, ret_callback) {
     })
 }
 
-function get_is_device_already_registered(userid, dev_id, err_callback, ret_callback) {
+function get_is_device_already_registered(dev_id, err_callback, ret_callback) {
     var template = "select device from user_device where device = '{0}'";
     var sql = template.format(dev_id);
     console.log(sql);
@@ -395,7 +391,7 @@ function record_user_device(userid, dev_id, err_callback, ret_callback) {
 
 function add_new_user(dev_id, err_callback, ret_callback){
     var temp = "select count({0}) as cid from {1}";
-    var sql = temp.format(database.field_userid, database.table_user);
+    var sql = temp.format(db.field_userid, db.table_user);
     console.log(sql);
     conn.query(sql, function(err, result){
         if (err){
@@ -404,8 +400,8 @@ function add_new_user(dev_id, err_callback, ret_callback){
             }
         }
         else{
-            var username = "LX" + (result[0].cid + database.username_start_number + 1)
-            var sql = "insert into {0}({1}) values('{2}')".format(database.table_user, database.field_username, username);
+            var username = "LX" + (result[0].cid + db.username_start_number + 1)
+            var sql = "insert into {0}({1}) values('{2}')".format(db.table_user, db.field_username, username);
             conn.query(sql, function (err, result) {
                 if (err) {
                     if (err_callback){
@@ -414,8 +410,8 @@ function add_new_user(dev_id, err_callback, ret_callback){
                 }
                 else {
                     var newId = result.insertId;
-                    var sql = "insert into {0}({1},{2}) values ({3},'{4}');".format(database.table_user_device,
-                        database.field_userid, database.field_device, newId, dev_id);
+                    var sql = "insert into {0}({1},{2}) values ({3},'{4}');".format(db.table_user_device,
+                        db.field_userid, db.field_device, newId, dev_id);
                     conn.query(sql, function (err, result) {
                         if (err){
                             if (err_callback){
@@ -438,7 +434,7 @@ function add_new_user(dev_id, err_callback, ret_callback){
 
 function get_user_info(user_id, callback){
     var template = "select username from {0} where userid = {1}";
-    var sql = template.format(database.table_user, user_id);
+    var sql = template.format(db.table_user, user_id);
     conn.query(sql, function(err, result){
         if (err){
             logger.error(err)
@@ -488,7 +484,7 @@ function process_login(req_obj, resp) {
                 });
             }
             else{
-                err_resp = create_error_repsonse("Not registered device");
+                var err_resp = create_error_repsonse(cmd, errors.ERROR_DEVICE_NOT_REGISTERED);
                 resp.end(err_resp);
             }
         }
