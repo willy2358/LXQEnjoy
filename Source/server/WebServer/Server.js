@@ -75,6 +75,14 @@ function create_success_response(cmd, msg) {
     return JSON.stringify(pack);
 }
 
+function create_undefine_error_response(cmd, err){
+
+}
+
+function generate_error_code_for_undefined_err(err){
+    return 100;
+}
+
 function create_success_ext_response(cmd, propObj, msg) {
     var pack = {
         "cmdtype": api_protocal.cmd_type_httpresp,
@@ -103,6 +111,126 @@ function dispatch_request(req_cmd, req_obj, resp){
     }
     else if (req_cmd == api_protocal.req_cmd_add_dev){
         process_add_device(req_obj, resp);
+    }
+    else if (req_cmd == api_protocal.req_cmd_get_games){
+        process_get_games(req_obj, resp);
+    }
+    else if (req_cmd == api_protocal.req_cmd_new_room){
+        process_new_room(req_obj, resp);
+    }
+}
+
+function logger_undefined_err(err_code, err){
+
+}
+
+function process_get_games(req_obj, resp){
+    try{
+        var cmd = req_obj[api_protocal.cmd_type_httpreq];
+        var sql = "select gameid, game_name,min_players, max_players, server_ip, server_port, region, type from games";
+        conn.query(sql, function(err, result){
+           if (err){
+               process_undefined_err(err, resp);
+           }
+            else{
+               var gs = [];
+               for(var i = 0; i < result.length; i++){
+                   var game = {
+                       gameid : result[i].gameid,
+                       game_name: result[i].gamename,
+                       game_type: result[i].type,
+                       min_players:result[i].min_players,
+                       max_players:result[i].max_players,
+                       server_ip:result[i].server_ip,
+                       server_port:result[i].server_port,
+                       region:result[i].region
+                   }
+                   gs.push(game);
+               }
+               var gsObj = {
+                   games:gs,
+               }
+               var resp_pack = create_success_ext_response(cmd, gsObj, "OK");
+               resp.end(resp_pack);
+           }
+        });
+    }
+    catch (err){
+        process_undefined_err(err);
+    }
+}
+
+function process_undefined_err(err, resp){
+    var err_code = generate_error_code_for_undefined_err(err);
+    var resp_pack = create_error_repsonse(err_code);
+    logger_undefined_err(err_code, err);
+    resp.end(resp_pack);
+}
+
+function process_new_room(req_obj, resp){
+    try{
+        var cmd = req_obj[api_protocal.cmd_type_httpreq];
+        var userid = req_obj[api_protocal.req_userid];
+        var gameid = req_obj[api_protocal.game_id];
+        var gps_cheat_proof = req_obj[api_protocal.req_room_same_gps_exclude];
+        var ip_cheat_proof = req_obj[api_protocal.req_room_same_ip_exclude];
+        var game_rounds = req_obj[api_protocal.req_room_game_round_num];
+        var sql = "select count(room_num) as num from room where userid={0}";
+        sql = sql.format(userid);
+        conn.query(sql, function(err, results){
+            if (err){
+                process_undefined_err(err, resp);
+            }
+            else{
+                var n = results[0].num;
+                if (n >= 9){
+                    var resp_pack = create_error_repsonse(cmd, errors.ERROR_TO_MAX_ALLOWED_ROOMS);
+                    resp.end(resp_pack);
+                }
+                else{
+                    var room_number = (db.room_start_number + userid * 10) + n;
+                    create_new_room_for_user(userid, gameid, room_number, game_rounds, ip_cheat_proof, gps_cheat_proof,
+                    function(err){
+                        process_undefined_err(err, resp);
+                    },
+                    function(ret_msg){
+                        if(ret_msg == errors.cbt_room_created_failed){
+                            var resp_pack = create_error_repsonse(cmd, errors.ERROR_FAILED_TO_CREATE_ROOM);
+                            resp.end(resp_pack);
+                        }
+                        else{
+                            var resp_pack = create_success_response("cmd", "OK");
+                            resp.end(resp_pack);
+                        }
+                    });
+                }
+            }
+        });
+    }
+    catch (err){
+        process_undefined_err(err, resp);
+    }
+}
+
+function create_new_room_for_user(userid, gameid, room_number, round_num, ip_exclude, gps_exclude, err_callback, result_callback){
+    try{
+        var sql = "insert into room(userid, gameid, room_no, round_num, ex_ip_cheat, ex_gps_cheat) values({0},{1},{2},{3},{4},{5})";
+        sql = sql.format(userid, gameid, room_number,round_num, ip_exclude, gps_exclude);
+        conn.query(sql, function(err, result){
+           if(err){
+               if(err_callback){
+                   err_callback(err);
+               }
+               else if(result_callback){
+                   result_callback(errors.cbt_room_created_ok);
+               }
+           }
+        });
+    }
+    catch(err){
+        if(err_callback){
+            err_callback(err);
+        }
     }
 }
 

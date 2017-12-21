@@ -93,11 +93,13 @@ class Room:
     def process_join_game(self, player):
         try:
             if self._lock_join_game.acquire(5): # timeout 5 seconds
+                if self.is_player_in(player):
+                    #player.send_error_message(InterProtocol.client_req_type_join_game, "Already in room")
+                    player.send_success_message(InterProtocol.client_req_type_join_game);
+                    #player.send_cards_state();
+                    return
                 if not self.can_new_player_seated():
                     player.send_error_message(InterProtocol.client_req_type_join_game, "Room is full")
-                    return
-                if self.is_player_in(player):
-                    player.send_error_message(InterProtocol.client_req_type_join_game, "Already in room")
                     return
                 self.add_seated_player(player)
                 player.send_success_message(InterProtocol.client_req_type_join_game)

@@ -14,6 +14,8 @@ exports = module.exports = Object.freeze({
     ERROR_FAILED_CREATE_USER: 14,          //创建新用户失败
     ERROR_FAILED_LOGIN:15,                 //登录失败
     ERROR_DEVICE_NOT_REGISTERED:16,        //设备未注册
+    ERROR_TO_MAX_ALLOWED_ROOMS:17,         //用户达到最大允许创建数
+    ERROR_FAILED_TO_CREATE_ROOM: 18,       //创建房间失败
 
     //cbt : callback return
     cbt_invalid_userid: "invalid userid",
@@ -26,6 +28,8 @@ exports = module.exports = Object.freeze({
     cbt_device_not_found: "not found device",
 
     cbt_record_device_ok: "record user device ok",
+    cbt_room_created_ok: "room created ok",
+    cbt_room_created_failed:"room created failed",
 
 
 
