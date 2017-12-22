@@ -8,3 +8,6 @@ __pycache__
 /Source/server/WebServer/.idea/*
 /Source/server/WebServer/logs/*
 ./Source/server/WebServer/logs
+/Source/server/SocketServert/TestSocket/.DS_Store
+./Source/server/SocketServert/TestSocket/.DS_Store
+

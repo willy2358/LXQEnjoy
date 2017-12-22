@@ -118,7 +118,8 @@ class PlayerClient:
     def send_command_message(self, msg):
 
         try:
-            self.__socket__conn.sendall(msg.encode(encoding="utf-8"))
+            gamepack = "LXQ<(:" + msg + ":)>QXL";
+            self.__socket__conn.sendall(gamepack.encode(encoding="utf-8"))
             
         except Exception as ex:
             Log.write_exception(ex)
