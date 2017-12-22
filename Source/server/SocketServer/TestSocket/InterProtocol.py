@@ -37,6 +37,10 @@ server_push_status_data = "status-data"
 server_push_game_players = "game-players"
 server_push_players = "players"
 server_push_play_cards = "play-cards"
+server_push_cards_state = "cards-state"
+server_push_active_cards = "active-cards"
+server_push_freezed_cards = "frozen-cards"
+server_push_shown_card_groups = "shown-cards-groups"
 
 
 cmd_data_cards = "cards"
@@ -68,6 +72,18 @@ majiang_acts_priorities = [majiang_player_act_zimo, majiang_player_act_hu,
                            majiang_player_act_play_card, majiang_player_act_pass ]
 
 min_room_id = 10   # valid room id should > 10
+
+def create_cards_state_packet(player):
+    packet = {
+        cmd_type: server_cmd_type_push,
+        server_cmd_type_push: server_push_cards_state,
+        user_id: player.get_user_id(),
+        server_push_active_cards: player.get_active_cards(),
+        server_push_freezed_cards: player.get_frozen_cards(),
+        server_push_shown_card_groups:player.get_shown_card_groups()
+    }
+
+    return packet
 
 def create_play_cards_packet(player, cards):
     l_cards = []

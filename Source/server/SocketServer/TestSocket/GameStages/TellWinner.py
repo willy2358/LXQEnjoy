@@ -17,10 +17,10 @@ class TellWinner(GameStage):
         losers = rule.get_losers_for_round(self.get_my_round())
         for w in winners:
             msg = {"game-end": "won"}
-            w.send_server_command(msg)
+            w.send_server_cmd_packet(msg)
         for l in losers:
             msg = {"game-end": "lost"}
-            l.send_server_command(msg)
+            l.send_server_cmd_packet(msg)
 
         self.__executed = True
 
@@ -33,6 +33,6 @@ class TellWinner(GameStage):
         losers = game_round.get_losers()
         json_packet = InterProtocol.create_winners_losers_json_packet(winners, losers)
         for p in game_round.get_players():
-            p.send_server_command(json_packet)
+            p.send_server_cmd_packet(json_packet)
 
 

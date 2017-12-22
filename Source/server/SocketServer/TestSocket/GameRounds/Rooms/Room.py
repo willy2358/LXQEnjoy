@@ -74,7 +74,7 @@ class Room:
         elif req_cmd == InterProtocol.client_req_type_exe_cmd:
             if InterProtocol.client_req_exe_cmd not in req_json:
                 err = InterProtocol.create_request_error_packet(req_cmd)
-                player.send_server_command(err)
+                player.send_server_cmd_packet(err)
             elif self._current_round:
                 cmd = req_json[InterProtocol.client_req_exe_cmd]
                 const_param = InterProtocol.client_req_cmd_param
@@ -88,7 +88,7 @@ class Room:
                 self._current_round.process_player_robot_play_request(player, False)
             else:
                 err = InterProtocol.create_request_error_packet(req_cmd)
-                player.send_server_command(err)
+                player.send_server_cmd_packet(err)
 
     def process_join_game(self, player):
         try:
@@ -128,7 +128,7 @@ class Room:
 
         pack = InterProtocol.create_game_players_packet(players)
         for p in self._seated_players:
-            p.send_server_command(pack)
+            p.send_server_cmd_packet(pack)
 
     def test_continue_next_round(self):
         if self._current_round_order < self._round_num:

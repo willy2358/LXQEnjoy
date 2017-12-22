@@ -331,6 +331,7 @@ def process_client_request(conn, req_json):
                     return
                 else:
                     player.update_connection(conn)
+                    return
                 # if req_json[InterProtocol.player_auth_token] != player.get_session_token():
                 #     send_msg_to_client_connection("Wrong player token")
                 #     returnß

@@ -416,6 +416,27 @@ score > 0 赢的分数，score < 0 输的分数
 	"state-data":"1". #state-data作为扩展使用，预留
 }
 
+4.10 向玩家推送当前牌的状态
+推送参数：
+{
+	"cmdtype": "sockpush", 
+	"sockpush": "cards-state", 
+	"userid": 333, 
+	"active-cards": [14, 37, 36, 21, 27, 24, 23, 16, 36, 38, 17, 25, 34, 15], //列表，每个数字对应一张牌
+	"frozen-cards": [13,13,13], //列表，每个元素对应一张牌，
+	"shown-cards-groups": [[13,13,13],[11,12,13]] //向其他玩家亮明的牌的分组，每个分组可以包括1到多张牌
+}
+
+示例
+{
+	"cmdtype": "sockpush", 
+	"sockpush": "cards-state", 
+	"userid": 333, 
+	"active-cards": [14, 37, 36, 21, 27, 24, 23, 16, 36, 38, 17, 25, 34, 15], 
+	"frozen-cards": [13,13,13], 
+	"shown-cards-groups": [[13,13,13],[11,12,13]] 
+}
+
 5.玩家发送
 5.1出牌
 请求参数：
@@ -423,7 +444,7 @@ score > 0 赢的分数，score < 0 输的分数
 	"cmdtype":"sockreq",
 	"sockreq":"play-cards",
 	"userid":124242,
-	"roomid":123|0
+	"roomid":123|0,
 	"cards:"["majiang_tong_2"]
 }
 5.2玩家响应
@@ -432,7 +453,7 @@ score > 0 赢的分数，score < 0 输的分数
 	"cmdtype":"sockreq",
 	"sockreq":"exe-cmd",  //执行命令
 	"userid":124122,
-	"roomid",123|0
+	"roomid",123|0,
 	"cmd":"peng", //此命令来自服务器推送的命令列表
 	"cmd-data":"" //命令数据，预留 当cmd为hu, peng, gang,时cmd-data须为服务器push的牌点数
 }
@@ -447,10 +468,10 @@ score > 0 赢的分数，score < 0 输的分数
 }
 socket服务器返回：
 {
-	"cmdtype":"sockresp"
+	"cmdtype":"sockresp",
 	"sockresp":"reconnect",
-	"result":"OK"
-	"errmsg":""
+	"result":"OK",
+	"errmsg":"",
 	"result-data":{"player-state":"normal|offline|robot-play"} #player-state: 玩家状态，normal:正常，offline：离线，robot-play:机器人托管，normal与offline是互斥出现的，robot-play可与normal或offline组合出现，中间以竖线“|”分隔。
 
 }
@@ -459,16 +480,16 @@ socket服务器返回：
 {
 	"cmdtype":"sockreq",
 	"sockreq":"robot-play",
-	"robot-play":"yes|no"
-	"userid":123
-        "Roomie":123
+	"robot-play":"yes|no",
+	"userid":123,
+    "Roomid":123,
 }
 socket服务器返回：
 {
-	"cmdtype":"sockresp"
+	"cmdtype":"sockresp",
 	"sockresp":"robot-play",
-	"result":"OK"
-	"errmsg":""
-	"result-data":{"player-state":"normal|offline|robot-play"} #player-state: 玩家状态，normal:正常，offline：离线，robot-play:机器人托管，normal与offline是互斥出现的，robot-play可与normal或offline组合出现，中间以竖线“|”分隔。
-
+	"result":"OK",
+	"errmsg":"",
 }
+
+说明：执行成功：result:OK, 执行失败：result: ERROR, errmsg为失败原因 

@@ -5,6 +5,7 @@ import PlayManager
 
 import Utils
 import Log
+import InterProtocol
 
 import base64
 import os
@@ -19,7 +20,8 @@ class PlayerClient:
         # self.__initial_cards = []
         self.__cards_in_hand = []   # _cards_in_hand == __active_cards + __freezed_cards
         self.__active_cards = []  # These cards are active, that, these cards can be played out
-        self.__freezed_card_groups = []   # These cards are freezed, that is, these cards can not be played out, or used by other purpose
+        self.__shown_card_groups = []   #cards shown to other players, in group way
+        self.__frozen_cards = []  # These cards are freezed, that is, these cards can not be played out, or used by other purpose
         self.__user_id = user_id
         self.__room_id = 0
         self.__my_room = None
@@ -31,6 +33,7 @@ class PlayerClient:
         self.__is_robot_play = False
         self.__session_token = ""
         self.__last_alive_time = datetime.now()
+        self.__last_sent_cmd_str = ""
 
     def is_banker(self):
         return self.__is_banker
@@ -40,6 +43,12 @@ class PlayerClient:
 
     def get_active_cards(self):
         return self.__active_cards
+
+    def get_frozen_cards(self):
+        return self.__frozen_cards
+
+    def get_shown_card_groups(self):
+        return self.__shown_card_groups
 
     def get_user_id(self):
         return self.__user_id
@@ -62,6 +71,13 @@ class PlayerClient:
     def update_connection(self, conn):
         self.__socket__conn = conn
         self.set_is_online(True)
+
+        cmd_str_bak = self.__last_sent_cmd_str
+        pack = InterProtocol.create_cards_state_packet(self)
+        self.send_server_cmd_packet(pack)
+
+        if cmd_str_bak:
+            self.send_raw_network_data(cmd_str_bak)
 
     def set_playing_rule_id(self, rule_id):
         self.__playing_rule_id = rule_id
@@ -93,7 +109,7 @@ class PlayerClient:
         self.__cards_in_hand = []
         self.__final_cards = []
         self.__active_cards = []
-        self.__freezed_card_groups = []
+        self.__shown_card_groups = []
         self.__final_cards = None
         self.__final_cards_from_dealer = False
         self.__won_score = 0  # positive, win, negative, lose
@@ -116,11 +132,13 @@ class PlayerClient:
         return self.__socket__conn
 
     def send_command_message(self, msg):
+        gamepack = "LXQ<(:" + msg + ":)>QXL"
+        self.__last_sent_cmd_str = gamepack
+        self.send_raw_network_data(gamepack)
 
+    def send_raw_network_data(self, dataStr):
         try:
-            gamepack = "LXQ<(:" + msg + ":)>QXL";
-            self.__socket__conn.sendall(gamepack.encode(encoding="utf-8"))
-            
+            self.__socket__conn.sendall(dataStr.encode(encoding="utf-8"))
         except Exception as ex:
             Log.write_exception(ex)
 
@@ -143,26 +161,44 @@ class PlayerClient:
         cards1 = self.__active_cards[:]
         cards1.sort()
         str1 = "active cards:" + str(cards1)
-        cards2 = self.__freezed_card_groups[:]
+        cards2 = self.__shown_card_groups[:]
         cards2.sort()
         str2 = ";freezed cards:" + str(cards2)
         self.send_command_message(str1 + str2)
 
-    def move_cards_to_freeze_group(self, cards_in_hand, cards_not_in_hand):
-        group = cards_in_hand + cards_not_in_hand
-        self.__freezed_card_groups.append(group)
+    # def move_cards_to_freeze_group(self, cards_in_hand, cards_not_in_hand):
+    #     group = cards_in_hand + cards_not_in_hand
+    #     self.__shown_card_groups.append(group)
+    #     for c in cards_in_hand:
+    #         self.__active_cards.remove(c)
+    #     self.__cards_in_hand = self.__cards_in_hand + cards_not_in_hand
+        # self.__final_cards = cards_not_in_hand
+
+    def move_cards_to_frozen(self, cards_in_hand, cards_not_in_hand):
+        if isinstance(cards_in_hand, type(int)):
+            self.__frozen_cards.append(cards_in_hand)
+        elif isinstance(cards_in_hand, type([])):
+            self.__frozen_cards = self.__frozen_cards + cards_in_hand
+
+        if isinstance(cards_not_in_hand, type(int)):
+            self.__frozen_cards.append(cards_not_in_hand)
+        elif isinstance(cards_not_in_hand, type([])):
+            self.__frozen_cards = self.__frozen_cards + cards_not_in_hand
+
         for c in cards_in_hand:
             self.__active_cards.remove(c)
         self.__cards_in_hand = self.__cards_in_hand + cards_not_in_hand
-        # self.__final_cards = cards_not_in_hand
+
+    def add_shown_card_group(self, cards_group):
+        self.__shown_card_groups.append(cards_group)
 
     def set_won_score(self, score):
         self.__won_score = score
 
-    def send_server_command(self, cmd_obj):
+    def send_server_cmd_packet(self, cmd_pack_obj):
         # self.send_cards_state() # for viewing data in test client
 
-        j_str = json.dumps(cmd_obj)
+        j_str = json.dumps(cmd_pack_obj)
         self.send_command_message(j_str)
 
     def send_error_message(self, req_cmd, errmsg):
