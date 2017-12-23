@@ -287,6 +287,7 @@ def dispatch_player_commands(conn, comm_text):
     try:
         j_obj = json.loads(comm_text)
     except Exception as ex:
+        print(ex)
         send_msg_to_client_connection(conn, "Invalid request format")
         return
 

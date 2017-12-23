@@ -223,6 +223,84 @@ user-info，用户信息，具体待定
 执行成功：result:OK
 执行失败：result:ERROR,错误信息在err-msg中
 
+7.取得游戏列表
+通道：http
+请求接口：http://serverid/service
+请求类型：post
+请求参数：
+{
+	"cmdtype":"httpreq",
+	httpreq:"getgames", 
+}
+
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"httpresp":"getgames",
+	"result":"OK|ERROR"
+	"err-msg":""
+	"games":[{"gameid":gameid,
+	          "game_name":"gamename",
+	          "game_type": "M|P", //游戏类型：M：麻将；P：扑克
+	          “min_players":3, //最少玩家数
+	          “max_players":num,  //最多玩家数
+	          “server_ip”: “192.168.1.24”， //游戏服务器IP
+	          “server_port":3993, // 服务器端口
+	          “region": “beijing" //所在地区
+	         },
+	         {
+	          "gameid":gameid
+	         }]
+}
+
+示例：
+{ cmdtype: 'httpresp',
+  httpresp: 'getgames',
+  result: 'OK',
+  'result-data': 'OK',
+  games: 
+   [ { gameid: 111,
+       game_name: '拐三角',
+       game_type: 'M',
+       min_players: 3,
+       max_players: '3',
+       server_ip: '127.0.0.1',
+       server_port: 9229,
+       region: 'da tong' },
+     { gameid: 222,
+       game_name: 'za jin hua',
+       game_type: 'P',
+       min_players: 3,
+       max_players: '7',
+       server_ip: '127.0.0.1',
+       server_port: 9229,
+       region: 'da tong' } ] }
+
+ 8. 创建房间
+ 请求参数
+ {
+   cmdtype:"httpreq",
+    httpreq:"newroom",
+    userid:22,
+    gameid:111,
+    same_ip_exclude:1,
+    near_gps_exclude:0,
+    round_num:8,
+    fee_stuff_id:11,
+    fee_amount_per_player:1,
+    fee_creator_pay_all:0,
+    stake_stuff_id:11,
+    stake_base_score:5
+ }
+
+ 服务器返回：
+ { 
+ 	cmdtype: 'httpresp',
+  	httpresp: 'newroom',
+  	result: 'OK|ERROR',
+  	'result-data': 'OK' 
+  }
+
 二、进入游戏
 
 1.创建房间

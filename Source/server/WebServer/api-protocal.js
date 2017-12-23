@@ -22,6 +22,12 @@ exports = module.exports = Object.freeze({
     req_room_same_ip_exclude:"same_ip_exclude",
     req_room_same_gps_exclude:"near_gps_exclude",
     req_room_game_round_num :"round_num",
+    req_room_game_fee_stuff_id:"fee_stuff_id",
+    req_room_game_fee_per_player:"fee_amount_per_player",
+    req_room_game_fee_creator_pay_all:"fee_creator_pay_all",
+    req_room_game_stake_stuff_id: "stake_stuff_id",
+    req_room_game_stake_base_score:"stake_base_score",
+
 
     game_id: "gameid",
     game_name: "gamename",

@@ -138,6 +138,7 @@ class PlayerClient:
 
     def send_raw_network_data(self, dataStr):
         try:
+            print(dataStr)
             self.__socket__conn.sendall(dataStr.encode(encoding="utf-8"))
         except Exception as ex:
             Log.write_exception(ex)
@@ -196,6 +197,11 @@ class PlayerClient:
         self.__won_score = score
 
     def send_server_cmd_packet(self, cmd_pack_obj):
+
+        pack = InterProtocol.create_cards_state_packet(self)
+        j_str = json.dumps(pack)
+        self.send_command_message(j_str)
+
         # self.send_cards_state() # for viewing data in test client
 
         j_str = json.dumps(cmd_pack_obj)

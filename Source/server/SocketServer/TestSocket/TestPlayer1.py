@@ -5,7 +5,7 @@ import json
 # client = SocketClient.SocketClient("117.78.40.54", 9229)
 client = SocketClient.SocketClient("127.0.0.1", 9229)
 client.run()
-cmd = '{"cmdtype":"sockreq","sockreq":"join-game","userid":111,	"roomid":123333,"gameid":"m1"}'
+cmd = '{"cmdtype":"sockreq","sockreq":"join-game","userid":111,	"roomid":888,"gameid":"m1"}'
 client.send_message(cmd)
 print('sent: ' + cmd)
 cmds = {
@@ -33,7 +33,7 @@ while True:
             InterProtocol.cmd_type: InterProtocol.sock_req_cmd,
             InterProtocol.sock_req_cmd:InterProtocol.client_req_type_exe_cmd,
             InterProtocol.user_id:111,
-            InterProtocol.room_id:123333,
+            InterProtocol.room_id:888,
             InterProtocol.client_req_exe_cmd:cmds[cmd],
             InterProtocol.client_req_cmd_param:cmd_param
         }

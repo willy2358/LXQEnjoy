@@ -127,7 +127,7 @@ function logger_undefined_err(err_code, err){
 function process_get_games(req_obj, resp){
     try{
         var cmd = req_obj[api_protocal.cmd_type_httpreq];
-        var sql = "select gameid, game_name,min_players, max_players, server_ip, server_port, region, type from games";
+        var sql = "select gameid, game_name,min_players, max_players, server_ip, server_port, region, type from game";
         conn.query(sql, function(err, result){
            if (err){
                process_undefined_err(err, resp);
@@ -137,7 +137,7 @@ function process_get_games(req_obj, resp){
                for(var i = 0; i < result.length; i++){
                    var game = {
                        gameid : result[i].gameid,
-                       game_name: result[i].gamename,
+                       game_name: result[i].game_name,
                        game_type: result[i].type,
                        min_players:result[i].min_players,
                        max_players:result[i].max_players,
@@ -150,7 +150,9 @@ function process_get_games(req_obj, resp){
                var gsObj = {
                    games:gs,
                }
+               console.log(gsObj);
                var resp_pack = create_success_ext_response(cmd, gsObj, "OK");
+               console.log(resp_pack)
                resp.end(resp_pack);
            }
         });
@@ -175,10 +177,18 @@ function process_new_room(req_obj, resp){
         var gps_cheat_proof = req_obj[api_protocal.req_room_same_gps_exclude];
         var ip_cheat_proof = req_obj[api_protocal.req_room_same_ip_exclude];
         var game_rounds = req_obj[api_protocal.req_room_game_round_num];
-        var sql = "select count(room_num) as num from room where userid={0}";
+        var fee_stuff_id = req_obj[api_protocal.req_room_game_fee_stuff_id];
+        var fee_amount_per_player = req_obj[api_protocal.req_room_game_fee_per_player];
+        var fee_creator_pay_all = req_obj[api_protocal.req_room_game_fee_creator_pay_all];
+        var stake_stuff_id = req_obj[api_protocal.req_room_game_stake_stuff_id];
+        var stake_base_score = req_obj[api_protocal.req_room_game_stake_base_score];
+
+        var sql = "select count(room_no) as num from room where userid={0}";
+
         sql = sql.format(userid);
         conn.query(sql, function(err, results){
             if (err){
+                console.log(err);
                 process_undefined_err(err, resp);
             }
             else{
@@ -190,6 +200,7 @@ function process_new_room(req_obj, resp){
                 else{
                     var room_number = (db.room_start_number + userid * 10) + n;
                     create_new_room_for_user(userid, gameid, room_number, game_rounds, ip_cheat_proof, gps_cheat_proof,
+                    fee_stuff_id, fee_amount_per_player, fee_creator_pay_all, stake_stuff_id, stake_base_score,
                     function(err){
                         process_undefined_err(err, resp);
                     },
@@ -199,7 +210,7 @@ function process_new_room(req_obj, resp){
                             resp.end(resp_pack);
                         }
                         else{
-                            var resp_pack = create_success_response("cmd", "OK");
+                            var resp_pack = create_success_response(cmd, "OK");
                             resp.end(resp_pack);
                         }
                     });
@@ -212,18 +223,23 @@ function process_new_room(req_obj, resp){
     }
 }
 
-function create_new_room_for_user(userid, gameid, room_number, round_num, ip_exclude, gps_exclude, err_callback, result_callback){
+function create_new_room_for_user(userid, gameid, room_number, round_num, ip_exclude, gps_exclude,
+                                  fee_stuff_id, fee_amount_per_player, fee_creator_pay_all, stake_stuff_id, stake_base_score,
+                                  err_callback, result_callback){
     try{
-        var sql = "insert into room(userid, gameid, room_no, round_num, ex_ip_cheat, ex_gps_cheat) values({0},{1},{2},{3},{4},{5})";
-        sql = sql.format(userid, gameid, room_number,round_num, ip_exclude, gps_exclude);
+        var sql = "insert into room(userid, gameid, room_no, round_num, ex_ip_cheat, ex_gps_cheat" +
+            ",fee_stuff_id, fee_amount_per_player, fee_creator_pay_all, stake_stuff_id, stake_base_score) values({0},{1},{2},{3},{4},{5}" +
+            ",{6},{7},{8},{9},{10})";
+        sql = sql.format(userid, gameid, room_number,round_num, ip_exclude, gps_exclude,
+            fee_stuff_id, fee_amount_per_player, fee_creator_pay_all, stake_stuff_id, stake_base_score);
         conn.query(sql, function(err, result){
            if(err){
                if(err_callback){
                    err_callback(err);
                }
-               else if(result_callback){
-                   result_callback(errors.cbt_room_created_ok);
-               }
+           }
+           else if(result_callback){
+               result_callback(errors.cbt_room_created_ok);
            }
         });
     }
