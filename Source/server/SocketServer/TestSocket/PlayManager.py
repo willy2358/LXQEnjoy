@@ -328,40 +328,43 @@ def process_client_request(conn, req_json):
             player = Players[user_id]
             if player.get_socket_conn() != conn:
                 if player.get_is_online():
-                    send_msg_to_client_connection(conn, "Already in game, try reconnect to refresh connection")
+                    send_msg_to_client_connection(conn, "Already in game")
                     return
                 else:
                     player.update_connection(conn)
                     return
-                # if req_json[InterProtocol.player_auth_token] != player.get_session_token():
-                #     send_msg_to_client_connection("Wrong player token")
-                #     returnß
-                # else:
-                #player.update_connection(conn)
         if player:
             player.update_last_alive()
 
-        if req_json[InterProtocol.sock_req_cmd].lower() == InterProtocol.client_req_type_reconnect:
-            player.update_connection(conn)
-
-        if req_json[InterProtocol.room_id] > InterProtocol.min_room_id:
-            if req_json[InterProtocol.sock_req_cmd].lower() == InterProtocol.client_req_type_join_game \
-                    and req_json[InterProtocol.room_id] not in Rooms:
-                create_room_from_db(req_json[InterProtocol.room_id], req_json[InterProtocol.game_id])
-
-            if req_json[InterProtocol.room_id] in Rooms:
-                Rooms[req_json[InterProtocol.room_id]].process_player_cmd_request(player, req_json)
-        else:
-            # process_lobby_player_request(player, req_json)
+        roomid = str(req_json[InterProtocol.room_id])
+        if roomid == "-1":
             Lobby.process_player_request(player, req_json)
+        else:
+            room = get_room(roomid)
+            if not room:
+                send_msg_to_client_connection(conn, "wrong room number")
+            else:
+                room.process_player_cmd_request(player, req_json)
 
     except Exception as ex:
         Log.write_exception(ex)
 
-# def update_round_stage(client_conn):
-#     player = get_player_client_from_conn(client_conn)
-#     round = player.get_game_round()
-#     round.test_and_update_current_stage()
+def get_room(cmd, room_id, game_id):
+    if room_id in Rooms:
+        return Rooms[room_id]
+
+    if cmd.lower() == InterProtocol.client_req_type_join_game.lower():
+        if room_id.startswith("LX"):
+            return create_room_from_db(room_id, game_id)
+        elif check_is_room_created(room_id, game_id):
+            return create_room_from_db(room_id, game_id)
+        else:
+            return None
+    else:
+        return None   # should join game first
+
+def check_is_room_created(roomid, game_id):
+    return True
 
 
 def get_player_client_from_conn(conn):
@@ -416,6 +419,7 @@ def create_room_from_db(room_id, rule_id):
     room.set_min_seated_player_num(3)
     room.set_max_seated_player_num(3)
     Rooms[room_id] = room
+    return room
 
 def process_client_disconnected(conn):
     player = get_player_client_from_conn(conn)

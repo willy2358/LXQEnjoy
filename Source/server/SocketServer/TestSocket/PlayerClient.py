@@ -71,6 +71,7 @@ class PlayerClient:
     def update_connection(self, conn):
         self.__socket__conn = conn
         self.set_is_online(True)
+        self.update_last_alive()
 
         cmd_str_bak = self.__last_sent_cmd_str
         pack = InterProtocol.create_cards_state_packet(self)
