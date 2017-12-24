@@ -28,6 +28,9 @@ exports = module.exports = Object.freeze({
     req_room_game_stake_stuff_id: "stake_stuff_id",
     req_room_game_stake_base_score:"stake_base_score",
 
+    resp_user:"user",
+    resp_userid:"userid",
+    resp_username:"username",
 
     game_id: "gameid",
     game_name: "gamename",

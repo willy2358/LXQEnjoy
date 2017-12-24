@@ -1,4 +1,15 @@
 
+概述
+本套通讯接口由两部分组成
+一. http restful API，采用客户端请求，服务器响应的单向的方式
+二. socket dual API，采用客户端建立到socket服务器的连接，客户端与服务器双向通讯。
+
+
+两种API的请求和响应的数据，格式都是JSON，
+在socket dual API 中，服务器返回或推送的JSON的数据包是包封在API的签名包中，签名包以"LXQ<(:"开始，以“:)>QXL”结束	，提取API JSON包的
+正则表达式为：LXQ<\(:([\w\W]*?):\)>QXL
+
+
 一、用户信息
 1.用户注册：
 客户端请求：
@@ -14,16 +25,19 @@
 服务器返回：
 {
 	"cmdtype":"httpresp",
+	"httpresp":"newuser",
 	"result":"OK|ERROR",
-	"errmsg":"",
-	"result-data":{"userid":124232，“username”：“LX323532”}
+	”errcode":13,      //错误码, 此项只有result为“ERROR”，才会出现
+	"errmsg":"",       //错误的简单描述，此项只有result为“ERROR”，才会出现
+	"result-data":"user",
+	"user":	{"userid":124232，“username”：“LX323532”}
 }
 说明：
-注册成功：result 为 “OK”，result-data中含有玩家的userid，此userid将用作玩家的唯一标识，用于后续与服务器通信的玩家唯一识别码，username是用户名，此用户名用户切换用户，密码找回等。
+注册成功：result 为 “OK”，result-data为“user”，然后在数据包中会含有一个名字为“user”的对象，
+在user中含有玩家的userid，此userid将用作玩家的唯一标识，用于后续与服务器通信的玩家唯一识别码，username是用户名，此用户名用户切换用户，密码找回等。
 注册失败：result 为“ERROR”，errmsg是错误信息。
 此接口也可用于用户作为游客身份的快速注册，登录，或无账户登录（其实对于服务器来说，这个用户还是有username和password的，只不过这些信息是由客户端按规则默认生成了，以后提供更新用户信息接口，绑定手机号，微信号等。
 设想：用户打开APP就能直接进入游戏界面，无须登录，如果将初次安装，客户端静默使用设备识别码进行注册。对于已使用设备码注过的用户，默认使用设备码登录，这样以来，设备码就成了类似userid的用户标识，也即一机一户。如果用户要再多台设备登录，须在初始的设备上设置有关密码，或绑定手机，微信。然后在其他设备上切换登录。
-
 
 
 2.用户登录：
@@ -37,7 +51,7 @@
 	"cmdtype":"httpreq",
 	"httpreq":"login",
 	"userid":2134,
-	"dev-id":"124323", //设备识别码，PC端Mac地址
+	"devid":"124323", //设备识别码，PC端Mac地址
 	
 }
 服务器返回：
@@ -298,7 +312,12 @@ user-info，用户信息，具体待定
  	cmdtype: 'httpresp',
   	httpresp: 'newroom',
   	result: 'OK|ERROR',
-  	'result-data': 'OK' 
+
+  	'result-data': 'room',
+  	room: {
+  			room_num: 12345678    //房间号，8位数字
+  		  }
+
   }
 
 二、进入游戏

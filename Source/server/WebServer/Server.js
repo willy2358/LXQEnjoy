@@ -54,12 +54,13 @@ function generate_session_token(userid) {
     return vid;
 }
 
-function create_error_repsonse(cmd, errMsg) {
+function create_error_repsonse(cmd, errMsg, errCode) {
     var pack = {
         cmdtype: api_protocal.cmd_type_httpresp,
         httpresp: cmd,
         result: api_protocal.cmd_resp_ERROR,
-        errmsg: errMsg
+        errmsg: errMsg,
+        errcode:errCode
     };
 
     return JSON.stringify(pack);
@@ -72,6 +73,24 @@ function create_success_response(cmd, msg) {
         "result": api_protocal.cmd_resp_OK,
         "result-data": msg
     };
+    return JSON.stringify(pack);
+}
+
+function create_successs_resp_pack(cmd, result_name, result_data) {
+    var pack = {
+        cmdtype: api_protocal.cmd_type_httpresp,
+        httpresp:cmd,
+        result:api_protocal.cmd_resp_OK,
+        "result-data":result_name,
+    }
+
+    pack[result_name] = result_data;
+    return pack;
+}
+
+function create_success_resp(cmd, result_name, result_data) {
+    pack = create_successs_resp_pack(cmd, result_name, result_data);
+
     return JSON.stringify(pack);
 }
 
@@ -450,8 +469,8 @@ function process_new_user(req_obj, resp) {
                             resp.end(resp_str);
                         },
                         function(userObj){
-                            var user_str = JSON.stringify(userObj);
-                            var resp_str = create_success_response(cmd, user_str);
+                            // var user_str = JSON.stringify(userObj);
+                            var resp_str = create_success_resp(cmd, api_protocal.resp_user, userObj);
                             resp.end(resp_str);
                         }
                     );

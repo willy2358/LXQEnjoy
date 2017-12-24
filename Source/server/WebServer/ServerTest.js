@@ -4,7 +4,7 @@ var request = require('request')
 var newUserReq = {
 	cmdtype:"httpreq",
 	httpreq: "newuser",
-	devid: "wqrrrq",
+	devid: "wqrrrq21",
 }
 
 var loginReq = {
@@ -57,7 +57,7 @@ request({
     url: "http://0.0.0.0:8081/service",
     method: "POST",
     json: true,   // <--Very important!!!
-    body: createRoomReq,
+    body: newUserReq,
 }, function (error, response, body){
     console.log(response);
     console.log("body");
