@@ -1,4 +1,5 @@
 import json
+import Errors
 
 import CardsMaster
 import InterProtocol
@@ -288,11 +289,11 @@ def dispatch_player_commands(conn, comm_text):
         j_obj = json.loads(comm_text)
     except Exception as ex:
         print(ex)
-        send_msg_to_client_connection(conn, "Invalid request format")
+        send_err_pack_to_client(conn, 'unknown', Errors.invalid_packet_format)
         return
 
     if not validate_player(j_obj):
-        send_msg_to_client_connection(conn, "Invalid request parameters")
+        send_err_pack_to_client(conn, "invalid", Errors.invalid_request_parameter)
         return
 
     try:
@@ -302,21 +303,28 @@ def dispatch_player_commands(conn, comm_text):
         Log.write_exception(ex)
         print(ex)
 
-def send_msg_to_client_connection(conn, msg):
+
+def send_msg_to_client(conn, msg):
+
     try:
         conn.sendall(msg.encode(encoding="utf-8"))
     except Exception as ex:
         Log.write_exception(ex)
 
+def send_err_pack_to_client(clientConn, cmd, errCode):
+    err_pack = InterProtocol.create_error_pack(cmd, errCode);
+    err_str = json.dumps(err_pack)
+    send_msg_to_client(err_str)
 
 def send_welcome_to_new_connection(conn):
     welcome_msg = "welcome,just enjoy!"
-    send_msg_to_client_connection(conn, welcome_msg)
+    send_msg_to_client(conn, welcome_msg)
 
 
 def process_client_request(conn, req_json):
     try:
         player = None
+        cmd = req_json[InterProtocol.sock_req_cmd]
         user_id = req_json[InterProtocol.user_id]
         if user_id not in Players:
             player = PlayerClient(conn, user_id)
@@ -328,7 +336,7 @@ def process_client_request(conn, req_json):
             player = Players[user_id]
             if player.get_socket_conn() != conn:
                 if player.get_is_online():
-                    send_msg_to_client_connection(conn, "Already in game")
+                    send_err_pack_to_client(conn, cmd, Errors.player_already_in_game)
                     return
                 else:
                     player.update_connection(conn)
@@ -337,12 +345,12 @@ def process_client_request(conn, req_json):
             player.update_last_alive()
 
         roomid = str(req_json[InterProtocol.room_id])
-        if roomid == "-1":
+        if not roomid or roomid == "-1" or roomid == "0" or roomid.lower() == "null" or roomid.lower() == "none":
             Lobby.process_player_request(player, req_json)
         else:
-            room = get_room(roomid)
+            room,err = get_room(cmd, roomid, req_json[InterProtocol.game_id])
             if not room:
-                send_msg_to_client_connection(conn, "wrong room number")
+                send_err_pack_to_client(conn, cmd, err)
             else:
                 room.process_player_cmd_request(player, req_json)
 
@@ -351,19 +359,20 @@ def process_client_request(conn, req_json):
 
 def get_room(cmd, room_id, game_id):
     if room_id in Rooms:
-        return Rooms[room_id]
+        return Rooms[room_id],0
 
-    if cmd.lower() == InterProtocol.client_req_type_join_game.lower():
+    if cmd.lower() == InterProtocol.client_req_cmd_enter_room.lower():
         if room_id.startswith("LX"):
             return create_room_from_db(room_id, game_id)
-        elif check_is_room_created(room_id, game_id):
-            return create_room_from_db(room_id, game_id)
         else:
-            return None
+            if check_is_valid_room_no(room_id, game_id):
+                return create_room_from_db(room_id, game_id)
+            else:
+                return None, Errors.wrong_room_number
     else:
-        return None   # should join game first
+        return None, Errors.did_not_call_enter_room
 
-def check_is_room_created(roomid, game_id):
+def check_is_valid_room_no(roomid, game_id):
     return True
 
 
@@ -388,7 +397,7 @@ def remove_dead_connection():
         room = player.get_my_room()
         if room:
             room.remove_player(player)
-        send_msg_to_client_connection(conn,"disconnected as dead connection")
+        send_msg_to_client(conn, "disconnected as dead connection")
         Players.pop(item[0])
         Conn_Players.pop(item[1])
         conn.close()

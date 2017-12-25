@@ -1,4 +1,6 @@
 
+import Errors
+
 cmd_type = "cmdtype"
 sock_req_cmd = "sockreq"
 sock_resp = "sockresp"
@@ -6,16 +8,18 @@ sock_result = "result"
 sock_result_error = "ERROR"
 sock_result_ok = "OK"
 sock_error_message = "errmsg"
+sock_error_code = "errcode"
 
 
 
-client_req_type_join_game = "join-game"   # 开始游戏
+client_req_cmd_join_game = "join-game"   # 开始游戏
 client_req_select_action = "sel-act"
 client_req_type_reconnect = "reconnect"   # 断线重连
 client_req_type_exe_cmd = "exe-cmd"
 client_req_exe_cmd = "cmd"
 client_req_cmd_param = "cmd-data"
 client_req_robot_play = "robot-play"
+client_req_cmd_enter_room = "enter-room"
 
 player_auth_token = "user_token"
 
@@ -163,8 +167,19 @@ def create_cmd_options_json_packet(player, cmd_options, def_cmd=None, resp_timeo
     return packet
 
 
-def create_error_json_packet(player, err_msg):
-    pass
+# def create_error_json_packet(player, err_msg):
+#     pass
+
+def create_error_pack(req_cmd, errCode):
+    pack = {
+        cmd_type: sock_resp,
+        sock_resp:req_cmd,
+        sock_result:sock_result_error,
+        sock_error_code:errCode,
+        sock_error_message:Errors.Errors[errCode]
+    }
+
+    return pack
 
 
 def create_publish_bank_player_json_packet(bank_player):

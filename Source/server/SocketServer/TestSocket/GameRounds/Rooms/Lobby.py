@@ -13,12 +13,12 @@ def process_player_join_game(player, req_json):
     else:
         play_round = get_available_game_round(req_json[InterProtocol.game_id])
         play_round.add_player(player)
-        player.send_success_messsage(InterProtocol.client_req_type_join_game)
+        player.send_success_messsage(InterProtocol.client_req_cmd_join_game)
         play_round.test_and_update_current_stage()
 
 
 def process_player_request(player, req_json):
-    if req_json[InterProtocol.sock_req_cmd].lower() == InterProtocol.client_req_type_join_game:
+    if req_json[InterProtocol.sock_req_cmd].lower() == InterProtocol.client_req_cmd_join_game:
         process_player_join_game(player, req_json)
 
 

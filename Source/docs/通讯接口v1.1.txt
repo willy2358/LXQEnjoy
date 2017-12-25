@@ -381,7 +381,7 @@ user-info，用户信息，具体待定
 	"cmdtype":"sockreq",
 	"sockreq":"join-game"
 	"userid":123456,
-	"roomid":123333,
+	"roomid":123333,  //roomid为0，-1，或空时，为进入游戏大厅
 	"gameid":123432
 	"token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN"
 }

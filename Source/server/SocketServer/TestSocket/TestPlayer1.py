@@ -3,9 +3,17 @@ import InterProtocol
 import json
 
 roomid = "LX888";
+# roomid = 888
 # client = SocketClient.SocketClient("117.78.40.54", 9229)
 client = SocketClient.SocketClient("127.0.0.1", 9229)
 client.run()
+
+cmd = '{"cmdtype":"sockreq","sockreq":"enter-room","userid":111,"roomid":' +'"' + roomid +'","gameid":"m1"}'
+# cmd = '{"cmdtype":"sockreq","sockreq":"enter-room","userid":111,"roomid":' + roomid +',"gameid":"m1"}'
+client.send_message(cmd)
+
+line = input("press any key to join game")
+
 cmd = '{"cmdtype":"sockreq","sockreq":"join-game","userid":111,	"roomid":' + roomid +',"gameid":"m1"}'
 client.send_message(cmd)
 print('sent: ' + cmd)
