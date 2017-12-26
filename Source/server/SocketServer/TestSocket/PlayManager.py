@@ -314,7 +314,7 @@ def send_msg_to_client(conn, msg):
 def send_err_pack_to_client(clientConn, cmd, errCode):
     err_pack = InterProtocol.create_error_pack(cmd, errCode);
     err_str = json.dumps(err_pack)
-    send_msg_to_client(err_str)
+    send_msg_to_client(clientConn, err_str)
 
 def send_welcome_to_new_connection(conn):
     welcome_msg = "welcome,just enjoy!"
@@ -363,10 +363,10 @@ def get_room(cmd, room_id, game_id):
 
     if cmd.lower() == InterProtocol.client_req_cmd_enter_room.lower():
         if room_id.startswith("LX"):
-            return create_room_from_db(room_id, game_id)
+            return create_room_from_db(room_id, game_id), Errors.ok
         else:
             if check_is_valid_room_no(room_id, game_id):
-                return create_room_from_db(room_id, game_id)
+                return create_room_from_db(room_id, game_id), Errors.ok
             else:
                 return None, Errors.wrong_room_number
     else:

@@ -564,6 +564,7 @@ score > 0 赢的分数，score < 0 输的分数
 	"sockreq":"play-cards",
 	"userid":124242,
 	"roomid":123,
+	"gameid":123,
 	"token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN"
 	"cards": [11],
 }
@@ -574,6 +575,7 @@ score > 0 赢的分数，score < 0 输的分数
 	"cmdtype":"sockreq",
 	"sockreq":"exe-cmd",  //执行命令
 	"userid":124122,
+	"gameid":234,
 	"roomid",123,
 	"token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN"
 	"cmd":"peng", //此命令来自服务器推送的命令列表
@@ -591,6 +593,7 @@ score > 0 赢的分数，score < 0 输的分数
 	"userid":123,
 	"token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN"
     "Roomid":123,
+    "gameid":123,
 }
 socket服务器返回：
 {

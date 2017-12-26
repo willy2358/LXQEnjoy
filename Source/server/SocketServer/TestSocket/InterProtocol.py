@@ -17,9 +17,10 @@ client_req_select_action = "sel-act"
 client_req_type_reconnect = "reconnect"   # 断线重连
 client_req_type_exe_cmd = "exe-cmd"
 client_req_exe_cmd = "cmd"
-client_req_cmd_param = "cmd-data"
+client_req_cmd_param = "cmd-param"
 client_req_robot_play = "robot-play"
 client_req_cmd_enter_room = "enter-room"
+client_req_play_cards = "play-cards"
 
 player_auth_token = "user_token"
 

@@ -56,7 +56,7 @@ class PlayMajiang(PlayInTurn):
         rule = game_round.get_rule()
         players_cmd_opts = []
         for p in listeners:
-            cmd_opts = rule.get_player_cmd_options_for_cards(p, [played_card], p == listeners[0], True)
+            cmd_opts = rule.get_player_cmd_options_for_cards(p, played_card, p == listeners[0], True)
             if cmd_opts:
                 players_cmd_opts.append({
                     "player":p,
@@ -68,6 +68,7 @@ class PlayMajiang(PlayInTurn):
             next_player = listeners[0]
             game_round.deal_cards_for_player(next_player, 1)
             cmd_opts = rule.get_player_cmd_options_for_cards(next_player, [], True, False)
+            def_cmd = None
             if not cmd_opts:
                 def_cmd = PlayCmd(next_player, InterProtocol.majiang_player_act_play_card)
                 def_cmd.set_cmd_param(PlayMajiang.get_player_default_play_card(next_player))

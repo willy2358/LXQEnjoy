@@ -49,8 +49,16 @@ class SocketClient:
         while self.__isRun:
             try:
                 buf = self.__mySock.recv(1024)
+                if not buf:
+                    print("client closed")
+                    break
                 data = buf.decode('utf-8')
-                print('Received:' + data)
+                parts = data.split(":)>QXL");
+                for p in parts:
+                    if len(p) > 5:
+                        print('Received:' + p)
+                        print("\r\n")
+
             except Exception as ex:
                 print(ex)
                 self.__isRun = False

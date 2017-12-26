@@ -177,19 +177,19 @@ class PlayerClient:
         # self.__final_cards = cards_not_in_hand
 
     def move_cards_to_frozen(self, cards_in_hand, cards_not_in_hand):
-        if isinstance(cards_in_hand, type(int)):
+        if isinstance(cards_in_hand, type(1)):
             self.__frozen_cards.append(cards_in_hand)
         elif isinstance(cards_in_hand, type([])):
             self.__frozen_cards = self.__frozen_cards + cards_in_hand
 
-        if isinstance(cards_not_in_hand, type(int)):
+        if isinstance(cards_not_in_hand, type(1)):
             self.__frozen_cards.append(cards_not_in_hand)
         elif isinstance(cards_not_in_hand, type([])):
             self.__frozen_cards = self.__frozen_cards + cards_not_in_hand
 
         for c in cards_in_hand:
             self.__active_cards.remove(c)
-        self.__cards_in_hand = self.__cards_in_hand + cards_not_in_hand
+        self.__cards_in_hand = self.__cards_in_hand + [cards_not_in_hand]
 
     def add_shown_card_group(self, cards_group):
         self.__shown_card_groups.append(cards_group)
@@ -247,9 +247,8 @@ class PlayerClient:
                 self.__active_cards.remove(cards)
             elif isinstance(cards, list):
                 Utils.list_remove_parts(self.__cards_in_hand, cards)
-                for c in cards:
-                    self.__active_cards.remove(c)
-                    self.__cards_in_hand.remove(c)
+                Utils.list_remove_parts(self.__active_cards, cards)
+                Utils.list_remove_parts(self.__cards_in_hand, cards)
             else:
                 pass
         except Exception as ex:

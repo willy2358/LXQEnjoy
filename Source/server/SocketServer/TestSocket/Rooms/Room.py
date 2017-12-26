@@ -80,6 +80,14 @@ class Room:
                 const_param = InterProtocol.client_req_cmd_param
                 cmd_param = req_json[const_param] if const_param in req_json else None
                 self._current_round.process_player_execute_command(player, cmd, cmd_param)
+        elif req_cmd == InterProtocol.client_req_play_cards:
+            if InterProtocol.cmd_data_cards not in req_json:
+                err = InterProtocol.create_request_error_packet(req_cmd)
+                player.send_server_cmd_packet(err)
+            else:
+                cards = req_json[InterProtocol.cmd_data_cards]
+                self._current_round.process_player_execute_command(player, InterProtocol.client_req_play_cards, cards)
+
         elif req_cmd == InterProtocol.client_req_robot_play:
             flag = str(req_json[InterProtocol.client_req_robot_play])
             if flag.lower().startswith('y'):
