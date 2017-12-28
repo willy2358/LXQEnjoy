@@ -31,6 +31,11 @@ exports = module.exports = Object.freeze({
     resp_user:"user",
     resp_userid:"userid",
     resp_username:"username",
+    resp_session_token:"session-token",
+    resp_games:"games",
+    resp_login:"login",
+    resp_room:"room",
+
 
     game_id: "gameid",
     game_name: "gamename",

@@ -24,12 +24,28 @@ sockresp:socket服务器向客户端发送的socket应答
 	”errcode":11,      //错误码
 	"errmsg":"",       //错误的简单描述
 }
+或者
+{
+	"cmdtype":"sockresp",
+	"sockresp":"客户端发送的命令",
+	"result":"ERROR",
+	”errcode":11,      //错误码
+	"errmsg":"",       //错误的简单描述
+}
 
 如果API调用成功，resutl的值为“OK”，会在返回的数据包中，含有一个“result-data”的字段，这个字段的值是个字符串，当字符串不为空时（比如“user”），表示数据包中还包括一个以字符串命名的对象。
 成功包的格式如下：
 {
 	"cmdtype":"httpresp",
 	"httpresp":"客户端的发送的命令",
+	"result":"OK",
+	"result-data":"user",  //此处的user为示例数据
+	"user":	{"userid":124232，“username”：“LX323532”}
+}
+
+{
+	"cmdtype":"sockresp",
+	"sockresp":"客户端的发送的命令",
 	"result":"OK",
 	"result-data":"user",  //此处的user为示例数据
 	"user":	{"userid":124232，“username”：“LX323532”}

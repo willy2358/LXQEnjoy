@@ -166,13 +166,9 @@ function process_get_games(req_obj, resp){
                    }
                    gs.push(game);
                }
-               var gsObj = {
-                   games:gs,
-               }
-               console.log(gsObj);
-               var resp_pack = create_success_ext_response(cmd, gsObj, "OK");
-               console.log(resp_pack)
-               resp.end(resp_pack);
+
+               var resp_str = create_success_resp(cmd, api_protocal.resp_games, gs);
+               resp.end(resp_str);
            }
         });
     }
@@ -229,8 +225,13 @@ function process_new_room(req_obj, resp){
                             resp.end(resp_pack);
                         }
                         else{
-                            var resp_pack = create_success_response(cmd, "OK");
-                            resp.end(resp_pack);
+                            room = {
+                                "room_num":room_number
+                            }
+
+                            var resp_str = create_success_resp(cmd, api_protocal.resp_room, room);
+                            // var resp_str = create_success_response(cmd, "OK");
+                            resp.end(resp_str);
                         }
                     });
                 }
@@ -634,11 +635,15 @@ function process_login(req_obj, resp) {
                     },
                     function (token) {
                     if (token){
-                        var extProps = {
-                            "session-token":token
+                        var loginObj = {
+                            "session-token":token,
+                            "user-info":{
+                                "userid":user_id,
+                            }
                         };
-                        var resp_str = create_success_ext_response(cmd, extProps, "");
+                        var resp_str = create_success_resp(cmd, api_protocal.resp_login, loginObj);
                         resp.end(resp_str);
+
                     }
                     else{
                         var resp_str = create_error_repsonse(cmd, errors.ERROR_FAILED_LOGIN);

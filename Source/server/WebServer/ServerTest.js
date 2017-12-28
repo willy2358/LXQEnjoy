@@ -1,5 +1,6 @@
 
 var request = require('request')
+var devid = "wqrrrq21";
 
 var newUserReq = {
 	cmdtype:"httpreq",
@@ -10,8 +11,8 @@ var newUserReq = {
 var loginReq = {
     cmdtype:"httpreq",
     httpreq:"login",
-    userid:22,
-    devid:"wqrrrq",
+    userid:29,
+    devid:devid,
 }
 
 var setPwdReq ={
@@ -38,7 +39,7 @@ var getGamesReq = {
 var createRoomReq = {
     cmdtype:"httpreq",
     httpreq:"newroom",
-    userid:22,
+    userid:29,
     gameid:111,
     same_ip_exclude:1,
     near_gps_exclude:0,
@@ -57,7 +58,7 @@ request({
     url: "http://0.0.0.0:8081/service",
     method: "POST",
     json: true,   // <--Very important!!!
-    body: newUserReq,
+    body: createRoomReq,
 }, function (error, response, body){
     console.log(response);
     console.log("body");
