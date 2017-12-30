@@ -266,25 +266,25 @@ class GameRound:
                     self.__cur_stage.on_player_selected_action(self, player, cmd, cmd_param, silent_cmd)
                 except Exception as ex:
                     print(ex)
-                    player.send_command_message(str(ex))
+                    player.send_api_pack_msg_str(str(ex))
 
     def is_player_cmd_valid(self, player, cmd, cmd_param):
         if not self.__player_waiting_for_cmd_resp:
             err = "Invalid player:" + str(player.get_user_id())
-            player.send_command_message(err)
+            player.send_api_pack_msg_str(err)
             print(err)
             return False
         if player != self.__player_waiting_for_cmd_resp:
             err = "Invalid player:" + str(player.get_user_id())  \
                  + ",expected:" + str(self.__player_waiting_for_cmd_resp.get_user_id())
-            player.send_command_message(err)
+            player.send_api_pack_msg_str(err)
             print(err)
             return False
         for c in self.__cmds_opts_waiting_for_resp:
             if c.get_cmd() == cmd:
                 return True
         err = "Invalid cmd:" + cmd
-        player.send_command_message(err)
+        player.send_api_pack_msg_str(err)
         print(err)
         return False
 

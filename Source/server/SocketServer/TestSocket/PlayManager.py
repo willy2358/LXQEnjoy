@@ -427,6 +427,7 @@ def create_room_from_db(room_id, rule_id):
 
     room.set_min_seated_player_num(3)
     room.set_max_seated_player_num(3)
+    room.set_max_player_number(3)
     Rooms[room_id] = room
     return room
 

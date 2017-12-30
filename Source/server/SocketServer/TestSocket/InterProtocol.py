@@ -9,6 +9,7 @@ sock_result_error = "ERROR"
 sock_result_ok = "OK"
 sock_error_message = "errmsg"
 sock_error_code = "errcode"
+sock_result_data = "result-data"
 
 
 
@@ -77,6 +78,16 @@ majiang_acts_priorities = [majiang_player_act_zimo, majiang_player_act_hu,
                            majiang_player_act_play_card, majiang_player_act_pass ]
 
 min_room_id = 10   # valid room id should > 10
+
+def create_success_resp_pack(cmd):
+    packet = {
+        cmd_type: sock_resp,
+        sock_resp: cmd,
+        sock_result: sock_result_ok,
+        sock_result_data:""
+    }
+
+    return packet
 
 def create_cards_state_packet(player):
     packet = {

@@ -154,7 +154,7 @@ user-info，用户信息，具体待定
 {
 	"cmdtype":"httpreq",
 	"httpreq":"login-username",
-	"username":"124323", //用户手机号
+	"username":"124323", //用户名，以LX开头的一个随机数字串
 	"password":"pwd", //用户的密码，须为用户密码在客户端md5加密后的值
 }
 服务器返回：
@@ -415,13 +415,18 @@ user-info，用户信息，具体待定
 {
 	"cmdtype":"sockpush",
 	"sockpush":"game-players",
-	"players": [{"userid": 111}, {"userid": 222}, {"userid": 333}] //玩家按照入场顺序排序
+	"players": [{"userid": 111, 
+				"seated":1, //是否已入座，1:入座；0: 未入座
+				}, 
+				{"userid": 222
+				“seated":0,
+				}, {"userid": 333}] //玩家按照入场顺序排序
 }
 示例：
 {
 	"cmdtype": "sockpush",
  	"sockpush": "game-players", 
- 	"players": [{"userid": 111}, {"userid": 222}, {"userid": 333}]
+ 	"players": [{"userid": 111,"seated":0}, {"userid": 222,"seated":1}, {"userid": 333,"seated":1}]
 }
 
 4.2组局成功，发牌

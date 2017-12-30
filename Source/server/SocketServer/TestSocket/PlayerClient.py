@@ -132,7 +132,7 @@ class PlayerClient:
     def get_socket_conn(self):
         return self.__socket__conn
 
-    def send_command_message(self, msg):
+    def send_api_pack_msg_str(self, msg):
         gamepack = "LXQ<(:" + msg + ":)>QXL"
         self.__last_sent_cmd_str = gamepack
         self.send_raw_network_data(gamepack)
@@ -145,13 +145,13 @@ class PlayerClient:
             Log.write_exception(ex)
 
     def begin_new_deal(self):
-        self.send_command_message(PlayManager.SERVER_CMD_DEAL_BEGIN)
+        self.send_api_pack_msg_str(PlayManager.SERVER_CMD_DEAL_BEGIN)
 
     def finish_new_deal(self):
         cmd = {"cmd": PlayManager.SERVER_CMD_DEAL_FINISH,
                "recv-resp" :  "resp-" + PlayManager.SERVER_CMD_DEAL_FINISH}
         j_str = json.dumps(cmd)
-        self.send_command_message(j_str)
+        self.send_api_pack_msg_str(j_str)
 
     def set_bank_cards(self, cards):
         self.add_dealed_cards(cards)
@@ -166,7 +166,7 @@ class PlayerClient:
         cards2 = self.__shown_card_groups[:]
         cards2.sort()
         str2 = ";freezed cards:" + str(cards2)
-        self.send_command_message(str1 + str2)
+        self.send_api_pack_msg_str(str1 + str2)
 
     # def move_cards_to_freeze_group(self, cards_in_hand, cards_not_in_hand):
     #     group = cards_in_hand + cards_not_in_hand
@@ -201,29 +201,29 @@ class PlayerClient:
 
         pack = InterProtocol.create_cards_state_packet(self)
         j_str = json.dumps(pack)
-        self.send_command_message(j_str)
+        self.send_api_pack_msg_str(j_str)
 
         # self.send_cards_state() # for viewing data in test client
 
         j_str = json.dumps(cmd_pack_obj)
-        self.send_command_message(j_str)
+        self.send_api_pack_msg_str(j_str)
 
-    def send_error_message(self, req_cmd, errmsg):
-        Log.write_error(errmsg)
-        msg = {"cmdtype": "sockresp",
-               "sockresp":req_cmd,
-               "result":"ERROR",
-               "errmsg":errmsg}
-        j_str = json.dumps(msg)
-        self.send_command_message(j_str)
-
-    def send_success_message(self, req_cmd):
-        msg = {"cmdtype": "sockresp",
-                    "sockresp":req_cmd,
-                    "result":"OK",
-                    "errmsg":""}
-        j_str = json.dumps(msg)
-        self.send_command_message(j_str)
+    # def send_error_message(self, req_cmd, errmsg):
+    #     Log.write_error(errmsg)
+    #     msg = {"cmdtype": "sockresp",
+    #            "sockresp":req_cmd,
+    #            "result":"ERROR",
+    #            "errmsg":errmsg}
+    #     j_str = json.dumps(msg)
+    #     self.send_api_pack_msg_str(j_str)
+    #
+    # def send_success_message(self, req_cmd):
+    #     msg = {"cmdtype": "sockresp",
+    #                 "sockresp":req_cmd,
+    #                 "result":"OK",
+    #                 "errmsg":""}
+    #     j_str = json.dumps(msg)
+    #     self.send_api_pack_msg_str(j_str)
 
     # def set_initial_cards(self, cards):
     #     self.__initial_cards = cards[:]
@@ -253,7 +253,7 @@ class PlayerClient:
                 pass
         except Exception as ex:
             print(ex)
-            self.send_command_message(str(ex))
+            self.send_api_pack_msg_str(str(ex))
 
     def set_banker(self):
         self.__is_banker = True

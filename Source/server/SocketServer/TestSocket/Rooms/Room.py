@@ -1,7 +1,8 @@
 import threading
 
 import InterProtocol
-from GameRounds.GameRound_Majiang import GameRound_Majiang
+import Errors
+import Log
 
 
 class Room:
@@ -9,16 +10,19 @@ class Room:
         self._room_id = room_id
         self._game_rule = game_rule
         self._seated_players = []
-        self._lookon_players = []
+        # self._lookon_players = []
+        self._all_players = []
         self._max_seated_players = 0
         self._min_seated_players = 0
-        self._max_lookon_players = 0
+        # self._max_lookon_players = 0
+        self._max_players_number = 0
         self._round_num = 2
         self._current_round_order = 0
         self._current_round = None
         self._last_winners = []
         self._players_total_score = {}
         self._lock_join_game = threading.Lock()
+        self._lock_enter_room = threading.Lock()
 
     def is_player_in(self, player):
         return player in self._seated_players
@@ -41,8 +45,11 @@ class Room:
     def can_new_player_seated(self):
         return len(self._seated_players) < self._max_seated_players
 
-    def can_new_player_lookon(self):
-        return len(self._lookon_players) < self._max_lookon_players
+    # def can_new_player_lookon(self):
+    #     return len(self._lookon_players) < self._max_lookon_players
+
+    def can_new_player_enter(self):
+        return len(self._all_players) < self._max_players_number
 
     def add_seated_player(self, player):
         if self.can_new_player_seated():
@@ -54,22 +61,38 @@ class Room:
     def remove_player(self, player):
         if player in self._seated_players:
             self._seated_players.remove(player)
-        if player in self._lookon_players:
-            self._lookon_players.remove(player)
+        if player in self._all_players:
+            self._all_players.remove(player)
         
-    def add_lookon_player(self, player):
-        if self.can_new_player_lookon():
-            self._lookon_players.append(player)
-            return True
-        else:
-            return False
+    # def add_lookon_player(self, player):
+    #     if self.can_new_player_lookon():
+    #         self._lookon_players.append(player)
+    #         return True
+    #     else:
+    #         return False
+    #
+    def add_new_enter_player(self, player):
+        try:
+            if self._lock_enter_room.acquire(5):
+                if self.can_new_player_enter():
+                    self._all_players.append(player)
+                    return True, Errors.ok
+                else:
+                    return False, Errors.room_is_full
+        except Exception as ex:
+            Log.write_exception(ex)
+            return False, Errors.unknown_error
+        finally:
+            self._lock_enter_room.release()
 
     def set_last_winners(self, winners):
         self._last_winners = winners
 
     def process_player_cmd_request(self, player, req_json):
         req_cmd = req_json[InterProtocol.sock_req_cmd].lower()
-        if req_cmd == InterProtocol.client_req_cmd_join_game:
+        if req_cmd == InterProtocol.client_req_cmd_enter_room:
+          self.process_player_enter_room(player)
+        elif req_cmd == InterProtocol.client_req_cmd_join_game:
             self.process_join_game(player)
         elif req_cmd == InterProtocol.client_req_type_exe_cmd:
             if InterProtocol.client_req_exe_cmd not in req_json:
@@ -98,27 +121,39 @@ class Room:
                 err = InterProtocol.create_request_error_packet(req_cmd)
                 player.send_server_cmd_packet(err)
 
+    def process_player_enter_room(self, player):
+        cmd = InterProtocol.client_req_cmd_enter_room
+        if player in self._all_players:
+            resp_pack = InterProtocol.create_error_pack(cmd, Errors.player_already_in_room)
+            player.send_server_cmd_packet(resp_pack)
+        elif not self.can_new_player_enter():
+            resp_pack = InterProtocol.create_error_pack(cmd, Errors.room_is_full)
+            player.send_server_cmd_packet(resp_pack)
+        else:
+            ret, err = self.add_new_enter_player(player)
+            resp_pack = None
+            if ret:
+                resp_pack = InterProtocol.create_success_resp_pack(cmd)
+            else:
+                resp_pack = InterProtocol.create_error_pack(cmd, err)
+            player.send_server_cmd_packet(resp_pack)
+            self.publish_players_status()
+
     def process_join_game(self, player):
         try:
             if self._lock_join_game.acquire(5): # timeout 5 seconds
-                if not self.can_new_player_seated():
-                    player.send_error_message(InterProtocol.client_req_cmd_join_game, "Room is full")
-                    return
-                if self.is_player_in(player):
-                    player.send_error_message(InterProtocol.client_req_cmd_join_game, "Already in room")
-                    return
-                self.add_seated_player(player)
-                player.send_success_message(InterProtocol.client_req_cmd_join_game)
-                self.publish_seated_players()
+                cmd = InterProtocol.client_req_cmd_join_game
+                resp = None
+                if self.can_new_player_seated():
+                    self.add_seated_player(player)
+                    resp = InterProtocol.create_success_resp_pack(cmd)
+                else:
+                    resp = InterProtocol.create_error_pack(cmd, Errors.room_no_empty_seat)
+
+                player.send_server_cmd_packet(resp)
+                self.publish_players_status()
 
                 if self.get_seated_player_count() >= self._min_seated_players:
-                    # game_round = GameRound_Majiang(self._game_rule)
-                    # game_round.set_my_room(self)
-                    # game_round.set_round_end_callback(self.test_continue_next_round)
-                    # for p in self._seated_players:
-                    #     game_round.add_player(p)
-                    # self._current_round = game_round
-                    # game_round.begin_run()
                     self.test_continue_next_round()
 
         except Exception as ex:
@@ -126,14 +161,16 @@ class Room:
         finally:
             self._lock_join_game.release()
 
-    def publish_seated_players(self):
+    def publish_players_status(self):
         players = []
-        for i in range(0, len(self._seated_players)):
-            player = self._seated_players[i]
-            players.append({'userid':player.get_user_id()})
+        for i in range(0, len(self._all_players)):
+            player = self._all_players[i]
+            seated = 1 if player in self._seated_players else 0
+
+            players.append({'userid':player.get_user_id(),'seated': seated})
 
         pack = InterProtocol.create_game_players_packet(players)
-        for p in self._seated_players:
+        for p in self._all_players:
             p.send_server_cmd_packet(pack)
 
     def test_continue_next_round(self):
@@ -170,8 +207,8 @@ class Room:
     def set_min_seated_player_num(self, min_number):
         self._min_seated_players = min_number
 
-    def set_max_lookon_player_num(self, max_number):
-        self._max_lookon_players = max_number
+    def set_max_player_number(self, max_number):
+        self._max_players_number = max_number
 
     def set_round_number(self, number):
         self._round_num = number
