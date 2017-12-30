@@ -201,14 +201,14 @@ var app = express();
 var utils = require('./utils.js');
 
 
-var template = 'select {0}';
-var sql = template.format('hello');
-console.log(sql);
-
-var dev_id = "heelo";
-var template = "select device from user_device where device = '{0}'";
-var sql = template.format(dev_id);
-console.log(sql);
+// var template = 'select {0}';
+// var sql = template.format('hello');
+// console.log(sql);
+//
+// var dev_id = "heelo";
+// var template = "select device from user_device where device = '{0}'";
+// var sql = template.format(dev_id);
+// console.log(sql);
 
 // var api_protocal = require("./api-protocal.js");
 //
@@ -222,15 +222,30 @@ console.log(sql);
 //
 // var s = JSON.stringify(myObj);
 
-var uuid = require('uuid');
+// var uuid = require('uuid');
+//
+// var vid = uuid.v1();
+//
+// console.log(vid);
+//
+// var func = function(args){
+//     console.log(args);
+// }
+//
+// func({aa:123});
 
-var vid = uuid.v1();
+// function test(errCode, errMsg) {
+//     if (errMsg == undefined){
+//         console.log("not defined")
+//     }
+//
+//     console.log("errCode:" + errCode)
+// }
+//
+// test(123);
+//
+// test(111,"hello");
 
-console.log(vid);
-
-var func = function(args){
-    console.log(args);
-}
-
-func({aa:123});
-
+var v1 = " ";
+var v2 = v1||"not defined";
+console.log(v2);
