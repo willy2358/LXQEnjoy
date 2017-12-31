@@ -2,7 +2,7 @@ import SocketClient
 import InterProtocol
 import json
 
-roomid = "LX888"
+roomid = "1256436"
 userid = 111
 gameid = "m1"
 # roomid = 888

@@ -1,5 +1,6 @@
 import json
 import Errors
+import db
 
 import CardsMaster
 import InterProtocol
@@ -425,11 +426,24 @@ def create_room_from_db(room_id, rule_id):
     if isinstance(game_rule, GameRule_Majiang):
         room = Room_Majiang(room_id, game_rule)
 
-    room.set_min_seated_player_num(3)
-    room.set_max_seated_player_num(3)
-    room.set_max_player_number(3)
-    Rooms[room_id] = room
-    return room
+    try:
+        dbConn = db.get_connection()
+        with dbConn.cursor() as cursor:
+            # Read a single record
+            sql = "SELECT `userid`, `room_no`,`gameid`,`round_num` FROM `room` WHERE room_no=%s"
+            cursor.execute(sql, (room_id))
+            result = cursor.fetchone()
+            print(result)
+
+            room.set_min_seated_player_num(3)
+            room.set_max_seated_player_num(3)
+            room.set_max_player_number(3)
+            Rooms[room_id] = room
+            return room
+    except Exception as ex:
+        return None
+
+
 
 def process_client_disconnected(conn):
     player = get_player_client_from_conn(conn)
