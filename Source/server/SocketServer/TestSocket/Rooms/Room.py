@@ -21,8 +21,8 @@ class Room:
         self._current_round = None
         self._last_winners = []
         self._players_total_score = {}
-        self._lock_join_game = threading.Lock()
-        self._lock_enter_room = threading.Lock()
+        self._lock_seated_players = threading.Lock()
+        self._lock_all_players = threading.Lock()
 
     def is_player_in(self, player):
         return player in self._seated_players
@@ -52,12 +52,35 @@ class Room:
         return len(self._all_players) < self._max_players_number
 
     def add_seated_player(self, player):
-        if self.can_new_player_seated():
-            self._seated_players.append(player)
-            player.set_my_room(self)
-            return True
-        else:
-            return False
+        try:
+            if self._lock_seated_players.acquire(5):
+                if self.can_new_player_seated():
+                    self._seated_players.append(player)
+                    player.set_my_room(self)
+                    return True, Errors.ok
+                else:
+                    return False, Errors.room_no_empty_seat
+        except Exception as ex:
+            Log.write_exception(ex)
+            return False, Errors.unknown_error
+        finally:
+            self._lock_seated_players.release()
+
+    def remove_player_from_seat(self, player):
+        try:
+            if self._lock_seated_players.acquire(5):
+                if player in self._seated_players:
+                    self._seated_players.remove(player)
+                    return True, Errors.ok
+                else:
+                    return False, Errors.player_not_in_game
+
+        except Exception as ex:
+            Log.write_exception(ex)
+            return False, Errors.unknown_error
+        finally:
+            self._lock_seated_players.release()
+
     def remove_player(self, player):
         if player in self._seated_players:
             self._seated_players.remove(player)
@@ -73,9 +96,10 @@ class Room:
     #
     def add_new_enter_player(self, player):
         try:
-            if self._lock_enter_room.acquire(5):
+            if self._lock_all_players.acquire(5):
                 if self.can_new_player_enter():
                     self._all_players.append(player)
+                    player.set_my_room(self)
                     return True, Errors.ok
                 else:
                     return False, Errors.room_is_full
@@ -83,7 +107,22 @@ class Room:
             Log.write_exception(ex)
             return False, Errors.unknown_error
         finally:
-            self._lock_enter_room.release()
+            self._lock_all_players.release()
+
+    def remove_player_from_room(self, player):
+        try:
+            if self._lock_all_players.acquire(5):
+                if player in self._all_players:
+                    self._all_players.remove(player)
+                    player.set_my_room(None)
+                    return True, Errors.ok
+                else:
+                    return False, Errors.player_not_in_room
+        except Exception as ex:
+            Log.write_exception(ex)
+            return False, Errors.unknown_error
+        finally:
+            self._lock_all_players.release()
 
     def set_last_winners(self, winners):
         self._last_winners = winners
@@ -91,9 +130,13 @@ class Room:
     def process_player_cmd_request(self, player, req_json):
         req_cmd = req_json[InterProtocol.sock_req_cmd].lower()
         if req_cmd == InterProtocol.client_req_cmd_enter_room:
-          self.process_player_enter_room(player)
+            self.process_player_enter_room(player)
+        elif req_cmd == InterProtocol.client_req_cmd_leave_room:
+            self.process_player_leave_room(player)
         elif req_cmd == InterProtocol.client_req_cmd_join_game:
             self.process_join_game(player)
+        elif req_cmd == InterProtocol.client_req_cmd_leave_game:
+            self.process_player_leave_game(player)
         elif req_cmd == InterProtocol.client_req_type_exe_cmd:
             if InterProtocol.client_req_exe_cmd not in req_json:
                 err = InterProtocol.create_request_error_packet(req_cmd)
@@ -121,6 +164,30 @@ class Room:
                 err = InterProtocol.create_request_error_packet(req_cmd)
                 player.send_server_cmd_packet(err)
 
+    def process_player_leave_game(self, player):
+        cmd = InterProtocol.client_req_cmd_leave_game
+        resp_pack = None
+        if player in self._seated_players:
+            self.remove_player_from_seat(player)
+            resp_pack = InterProtocol.create_success_resp_pack(cmd)
+        else:
+            resp_pack = InterProtocol.create_error_pack(cmd, Errors.player_not_in_game)
+
+        player.send_server_cmd_packet(resp_pack)
+
+
+    def process_player_leave_room(self, player):
+        cmd = InterProtocol.client_req_cmd_leave_room
+        resp_pack = None
+        if player in self._all_players:
+            self.remove_player_from_room(player)
+            player.set_my_room(None)
+            resp_pack = InterProtocol.create_success_resp_pack(cmd)
+        else:
+            resp_pack = InterProtocol.create_error_pack(cmd, Errors.player_not_in_room)
+
+        player.send_server_cmd_packet(resp_pack)
+
     def process_player_enter_room(self, player):
         cmd = InterProtocol.client_req_cmd_enter_room
         if player in self._all_players:
@@ -133,41 +200,52 @@ class Room:
             ret, err = self.add_new_enter_player(player)
             resp_pack = None
             if ret:
-                resp_pack = InterProtocol.create_success_resp_pack(cmd)
+                roomObj = {
+                    InterProtocol.room_id : self._room_id,
+                    InterProtocol.resp_players: self.get_players_status()
+                }
+                resp_pack = InterProtocol.create_success_resp_data_pack(cmd, InterProtocol.resp_room, roomObj)
             else:
                 resp_pack = InterProtocol.create_error_pack(cmd, err)
             player.send_server_cmd_packet(resp_pack)
             self.publish_players_status()
 
     def process_join_game(self, player):
-        try:
-            if self._lock_join_game.acquire(5): # timeout 5 seconds
-                cmd = InterProtocol.client_req_cmd_join_game
-                resp = None
-                if self.can_new_player_seated():
-                    self.add_seated_player(player)
-                    resp = InterProtocol.create_success_resp_pack(cmd)
-                else:
-                    resp = InterProtocol.create_error_pack(cmd, Errors.room_no_empty_seat)
+        cmd = InterProtocol.client_req_cmd_join_game
+        if player not in self._all_players:
+            resp_pack = InterProtocol.create_error_pack(cmd, Errors.player_not_in_room)
+            player.send_server_cmd_packet(resp_pack)
+        elif player in self._seated_players:
+            resp_pack = InterProtocol.create_error_pack(cmd, Errors.player_already_in_game)
+            player.send_server_cmd_packet(resp_pack)
+        else:
+            ret, errCode = self.add_seated_player(player)
+            if not ret:
+                resp_pack = InterProtocol.create_error_pack(cmd, errCode)
+                player.send_server_cmd_packet(resp_pack)
 
-                player.send_server_cmd_packet(resp)
+            else:
+                resp_pack = InterProtocol.create_success_resp_pack(cmd)
+                player.send_server_cmd_packet(resp_pack)
+
                 self.publish_players_status()
 
                 if self.get_seated_player_count() >= self._min_seated_players:
                     self.test_continue_next_round()
 
-        except Exception as ex:
-            print(ex)
-        finally:
-            self._lock_join_game.release()
 
-    def publish_players_status(self):
+    def get_players_status(self):
         players = []
         for i in range(0, len(self._all_players)):
             player = self._all_players[i]
             seated = 1 if player in self._seated_players else 0
 
-            players.append({'userid':player.get_user_id(),'seated': seated})
+            players.append({'userid': player.get_user_id(), 'seated': seated})
+
+        return players
+
+    def publish_players_status(self):
+        players = self.get_players_status()
 
         pack = InterProtocol.create_game_players_packet(players)
         for p in self._all_players:

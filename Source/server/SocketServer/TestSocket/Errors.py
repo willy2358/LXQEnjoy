@@ -9,6 +9,8 @@ did_not_call_enter_room = 115
 player_already_in_room = 116
 room_is_full = 117
 room_no_empty_seat = 118
+player_not_in_room = 119
+player_not_in_game = 120
 
 
 
@@ -24,5 +26,7 @@ Errors = {
     player_already_in_room: "already in room",
     room_is_full: "room is full, no more play can be accepted",
     room_no_empty_seat:"no more empty seat",
+    player_not_in_game: "player is not in game",
+    player_not_in_room: "player is not in room",
 
 }

@@ -369,7 +369,8 @@ user-info，用户信息，具体待定
 	"cmdtype":"httpreq",
 	"httpreq":"enter-room",
 	"userid",123456,
-	"token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN"
+	"token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN",
+	“gameid":12,
 	"roomid",122424，//roomid为0，-1，或空时，为进入游戏大厅
 }
 服务器返回：
@@ -380,7 +381,6 @@ user-info，用户信息，具体待定
 	"result-data":"room"，
 	"room":{       //room 的属性
 		”roomid": 12,
-		"room_no": 12345678,
 		"players": [], //在房间的玩家列表
 		“seated-players":[], //已入座的玩家列表
 	},  
@@ -390,7 +390,27 @@ user-info，用户信息，具体待定
 用户可成功进入房间，result 为“OK", ”room" 中包含了房间的有关信息
 不可进入房间：result 为“error”， errmsg：错误原因，可能值：用户未登录，房间不存在,房间已满人
 
-3.进入游戏(入座)
+### 离开房间
+通道：socket
+接口：http://serverip/service
+请求参数：
+{
+	"cmdtype":"httpreq",
+	"httpreq":"leave-room",
+	"userid",123456,
+	"token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN"
+	"roomid",122424
+}
+服务器返回：
+{
+	"cmdtype":"httpresp",
+	"httpresp":"leave-room",
+	"result":"OK"，
+	"result-data":""， 
+}
+
+
+### 进入游戏(入座)
 通道：socket
 请求参数：
 {
@@ -409,6 +429,26 @@ user-info，用户信息，具体待定
 	"result-data":“”，
 }
 
+### 离开游戏
+通道：socket
+请求参数：
+{
+	"cmdtype":"sockreq",
+	"sockreq":"leave-game"
+	"userid":123456,
+	"roomid":123333,  
+	"gameid":123432
+	"token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN"
+}
+服务器返回：
+{
+	"cmdtype":"sockresp"
+	"sockresp":"leave-game",
+	"result":"OK"
+	"result-data":“”，
+}
+
+
 4.服务器推送：
 4.1当前玩家入场情况：
 推送信息：
@@ -422,6 +462,9 @@ user-info，用户信息，具体待定
 				“seated":0,
 				}, {"userid": 333}] //玩家按照入场顺序排序
 }
+说明：
+players 是一个列表，其中的玩家是按照入场的顺序排列的
+
 示例：
 {
 	"cmdtype": "sockpush",

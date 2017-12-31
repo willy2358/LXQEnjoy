@@ -11,9 +11,13 @@ sock_error_message = "errmsg"
 sock_error_code = "errcode"
 sock_result_data = "result-data"
 
+resp_players = "players"
+resp_seated_players = "seated-players"
+resp_room = "room"
 
 
-client_req_cmd_join_game = "join-game"   # 开始游戏
+client_req_cmd_join_game = "join-game"   # 加入游戏
+client_req_cmd_leave_game = "leave-game" #离开游戏
 client_req_select_action = "sel-act"
 client_req_type_reconnect = "reconnect"   # 断线重连
 client_req_type_exe_cmd = "exe-cmd"
@@ -21,6 +25,7 @@ client_req_exe_cmd = "cmd"
 client_req_cmd_param = "cmd-param"
 client_req_robot_play = "robot-play"
 client_req_cmd_enter_room = "enter-room"
+client_req_cmd_leave_room = "leave-room"
 client_req_play_cards = "play-cards"
 
 player_auth_token = "user_token"
@@ -78,6 +83,19 @@ majiang_acts_priorities = [majiang_player_act_zimo, majiang_player_act_hu,
                            majiang_player_act_play_card, majiang_player_act_pass ]
 
 min_room_id = 10   # valid room id should > 10
+
+def create_success_resp_data_pack(cmd, dataName, dataObj):
+    packet = {
+        cmd_type: sock_resp,
+        sock_resp: cmd,
+        sock_result: sock_result_ok,
+        sock_result_data: dataName
+    }
+
+    if dataName and dataObj:
+        packet[dataName] = dataObj
+
+    return packet
 
 def create_success_resp_pack(cmd):
     packet = {
