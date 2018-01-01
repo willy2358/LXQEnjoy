@@ -4,7 +4,7 @@ import json
 
 roomid = "1256436"
 userid = 111
-gameid = "m1"
+gameid = 111
 # roomid = 888
 # client = SocketClient.SocketClient("117.78.40.54", 9229)
 client = SocketClient.SocketClient("127.0.0.1", 9229)

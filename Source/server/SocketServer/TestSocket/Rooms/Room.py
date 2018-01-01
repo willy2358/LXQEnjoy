@@ -19,6 +19,10 @@ class Room:
         self._round_num = 2
         self._current_round_order = 0
         self._current_round = None
+        self._fee_stuff_id = 0
+        self._fee_stuff_name = ""
+        self._stake_stuff_id = 0
+        self._stake_stuff_name = ""
         self._last_winners = []
         self._players_total_score = {}
         self._lock_seated_players = threading.Lock()
@@ -290,3 +294,11 @@ class Room:
 
     def set_round_number(self, number):
         self._round_num = number
+
+    def set_fee_stuff(self, stuffid, stuffname):
+        self._fee_stuff_id = stuffid
+        self._fee_stuff_name = stuffname
+
+    def set_stake_stuff(self, stuffid, stuffname):
+        self._stake_stuff_id = stuffid
+        self._stake_stuff_name = stuffname

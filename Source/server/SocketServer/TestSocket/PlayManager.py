@@ -60,6 +60,8 @@ cycle_minutes_check_dead = 10
 dead_connect_reserve_minutes = 5
 timer_clear_dead_connection = None
 
+MAX_PLAYER_NUM_IN_ROOM = 8
+
 # dou di zu
 def init_poker_rule_doudizu():
     rule_id = "1212"
@@ -101,7 +103,7 @@ def init_poker_rule_doudizu():
 
 # da tong guai san jiao
 def init_majiang_rule_guaisanjiao():
-    rule_id = "m1"
+    rule_id = 111
     rule = GameRule_Majiang(rule_id)
     rule.set_player_min_number(3)
     rule.set_player_max_number(4)
@@ -373,8 +375,36 @@ def get_room(cmd, room_id, game_id):
     else:
         return None, Errors.did_not_call_enter_room
 
-def check_is_valid_room_no(roomid, game_id):
-    return True
+def create_inner_test_room(roomid, gameid):
+    game_rule = GameRules[gameid]
+    room = None
+    if isinstance(game_rule, GameRule_Majiang):
+        room = Room_Majiang(roomid, game_rule)
+
+    room.set_min_seated_player_num(game_rule.get_player_min_number())
+    room.set_max_seated_player_num(game_rule.get_player_max_number())
+    room.set_max_player_number(MAX_PLAYER_NUM_IN_ROOM)
+    Rooms[roomid] = room
+    return room
+
+def check_is_valid_room_no(roomid, gameid):
+
+    try:
+        dbConn = db.get_connection()
+        with dbConn.cursor() as cursor:
+            sql = " SELECT count(room_no) as rcount" \
+                  " FROM `room` " \
+                  " WHERE room_no=%s and gameid=%s"
+            cursor.execute(sql, (roomid, gameid))
+            result = cursor.fetchone()
+            if result["rcount"] < 1:
+                return False
+            else:
+                return True
+
+    except Exception as ex:
+        Log.write_exception(ex)
+        return False
 
 
 def get_player_client_from_conn(conn):
@@ -425,19 +455,27 @@ def create_room_from_db(room_id, rule_id):
     game_rule = GameRules[rule_id]
     if isinstance(game_rule, GameRule_Majiang):
         room = Room_Majiang(room_id, game_rule)
+        room.set_min_seated_player_num(game_rule.get_player_min_number())
+        room.set_max_seated_player_num(game_rule.get_player_max_number())
+        room.set_max_player_number(MAX_PLAYER_NUM_IN_ROOM)
 
     try:
         dbConn = db.get_connection()
         with dbConn.cursor() as cursor:
             # Read a single record
-            sql = "SELECT `userid`, `room_no`,`gameid`,`round_num` FROM `room` WHERE room_no=%s"
+            sql = "SELECT `userid`, `room_no`,`gameid`,`round_num`,`ex_ip_cheat`,`ex_gps_cheat`,`fee_stuff_id`, " \
+                  " s1.`stuffname` as `fee_stuff_name`," \
+                  "`fee_amount_per_player`,`fee_creator_pay_all`,`stake_stuff_id`," \
+                  "s2.`stuffname` as `stake_stuff_name`,`stake_base_score`" \
+                  " FROM `room` as r, stuff as s1, stuff as s2 " \
+                  " WHERE room_no=%s and r.fee_stuff_id = s1.stuffid and r.stake_stuff_id = s2.stuffid"
             cursor.execute(sql, (room_id))
             result = cursor.fetchone()
             print(result)
+            room.set_round_number(result["round_num"])
+            room.set_fee_stuff(result["fee_stuff_id"], result["fee_stuff_name"])
+            room.set_stake_stuff(result["stake_stuff_id"], result["stake_stuff_name"])
 
-            room.set_min_seated_player_num(3)
-            room.set_max_seated_player_num(3)
-            room.set_max_player_number(3)
             Rooms[room_id] = room
             return room
     except Exception as ex:
