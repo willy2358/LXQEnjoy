@@ -1,17 +1,18 @@
 
 var request = require('request')
+var devid = "wqrrrq21";
 
 var newUserReq = {
 	cmdtype:"httpreq",
 	httpreq: "newuser",
-	devid: "wqrrrq",
+	devid: "wqrrrq21",
 }
 
 var loginReq = {
     cmdtype:"httpreq",
     httpreq:"login",
-    userid:22,
-    devid:"wqrrrq",
+    userid:29,
+    devid:devid,
 }
 
 var setPwdReq ={
@@ -30,15 +31,38 @@ var addDevReq ={
     devid:"22dev2",
 }
 
+var getGamesReq = {
+    "cmdtype":"httpreq",
+    httpreq:"getgames",
+}
+
+var createRoomReq = {
+    cmdtype:"httpreq",
+    httpreq:"newroom",
+    userid:29,
+    gameid:111,
+    same_ip_exclude:1,
+    near_gps_exclude:0,
+    round_num:8,
+    fee_stuff_id:11,
+    fee_amount_per_player:1,
+    fee_creator_pay_all:0,
+    stake_stuff_id:11,
+    stake_base_score:5
+
+}
+
 var myJSONObject = {"key1":"value1", "key2":"value2"};
 
 request({
     url: "http://0.0.0.0:8081/service",
     method: "POST",
     json: true,   // <--Very important!!!
-    body: addDevReq,
+    body: newUserReq,
 }, function (error, response, body){
     console.log(response);
+    console.log("body");
+    console.log(body);
 });
 
 // request('http://0.0.0.0:8081/test', function(error, response, body){

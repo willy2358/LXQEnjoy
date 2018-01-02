@@ -54,39 +54,46 @@ function generate_session_token(userid) {
     return vid;
 }
 
-function create_error_repsonse(cmd, errMsg) {
+function create_error_resp_str(cmd, errCode, errMsg) {
+    if (errMsg == undefined){
+        errMsg = errors.get_error_desc(errCode);
+    }
+
+    var pack = create_error_resp_pack(cmd, errMsg, errCode);
+
+    return JSON.stringify(pack);
+}
+
+function create_error_resp_pack(cmd, errMsg, errCode) {
     var pack = {
         cmdtype: api_protocal.cmd_type_httpresp,
         httpresp: cmd,
         result: api_protocal.cmd_resp_ERROR,
-        errmsg: errMsg
+        errmsg: errMsg,
+        errcode:errCode
     };
 
-    return JSON.stringify(pack);
+    return pack;
 }
 
-function create_success_response(cmd, msg) {
+function create_successs_resp_pack(cmd, result_name, result_data) {
+    var ret_name = result_name||"";
     var pack = {
-        "cmdtype": api_protocal.cmd_type_httpresp,
-        "httpresp": cmd,
-        "result": api_protocal.cmd_resp_OK,
-        "result-data": msg
-    };
-    return JSON.stringify(pack);
+        cmdtype: api_protocal.cmd_type_httpresp,
+        httpresp:cmd,
+        result:api_protocal.cmd_resp_OK,
+        "result-data":ret_name,
+    }
+
+    if (ret_name.length > 0 && result_data != undefined){
+        pack[ret_name] = result_data;
+    }
+
+    return pack;
 }
 
-function create_success_ext_response(cmd, propObj, msg) {
-    var pack = {
-        "cmdtype": api_protocal.cmd_type_httpresp,
-        "httpresp": cmd,
-        "result": api_protocal.cmd_resp_OK,
-        "result-data": msg
-    };
-
-    var props = Object.getOwnPropertyNames(propObj);
-    props.forEach(function (val, index, arr) {
-        pack[val] = propObj[val];
-    })
+function create_success_resp_str(cmd, result_name, result_data) {
+    pack = create_successs_resp_pack(cmd, result_name, result_data);
 
     return JSON.stringify(pack);
 }
@@ -104,6 +111,144 @@ function dispatch_request(req_cmd, req_obj, resp){
     else if (req_cmd == api_protocal.req_cmd_add_dev){
         process_add_device(req_obj, resp);
     }
+    else if (req_cmd == api_protocal.req_cmd_get_games){
+        process_get_games(req_obj, resp);
+    }
+    else if (req_cmd == api_protocal.req_cmd_new_room){
+        process_new_room(req_obj, resp);
+    }
+}
+
+function logger_undefined_err(err_code, err){
+
+}
+
+function process_get_games(req_obj, resp){
+    var cmd = req_obj[api_protocal.cmd_type_httpreq];
+    try{
+        var sql = "select gameid, game_name,min_players, max_players, server_ip, server_port, region, type from game";
+        conn.query(sql, function(err, result){
+            if (err){
+               var resp_str = create_error_resp_str(cmd, errors.ERROR_UNDEFINED, err);
+               resp.end(resp_str);
+            }
+            else{
+               var gs = [];
+               for(var i = 0; i < result.length; i++){
+                   var game = {
+                       gameid : result[i].gameid,
+                       game_name: result[i].game_name,
+                       game_type: result[i].type,
+                       min_players:result[i].min_players,
+                       max_players:result[i].max_players,
+                       server_ip:result[i].server_ip,
+                       server_port:result[i].server_port,
+                       region:result[i].region
+                   }
+                   gs.push(game);
+               }
+
+               var resp_str = create_success_resp_str(cmd, api_protocal.resp_games, gs);
+               resp.end(resp_str);
+           }
+        });
+    }
+    catch (err){
+        response_undefined_err(cmd, err, resp);
+    }
+}
+
+function response_undefined_err(reqcmd, err, resp){
+    // var err_code = generate_error_code_for_undefined_err(err);
+    // var resp_pack = create_error_response(err_code);
+    logger_undefined_err(errors.ERROR_UNDEFINED, err);
+    var resp_str = create_error_resp_str(reqcmd, errors.ERROR_UNDEFINED, err);
+    resp.end(resp_str);
+}
+
+function process_new_room(req_obj, resp){
+    var cmd = req_obj[api_protocal.cmd_type_httpreq];
+    try{
+        var userid = req_obj[api_protocal.req_userid];
+        var gameid = req_obj[api_protocal.game_id];
+        var gps_cheat_proof = req_obj[api_protocal.req_room_same_gps_exclude];
+        var ip_cheat_proof = req_obj[api_protocal.req_room_same_ip_exclude];
+        var game_rounds = req_obj[api_protocal.req_room_game_round_num];
+        var fee_stuff_id = req_obj[api_protocal.req_room_game_fee_stuff_id];
+        var fee_amount_per_player = req_obj[api_protocal.req_room_game_fee_per_player];
+        var fee_creator_pay_all = req_obj[api_protocal.req_room_game_fee_creator_pay_all];
+        var stake_stuff_id = req_obj[api_protocal.req_room_game_stake_stuff_id];
+        var stake_base_score = req_obj[api_protocal.req_room_game_stake_base_score];
+
+        var sql = "select count(room_no) as num from room where userid={0}";
+
+        sql = sql.format(userid);
+        conn.query(sql, function(err, results){
+            if (err){
+                console.log(err);
+                response_undefined_err(cmd, err, resp);
+            }
+            else{
+                var n = results[0].num;
+                if (n >= 9){
+                    var resp_pack = create_error_resp_str(cmd, errors.ERROR_TO_MAX_ALLOWED_ROOMS);
+                    resp.end(resp_pack);
+                }
+                else{
+                    var room_number = (db.room_start_number + userid * 10) + n;
+                    create_new_room_for_user(userid, gameid, room_number, game_rounds, ip_cheat_proof, gps_cheat_proof,
+                    fee_stuff_id, fee_amount_per_player, fee_creator_pay_all, stake_stuff_id, stake_base_score,
+                    function(err){
+                        response_undefined_err(cmd, err, resp);
+                    },
+                    function(ret_msg){
+                        if(ret_msg == errors.cbt_room_created_failed){
+                            var resp_pack = create_error_resp_str(cmd, errors.ERROR_FAILED_TO_CREATE_ROOM);
+                            resp.end(resp_pack);
+                        }
+                        else{
+                            room = {
+                                "room_num":room_number
+                            }
+
+                            var resp_str = create_success_resp_str(cmd, api_protocal.resp_room, room);
+                            resp.end(resp_str);
+                        }
+                    });
+                }
+            }
+        });
+    }
+    catch (err){
+        response_undefined_err(cmd, err, resp);
+    }
+}
+
+function create_new_room_for_user(userid, gameid, room_number, round_num, ip_exclude, gps_exclude,
+                                  fee_stuff_id, fee_amount_per_player, fee_creator_pay_all, stake_stuff_id, stake_base_score,
+                                  err_callback, result_callback){
+    try{
+        var sql = "insert into room(userid, gameid, room_no, round_num, ex_ip_cheat, ex_gps_cheat" +
+            ",fee_stuff_id, fee_amount_per_player, fee_creator_pay_all, stake_stuff_id, stake_base_score) values({0},{1},{2},{3},{4},{5}" +
+            ",{6},{7},{8},{9},{10})";
+        sql = sql.format(userid, gameid, room_number,round_num, ip_exclude, gps_exclude,
+            fee_stuff_id, fee_amount_per_player, fee_creator_pay_all, stake_stuff_id, stake_base_score);
+        conn.query(sql, function(err, result){
+           if(err){
+               if(err_callback){
+                   err_callback(err);
+               }
+           }
+           else if(result_callback){
+               result_callback(errors.cbt_room_created_ok);
+           }
+        });
+    }
+    catch(err){
+        if(err_callback){
+            err_callback(err);
+        }
+    }
 }
 
 function process_set_password(req_obj, resp){
@@ -115,7 +260,7 @@ function process_set_password(req_obj, resp){
 
         is_device_valid(userid, devid,
             function (err) {
-                resp_pack = create_error_repsonse(cmd, err);
+                resp_pack = create_error_resp_str(cmd, errors.ERROR_UNDEFINED, String(err));
                 resp.end(resp_pack);
             },
             function (ret_msg) {
@@ -125,17 +270,17 @@ function process_set_password(req_obj, resp){
                     conn.query(sql, function (err, result) {
                         if (err) {
                             logger.error(err);
-                            var resp_pack = create_error_repsonse(cmd, err);
+                            var resp_pack = create_error_resp_str(cmd, errors.ERROR_UNDEFINED, String(err));
                             resp.end(resp_pack);
                         }
                         else {
-                            var resp_pack = create_success_response(cmd, "");
+                            var resp_pack = create_success_resp_str(cmd, "");
                             resp.end(resp_pack);
                         }
                     });
                 }
                 else {
-                    var resp_pack = create_error_repsonse(cmd, errors.cbt_invalid_device);
+                    var resp_pack = create_error_resp_str(cmd, errors.ERROR_DEVICE_NOT_REGISTERED);
                     resp.end(resp_pack);
                 }
             });
@@ -154,36 +299,35 @@ function process_add_device(req_obj, resp){
 
         is_password_right(userid, pwd,
             function (err) {
-                var resp_pack = create_error_repsonse(cmd, err);
+                var resp_pack = create_error_resp_str(cmd, errors.ERROR_UNDEFINED, err);
                 resp.end(err);
-
             },
             function (ret_msg) {
                 if (ret_msg !== errors.cbt_valid_password){
-                    var resp_pack = create_error_repsonse(cmd, ret_msg);
+                    var resp_pack = create_error_resp_str(cmd, errors.ERROR_PWD_NOT_RIGHT);
                     resp.end(resp_pack);
                 }
                 else {
                     is_device_valid(userid, dev_id,
                         function (err) {
-                            var resp_pack = create_error_repsonse(cmd, err);
+                            var resp_pack = create_error_resp_str(cmd, errors.ERROR_UNDEFINED, String(err));
                             resp.end(resp_pack);
                         },
                         function (ret_msg) {
                             if (ret_msg !==errors.cbt_valid_device){
                                 record_user_device(userid, dev_id,
                                     function (err) {
-                                        var resp_pack = create_error_repsonse(cmd, err);
+                                        var resp_pack = create_error_resp_str(cmd, errors.ERROR_UNDEFINED, String(err));
                                         resp.end(resp_pack);
                                     },
                                     function (ret_msg) {
-                                        var resp_pack = create_success_response(cmd,ret_msg);
+                                        var resp_pack = create_success_resp_str(cmd);
                                         resp.end(resp_pack);
                                     }
                                 );
                             }
                             else{
-                                var resp_pack = create_error_repsonse(cmd, api_protocal.ERROR_DEVICE_ALREADY_REGISTERED);
+                                var resp_pack = create_error_resp_str(cmd, errors.ERROR_DEVICE_ALREADY_REGISTERED);
                                 resp.end(resp_pack);
                             }
                         }
@@ -288,26 +432,25 @@ function process_new_user(req_obj, resp) {
         var cmd = req_obj[api_protocal.cmd_type_httpreq];
         get_is_device_already_registered(dev_id,
             function(err){
-                resp_str = create_error_repsonse(cmd, err);
+                resp_str = create_error_resp_str(cmd, errors.ERROR_UNDEFINED, err);
                 logger.error(err);
                 resp.end(resp_str);
             },
             function (ret_msg) {
                 if (ret_msg === errors.cbt_device_found){
-                    resp_str = create_error_repsonse(cmd, errors.ERROR_DEVICE_ALREADY_REGISTERED);
+                    resp_str = create_error_resp_str(cmd, errors.ERROR_DEVICE_ALREADY_REGISTERED);
                     logger.error(resp_str);
                     resp.end(resp_str);
                 }
                 else{
                     add_new_user(dev_id,
                         function(err){
-                            var resp_str = create_error_repsonse(cmd, errors.ERROR_FAILED_CREATE_USER);
+                            var resp_str = create_error_resp_str(cmd, errors.ERROR_FAILED_CREATE_USER, String(err));
                             logger.error(resp_str);
                             resp.end(resp_str);
                         },
                         function(userObj){
-                            var user_str = JSON.stringify(userObj);
-                            var resp_str = create_success_response(cmd, user_str);
+                            var resp_str = create_success_resp_str(cmd, api_protocal.resp_user, userObj);
                             resp.end(resp_str);
                         }
                     );
@@ -457,7 +600,7 @@ function process_login(req_obj, resp) {
     var sql = temp.format(user_id, device);
     conn.query(sql, function (err, result) {
         if (err){
-            var resp_str = create_error_repsonse(cmd, err);
+            var resp_str = create_error_resp_str(cmd, errors.ERROR_UNDEFINED, String(err));
             logger.error(err);
             resp.end(resp_str);
         }
@@ -465,26 +608,30 @@ function process_login(req_obj, resp) {
             if (result.length > 0) {
                 update_user_login_token(user_id, device,
                     function(err){
-                        var resp_str = create_error_repsonse(cmd, err);
+                        var resp_str = create_error_resp_str(cmd, errors.ERROR_UNDEFINED,  String(err));
                         logger.error(resp_str);
                         resp.end(resp_str);
                     },
                     function (token) {
                     if (token){
-                        var extProps = {
-                            "session-token":token
+                        var loginObj = {
+                            "session-token":token,
+                            "user-info":{
+                                "userid":user_id,
+                            }
                         };
-                        var resp_str = create_success_ext_response(cmd, extProps, "");
+                        var resp_str = create_success_resp_str(cmd, api_protocal.resp_login, loginObj);
                         resp.end(resp_str);
+
                     }
                     else{
-                        var resp_str = create_error_repsonse(cmd, errors.ERROR_FAILED_LOGIN);
+                        var resp_str = create_error_resp_str(cmd, errors.ERROR_FAILED_LOGIN, "Invalid token");
                         resp.end(resp_str);
                     }
                 });
             }
             else{
-                var err_resp = create_error_repsonse(cmd, errors.ERROR_DEVICE_NOT_REGISTERED);
+                var err_resp = create_error_resp_str(cmd, errors.ERROR_DEVICE_NOT_REGISTERED);
                 resp.end(err_resp);
             }
         }

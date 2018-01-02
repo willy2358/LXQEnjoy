@@ -1,4 +1,6 @@
 
+import Errors
+
 cmd_type = "cmdtype"
 sock_req_cmd = "sockreq"
 sock_resp = "sockresp"
@@ -6,16 +8,25 @@ sock_result = "result"
 sock_result_error = "ERROR"
 sock_result_ok = "OK"
 sock_error_message = "errmsg"
+sock_error_code = "errcode"
+sock_result_data = "result-data"
+
+resp_players = "players"
+resp_seated_players = "seated-players"
+resp_room = "room"
 
 
-
-client_req_type_join_game = "join-game"   # 开始游戏
+client_req_cmd_join_game = "join-game"   # 加入游戏
+client_req_cmd_leave_game = "leave-game" #离开游戏
 client_req_select_action = "sel-act"
 client_req_type_reconnect = "reconnect"   # 断线重连
 client_req_type_exe_cmd = "exe-cmd"
 client_req_exe_cmd = "cmd"
-client_req_cmd_param = "cmd-data"
+client_req_cmd_param = "cmd-param"
 client_req_robot_play = "robot-play"
+client_req_cmd_enter_room = "enter-room"
+client_req_cmd_leave_room = "leave-room"
+client_req_play_cards = "play-cards"
 
 player_auth_token = "user_token"
 
@@ -37,6 +48,10 @@ server_push_status_data = "status-data"
 server_push_game_players = "game-players"
 server_push_players = "players"
 server_push_play_cards = "play-cards"
+server_push_cards_state = "cards-state"
+server_push_active_cards = "active-cards"
+server_push_freezed_cards = "frozen-cards"
+server_push_shown_card_groups = "shown-cards-groups"
 
 
 cmd_data_cards = "cards"
@@ -68,6 +83,41 @@ majiang_acts_priorities = [majiang_player_act_zimo, majiang_player_act_hu,
                            majiang_player_act_play_card, majiang_player_act_pass ]
 
 min_room_id = 10   # valid room id should > 10
+
+def create_success_resp_data_pack(cmd, dataName, dataObj):
+    packet = {
+        cmd_type: sock_resp,
+        sock_resp: cmd,
+        sock_result: sock_result_ok,
+        sock_result_data: dataName
+    }
+
+    if dataName and dataObj:
+        packet[dataName] = dataObj
+
+    return packet
+
+def create_success_resp_pack(cmd):
+    packet = {
+        cmd_type: sock_resp,
+        sock_resp: cmd,
+        sock_result: sock_result_ok,
+        sock_result_data:""
+    }
+
+    return packet
+
+def create_cards_state_packet(player):
+    packet = {
+        cmd_type: server_cmd_type_push,
+        server_cmd_type_push: server_push_cards_state,
+        user_id: player.get_user_id(),
+        server_push_active_cards: player.get_active_cards(),
+        server_push_freezed_cards: player.get_frozen_cards(),
+        server_push_shown_card_groups:player.get_shown_card_groups()
+    }
+
+    return packet
 
 def create_play_cards_packet(player, cards):
     l_cards = []
@@ -147,8 +197,19 @@ def create_cmd_options_json_packet(player, cmd_options, def_cmd=None, resp_timeo
     return packet
 
 
-def create_error_json_packet(player, err_msg):
-    pass
+# def create_error_json_packet(player, err_msg):
+#     pass
+
+def create_error_pack(req_cmd, errCode):
+    pack = {
+        cmd_type: sock_resp,
+        sock_resp:req_cmd,
+        sock_result:sock_result_error,
+        sock_error_code:errCode,
+        sock_error_message:Errors.Errors[errCode]
+    }
+
+    return pack
 
 
 def create_publish_bank_player_json_packet(bank_player):

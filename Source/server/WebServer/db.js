@@ -6,6 +6,7 @@ var connection;
 exports = module.exports = Object.freeze({
 
     username_start_number:122363,
+    room_start_number:1256146,
 
     table_user : "user",
     field_userid : "userid",

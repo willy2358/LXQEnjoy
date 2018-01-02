@@ -1,4 +1,6 @@
 import json
+import Errors
+import db
 
 import CardsMaster
 import InterProtocol
@@ -58,6 +60,8 @@ cycle_minutes_check_dead = 10
 dead_connect_reserve_minutes = 5
 timer_clear_dead_connection = None
 
+MAX_PLAYER_NUM_IN_ROOM = 8
+
 # dou di zu
 def init_poker_rule_doudizu():
     rule_id = "1212"
@@ -99,7 +103,7 @@ def init_poker_rule_doudizu():
 
 # da tong guai san jiao
 def init_majiang_rule_guaisanjiao():
-    rule_id = "m1"
+    rule_id = 111
     rule = GameRule_Majiang(rule_id)
     rule.set_player_min_number(3)
     rule.set_player_max_number(4)
@@ -287,11 +291,12 @@ def dispatch_player_commands(conn, comm_text):
     try:
         j_obj = json.loads(comm_text)
     except Exception as ex:
-        send_msg_to_client_connection(conn, "Invalid request format")
+        print(ex)
+        send_err_pack_to_client(conn, 'unknown', Errors.invalid_packet_format)
         return
 
     if not validate_player(j_obj):
-        send_msg_to_client_connection(conn, "Invalid request parameters")
+        send_err_pack_to_client(conn, "invalid", Errors.invalid_request_parameter)
         return
 
     try:
@@ -301,21 +306,28 @@ def dispatch_player_commands(conn, comm_text):
         Log.write_exception(ex)
         print(ex)
 
-def send_msg_to_client_connection(conn, msg):
+
+def send_msg_to_client(conn, msg):
+
     try:
         conn.sendall(msg.encode(encoding="utf-8"))
     except Exception as ex:
         Log.write_exception(ex)
 
+def send_err_pack_to_client(clientConn, cmd, errCode):
+    err_pack = InterProtocol.create_error_pack(cmd, errCode);
+    err_str = json.dumps(err_pack)
+    send_msg_to_client(clientConn, err_str)
 
 def send_welcome_to_new_connection(conn):
     welcome_msg = "welcome,just enjoy!"
-    send_msg_to_client_connection(conn, welcome_msg)
+    send_msg_to_client(conn, welcome_msg)
 
 
 def process_client_request(conn, req_json):
     try:
         player = None
+        cmd = req_json[InterProtocol.sock_req_cmd]
         user_id = req_json[InterProtocol.user_id]
         if user_id not in Players:
             player = PlayerClient(conn, user_id)
@@ -327,39 +339,72 @@ def process_client_request(conn, req_json):
             player = Players[user_id]
             if player.get_socket_conn() != conn:
                 if player.get_is_online():
-                    send_msg_to_client_connection(conn, "Already in game, try reconnect to refresh connection")
+                    send_err_pack_to_client(conn, cmd, Errors.player_already_in_game)
                     return
                 else:
                     player.update_connection(conn)
-                # if req_json[InterProtocol.player_auth_token] != player.get_session_token():
-                #     send_msg_to_client_connection("Wrong player token")
-                #     returnß
-                # else:
-                #player.update_connection(conn)
+                    return
         if player:
             player.update_last_alive()
 
-        if req_json[InterProtocol.sock_req_cmd].lower() == InterProtocol.client_req_type_reconnect:
-            player.update_connection(conn)
-
-        if req_json[InterProtocol.room_id] > InterProtocol.min_room_id:
-            if req_json[InterProtocol.sock_req_cmd].lower() == InterProtocol.client_req_type_join_game \
-                    and req_json[InterProtocol.room_id] not in Rooms:
-                create_room_from_db(req_json[InterProtocol.room_id], req_json[InterProtocol.game_id])
-
-            if req_json[InterProtocol.room_id] in Rooms:
-                Rooms[req_json[InterProtocol.room_id]].process_player_cmd_request(player, req_json)
-        else:
-            # process_lobby_player_request(player, req_json)
+        roomid = str(req_json[InterProtocol.room_id])
+        if not roomid or roomid == "-1" or roomid == "0" or roomid.lower() == "null" or roomid.lower() == "none":
             Lobby.process_player_request(player, req_json)
+        else:
+            room,err = get_room(cmd, roomid, req_json[InterProtocol.game_id])
+            if not room:
+                send_err_pack_to_client(conn, cmd, err)
+            else:
+                room.process_player_cmd_request(player, req_json)
 
     except Exception as ex:
         Log.write_exception(ex)
 
-# def update_round_stage(client_conn):
-#     player = get_player_client_from_conn(client_conn)
-#     round = player.get_game_round()
-#     round.test_and_update_current_stage()
+def get_room(cmd, room_id, game_id):
+    if room_id in Rooms:
+        return Rooms[room_id],0
+
+    if cmd.lower() == InterProtocol.client_req_cmd_enter_room.lower():
+        if room_id.startswith("LX"):
+            return create_room_from_db(room_id, game_id), Errors.ok
+        else:
+            if check_is_valid_room_no(room_id, game_id):
+                return create_room_from_db(room_id, game_id), Errors.ok
+            else:
+                return None, Errors.wrong_room_number
+    else:
+        return None, Errors.did_not_call_enter_room
+
+def create_inner_test_room(roomid, gameid):
+    game_rule = GameRules[gameid]
+    room = None
+    if isinstance(game_rule, GameRule_Majiang):
+        room = Room_Majiang(roomid, game_rule)
+
+    room.set_min_seated_player_num(game_rule.get_player_min_number())
+    room.set_max_seated_player_num(game_rule.get_player_max_number())
+    room.set_max_player_number(MAX_PLAYER_NUM_IN_ROOM)
+    Rooms[roomid] = room
+    return room
+
+def check_is_valid_room_no(roomid, gameid):
+
+    try:
+        dbConn = db.get_connection()
+        with dbConn.cursor() as cursor:
+            sql = " SELECT count(room_no) as rcount" \
+                  " FROM `room` " \
+                  " WHERE room_no=%s and gameid=%s"
+            cursor.execute(sql, (roomid, gameid))
+            result = cursor.fetchone()
+            if result["rcount"] < 1:
+                return False
+            else:
+                return True
+
+    except Exception as ex:
+        Log.write_exception(ex)
+        return False
 
 
 def get_player_client_from_conn(conn):
@@ -383,7 +428,7 @@ def remove_dead_connection():
         room = player.get_my_room()
         if room:
             room.remove_player(player)
-        send_msg_to_client_connection(conn,"disconnected as dead connection")
+        send_msg_to_client(conn, "disconnected as dead connection")
         Players.pop(item[0])
         Conn_Players.pop(item[1])
         conn.close()
@@ -410,10 +455,33 @@ def create_room_from_db(room_id, rule_id):
     game_rule = GameRules[rule_id]
     if isinstance(game_rule, GameRule_Majiang):
         room = Room_Majiang(room_id, game_rule)
+        room.set_min_seated_player_num(game_rule.get_player_min_number())
+        room.set_max_seated_player_num(game_rule.get_player_max_number())
+        room.set_max_player_number(MAX_PLAYER_NUM_IN_ROOM)
 
-    room.set_min_seated_player_num(3)
-    room.set_max_seated_player_num(3)
-    Rooms[room_id] = room
+    try:
+        dbConn = db.get_connection()
+        with dbConn.cursor() as cursor:
+            # Read a single record
+            sql = "SELECT `userid`, `room_no`,`gameid`,`round_num`,`ex_ip_cheat`,`ex_gps_cheat`,`fee_stuff_id`, " \
+                  " s1.`stuffname` as `fee_stuff_name`," \
+                  "`fee_amount_per_player`,`fee_creator_pay_all`,`stake_stuff_id`," \
+                  "s2.`stuffname` as `stake_stuff_name`,`stake_base_score`" \
+                  " FROM `room` as r, stuff as s1, stuff as s2 " \
+                  " WHERE room_no=%s and r.fee_stuff_id = s1.stuffid and r.stake_stuff_id = s2.stuffid"
+            cursor.execute(sql, (room_id))
+            result = cursor.fetchone()
+            print(result)
+            room.set_round_number(result["round_num"])
+            room.set_fee_stuff(result["fee_stuff_id"], result["fee_stuff_name"])
+            room.set_stake_stuff(result["stake_stuff_id"], result["stake_stuff_name"])
+
+            Rooms[room_id] = room
+            return room
+    except Exception as ex:
+        return None
+
+
 
 def process_client_disconnected(conn):
     player = get_player_client_from_conn(conn)

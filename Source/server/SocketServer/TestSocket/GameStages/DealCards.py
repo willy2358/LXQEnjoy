@@ -30,7 +30,7 @@ class DealCards(GameStage):
             for j in range(player_num):
                 cmd_obj = {"cmd": DealCards.COMMAND_DEAL_CARD, "cards": [cards_one_deal[j]]}
                 players[j].add_dealed_cards(cards_one_deal[j])
-                players[j].send_server_command(cmd_obj)
+                players[j].send_server_cmd_packet(cmd_obj)
                 # players[j].deal_one_card(cards_one_deal[j])
             Utils.list_remove_parts(cards_b, cards_one_deal)
         for p in players:

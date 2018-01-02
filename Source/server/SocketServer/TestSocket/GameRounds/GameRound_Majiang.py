@@ -43,14 +43,17 @@ class GameRound_Majiang(GameRound):
 
     def player_select_peng(self, player, card):
         self.reset_player_waiting_for_cmd_resp()
-        player.move_cards_to_freeze_group([card, card], [card])
-        player.set_newest_cards([card], False, False)
-
+        s_card = card[0]
+        player.move_cards_to_frozen([s_card, s_card], s_card)
+        player.add_shown_card_group([s_card, s_card] + [s_card])
+        player.set_newest_cards(s_card, False, False)
 
     def player_select_gang(self, player, card):
         self.reset_player_waiting_for_cmd_resp()
-        player.move_cards_to_freeze_group([card, card, card], [card])
-        player.set_newest_cards([card], False, False)
+        s_card = card[0]
+        player.move_cards_to_frozen([s_card, s_card, s_card], s_card)
+        player.add_shown_card_group([s_card, s_card, s_card] + [s_card])
+        player.set_newest_cards(s_card, False, False)
 
     def player_select_hu(self, player, card):
         self.reset_player_waiting_for_cmd_resp()

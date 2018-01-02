@@ -35,7 +35,7 @@ class Dealer:
             self.start_timer_to_wait_player_response(act_group.get_select_timeout())
             cmd_obj = {"cmd": Dealer.COMMAND_OPTIONS,
                        "opts": act_group.to_json_object()}
-            player.send_server_command(cmd_obj)
+            player.send_server_cmd_packet(cmd_obj)
 
     def start_timer_to_wait_player_response(self, timeout_seconds):
         self.__timer_wait_player = Timer(timeout_seconds, self.select_default_action)
@@ -58,7 +58,7 @@ class Dealer:
             resp = {"resp": Dealer.CLIENT_RESP_SELECT_ACTION,
                     "sel-act": action.to_broadcast_json_object()}
             for p in self.__select_action_publish_players:
-                p.send_server_command(resp)
+                p.send_server_cmd_packet(resp)
 
     def get_action_by_id(self, action_id):
         if self.__sent_action_group:

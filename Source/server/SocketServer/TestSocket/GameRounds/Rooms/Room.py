@@ -69,12 +69,12 @@ class Room:
 
     def process_player_cmd_request(self, player, req_json):
         req_cmd = req_json[InterProtocol.sock_req_cmd].lower()
-        if req_cmd == InterProtocol.client_req_type_join_game:
+        if req_cmd == InterProtocol.client_req_cmd_join_game:
             self.process_join_game(player)
         elif req_cmd == InterProtocol.client_req_type_exe_cmd:
             if InterProtocol.client_req_exe_cmd not in req_json:
                 err = InterProtocol.create_request_error_packet(req_cmd)
-                player.send_server_command(err)
+                player.send_server_cmd_packet(err)
             elif self._current_round:
                 cmd = req_json[InterProtocol.client_req_exe_cmd]
                 const_param = InterProtocol.client_req_cmd_param
@@ -88,19 +88,23 @@ class Room:
                 self._current_round.process_player_robot_play_request(player, False)
             else:
                 err = InterProtocol.create_request_error_packet(req_cmd)
-                player.send_server_command(err)
+                player.send_server_cmd_packet(err)
 
     def process_join_game(self, player):
         try:
             if self._lock_join_game.acquire(5): # timeout 5 seconds
+                cmd = InterProtocol.client_req_cmd_join_game
+                # if self.is_player_in(player):
+                #     #player.send_error_message(InterProtocol.client_req_type_join_game, "Already in room")
+                #     player.send_success_message(InterProtocol.client_req_cmd_join_game);
+                #     #player.send_cards_state();
+                #     return
                 if not self.can_new_player_seated():
-                    player.send_error_message(InterProtocol.client_req_type_join_game, "Room is full")
-                    return
-                if self.is_player_in(player):
-                    player.send_error_message(InterProtocol.client_req_type_join_game, "Already in room")
+                    err_resp = InterProtocol.create_error_pack(cmd, )
+                    player.send_error_message(InterProtocol.client_req_cmd_join_game, "Room is full")
                     return
                 self.add_seated_player(player)
-                player.send_success_message(InterProtocol.client_req_type_join_game)
+                player.send_success_message(InterProtocol.client_req_cmd_join_game)
                 self.publish_seated_players()
 
                 if self.get_seated_player_count() >= self._min_seated_players:
@@ -126,7 +130,7 @@ class Room:
 
         pack = InterProtocol.create_game_players_packet(players)
         for p in self._seated_players:
-            p.send_server_command(pack)
+            p.send_server_cmd_packet(pack)
 
     def test_continue_next_round(self):
         if self._current_round_order < self._round_num:

@@ -201,7 +201,7 @@ class GameRound:
         player.set_newest_cards(cards, True, False)
         Utils.list_remove_parts(self.__cards_on_table, cards)
         packet = InterProtocol.create_deal_cards_json_packet(player, cards)
-        player.send_server_command(packet)
+        player.send_server_cmd_packet(packet)
 
     def start_process_for_players_want_played_out_cards(self, player_cmds):
         self.__pending_player_cmds.empty()
@@ -259,32 +259,32 @@ class GameRound:
 
         if not self.is_player_cmd_valid(player, cmd, cmd_param):
             err = InterProtocol.create_request_error_packet(cmd)
-            player.send_server_command(err)
+            player.send_server_cmd_packet(err)
         else:
             if isinstance(self.__cur_stage, PlayInTurn):
                 try:
                     self.__cur_stage.on_player_selected_action(self, player, cmd, cmd_param, silent_cmd)
                 except Exception as ex:
                     print(ex)
-                    player.send_command_message(str(ex))
+                    player.send_api_pack_msg_str(str(ex))
 
     def is_player_cmd_valid(self, player, cmd, cmd_param):
         if not self.__player_waiting_for_cmd_resp:
             err = "Invalid player:" + str(player.get_user_id())
-            player.send_command_message(err)
+            player.send_api_pack_msg_str(err)
             print(err)
             return False
         if player != self.__player_waiting_for_cmd_resp:
             err = "Invalid player:" + str(player.get_user_id())  \
                  + ",expected:" + str(self.__player_waiting_for_cmd_resp.get_user_id())
-            player.send_command_message(err)
+            player.send_api_pack_msg_str(err)
             print(err)
             return False
         for c in self.__cmds_opts_waiting_for_resp:
             if c.get_cmd() == cmd:
                 return True
         err = "Invalid cmd:" + cmd
-        player.send_command_message(err)
+        player.send_api_pack_msg_str(err)
         print(err)
         return False
 
@@ -324,13 +324,13 @@ class GameRound:
 
     def publish_round_states(self, json_state):
         for p in self._players:
-            p.send_server_command(json_state)
+            p.send_server_cmd_packet(json_state)
 
     def send_player_cmd_options(self, player, cmd_opts, def_cmd):
         rule = self.get_rule()
         timeout = rule.get_default_cmd_resp_timeout()
         self.set_player_waiting_for_cmd_resp(player, cmd_opts)
         packet = InterProtocol.create_cmd_options_json_packet(player, cmd_opts, def_cmd, timeout)
-        player.send_server_command(packet)
+        player.send_server_cmd_packet(packet)
         if def_cmd and timeout > 1:
             self.setup_timer_to_select_default_act_for_player(player, def_cmd, timeout)
