@@ -57,7 +57,7 @@ class SocketClient:
                 for p in parts:
                     if len(p) > 5:
                         print('Received:' + p)
-                        print("\r\n")
+                        # print("\r\n")
 
             except Exception as ex:
                 print(ex)

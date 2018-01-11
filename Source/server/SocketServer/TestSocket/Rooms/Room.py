@@ -34,6 +34,9 @@ class Room:
     def get_seated_player_count(self):
         return len(self._seated_players)
 
+    def get_room_id(self):
+        return self._room_id
+
     def get_seated_players(self):
         return self._seated_players
 

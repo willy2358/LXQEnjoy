@@ -360,16 +360,20 @@ def process_client_request(conn, req_json):
     except Exception as ex:
         Log.write_exception(ex)
 
+def is_room_for_inner_test(room_id):
+    sr_id = str(room_id)
+    return sr_id.startswith("LX")
+
 def get_room(cmd, room_id, game_id):
     if room_id in Rooms:
         return Rooms[room_id],0
 
     if cmd.lower() == InterProtocol.client_req_cmd_enter_room.lower():
-        if room_id.startswith("LX"):
-            return create_room_from_db(room_id, game_id), Errors.ok
+        if is_room_for_inner_test(room_id):
+            return create_room(room_id, game_id), Errors.ok
         else:
             if check_is_valid_room_no(room_id, game_id):
-                return create_room_from_db(room_id, game_id), Errors.ok
+                return create_room(room_id, game_id), Errors.ok
             else:
                 return None, Errors.wrong_room_number
     else:
@@ -451,14 +455,27 @@ def process_player_select_action(conn, j_obj):
     round.process_player_select_action(player, j_obj["act-id"], act_param)
 
 # TODO create Room from database
-def create_room_from_db(room_id, rule_id):
+def create_room(room_id, rule_id):
     game_rule = GameRules[rule_id]
+
+    room = None
     if isinstance(game_rule, GameRule_Majiang):
         room = Room_Majiang(room_id, game_rule)
         room.set_min_seated_player_num(game_rule.get_player_min_number())
         room.set_max_seated_player_num(game_rule.get_player_max_number())
         room.set_max_player_number(MAX_PLAYER_NUM_IN_ROOM)
+    ret = True
+    if not is_room_for_inner_test(room_id):
+        ret = load_room_settings_from_db(room)
 
+    if ret:
+        Rooms[room_id] = room
+        return room
+    else:
+        return None
+
+
+def load_room_settings_from_db(room):
     try:
         dbConn = db.get_connection()
         with dbConn.cursor() as cursor:
@@ -469,19 +486,15 @@ def create_room_from_db(room_id, rule_id):
                   "s2.`stuffname` as `stake_stuff_name`,`stake_base_score`" \
                   " FROM `room` as r, stuff as s1, stuff as s2 " \
                   " WHERE room_no=%s and r.fee_stuff_id = s1.stuffid and r.stake_stuff_id = s2.stuffid"
-            cursor.execute(sql, (room_id))
+            cursor.execute(sql, (room.get_room_id()))
             result = cursor.fetchone()
             print(result)
             room.set_round_number(result["round_num"])
             room.set_fee_stuff(result["fee_stuff_id"], result["fee_stuff_name"])
             room.set_stake_stuff(result["stake_stuff_id"], result["stake_stuff_name"])
-
-            Rooms[room_id] = room
-            return room
+            return True
     except Exception as ex:
-        return None
-
-
+        return False
 
 def process_client_disconnected(conn):
     player = get_player_client_from_conn(conn)
