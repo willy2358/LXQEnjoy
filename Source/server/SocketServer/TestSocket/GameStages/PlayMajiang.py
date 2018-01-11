@@ -154,7 +154,7 @@ class PlayMajiang(PlayInTurn):
         elif cmd == InterProtocol.majiang_player_act_hu:
             losers = []
             card = cmd_data
-            player.set_newest_cards([card],False, True)
+            player.set_newest_cards(card,False, True)
             if game_round.get_rule().get_win_type() == WinType.dian_pao:
                 losers.append(game_round.get_last_out_cards_player())
             else:
