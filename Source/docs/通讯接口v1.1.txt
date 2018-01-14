@@ -363,10 +363,10 @@ user-info，用户信息，具体待定
 
 ### 进入房间
 通道：socket
-接口：http://serverip/service
+
 请求参数：
 {
-	"cmdtype":"httpreq",
+	"cmdtype":"sockreq",
 	"httpreq":"enter-room",
 	"userid",123456,
 	"token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN",
@@ -375,7 +375,7 @@ user-info，用户信息，具体待定
 }
 服务器返回：
 {
-	"cmdtype":"httpresp",
+	"cmdtype":"sockresp",
 	"httpresp":"enter-room",
 	"result":"OK"，
 	"result-data":"room"，
@@ -392,10 +392,9 @@ user-info，用户信息，具体待定
 
 ### 离开房间
 通道：socket
-接口：http://serverip/service
 请求参数：
 {
-	"cmdtype":"httpreq",
+	"cmdtype":"sockreq",
 	"httpreq":"leave-room",
 	"userid",123456,
 	"token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN"
@@ -403,7 +402,7 @@ user-info，用户信息，具体待定
 }
 服务器返回：
 {
-	"cmdtype":"httpresp",
+	"cmdtype":"sockresp",
 	"httpresp":"leave-room",
 	"result":"OK"，
 	"result-data":""， 
