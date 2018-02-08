@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3F05B395202CB0DB00971438 /* CocoaAsyncSocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F05B394202CB0DB00971438 /* CocoaAsyncSocket.framework */; };
+		3F05B396202CB13700971438 /* CocoaAsyncSocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F05B394202CB0DB00971438 /* CocoaAsyncSocket.framework */; };
+		3F05B397202CB13700971438 /* CocoaAsyncSocket.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3F05B394202CB0DB00971438 /* CocoaAsyncSocket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3F72F215201F6E120067A5CA /* CreateMajiangRoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F72F214201F6E120067A5CA /* CreateMajiangRoomViewController.m */; };
 		3F72F218201F6EE50067A5CA /* EnterRoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F72F217201F6EE50067A5CA /* EnterRoomViewController.m */; };
 		3F9220E3200B9ECD00797D3E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F9220E2200B9ECD00797D3E /* AppDelegate.m */; };
@@ -21,7 +24,22 @@
 		3F922102200FA5C800797D3E /* GameRoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F922101200FA5C800797D3E /* GameRoomViewController.m */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		3F05B398202CB13700971438 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				3F05B397202CB13700971438 /* CocoaAsyncSocket.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		3F05B394202CB0DB00971438 /* CocoaAsyncSocket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CocoaAsyncSocket.framework; sourceTree = "<group>"; };
 		3F72F213201F6E120067A5CA /* CreateMajiangRoomViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CreateMajiangRoomViewController.h; sourceTree = "<group>"; };
 		3F72F214201F6E120067A5CA /* CreateMajiangRoomViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CreateMajiangRoomViewController.m; sourceTree = "<group>"; };
 		3F72F216201F6EE50067A5CA /* EnterRoomViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EnterRoomViewController.h; sourceTree = "<group>"; };
@@ -51,6 +69,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F05B396202CB13700971438 /* CocoaAsyncSocket.framework in Frameworks */,
+				3F05B395202CB0DB00971438 /* CocoaAsyncSocket.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -76,6 +96,7 @@
 		3F9220E0200B9ECD00797D3E /* LxqAppleApp */ = {
 			isa = PBXGroup;
 			children = (
+				3F05B394202CB0DB00971438 /* CocoaAsyncSocket.framework */,
 				3F9220FD200E546C00797D3E /* CreateRoomViewController.h */,
 				3F9220FE200E546C00797D3E /* CreateRoomViewController.m */,
 				3F9220E1200B9ECD00797D3E /* AppDelegate.h */,
@@ -111,6 +132,7 @@
 				3F9220DA200B9ECD00797D3E /* Sources */,
 				3F9220DB200B9ECD00797D3E /* Frameworks */,
 				3F9220DC200B9ECD00797D3E /* Resources */,
+				3F05B398202CB13700971438 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -315,6 +337,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/LxqAppleApp",
+				);
 				INFOPLIST_FILE = LxqAppleApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -329,6 +355,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/LxqAppleApp",
+				);
 				INFOPLIST_FILE = LxqAppleApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

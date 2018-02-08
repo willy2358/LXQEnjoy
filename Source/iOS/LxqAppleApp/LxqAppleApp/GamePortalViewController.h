@@ -16,4 +16,10 @@
 - (IBAction)createRoom_Clicked:(id)sender;
 //@property (weak, nonatomic) IBOutlet UIButton *btnEnterRoom;
 
+//- (NSString *) serverIP;
+//- (NSInteger) serverPort;
+
+@property NSString* serverIP;
+@property int serverPort;
+
 @end
