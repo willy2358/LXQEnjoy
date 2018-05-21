@@ -61,6 +61,10 @@ class GameListViewController: UIViewController{
         let gameEntry = myStoryBoard?.instantiateViewController(withIdentifier: "game_entry")
         self.present(gameEntry!, animated: true, completion: nil) //(gameEntry!, animated: true, completion: nil)
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        print("hello")
+    }
 
     func gameBtnClicked(sender:UIButton?){
         

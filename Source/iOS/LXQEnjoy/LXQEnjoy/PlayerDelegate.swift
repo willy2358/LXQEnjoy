@@ -8,10 +8,12 @@
 
 import Foundation
 
+import SwiftyJSON
+
 protocol PlayerDelegate{
-    func processServerSuccessResponse(respCmd:String, result_data: String, data: String)
+    func processServerSuccessResponse(respCmd:String, jsonObj:JSON)
     func processServerFailResponse(reqCmd:String, errCode:UInt, errMsg:String)
-    func processServerPush(pushCmd:String, cmdJsonStr: String)
+    func processServerPush(pushCmd:String, jsonObj:JSON)
     
     func onPlayerConnectStateChanged(oldState:client_status, newState:client_status)
 }

@@ -8,8 +8,39 @@
 
 import UIKit
 import SnapKit
+import SwiftyJSON
 
 class MahongTableViewController: UIViewController, PlayerDelegate {
+    
+    var cardsPanelSize : CGSize!
+    let cardsInHand : NSMutableArray = NSMutableArray()
+    var cardsPanel : UIView!
+    var sockPlayer : SockPlayer!
+    
+    func processServerSuccessResponse(respCmd: String, jsonObj: JSON) {
+        
+    }
+    
+    public func setSockPlayer(player:SockPlayer) {
+        self.sockPlayer = player
+        
+    }
+    
+    func processServerPush(pushCmd: String, jsonObj: JSON) {
+        if pushCmd == SockCmds.push_deal_cards{
+            let cards = jsonObj[SockCmds.param_cards].arrayValue
+            let newCards = NSMutableArray()
+            for c in cards{
+                
+                let btn = UIButton()
+                let img = UIImage(named: String(c.intValue))
+                btn.setBackgroundImage(img, for: UIControlState.normal)
+                newCards.add(btn)
+            }
+            horzStackSubviews(panel: cardsPanel, subviews: newCards, panelSize:cardsPanelSize)
+        }
+    }
+    
     func onPlayerConnectStateChanged(oldState: client_status, newState: client_status) {
         
     }
@@ -18,47 +49,28 @@ class MahongTableViewController: UIViewController, PlayerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let rect = CGRect(x:0, y:10, width:150, height:60)
-        let myView = UIView(frame:rect)
-        myView.backgroundColor = UIColor.red
-        self.view.addSubview(myView)
+        let rect = self.view.frame
+        let yStart = rect.height * CGFloat(2.0 / 3.0)
+        let myAreaHeight = rect.height - yStart
+        let myProfileWidth = myAreaHeight
+        let space = CGFloat(10)
+        let xStart = myProfileWidth + space
         
-        let views = NSMutableArray()
-        let btn1 = UIButton()
-        let img1 = UIImage(named: "23")
-        btn1.setBackgroundImage(img1, for: UIControlState.normal)
-        views.add(btn1)
         
-        let btn2 = UIButton()
-        let img2 = UIImage(named: "13")
-        btn2.setBackgroundImage(img2, for: UIControlState.normal)
-        views.add(btn2)
+        let cardsPanelWidth = rect.width - myProfileWidth - 2.0 * space
+        let cardsPanelHeight = myAreaHeight * CGFloat(0.5)
         
-        let btn3 = UIButton()
-        let img3 = UIImage(named: "13")
-        btn3.setBackgroundImage(img3, for: UIControlState.normal)
-        views.add(btn3)
-        
-        let btn4 = UIButton()
-        let img4 = UIImage(named: "13")
-        btn4.setBackgroundImage(img4, for: UIControlState.normal)
-        views.add(btn4)
-
-        let btn5 = UIButton()
-        let img5 = UIImage(named: "13")
-        btn5.setBackgroundImage(img5, for: UIControlState.normal)
-        views.add(btn5)
-        
-        let btn6 = UIButton()
-        let img6 = UIImage(named: "13")
-        btn6.setBackgroundImage(img6, for: UIControlState.normal)
-        views.add(btn6)
+        cardsPanelSize = CGSize(width: cardsPanelWidth, height: cardsPanelHeight)
+        let rectPanel = CGRect(origin: CGPoint(x:xStart, y:yStart), size:cardsPanelSize )
+        cardsPanel = UIView(frame:rectPanel)
+        cardsPanel.backgroundColor = UIColor.clear
+        self.view.addSubview(cardsPanel)
+        sockPlayer = NetworkProxy.sockPlayer
+        sockPlayer.playerDelegate = self
+        sockPlayer.joinGame(roomId: "LX888", gameId: 111)
 
         
         
-        let size = CGSize(width: 150, height: 60)
-        
-        horzStackSubviews(panel: myView, subviews: views, panelSize:size)
         
         
         
@@ -77,7 +89,7 @@ class MahongTableViewController: UIViewController, PlayerDelegate {
         let bestSubviewWidth = bestRatio * panelSize.height
         let viewsWidthSum:CGFloat = CGFloat(vCount) * bestSubviewWidth
         if viewsWidthSum < panelSize.width{
-            self.centerSubviews(container: panel, subViews: subviews, containerSize: panelSize, space: 10.0)
+            self.centerSubviews(container: panel, subViews: subviews, containerSize: panelSize, space: 0.0)
         }
         else{
             self.overlapSubviews(container: panel, subViews: subviews, containerSize: panelSize, subViewWidth: bestSubviewWidth)
@@ -124,7 +136,7 @@ class MahongTableViewController: UIViewController, PlayerDelegate {
 
             subView.snp.makeConstraints { (make) -> Void in
                 make.top.equalTo(container)
-                make.left.equalTo(view).offset(offsetStart + CGFloat(i) * (bestSubviewWidth + space))
+                make.left.equalTo(container).offset(offsetStart + CGFloat(i) * (bestSubviewWidth + space))
                 make.width.equalTo(bestSubviewWidth)
                 make.height.equalTo(containerSize.height)
 
@@ -132,17 +144,13 @@ class MahongTableViewController: UIViewController, PlayerDelegate {
         }
     }
     
-    func processServerPush(pushCmd: String, cmdJsonStr: String) {
-   
-    }
+
     
     func processServerFailResponse(reqCmd: String, errCode: UInt, errMsg: String) {
     
     }
     
-    func processServerSuccessResponse(respCmd: String, result_data: String, data: String) {
- 
-    }
+
     /*
     // MARK: - Navigation
 

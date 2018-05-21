@@ -8,7 +8,17 @@
 
 import UIKit
 
+import SwiftyJSON
+
 class GameEntryViewController: UIViewController, PlayerDelegate {
+    func processServerSuccessResponse(respCmd: String, jsonObj: JSON) {
+        
+    }
+    
+    func processServerPush(pushCmd: String, jsonObj: JSON) {
+        
+    }
+    
 
     var player : SockPlayer?
     
@@ -17,7 +27,9 @@ class GameEntryViewController: UIViewController, PlayerDelegate {
 //        player = NetworkProxy.getSockPlayer()
         player = SockPlayer(serverIP: AppConfig.sockServerIP, serverPort: AppConfig.sockServerPort)
         player?.playerDelegate = self
+        NetworkProxy.sockPlayer = player
         player?.connect()
+        
         
         
         
@@ -63,6 +75,13 @@ class GameEntryViewController: UIViewController, PlayerDelegate {
         
     }
     
+//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//        if segue.identifier == "MJTable"{
+//            let roomVC = segue.destination as! MahongTableViewController
+//            roomVC.setSockPlayer(player: self.player!)
+//        }
+//    }
+    
     func onPlayerConnectStateChanged(oldState: client_status, newState: client_status) {
         if newState == client_status.connected{
             player?.enterRoom(roomId: "LX888", gameId: 111,
@@ -71,7 +90,8 @@ class GameEntryViewController: UIViewController, PlayerDelegate {
                     //        let anotherView = myStoryBoard.instanceViewControllerWithIdentifier("post")
                     //        let gameEntry = myStoryBoard?.instantiateInitialViewController("post")
                     let mjTable = myStoryBoard?.instantiateViewController(withIdentifier: "MJTable")
-                    //        let table = MahongTableViewController()
+                //        let table = MahongTableViewController()
+                
                     self.present(mjTable!, animated: true, completion: nil)
                 },
                 failCallback: {errCode,errMsg in

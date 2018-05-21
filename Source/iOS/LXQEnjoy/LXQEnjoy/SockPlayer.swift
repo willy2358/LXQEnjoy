@@ -32,7 +32,7 @@ class SockPlayer : NSObject, GCDAsyncSocketDelegate {
     }
     
     func enterRoom(roomId:String, gameId:UInt16, okCallBack : @escaping OKCallBack, failCallback: @escaping FailCallBack) -> Bool {
-        let cmd = SockCmds.sock_cmd_enter_room
+        let cmd = SockCmds.enter_room
         let packet = [
             "cmdtype":"sockreq",
             "sockreq":cmd,
@@ -49,6 +49,25 @@ class SockPlayer : NSObject, GCDAsyncSocketDelegate {
         sockClient.write(data, withTimeout: -1, tag: 0)
         sockClient.readData(withTimeout: -1, tag: 0)
         return true
+    }
+    
+    func joinGame(roomId:String, gameId:UInt16) {
+        let cmd = SockCmds.join_game
+        let packet = [
+            "cmdtype":"sockreq",
+            "sockreq":cmd,
+            "userid":self.userId,
+            
+            "gameid":gameId,
+            "roomid":roomId
+            ] as [String:Any]
+        
+//        updateCmdCallbacks(cmdName: cmd, okCallBack: okCallBack, failCallBack: failCallback)
+        
+        let jsonStr = convertDictionaryToString(dict: packet)
+        let data = jsonStr.data(using: String.Encoding.utf8)!
+        sockClient.write(data, withTimeout: -1, tag: 0)
+        sockClient.readData(withTimeout: -1, tag: 0)
     }
     
     func updateCmdCallbacks(cmdName:String, okCallBack:@escaping OKCallBack, failCallBack : @escaping FailCallBack) -> Void {
@@ -136,6 +155,7 @@ class SockPlayer : NSObject, GCDAsyncSocketDelegate {
             print("Invalid socket data")
             return;
         }
+        print("------once read")
         
         if pack_text.contains(SockPlayer.LXQ_PACKET_START) && pack_text.contains(SockPlayer.LXQ_PACKET_END){
             let pattern :String = "LXQ<\\(:([\\w\\W]*?):\\)>QXL"
@@ -144,11 +164,9 @@ class SockPlayer : NSObject, GCDAsyncSocketDelegate {
                 return
             }
             
-            // 3. 匹配字符串中内容
             let results =  regex.matches(in: pack_text, options: [], range: NSRange(location: 0, length: pack_text.characters.count))
             
-            // 4.遍历数组,获取结果[NSTextCheckingResult]
-            print("entry count:" + String(results.count) + "\r\n")
+            print("entry count:" + String(results.count) )
             let nsText = pack_text as NSString
             for result in results {
                 
@@ -156,18 +174,16 @@ class SockPlayer : NSObject, GCDAsyncSocketDelegate {
                 let range = NSMakeRange(SockPlayer.LXQ_PACKET_START.count, result.range.length - 12)
                 let cmd = resp.substring(with:range)
                 print("server cmd:" + cmd)
-                self.parseServerResponse(respJson: cmd)
+                self.processServerCmd(respJson: cmd)
                
             }
             
         }
         sockClient.readData(withTimeout: -1, tag: 0)
-        
-        print(str!)
-        
     }
     
     func processCmdResponse(cmd:String, respJson:JSON) {
+        
         if !cmdCallbacks.keys.contains(cmd){
             return
         }
@@ -183,8 +199,8 @@ class SockPlayer : NSObject, GCDAsyncSocketDelegate {
         }
     }
     
-    func parseServerResponse(respJson:String) {
-        print(respJson)
+    func processServerCmd(respJson:String) {
+       
         let jsonData = respJson.data(using : String.Encoding.utf8)
         var jsonObj : JSON?
         do{
@@ -204,13 +220,20 @@ class SockPlayer : NSObject, GCDAsyncSocketDelegate {
 //                //ToDo show error popup
 //                return
 //            }
+            if jsonObj?["result"].stringValue == "OK"{
+                playerDelegate?.processServerSuccessResponse(respCmd: cmd, jsonObj: jsonObj!)
+            }
+            else {
+                playerDelegate?.processServerFailResponse(reqCmd: cmd, errCode: (jsonObj?["errcode"].uInt)!, errMsg: (jsonObj?["errmsg"].stringValue)!)
+            }
             
-            print("cmd:" + cmd)
+           
             processCmdResponse(cmd: cmd, respJson: jsonObj!)
         }
         else if cmdType == "sockpush"{
             cmd = jsonObj?["sockpush"].stringValue
-            print("push cmd : " + cmd)
+          
+            playerDelegate?.processServerPush(pushCmd: cmd, jsonObj: jsonObj!)
         }
     }
     
