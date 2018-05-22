@@ -21,6 +21,10 @@ class SockCmds{
     
     static let push_deal_cards = "deal-cards"
     
+    static let push_cards_state = "cards-state"
+    
+    static let push_new_banker = "new-banker"
+    
     static let param_cards = "cards"
 }
 

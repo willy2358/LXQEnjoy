@@ -46,9 +46,7 @@ class MahongTableViewController: UIViewController, PlayerDelegate {
     }
     
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
+    fileprivate func createCardsPanel() {
         let rect = self.view.frame
         let yStart = rect.height * CGFloat(2.0 / 3.0)
         let myAreaHeight = rect.height - yStart
@@ -65,9 +63,14 @@ class MahongTableViewController: UIViewController, PlayerDelegate {
         cardsPanel = UIView(frame:rectPanel)
         cardsPanel.backgroundColor = UIColor.clear
         self.view.addSubview(cardsPanel)
-        sockPlayer = NetworkProxy.sockPlayer
-        sockPlayer.playerDelegate = self
-        sockPlayer.joinGame(roomId: "LX888", gameId: 111)
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        createSeatButtons()
+        
+        createCardsPanel()
 
         
         
@@ -80,6 +83,47 @@ class MahongTableViewController: UIViewController, PlayerDelegate {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func createSeatButtons() {
+        let tableRect = self.view.frame
+        let horzSpan = CGFloat(80.0)
+        let vertSpan = CGFloat(50.0)
+        let btnSize = CGSize(width: 80.0, height: 30.0)
+        let x = (tableRect.width - btnSize.width)/2.0
+        let y = (tableRect.height - btnSize.width)/2.0
+        
+        let btn1 = UIButton(frame: CGRect(x:x, y:vertSpan, width:btnSize.width, height:btnSize.height))
+        btn1.setTitle(StringRes.Join_game, for: UIControlState.normal)
+        btn1.tag = 1
+        btn1.addTarget(self, action:#selector(sitDownTabed(_:)), for:.touchUpInside)
+        self.view.addSubview(btn1)
+        
+        let btn2 = UIButton(frame: CGRect(x:x, y:tableRect.height - vertSpan, width:btnSize.width, height:btnSize.height))
+        btn2.tag = 2
+        btn2.addTarget(self, action:#selector(sitDownTabed(_:)), for:.touchUpInside)
+        btn2.setTitle(StringRes.Join_game, for: UIControlState.normal)
+        self.view.addSubview(btn2)
+        
+        let btn3 = UIButton(frame: CGRect(x:horzSpan, y:y, width:btnSize.width, height:btnSize.height))
+        btn3.tag = 3
+        btn3.setTitle(StringRes.Join_game, for: UIControlState.normal)
+        btn3.addTarget(self, action:#selector(sitDownTabed(_:)), for:.touchUpInside)
+        self.view.addSubview(btn3)
+        
+        let btn4 = UIButton(frame: CGRect(x:tableRect.width - horzSpan, y:y, width:btnSize.width, height:btnSize.height))
+        btn4.tag = 4
+        btn4.setTitle(StringRes.Join_game, for: UIControlState.normal)
+        btn4.addTarget(self, action:#selector(sitDownTabed(_:)), for:.touchUpInside)
+        self.view.addSubview(btn4)
+    
+    }
+    
+    @objc func sitDownTabed(_ button:UIButton){
+        let seatNo = button.tag
+        sockPlayer = NetworkProxy.sockPlayer
+        sockPlayer.playerDelegate = self
+        sockPlayer.joinGame(roomId: "LX888", gameId: 111, seatNo: UInt16(seatNo))
     }
     
     func horzStackSubviews(panel:UIView, subviews:NSMutableArray, panelSize:CGSize) -> Void {

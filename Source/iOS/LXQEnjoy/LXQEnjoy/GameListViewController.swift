@@ -41,7 +41,7 @@ class GameListViewController: UIViewController{
         for i in 0...2 {
             let btn = UIButton()
             btn.tag = gameId + i
-            btn.addTarget(self, action:#selector(tapped(_:)), for:.touchUpInside)
+            btn.addTarget(self, action:#selector(sitDownTabed(_:)), for:.touchUpInside)
 //            btn.addTarget(self, action: "gameBtnClicked:", for: UIControlEvents.touchUpInside)
             let img = UIImage(named: images[i])
             btn.setBackgroundImage(img, for: UIControlState.normal)

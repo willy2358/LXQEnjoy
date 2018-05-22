@@ -51,13 +51,13 @@ class SockPlayer : NSObject, GCDAsyncSocketDelegate {
         return true
     }
     
-    func joinGame(roomId:String, gameId:UInt16) {
+    func joinGame(roomId:String, gameId:UInt16, seatNo:UInt16) {
         let cmd = SockCmds.join_game
         let packet = [
             "cmdtype":"sockreq",
             "sockreq":cmd,
             "userid":self.userId,
-            
+            "seatno":seatNo,
             "gameid":gameId,
             "roomid":roomId
             ] as [String:Any]
