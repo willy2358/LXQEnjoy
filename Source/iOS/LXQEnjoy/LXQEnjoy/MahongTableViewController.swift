@@ -10,18 +10,18 @@ import UIKit
 import SnapKit
 import SwiftyJSON
 
-class MahongTableViewController: UIViewController, PlayerDelegate {
+class MahongTableViewController: UIViewController, SockClientDelegate {
     
     var cardsPanelSize : CGSize!
     let cardsInHand : NSMutableArray = NSMutableArray()
     var cardsPanel : UIView!
-    var sockPlayer : SockPlayer!
+    var sockPlayer : SockClient!
     
     func processServerSuccessResponse(respCmd: String, jsonObj: JSON) {
         
     }
     
-    public func setSockPlayer(player:SockPlayer) {
+    public func setSockPlayer(player:SockClient) {
         self.sockPlayer = player
         
     }
@@ -89,41 +89,67 @@ class MahongTableViewController: UIViewController, PlayerDelegate {
         let tableRect = self.view.frame
         let horzSpan = CGFloat(80.0)
         let vertSpan = CGFloat(50.0)
+        let btnWidth = 80.0
+        let btnHeight = 30.0
         let btnSize = CGSize(width: 80.0, height: 30.0)
         let x = (tableRect.width - btnSize.width)/2.0
-        let y = (tableRect.height - btnSize.width)/2.0
+        let y = (tableRect.height - btnSize.height)/2.0
         
-        let btn1 = UIButton(frame: CGRect(x:x, y:vertSpan, width:btnSize.width, height:btnSize.height))
+        let btn1 = UIButton()
         btn1.setTitle(StringRes.Join_game, for: UIControlState.normal)
         btn1.tag = 1
         btn1.addTarget(self, action:#selector(sitDownTabed(_:)), for:.touchUpInside)
         self.view.addSubview(btn1)
+        btn1.snp.makeConstraints{(make) -> Void in
+            make.top.equalTo(self.view).offset(vertSpan)
+            make.left.equalTo(self.view).offset(x)
+            make.width.equalTo(btnWidth)
+            make.height.equalTo(btnHeight)
+        }
         
-        let btn2 = UIButton(frame: CGRect(x:x, y:tableRect.height - vertSpan, width:btnSize.width, height:btnSize.height))
+        let btn2 = UIButton()
         btn2.tag = 2
         btn2.addTarget(self, action:#selector(sitDownTabed(_:)), for:.touchUpInside)
         btn2.setTitle(StringRes.Join_game, for: UIControlState.normal)
         self.view.addSubview(btn2)
+        btn2.snp.makeConstraints{ (make) -> Void in
+            make.bottom.equalTo(self.view).offset(-vertSpan)
+            make.left.equalTo(self.view).offset(x)
+            make.width.equalTo(btnWidth)
+            make.height.equalTo(btnHeight)
+        }
         
-        let btn3 = UIButton(frame: CGRect(x:horzSpan, y:y, width:btnSize.width, height:btnSize.height))
+        let btn3 = UIButton()
         btn3.tag = 3
         btn3.setTitle(StringRes.Join_game, for: UIControlState.normal)
         btn3.addTarget(self, action:#selector(sitDownTabed(_:)), for:.touchUpInside)
         self.view.addSubview(btn3)
+        btn3.snp.makeConstraints{(make) -> Void in
+            make.left.equalTo(self.view).offset(horzSpan)
+            make.top.equalTo(self.view).offset(y)
+            make.width.equalTo(btnWidth)
+            make.height.equalTo(btnHeight)
+        }
         
-        let btn4 = UIButton(frame: CGRect(x:tableRect.width - horzSpan, y:y, width:btnSize.width, height:btnSize.height))
+        let btn4 = UIButton()
         btn4.tag = 4
         btn4.setTitle(StringRes.Join_game, for: UIControlState.normal)
         btn4.addTarget(self, action:#selector(sitDownTabed(_:)), for:.touchUpInside)
         self.view.addSubview(btn4)
+        btn4.snp.makeConstraints{(make) -> Void in
+            make.right.equalTo(self.view).offset(-horzSpan)
+            make.top.equalTo(self.view).offset(y)
+            make.width.equalTo(btnWidth)
+            make.height.equalTo(btnHeight)
+        }
     
     }
     
     @objc func sitDownTabed(_ button:UIButton){
         let seatNo = button.tag
-        sockPlayer = NetworkProxy.sockPlayer
-        sockPlayer.playerDelegate = self
-        sockPlayer.joinGame(roomId: "LX888", gameId: 111, seatNo: UInt16(seatNo))
+//        sockPlayer = NetworkProxy.sockPlayer
+//        sockPlayer.playerDelegate = self
+//        sockPlayer.joinGame(roomId: "LX888", gameId: 111, seatNo: UInt16(seatNo))
     }
     
     func horzStackSubviews(panel:UIView, subviews:NSMutableArray, panelSize:CGSize) -> Void {

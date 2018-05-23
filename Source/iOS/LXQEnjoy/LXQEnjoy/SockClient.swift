@@ -10,7 +10,7 @@ import Foundation
 
 import SwiftyJSON
 
-class SockPlayer : NSObject, GCDAsyncSocketDelegate {
+class SockClient : NSObject, GCDAsyncSocketDelegate {
     
     static let LXQ_PACKET_START : String = "LXQ<(:"
     static let LXQ_PACKET_END : String = ":)>QXL"
@@ -21,10 +21,13 @@ class SockPlayer : NSObject, GCDAsyncSocketDelegate {
     var serverPort : UInt16!
     
     var cmdCallbacks = Dictionary<String, ServerRespCallBacks>()
+    var connectSuccessCB : (() -> Void)?
+    var connectFailCB: ((String) -> Void)?
+    
     
     var Status : client_status = client_status.not_connect
     
-    var playerDelegate : PlayerDelegate?
+    var playerDelegate : SockClientDelegate?
     
     public init(serverIP: String, serverPort: UInt16) {
         self.serverIP = serverIP
@@ -98,18 +101,26 @@ class SockPlayer : NSObject, GCDAsyncSocketDelegate {
     }
     
     
-    func connect() -> Bool {
+    func connect(successCallBack: @escaping () -> Void, failCallBack: @escaping (String) -> Void) -> Bool {
         sockClient.delegate = self
         sockClient.delegateQueue = DispatchQueue.main
+        self.connectSuccessCB = successCallBack
+        self.connectFailCB = failCallBack
+        
         do{
             try sockClient.connect(toHost: serverIP, onPort: self.serverPort)
             sockClient.readData(withTimeout: -1, tag: 0)
-//            Status = client_status.connected
+//          Status = client_status.connected
             return true
         }
         catch{
             print(error)
             Status = client_status.connect_failed
+            if let cb = self.connectFailCB {
+                cb(error.localizedDescription)
+            }
+//            self.connectFailCB!(error)
+            
             return false
         }
     }
@@ -120,6 +131,9 @@ class SockPlayer : NSObject, GCDAsyncSocketDelegate {
         let oldStatus = self.Status
         self.Status = client_status.connected
         print("Connected to socket server")
+        if let cb = self.connectSuccessCB{
+            cb()
+        }
         
         playerDelegate?.onPlayerConnectStateChanged(oldState: oldStatus, newState: self.Status)
         
@@ -157,7 +171,7 @@ class SockPlayer : NSObject, GCDAsyncSocketDelegate {
         }
         print("------once read")
         
-        if pack_text.contains(SockPlayer.LXQ_PACKET_START) && pack_text.contains(SockPlayer.LXQ_PACKET_END){
+        if pack_text.contains(SockClient.LXQ_PACKET_START) && pack_text.contains(SockClient.LXQ_PACKET_END){
             let pattern :String = "LXQ<\\(:([\\w\\W]*?):\\)>QXL"
             
             guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else {
@@ -171,7 +185,7 @@ class SockPlayer : NSObject, GCDAsyncSocketDelegate {
             for result in results {
                 
                 let resp = nsText.substring(with: result.range) as NSString
-                let range = NSMakeRange(SockPlayer.LXQ_PACKET_START.count, result.range.length - 12)
+                let range = NSMakeRange(SockClient.LXQ_PACKET_START.count, result.range.length - 12)
                 let cmd = resp.substring(with:range)
                 print("server cmd:" + cmd)
                 self.processServerCmd(respJson: cmd)

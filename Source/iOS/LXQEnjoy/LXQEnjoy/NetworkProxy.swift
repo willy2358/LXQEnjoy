@@ -12,21 +12,24 @@ class NetworkProxy{
     
     static let sharedInst = NetworkProxy.init()
     
-    static var sockPlayer : SockPlayer?
+    var sockPlayer : SockClient?
     private init(){
         
     }
     
-//    class func getSockPlayer() -> SockPlayer? {
-//        let inst = NetworkProxy.sharedInst
-//        if nil == inst.sockPlayer{
-//            let serverIP = AppConfig.sockServerIP
-//            let port = AppConfig.sockServerPort
-//            let sockPlayer = SockPlayer(serverIP: serverIP, serverPort: port)
-//            if sockPlayer.connect(){
-//                inst.sockPlayer = sockPlayer
-//            }
-//        }
-//        return inst.sockPlayer
-//    }
+    class func getSockClient() -> SockClient? {
+        let inst = NetworkProxy.sharedInst
+        if nil == inst.sockPlayer{
+            let serverIP = AppConfig.sockServerIP
+            let port = AppConfig.sockServerPort
+            let sockPlayer = SockClient(serverIP: serverIP, serverPort: port)
+            
+            if sockPlayer.connect(
+                successCallBack: {() -> Void in inst.sockPlayer = sockPlayer },
+                failCallBack: { (m) ->Void in  }){
+                inst.sockPlayer = sockPlayer
+            }
+        }
+        return inst.sockPlayer
+    }
 }

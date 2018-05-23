@@ -10,7 +10,7 @@ import Foundation
 
 import SwiftyJSON
 
-protocol PlayerDelegate{
+protocol SockClientDelegate{
     func processServerSuccessResponse(respCmd:String, jsonObj:JSON)
     func processServerFailResponse(reqCmd:String, errCode:UInt, errMsg:String)
     func processServerPush(pushCmd:String, jsonObj:JSON)

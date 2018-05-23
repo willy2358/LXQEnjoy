@@ -10,7 +10,7 @@ import UIKit
 
 import SwiftyJSON
 
-class GameEntryViewController: UIViewController, PlayerDelegate {
+class GameEntryViewController: UIViewController, SockClientDelegate {
     func processServerSuccessResponse(respCmd: String, jsonObj: JSON) {
         
     }
@@ -20,18 +20,20 @@ class GameEntryViewController: UIViewController, PlayerDelegate {
     }
     
 
-    var player : SockPlayer?
+    var playerSockClient : SockClient?
     
     @IBAction func EnterRoom(_ sender: Any) {
         
-//        player = NetworkProxy.getSockPlayer()
-        player = SockPlayer(serverIP: AppConfig.sockServerIP, serverPort: AppConfig.sockServerPort)
-        player?.playerDelegate = self
-        NetworkProxy.sockPlayer = player
-        player?.connect()
+
+//        playerSockClient = SockClient(serverIP: AppConfig.sockServerIP, serverPort: AppConfig.sockServerPort)
+//        playerSockClient?.playerDelegate = self
+//        NetworkProxy.sockPlayer = playerSockClient
+//        playerSockClient?.connect()
         
         
-        
+        let myStoryBoard = self.storyboard
+        let mjTable = myStoryBoard?.instantiateViewController(withIdentifier: "MJTable")
+        self.present(mjTable!, animated: true, completion: nil)
         
 //
      
@@ -84,13 +86,13 @@ class GameEntryViewController: UIViewController, PlayerDelegate {
     
     func onPlayerConnectStateChanged(oldState: client_status, newState: client_status) {
         if newState == client_status.connected{
-            player?.enterRoom(roomId: "LX888", gameId: 111,
+            playerSockClient?.enterRoom(roomId: "LX888", gameId: 111,
                okCallBack: {
                     let myStoryBoard = self.storyboard
-                    //        let anotherView = myStoryBoard.instanceViewControllerWithIdentifier("post")
-                    //        let gameEntry = myStoryBoard?.instantiateInitialViewController("post")
+                
+                
                     let mjTable = myStoryBoard?.instantiateViewController(withIdentifier: "MJTable")
-                //        let table = MahongTableViewController()
+                
                 
                     self.present(mjTable!, animated: true, completion: nil)
                 },
