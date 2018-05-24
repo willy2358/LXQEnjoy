@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 import SwiftyJSON
 
-class MahongTableViewController: UIViewController, SockClientDelegate {
+class MahongTableViewController: UIViewController{
     
     var cardsPanelSize : CGSize!
     let cardsInHand : NSMutableArray = NSMutableArray()

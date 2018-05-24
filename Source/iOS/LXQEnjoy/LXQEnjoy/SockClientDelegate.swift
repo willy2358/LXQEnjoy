@@ -16,4 +16,12 @@ protocol SockClientDelegate{
     func processServerPush(pushCmd:String, jsonObj:JSON)
     
     func onPlayerConnectStateChanged(oldState:client_status, newState:client_status)
+    
+    func onCardsState(cardsUserId: UInt32, activeCards:[UInt8], freezedCards:[UInt8], publicShownCards:[[UInt8]])
+    func onPlayersStateChanged(players: [PlayerInfo])
+    func onNewBanker(bankerPlayer: PlayerInfo)
+    func onDealCards(receivePlayer:PlayerInfo)
+    func onGameStatusChanged(status:String, statusData:String)
+    func onPlayerPlayCards(player: PlayerInfo, cards:[UInt8])
+    func onCmdOptions(player:PlayerInfo, cmds: [CmdPush], timeoutSec: UInt, defaultCmd: CmdPush)
 }

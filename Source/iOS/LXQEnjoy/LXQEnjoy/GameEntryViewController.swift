@@ -10,7 +10,7 @@ import UIKit
 
 import SwiftyJSON
 
-class GameEntryViewController: UIViewController, SockClientDelegate {
+class GameEntryViewController: UIViewController{
     func processServerSuccessResponse(respCmd: String, jsonObj: JSON) {
         
     }
