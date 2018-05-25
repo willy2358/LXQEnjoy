@@ -26,6 +26,22 @@ class SockCmds{
     static let push_new_banker = "new-banker"
     
     static let param_cards = "cards"
+    
+    static let pack_part_cmd_type = "cmdtype"
+    static let pack_part_push = "sockpush"
+    static let pack_part_resp = "sockresp"
+    static let pack_part_result = "result"
+    static let result_ok = "OK"
+    static let result_error = "ERROR"
+    static let error_code = "errcode"
+    static let error_msg = "errmsg"
+    static let userid = "userid"
+    static let card_state_active_cards = "active-cards"
+    static let card_state_frozen_cards = "frozen-cards"
+    static let card_state_shown_cards = "shown-cards-groups"
+    
+    
 }
+
 
 

@@ -188,7 +188,7 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
                 let range = NSMakeRange(SockClient.LXQ_PACKET_START.count, result.range.length - 12)
                 let cmd = resp.substring(with:range)
                 print("server cmd:" + cmd)
-                self.processServerCmd(respJson: cmd)
+                self.processServerDataPack(respJson: cmd)
                
             }
             
@@ -197,57 +197,95 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
     }
     
     func processCmdResponse(cmd:String, respJson:JSON) {
-        
         if !cmdCallbacks.keys.contains(cmd){
             return
         }
         
-        let result = respJson["result"].stringValue
-        if result == "OK" && nil != cmdCallbacks[cmd]?.successCallBack{
+        let result = respJson[SockCmds.pack_part_result].stringValue
+        
+//        let result = respJson[SockCmds.pack_part_result].stringValue else{
+//            //print no result field
+//            return;
+//        }
+        
+        if result == SockCmds.result_ok {
             cmdCallbacks[cmd]?.successCallBack()
         }
         else{
-            let errCode = respJson["errcode"].intValue
-            let errMsg = respJson["errmsg"].stringValue
+            let errCode = respJson[SockCmds.error_code].intValue
+            let errMsg = respJson[SockCmds.error_msg].stringValue
             cmdCallbacks[cmd]?.failCallBack(errCode, errMsg)
         }
     }
     
-    func processServerCmd(respJson:String) {
-       
-        let jsonData = respJson.data(using : String.Encoding.utf8)
+    func processServerDataPack(respJson:String) {
+        let jsonObj = tryParseJsonString(jsonStr: respJson)
+        guard let respJson = jsonObj else{
+            print("invalid json string")
+            return;
+        }
+        
+        let cmdType = respJson[SockCmds.pack_part_cmd_type].stringValue
+        if cmdType == SockCmds.pack_part_resp {
+            let cmd = respJson[SockCmds.pack_part_resp].stringValue
+
+            processCmdResponse(cmd: cmd, respJson: respJson)
+            
+        }
+        else if cmdType == SockCmds.pack_part_push{
+            let cmd = respJson[SockCmds.pack_part_push].stringValue
+            processServerPushCmd(pushCmd: cmd, pushJson: respJson)
+        }
+    }
+    
+//    func processServerResponse(respCmd:String!, jsonResp: JSON!) {
+//        guard let result = jsonResp[SockCmds.pack_part_result].stringValue else{
+//            //print no result field
+//            return;
+//        }
+//
+//        if result == SockCmds.result_ok{
+////            playerDelegate?.processServerSuccessResponse(respCmd: cmd, jsonObj: jsonObj!)
+//        }
+//        else {
+////            playerDelegate?.processServerFailResponse(reqCmd: cmd, errCode: (jsonObj?["errcode"].uInt)!, errMsg: (jsonObj?["errmsg"].stringValue)!)
+//        }
+//
+//
+//        processCmdResponse(cmd: cmd, respJson: jsonObj!)
+//    }
+    
+    func processServerPushCmd(pushCmd:String, pushJson:JSON) {
+//        playerDelegate?.processServerPush(pushCmd: pushCmd, jsonObj: jsonObj!)
+        guard let delegate = playerDelegate else{
+            return;
+        }
+        
+        if (pushCmd == SockCmds.push_cards_state){
+            let userid = pushJson[SockCmds.userid].uIntValue
+            let act_cards = pushJson[SockCmds.card_state_active_cards].arrayObject
+            let frozen_cards = pushJson[SockCmds.card_state_frozen_cards].arrayObject
+            let shown_cards = pushJson[SockCmds.card_state_shown_cards].arrayObject
+//            delegate.onCardsState(cardsUserId: UInt32(userid), activeCards: act_cards, freezedCards: frozen_cards, publicShownCards: shown_cards)
+        }
+        
+//        switch pushCmd {
+//        case SockCmds.push_cards_state:
+//            delegate.onCardsState(cardsUserId: <#T##UInt32#>, activeCards: <#T##[UInt8]#>, freezedCards: <#T##[UInt8]#>, publicShownCards: <#T##[[UInt8]]#>)
+//        default:
+//            <#code#>
+//        }
+    }
+    
+    func tryParseJsonString(jsonStr: String) -> JSON? {
+        let jsonData = jsonStr.data(using : String.Encoding.utf8)
         var jsonObj : JSON?
         do{
             jsonObj = try JSON(data: jsonData!)
+            return jsonObj
         }
         catch{
-            
-        }
-
-        let cmdType = jsonObj?["cmdtype"].stringValue
-        var cmd : String!
-        if cmdType == "sockresp"{
-            cmd = jsonObj?["sockresp"].stringValue
-            
-//            let result = jsonObj?["result"].stringValue
-//            guard result! == "OK" else{
-//                //ToDo show error popup
-//                return
-//            }
-            if jsonObj?["result"].stringValue == "OK"{
-                playerDelegate?.processServerSuccessResponse(respCmd: cmd, jsonObj: jsonObj!)
-            }
-            else {
-                playerDelegate?.processServerFailResponse(reqCmd: cmd, errCode: (jsonObj?["errcode"].uInt)!, errMsg: (jsonObj?["errmsg"].stringValue)!)
-            }
-            
-           
-            processCmdResponse(cmd: cmd, respJson: jsonObj!)
-        }
-        else if cmdType == "sockpush"{
-            cmd = jsonObj?["sockpush"].stringValue
-          
-            playerDelegate?.processServerPush(pushCmd: cmd, jsonObj: jsonObj!)
+            return nil
         }
     }
     
