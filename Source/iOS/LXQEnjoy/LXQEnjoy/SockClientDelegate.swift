@@ -11,9 +11,9 @@ import Foundation
 import SwiftyJSON
 
 protocol SockClientDelegate{
-    func processServerSuccessResponse(respCmd:String, jsonObj:JSON)
-    func processServerFailResponse(reqCmd:String, errCode:UInt, errMsg:String)
-    func processServerPush(pushCmd:String, jsonObj:JSON)
+//    func processServerSuccessResponse(respCmd:String, jsonObj:JSON)
+//    func processServerFailResponse(reqCmd:String, errCode:UInt, errMsg:String)
+//    func processServerPush(pushCmd:String, jsonObj:JSON)
     
     func onPlayerConnectStateChanged(oldState:client_status, newState:client_status)
     

@@ -10,8 +10,12 @@ import UIKit
 
 import SwiftyJSON
 
-class GameEntryViewController: UIViewController{
+class GameEntryViewController: UIViewController, SockClientDelegate{
     func processServerSuccessResponse(respCmd: String, jsonObj: JSON) {
+        
+    }
+    
+    func processServerFailResponse(reqCmd: String, errCode: UInt, errMsg: String) {
         
     }
     
@@ -19,11 +23,45 @@ class GameEntryViewController: UIViewController{
         
     }
     
+    func onCardsState(cardsUserId: UInt32, activeCards: [UInt8], freezedCards: [UInt8], publicShownCards: [[UInt8]]) {
+        print("onCardsState")
+    }
+    
+    func onPlayersStateChanged(players: [PlayerInfo]) {
+        print("onPlayersStateChanged")
+    }
+    
+    func onNewBanker(bankerPlayer: PlayerInfo) {
+        
+    }
+    
+    func onDealCards(receivePlayer: PlayerInfo) {
+        
+    }
+    
+    func onGameStatusChanged(status: String, statusData: String) {
+        
+    }
+    
+    func onPlayerPlayCards(player: PlayerInfo, cards: [UInt8]) {
+        
+    }
+    
+    func onCmdOptions(player: PlayerInfo, cmds: [CmdPush], timeoutSec: UInt, defaultCmd: CmdPush) {
+        
+    }
+    
+
+    
 
     var playerSockClient : SockClient?
     
     @IBAction func EnterRoom(_ sender: Any) {
         
+        
+//        test_push_cards_state()
+        test_push_game_players()
+        return;
 
 //        playerSockClient = SockClient(serverIP: AppConfig.sockServerIP, serverPort: AppConfig.sockServerPort)
 //        playerSockClient?.playerDelegate = self
@@ -31,16 +69,33 @@ class GameEntryViewController: UIViewController{
 //        playerSockClient?.connect()
         
         
-        let myStoryBoard = self.storyboard
-        let mjTable = myStoryBoard?.instantiateViewController(withIdentifier: "MJTable")
-        self.present(mjTable!, animated: true, completion: nil)
-        
+//        let myStoryBoard = self.storyboard
+//        let mjTable = myStoryBoard?.instantiateViewController(withIdentifier: "MJTable")
+//        self.present(mjTable!, animated: true, completion: nil)
+//
 //
      
         
         
     }
     
+    func test_push_cards_state()  {
+        let client = SockClient(serverIP: "testIP", serverPort: 34)
+        client.playerDelegate = self
+        let test_pack = """
+        {"cmdtype": "sockpush", "sockpush": "cards-state", "userid": 333, "active-cards": [39, 11, 38, 13, 15, 24, 18, 37, 37, 14, 23], "frozen-cards": [31, 31, 31], "shown-cards-groups": [[31, 31, 31]]}
+"""
+        client.testServerPack(pack: test_pack)
+    }
+    
+    func test_push_game_players()  {
+        let client = SockClient(serverIP: "testIP", serverPort: 34)
+        client.playerDelegate = self
+        let test_pack = """
+        {"cmdtype": "sockpush", "sockpush": "game-players", "players": [{"userid": 111, "seated": 1}, {"userid": 222, "seated": 1}, {"userid": 333, "seated": 0}]}
+"""
+        client.testServerPack(pack: test_pack)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,17 +120,17 @@ class GameEntryViewController: UIViewController{
     }
     */
     
-    func processServerPush(pushCmd: String, cmdJsonStr: String) {
-        
-    }
-    
-    func processServerFailResponse(reqCmd: String, errCode: UInt, errMsg: String) {
-        
-    }
-    
-    func processServerSuccessResponse(respCmd: String, result_data: String, data: String) {
-        
-    }
+//    func processServerPush(pushCmd: String, cmdJsonStr: String) {
+//
+//    }
+//
+//    func processServerFailResponse(reqCmd: String, errCode: UInt, errMsg: String) {
+//
+//    }
+//
+//    func processServerSuccessResponse(respCmd: String, result_data: String, data: String) {
+//
+//    }
     
 //    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 //        if segue.identifier == "MJTable"{

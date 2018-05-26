@@ -39,6 +39,8 @@ class SockCmds{
     static let card_state_active_cards = "active-cards"
     static let card_state_frozen_cards = "frozen-cards"
     static let card_state_shown_cards = "shown-cards-groups"
+    static let game_players = "players"
+    static let game_player_seated = "seated"
     
     
 }

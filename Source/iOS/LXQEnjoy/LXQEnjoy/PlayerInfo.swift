@@ -10,4 +10,10 @@ import Foundation
 
 class PlayerInfo{
     var alias : String?
+    var userid : UInt?
+    var seated : UInt8?  //1, seated; 0: unseated
+ 
+    public init(){
+        
+    }
 }

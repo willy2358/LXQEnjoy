@@ -34,6 +34,10 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
         self.serverPort = serverPort
     }
     
+    public func testServerPack(pack:String) -> Void{
+        self.processServerDataPack(strPack: pack)
+    }
+    
     func enterRoom(roomId:String, gameId:UInt16, okCallBack : @escaping OKCallBack, failCallback: @escaping FailCallBack) -> Bool {
         let cmd = SockCmds.enter_room
         let packet = [
@@ -186,9 +190,9 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
                 
                 let resp = nsText.substring(with: result.range) as NSString
                 let range = NSMakeRange(SockClient.LXQ_PACKET_START.count, result.range.length - 12)
-                let cmd = resp.substring(with:range)
-                print("server cmd:" + cmd)
-                self.processServerDataPack(respJson: cmd)
+                let packJson = resp.substring(with:range)
+                print("server pack:" + packJson)
+                self.processServerDataPack(strPack: packJson)
                
             }
             
@@ -218,8 +222,8 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
         }
     }
     
-    func processServerDataPack(respJson:String) {
-        let jsonObj = tryParseJsonString(jsonStr: respJson)
+    func processServerDataPack(strPack:String) {
+        let jsonObj = tryParseJsonString(jsonStr: strPack)
         guard let respJson = jsonObj else{
             print("invalid json string")
             return;
@@ -261,12 +265,25 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
             return;
         }
         
-        if (pushCmd == SockCmds.push_cards_state){
+        if pushCmd == SockCmds.push_cards_state{
             let userid = pushJson[SockCmds.userid].uIntValue
-            let act_cards = pushJson[SockCmds.card_state_active_cards].arrayObject
-            let frozen_cards = pushJson[SockCmds.card_state_frozen_cards].arrayObject
-            let shown_cards = pushJson[SockCmds.card_state_shown_cards].arrayObject
-//            delegate.onCardsState(cardsUserId: UInt32(userid), activeCards: act_cards, freezedCards: frozen_cards, publicShownCards: shown_cards)
+            let act_cards = pushJson[SockCmds.card_state_active_cards].arrayObject as! [UInt8]
+            let frozen_cards = pushJson[SockCmds.card_state_frozen_cards].arrayObject as! [UInt8]
+            let shown_cards = pushJson[SockCmds.card_state_shown_cards].arrayObject as! [[UInt8]]
+            delegate.onCardsState(cardsUserId: UInt32(userid), activeCards: act_cards, freezedCards: frozen_cards, publicShownCards: shown_cards)
+        }
+        else if pushCmd == SockCmds.push_game_players{
+            let players = pushJson[SockCmds.game_players].arrayObject as! [[String:AnyObject]]
+            
+            var playerInfos = [PlayerInfo]()
+            for p in players{
+                let pi = PlayerInfo()
+                pi.userid = p[SockCmds.userid] as! UInt
+                pi.seated = p[SockCmds.game_player_seated] as! UInt8
+                playerInfos.append(pi)
+            }
+            delegate.onPlayersStateChanged(players: playerInfos)
+            
         }
         
 //        switch pushCmd {
