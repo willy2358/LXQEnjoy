@@ -10,5 +10,14 @@ import Foundation
 
 // cmd from server
 class CmdPush {
+    
+    var cmdText: String = ""
+    
+    //differen cmdText, different meaning of cmd Params
+    var cmdParams : [Int32]? = nil
+    
+    public init() {
+        
+    }
 
 }

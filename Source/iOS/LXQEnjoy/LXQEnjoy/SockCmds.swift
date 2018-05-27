@@ -24,8 +24,14 @@ class SockCmds{
     static let push_cards_state = "cards-state"
     
     static let push_new_banker = "new-banker"
+    static let push_play_cards = "play-cards"
+    static let push_exed_cmd = "exed-cmd"
+    static let pack_part_cmd_param = "cmd-param"
     
     static let param_cards = "cards"
+    static let push_cmd_opts = "cmd-opts"
+    static let pack_part_cmd = "cmd"
+//    static let
     
     static let pack_part_cmd_type = "cmdtype"
     static let pack_part_push = "sockpush"
@@ -41,6 +47,8 @@ class SockCmds{
     static let card_state_shown_cards = "shown-cards-groups"
     static let game_players = "players"
     static let game_player_seated = "seated"
+    static let cmd_opts_resp_timeout = "resp-timeout"
+    static let cmd_opts_default_cmd = "def-cmd"
     
     
 }

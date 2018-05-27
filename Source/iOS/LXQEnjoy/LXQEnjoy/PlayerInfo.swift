@@ -16,4 +16,13 @@ class PlayerInfo{
     public init(){
         
     }
+    
+    class func getPlayerByUserid(userid:UInt) -> PlayerInfo?{
+        let player = PlayerInfo()
+        return player
+    }
+    
+    class func getMyPlayer() -> PlayerInfo? {
+        return PlayerInfo()
+    }
 }

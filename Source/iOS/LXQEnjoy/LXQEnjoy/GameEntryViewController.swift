@@ -11,17 +11,21 @@ import UIKit
 import SwiftyJSON
 
 class GameEntryViewController: UIViewController, SockClientDelegate{
-    func processServerSuccessResponse(respCmd: String, jsonObj: JSON) {
-        
+    func onPlayerExedCmd(player: PlayerInfo, cmd: String, cmdParam: [Int32]) {
+        print("onPlayerExedCmd")
     }
     
-    func processServerFailResponse(reqCmd: String, errCode: UInt, errMsg: String) {
-        
-    }
-    
-    func processServerPush(pushCmd: String, jsonObj: JSON) {
-        
-    }
+//    func processServerSuccessResponse(respCmd: String, jsonObj: JSON) {
+//        
+//    }
+//    
+//    func processServerFailResponse(reqCmd: String, errCode: UInt, errMsg: String) {
+//        
+//    }
+//    
+//    func processServerPush(pushCmd: String, jsonObj: JSON) {
+//        
+//    }
     
     func onCardsState(cardsUserId: UInt32, activeCards: [UInt8], freezedCards: [UInt8], publicShownCards: [[UInt8]]) {
         print("onCardsState")
@@ -31,24 +35,24 @@ class GameEntryViewController: UIViewController, SockClientDelegate{
         print("onPlayersStateChanged")
     }
     
-    func onNewBanker(bankerPlayer: PlayerInfo) {
-        
+    func onNewBanker(bankPlayer: PlayerInfo) {
+        print("onNewBanker")
     }
     
-    func onDealCards(receivePlayer: PlayerInfo) {
-        
+    func onDealCards(receivePlayer: PlayerInfo, cards:[UInt8]) {
+        print("onDealCards")
     }
     
     func onGameStatusChanged(status: String, statusData: String) {
-        
+        print("onGameStatusChanged")
     }
     
     func onPlayerPlayCards(player: PlayerInfo, cards: [UInt8]) {
-        
+        print("onPlayerPlayCards")
     }
     
-    func onCmdOptions(player: PlayerInfo, cmds: [CmdPush], timeoutSec: UInt, defaultCmd: CmdPush) {
-        
+    func onCmdOptions(player: PlayerInfo, cmds: [CmdPush], timeoutSec: Int32, defaultCmd: CmdPush) {
+        print("onCmdOptions")
     }
     
 
@@ -60,7 +64,12 @@ class GameEntryViewController: UIViewController, SockClientDelegate{
         
         
 //        test_push_cards_state()
-        test_push_game_players()
+//        test_push_game_players()
+//        test_push_new_banker()
+//        test_push_deal_cards()
+//        test_push_play_cards()
+//        test_push_cmd_opts()
+//        test_push_exed_cmd()
         return;
 
 //        playerSockClient = SockClient(serverIP: AppConfig.sockServerIP, serverPort: AppConfig.sockServerPort)
@@ -78,6 +87,55 @@ class GameEntryViewController: UIViewController, SockClientDelegate{
         
         
     }
+    
+    func test_push_cmd_opts() {
+        let client = SockClient(serverIP: "testIP", serverPort: 34)
+        client.playerDelegate = self
+        let test_pack = """
+        {"cmdtype": "sockpush", "sockpush": "cmd-opts", "cmd-opts": [{"cmd": "peng", "cmd-param": [31]}, {"cmd": "mo pai", "cmd-param": []}], "resp-timeout": -1, "def-cmd": {"cmd": "mo pai", "cmd-param": []}}
+"""
+        client.testServerPack(pack: test_pack)
+        
+    }
+    
+    func test_push_exed_cmd() {
+        let client = SockClient(serverIP: "testIP", serverPort: 34)
+        client.playerDelegate = self
+        let test_pack = """
+        {"cmdtype": "sockpush", "sockpush": "exed-cmd", "exed-cmd": "peng", "cmd-param": [31], "userid": 333}
+"""
+        client.testServerPack(pack: test_pack)
+        
+    }
+    
+    func test_push_play_cards() {
+        let client = SockClient(serverIP: "testIP", serverPort: 34)
+        client.playerDelegate = self
+        let test_pack = """
+        {"cmdtype": "sockpush", "sockpush": "play-cards", "userid": 222, "cards": [31], "player-state": "normal"}
+"""
+        client.testServerPack(pack: test_pack)
+        
+    }
+    
+    func test_push_new_banker()  {
+        let client = SockClient(serverIP: "testIP", serverPort: 34)
+        client.playerDelegate = self
+        let test_pack = """
+        {"cmdtype": "sockpush", "sockpush": "new-banker", "userid": 222}
+"""
+        client.testServerPack(pack: test_pack)
+    }
+    
+    func test_push_deal_cards()  {
+        let client = SockClient(serverIP: "testIP", serverPort: 34)
+        client.playerDelegate = self
+        let test_pack = """
+        {"cmdtype": "sockpush", "sockpush": "deal-cards", "cards": [31, 24, 33, 39, 11, 38, 13, 15, 31, 24, 18, 37, 37]}
+"""
+        client.testServerPack(pack: test_pack)
+    }
+    
     
     func test_push_cards_state()  {
         let client = SockClient(serverIP: "testIP", serverPort: 34)

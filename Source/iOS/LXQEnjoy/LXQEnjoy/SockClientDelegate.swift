@@ -19,9 +19,10 @@ protocol SockClientDelegate{
     
     func onCardsState(cardsUserId: UInt32, activeCards:[UInt8], freezedCards:[UInt8], publicShownCards:[[UInt8]])
     func onPlayersStateChanged(players: [PlayerInfo])
-    func onNewBanker(bankerPlayer: PlayerInfo)
-    func onDealCards(receivePlayer:PlayerInfo)
+    func onNewBanker(bankPlayer: PlayerInfo)
+    func onDealCards(receivePlayer:PlayerInfo, cards:[UInt8])
     func onGameStatusChanged(status:String, statusData:String)
     func onPlayerPlayCards(player: PlayerInfo, cards:[UInt8])
-    func onCmdOptions(player:PlayerInfo, cmds: [CmdPush], timeoutSec: UInt, defaultCmd: CmdPush)
+    func onCmdOptions(player:PlayerInfo, cmds: [CmdPush], timeoutSec: Int32, defaultCmd: CmdPush)
+    func onPlayerExedCmd(player:PlayerInfo, cmd:String, cmdParam:[Int32])
 }

@@ -19,6 +19,7 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
     let sockClient = GCDAsyncSocket()
     var serverIP : String!
     var serverPort : UInt16!
+    let myPlayer = PlayerInfo()
     
     var cmdCallbacks = Dictionary<String, ServerRespCallBacks>()
     var connectSuccessCB : (() -> Void)?
@@ -274,7 +275,6 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
         }
         else if pushCmd == SockCmds.push_game_players{
             let players = pushJson[SockCmds.game_players].arrayObject as! [[String:AnyObject]]
-            
             var playerInfos = [PlayerInfo]()
             for p in players{
                 let pi = PlayerInfo()
@@ -283,15 +283,52 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
                 playerInfos.append(pi)
             }
             delegate.onPlayersStateChanged(players: playerInfos)
-            
         }
-        
-//        switch pushCmd {
-//        case SockCmds.push_cards_state:
-//            delegate.onCardsState(cardsUserId: <#T##UInt32#>, activeCards: <#T##[UInt8]#>, freezedCards: <#T##[UInt8]#>, publicShownCards: <#T##[[UInt8]]#>)
-//        default:
-//            <#code#>
-//        }
+        else if pushCmd == SockCmds.push_new_banker{
+            let userid = pushJson[SockCmds.userid].uIntValue
+            let pi = PlayerInfo.getPlayerByUserid(userid: userid)
+            delegate.onNewBanker(bankPlayer: pi!)
+        }
+        else if pushCmd == SockCmds.push_deal_cards{
+            let cards = pushJson[SockCmds.param_cards].arrayObject as! [UInt8]
+            let player = PlayerInfo.getMyPlayer()
+            delegate.onDealCards(receivePlayer: player!, cards: cards)
+        }
+        else if pushCmd == SockCmds.push_play_cards{
+            let userid = pushJson[SockCmds.userid].uIntValue
+            let player = PlayerInfo.getPlayerByUserid(userid: userid)
+            let cards = pushJson[SockCmds.param_cards].arrayObject as! [UInt8]
+            delegate.onPlayerPlayCards(player: player!, cards: cards)
+        }
+        else if pushCmd == SockCmds.push_cmd_opts{
+            let userid = pushJson[SockCmds.userid].uIntValue
+            let player = PlayerInfo.getPlayerByUserid(userid: userid)
+            let opts = pushJson[SockCmds.push_cmd_opts].arrayObject as! [[String:AnyObject]]
+            var cmd_opts = [CmdPush]()
+            for c in opts{
+                let cmd = CmdPush()
+
+                cmd.cmdText = c[SockCmds.pack_part_cmd] as! String
+                cmd.cmdParams = c[SockCmds.pack_part_cmd_param] as! [AnyObject] as! [Int32]
+                cmd_opts.append(cmd)
+            }
+            let dc = pushJson[SockCmds.cmd_opts_default_cmd]
+            let def_cmd = CmdPush()
+            def_cmd.cmdText = dc[SockCmds.pack_part_cmd].stringValue
+            def_cmd.cmdParams = dc[SockCmds.pack_part_cmd_param].arrayObject as? [Int32]
+            let timeout = pushJson[SockCmds.cmd_opts_resp_timeout].int32Value
+
+            delegate.onCmdOptions(player: player!, cmds: cmd_opts, timeoutSec: timeout, defaultCmd: def_cmd)
+        }
+        else if pushCmd == SockCmds.push_exed_cmd{
+            let exeUserId = pushJson[SockCmds.userid].uIntValue
+            let exedCmd = pushJson[SockCmds.push_exed_cmd].stringValue
+            //Todo maybe some other type of arrayObject
+            let cmd_param = pushJson[SockCmds.pack_part_cmd_param].arrayObject as! [Int32]
+            let exePlayer = PlayerInfo.getPlayerByUserid(userid: exeUserId)
+            delegate.onPlayerExedCmd(player: exePlayer!, cmd: exedCmd, cmdParam: cmd_param)
+        }
+    
     }
     
     func tryParseJsonString(jsonStr: String) -> JSON? {
