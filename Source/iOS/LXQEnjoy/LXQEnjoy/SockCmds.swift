@@ -9,6 +9,11 @@
 import Foundation
 
 class SockCmds{
+    static let pack_key_cmd_type = "cmdtype"
+    static let cmd_type_sock_req="sockreq"
+    static let req_play_cards = "play-cards"
+    static let req_exe_cmd = "exe-cmd"
+    
     static let enter_room = "enter-room"
     
     static let leave_room = "leave-room"
@@ -28,12 +33,12 @@ class SockCmds{
     static let push_exed_cmd = "exed-cmd"
     static let pack_part_cmd_param = "cmd-param"
     
-    static let param_cards = "cards"
+    static let cards = "cards"
     static let push_cmd_opts = "cmd-opts"
     static let pack_part_cmd = "cmd"
 //    static let
     
-    static let pack_part_cmd_type = "cmdtype"
+    
     static let pack_part_push = "sockpush"
     static let pack_part_resp = "sockresp"
     static let pack_part_result = "result"
@@ -41,7 +46,13 @@ class SockCmds{
     static let result_error = "ERROR"
     static let error_code = "errcode"
     static let error_msg = "errmsg"
+    
     static let userid = "userid"
+    static let gameid = "gameid"
+    static let roomid = "roomid"
+    
+    static let seat_no = "seatno" //ToDo not implemented feature.
+    
     static let card_state_active_cards = "active-cards"
     static let card_state_frozen_cards = "frozen-cards"
     static let card_state_shown_cards = "shown-cards-groups"

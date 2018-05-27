@@ -39,44 +39,76 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
         self.processServerDataPack(strPack: pack)
     }
     
-    func enterRoom(roomId:String, gameId:UInt16, okCallBack : @escaping OKCallBack, failCallback: @escaping FailCallBack) -> Bool {
+    func enterRoom(roomId:String, gameId:UInt16, okCallBack : @escaping OKCallBack, failCallback: @escaping FailCallBack){
         let cmd = SockCmds.enter_room
         let packet = [
-            "cmdtype":"sockreq",
-            "sockreq":cmd,
-            "userid":self.userId,
-            
-            "gameid":gameId,
-            "roomid":roomId
+            SockCmds.pack_key_cmd_type : SockCmds.cmd_type_sock_req,
+            SockCmds.cmd_type_sock_req : cmd,
+            SockCmds.userid : myPlayer.userid as Any,
+            SockCmds.gameid : gameId,
+            SockCmds.roomid : roomId
         ] as [String:Any]
+
+        sendClientPack(cmd: cmd, pack: packet, okCallBack: okCallBack, failCallback: failCallback)
+    }
+    
+    func joinGame(roomId:String, gameId:UInt16, seatNo:UInt16, okCallBack : @escaping OKCallBack, failCallback: @escaping FailCallBack) {
+        let cmd = SockCmds.join_game
+        let packet = [
+            SockCmds.pack_key_cmd_type : SockCmds.cmd_type_sock_req,
+            SockCmds.cmd_type_sock_req : cmd,
+            "seatno":seatNo,
+            SockCmds.userid : myPlayer.userid,
+            SockCmds.gameid : gameId,
+            SockCmds.roomid : roomId
+            ] as [String:Any]
+        
+        sendClientPack(cmd: cmd, pack: packet, okCallBack: okCallBack, failCallback: failCallback)
+    }
+    
+    func playCards(cards:[UInt8], okCallBack : @escaping OKCallBack, failCallback: @escaping FailCallBack){
+        let cmd = SockCmds.req_play_cards
+        let packet = [
+            SockCmds.pack_key_cmd_type : SockCmds.cmd_type_sock_req,
+            SockCmds.cmd_type_sock_req : cmd,
+            SockCmds.userid : myPlayer.userid,
+            SockCmds.gameid : myPlayer.gameId,
+            SockCmds.roomid : myPlayer.roomId,
+            SockCmds.cards : cards
+            ] as [String:Any]
+        
+        sendClientPack(cmd: cmd, pack: packet, okCallBack: okCallBack, failCallback: failCallback)
+    }
+    
+    func executeCmd(cmdText:String, cmdParam:[Int32], okCallBack : @escaping OKCallBack, failCallback: @escaping FailCallBack) {
+        let cmd = SockCmds.req_exe_cmd
+        let packet = [
+            SockCmds.pack_key_cmd_type : SockCmds.cmd_type_sock_req,
+            SockCmds.cmd_type_sock_req : cmd,
+            SockCmds.userid : myPlayer.userid,
+            SockCmds.gameid : myPlayer.gameId,
+            SockCmds.roomid : myPlayer.roomId,
+            SockCmds.pack_part_cmd:cmdText,
+            SockCmds.pack_part_cmd_param: cmdParam
+            ] as [String:Any]
+        
+        sendClientPack(cmd: cmd, pack: packet, okCallBack: okCallBack, failCallback: failCallback)
+    }
+    
+    func sendClientPack(cmd: String, pack:[String:Any], okCallBack : @escaping OKCallBack, failCallback: @escaping FailCallBack) {
+        if self.Status != client_status.connected{
+            print("Fatal Error, not connected")
+        }
         
         updateCmdCallbacks(cmdName: cmd, okCallBack: okCallBack, failCallBack: failCallback)
         
-        let jsonStr = convertDictionaryToString(dict: packet)
+        let jsonStr = convertDictionaryToString(dict: pack)
         let data = jsonStr.data(using: String.Encoding.utf8)!
         sockClient.write(data, withTimeout: -1, tag: 0)
         sockClient.readData(withTimeout: -1, tag: 0)
-        return true
     }
     
-    func joinGame(roomId:String, gameId:UInt16, seatNo:UInt16) {
-        let cmd = SockCmds.join_game
-        let packet = [
-            "cmdtype":"sockreq",
-            "sockreq":cmd,
-            "userid":self.userId,
-            "seatno":seatNo,
-            "gameid":gameId,
-            "roomid":roomId
-            ] as [String:Any]
-        
-//        updateCmdCallbacks(cmdName: cmd, okCallBack: okCallBack, failCallBack: failCallback)
-        
-        let jsonStr = convertDictionaryToString(dict: packet)
-        let data = jsonStr.data(using: String.Encoding.utf8)!
-        sockClient.write(data, withTimeout: -1, tag: 0)
-        sockClient.readData(withTimeout: -1, tag: 0)
-    }
+
     
     func updateCmdCallbacks(cmdName:String, okCallBack:@escaping OKCallBack, failCallBack : @escaping FailCallBack) -> Void {
         if cmdCallbacks.keys.contains(cmdName){
@@ -115,7 +147,7 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
         do{
             try sockClient.connect(toHost: serverIP, onPort: self.serverPort)
             sockClient.readData(withTimeout: -1, tag: 0)
-//          Status = client_status.connected
+            Status = client_status.connected
             return true
         }
         catch{
@@ -124,8 +156,7 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
             if let cb = self.connectFailCB {
                 cb(error.localizedDescription)
             }
-//            self.connectFailCB!(error)
-            
+
             return false
         }
     }
@@ -230,7 +261,7 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
             return;
         }
         
-        let cmdType = respJson[SockCmds.pack_part_cmd_type].stringValue
+        let cmdType = respJson[SockCmds.pack_key_cmd_type].stringValue
         if cmdType == SockCmds.pack_part_resp {
             let cmd = respJson[SockCmds.pack_part_resp].stringValue
 
@@ -290,14 +321,14 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
             delegate.onNewBanker(bankPlayer: pi!)
         }
         else if pushCmd == SockCmds.push_deal_cards{
-            let cards = pushJson[SockCmds.param_cards].arrayObject as! [UInt8]
+            let cards = pushJson[SockCmds.cards].arrayObject as! [UInt8]
             let player = PlayerInfo.getMyPlayer()
             delegate.onDealCards(receivePlayer: player!, cards: cards)
         }
         else if pushCmd == SockCmds.push_play_cards{
             let userid = pushJson[SockCmds.userid].uIntValue
             let player = PlayerInfo.getPlayerByUserid(userid: userid)
-            let cards = pushJson[SockCmds.param_cards].arrayObject as! [UInt8]
+            let cards = pushJson[SockCmds.cards].arrayObject as! [UInt8]
             delegate.onPlayerPlayCards(player: player!, cards: cards)
         }
         else if pushCmd == SockCmds.push_cmd_opts{

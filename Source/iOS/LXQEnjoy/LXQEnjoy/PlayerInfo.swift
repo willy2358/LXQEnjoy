@@ -12,6 +12,8 @@ class PlayerInfo{
     var alias : String?
     var userid : UInt?
     var seated : UInt8?  //1, seated; 0: unseated
+    var roomId : Int32 = 0
+    var gameId : UInt8 = 0
  
     public init(){
         

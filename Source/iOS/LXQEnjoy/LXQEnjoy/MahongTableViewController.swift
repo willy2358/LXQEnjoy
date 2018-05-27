@@ -28,7 +28,7 @@ class MahongTableViewController: UIViewController{
     
     func processServerPush(pushCmd: String, jsonObj: JSON) {
         if pushCmd == SockCmds.push_deal_cards{
-            let cards = jsonObj[SockCmds.param_cards].arrayValue
+            let cards = jsonObj[SockCmds.cards].arrayValue
             let newCards = NSMutableArray()
             for c in cards{
                 
