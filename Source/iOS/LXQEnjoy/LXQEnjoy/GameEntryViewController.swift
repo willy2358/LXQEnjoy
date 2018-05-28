@@ -70,7 +70,7 @@ class GameEntryViewController: UIViewController, SockClientDelegate{
 //        test_push_play_cards()
 //        test_push_cmd_opts()
 //        test_push_exed_cmd()
-        return;
+//        return;
 
 //        playerSockClient = SockClient(serverIP: AppConfig.sockServerIP, serverPort: AppConfig.sockServerPort)
 //        playerSockClient?.playerDelegate = self
@@ -78,11 +78,11 @@ class GameEntryViewController: UIViewController, SockClientDelegate{
 //        playerSockClient?.connect()
         
         
-//        let myStoryBoard = self.storyboard
-//        let mjTable = myStoryBoard?.instantiateViewController(withIdentifier: "MJTable")
-//        self.present(mjTable!, animated: true, completion: nil)
-//
-//
+        let myStoryBoard = self.storyboard
+        let mjTable = myStoryBoard?.instantiateViewController(withIdentifier: "MJTable")
+        self.present(mjTable!, animated: true, completion: nil)
+
+
      
         
         

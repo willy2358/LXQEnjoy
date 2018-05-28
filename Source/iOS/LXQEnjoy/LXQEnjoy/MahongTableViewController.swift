@@ -10,12 +10,45 @@ import UIKit
 import SnapKit
 import SwiftyJSON
 
-class MahongTableViewController: UIViewController{
+class MahongTableViewController: UIViewController, SockClientDelegate{
+    func onCardsState(cardsUserId: UInt32, activeCards: [UInt8], freezedCards: [UInt8], publicShownCards: [[UInt8]]) {
+        
+    }
+    
+    func onPlayersStateChanged(players: [PlayerInfo]) {
+        
+    }
+    
+    func onNewBanker(bankPlayer: PlayerInfo) {
+        
+    }
+    
+    func onDealCards(receivePlayer: PlayerInfo, cards: [UInt8]) {
+        
+    }
+    
+    func onGameStatusChanged(status: String, statusData: String) {
+        
+    }
+    
+    func onPlayerPlayCards(player: PlayerInfo, cards: [UInt8]) {
+        
+    }
+    
+    func onCmdOptions(player: PlayerInfo, cmds: [CmdPush], timeoutSec: Int32, defaultCmd: CmdPush) {
+        
+    }
+    
+    func onPlayerExedCmd(player: PlayerInfo, cmd: String, cmdParam: [Int32]) {
+        
+    }
+    
     
     var cardsPanelSize : CGSize!
     let cardsInHand : NSMutableArray = NSMutableArray()
     var cardsPanel : UIView!
     var sockPlayer : SockClient!
+    var cmdsPanel :UIView!
     
     func processServerSuccessResponse(respCmd: String, jsonObj: JSON) {
         
@@ -61,8 +94,24 @@ class MahongTableViewController: UIViewController{
         cardsPanelSize = CGSize(width: cardsPanelWidth, height: cardsPanelHeight)
         let rectPanel = CGRect(origin: CGPoint(x:xStart, y:yStart), size:cardsPanelSize )
         cardsPanel = UIView(frame:rectPanel)
-        cardsPanel.backgroundColor = UIColor.clear
+        cardsPanel.backgroundColor = UIColor.yellow
         self.view.addSubview(cardsPanel)
+    }
+    
+    func createOptCmdsPanel() {
+        
+        cmdsPanel = UIView()
+        cmdsPanel.backgroundColor = UIColor.darkGray
+        self.view.addSubview(cmdsPanel)
+        
+        cmdsPanel.snp.makeConstraints{
+            (make) -> Void in
+            make.height.equalTo(30)
+            make.width.equalTo(self.view).multipliedBy(0.5)
+            make.bottom.equalTo(cardsPanel.snp.top).offset(-10)
+            make.centerX.equalTo(self.view)
+        }
+        
     }
     
     override func viewDidLoad() {
@@ -72,7 +121,7 @@ class MahongTableViewController: UIViewController{
         
         createCardsPanel()
 
-        
+        createOptCmdsPanel()
         
         
         
@@ -146,10 +195,11 @@ class MahongTableViewController: UIViewController{
     }
     
     @objc func sitDownTabed(_ button:UIButton){
-        let seatNo = button.tag
+//        let seatNo = button.tag
 //        sockPlayer = NetworkProxy.sockPlayer
 //        sockPlayer.playerDelegate = self
 //        sockPlayer.joinGame(roomId: "LX888", gameId: 111, seatNo: UInt16(seatNo))
+        test_push_cmd_opts()
     }
     
     func horzStackSubviews(panel:UIView, subviews:NSMutableArray, panelSize:CGSize) -> Void {
@@ -184,11 +234,18 @@ class MahongTableViewController: UIViewController{
                 make.left.equalTo(container).offset(offset)
                 make.width.equalTo(subViewWidth)
                 make.height.equalTo(container)
-                
             }
-            
-            
         }
+    }
+    
+    func test_push_cmd_opts() {
+        let client = SockClient(serverIP: "testIP", serverPort: 34)
+        client.playerDelegate = self
+        let test_pack = """
+        {"cmdtype": "sockpush", "sockpush": "cmd-opts", "cmd-opts": [{"cmd": "peng", "cmd-param": [31]}, {"cmd": "mo pai", "cmd-param": []}], "resp-timeout": -1, "def-cmd": {"cmd": "mo pai", "cmd-param": []}}
+"""
+        client.testServerPack(pack: test_pack)
+        
     }
     
     func centerSubviews(container:UIView, subViews:NSMutableArray, containerSize:CGSize, space:CGFloat = 0) -> Void {
