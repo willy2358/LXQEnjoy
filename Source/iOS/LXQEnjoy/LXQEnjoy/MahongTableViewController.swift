@@ -24,7 +24,17 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     }
     
     func onDealCards(receivePlayer: PlayerInfo, cards: [UInt8]) {
-        
+        let newCards = NSMutableArray()
+        for c in cards{
+            
+            let btn = UIButton()
+            let img = UIImage(named: String(c))
+            btn.tag = Int(c)
+            btn.addTarget(self, action:#selector(playCardBtnClicked(_:)), for:.touchUpInside)
+            btn.setBackgroundImage(img, for: UIControlState.normal)
+            newCards.add(btn)
+        }
+        horzStackSubviews(panel: cardsPanel, subviews: newCards, panelSize:cardsPanelSize)
     }
     
     func onGameStatusChanged(status: String, statusData: String) {
@@ -32,15 +42,27 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     }
     
     func onPlayerPlayCards(player: PlayerInfo, cards: [UInt8]) {
-        
+
     }
     
     func onCmdOptions(player: PlayerInfo, cmds: [CmdPush], timeoutSec: Int32, defaultCmd: CmdPush) {
-        
+        let cmdBtns = NSMutableArray()
+        self.cmdBtns.removeAll()
+        for c in cmds{
+            
+            let btn = UIButton()
+            btn.setTitle(c.cmdText, for: UIControlState.normal)
+            btn.backgroundColor = UIColor.blue
+            self.cmdBtns[btn] = c
+            btn.addTarget(self, action:#selector(cmdBtnClicked(_:)), for:.touchUpInside)
+            cmdBtns.add(btn)
+            centerSubviews(container: self.cmdsPanel, subViews: cmdBtns, subViewWidth: CGFloat(80), space: CGFloat(20))
+        }
     }
     
     func onPlayerExedCmd(player: PlayerInfo, cmd: String, cmdParam: [Int32]) {
-        
+        let txt = "\(player.userid ?? 000) : \(cmd)"
+        self.cmdExedPanel.text = txt
     }
     
     
@@ -49,6 +71,9 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     var cardsPanel : UIView!
     var sockPlayer : SockClient!
     var cmdsPanel :UIView!
+    var cmdExedPanel : UILabel!
+    
+    var cmdBtns = [UIButton : CmdPush]()
     
     func processServerSuccessResponse(respCmd: String, jsonObj: JSON) {
         
@@ -59,20 +84,20 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         
     }
     
-    func processServerPush(pushCmd: String, jsonObj: JSON) {
-        if pushCmd == SockCmds.push_deal_cards{
-            let cards = jsonObj[SockCmds.cards].arrayValue
-            let newCards = NSMutableArray()
-            for c in cards{
-                
-                let btn = UIButton()
-                let img = UIImage(named: String(c.intValue))
-                btn.setBackgroundImage(img, for: UIControlState.normal)
-                newCards.add(btn)
-            }
-            horzStackSubviews(panel: cardsPanel, subviews: newCards, panelSize:cardsPanelSize)
-        }
-    }
+//    func processServerPush(pushCmd: String, jsonObj: JSON) {
+//        if pushCmd == SockCmds.push_deal_cards{
+//            let cards = jsonObj[SockCmds.cards].arrayValue
+//            let newCards = NSMutableArray()
+//            for c in cards{
+//
+//                let btn = UIButton()
+//                let img = UIImage(named: String(c.intValue))
+//                btn.setBackgroundImage(img, for: UIControlState.normal)
+//                newCards.add(btn)
+//            }
+//            horzStackSubviews(panel: cardsPanel, subviews: newCards, panelSize:cardsPanelSize)
+//        }
+//    }
     
     func onPlayerConnectStateChanged(oldState: client_status, newState: client_status) {
         
@@ -123,7 +148,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
 
         createOptCmdsPanel()
         
-        
+        createPlayerExecutionPanel()
         
         
         // Do any additional setup after loading the view.
@@ -132,6 +157,20 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func createPlayerExecutionPanel() {
+        cmdExedPanel = UILabel()
+        self.view.addSubview(cmdExedPanel)
+        
+        cmdExedPanel.snp.makeConstraints{
+            (make) -> Void in
+            make.width.equalTo(200.0)
+            make.height.equalTo(50.0)
+            make.centerX.equalTo(self.view)
+            make.centerY.equalTo(self.view)
+        }
+        
     }
     
     func createSeatButtons() {
@@ -199,7 +238,28 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
 //        sockPlayer = NetworkProxy.sockPlayer
 //        sockPlayer.playerDelegate = self
 //        sockPlayer.joinGame(roomId: "LX888", gameId: 111, seatNo: UInt16(seatNo))
-        test_push_cmd_opts()
+//        test_push_cmd_opts()
+        test_push_exed_cmd()
+    }
+    
+    @objc func cmdBtnClicked(_ button: UIButton) {
+        let cmd = self.cmdBtns[button]
+        let client = SockClient(serverIP: "testIP", serverPort: 34)
+        client.executeCmd(cmdText: (cmd?.cmdText)!, cmdParam: (cmd?.cmdParams)!,
+                          okCallBack: {}, failCallback: {_,_ in })
+        
+    }
+    
+    @objc func playCardBtnClicked(_ button: UIButton) {
+        let card = button.tag
+        let cards = [UInt8(card)]
+        let client = SockClient(serverIP: "testIP", serverPort: 34)
+//        client.executeCmd(cmdText: (cmd?.cmdText)!, cmdParam: (cmd?.cmdParams)!,
+//                          okCallBack: {}, failCallback: {_,_ in })
+        
+        client.playCards(cards: cards, okCallBack:{}, failCallback: {_,_ in })
+        self.cardsPanel.willRemoveSubview(button)
+        
     }
     
     func horzStackSubviews(panel:UIView, subviews:NSMutableArray, panelSize:CGSize) -> Void {
@@ -248,6 +308,15 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         
     }
     
+    func test_push_exed_cmd() {
+        let client = SockClient(serverIP: "testIP", serverPort: 34)
+        client.playerDelegate = self
+        let test_pack = """
+        {"cmdtype": "sockpush", "sockpush": "exed-cmd", "exed-cmd": "peng", "cmd-param": [31], "userid": 333}
+"""
+        client.testServerPack(pack: test_pack)
+        
+    }
     func centerSubviews(container:UIView, subViews:NSMutableArray, containerSize:CGSize, space:CGFloat = 0) -> Void {
         
         let bestRatio:CGFloat = 0.618
@@ -257,8 +326,8 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         
         for i in 0..<subViews.count{
             let subView = subViews[i] as! UIView
-            if !container.subviews.contains(subView as! UIView){
-                container.addSubview(subView as! UIView)
+            if !container.subviews.contains(subView ){
+                container.addSubview(subView )
             }
 
             subView.snp.makeConstraints { (make) -> Void in
@@ -267,6 +336,31 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
                 make.width.equalTo(bestSubviewWidth)
                 make.height.equalTo(containerSize.height)
 
+            }
+        }
+    }
+    
+    
+    func centerSubviews(container:UIView, subViews:NSMutableArray, subViewWidth:CGFloat, space:CGFloat = 0) -> Void {
+        
+//        let bestRatio:CGFloat = 0.618
+//        let bestSubviewWidth = bestRatio * containerSize.height
+        let containerSize = container.frame.size;
+        let viewsWidthSum:CGFloat = CGFloat(subViews.count) * subViewWidth + CGFloat(subViews.count - 1) * space
+        let offsetStart = (containerSize.width - viewsWidthSum)/2
+        
+        for i in 0..<subViews.count{
+            let subView = subViews[i] as! UIView
+            if !container.subviews.contains(subView ){
+                container.addSubview(subView )
+            }
+            
+            subView.snp.makeConstraints { (make) -> Void in
+                make.top.equalTo(container)
+                make.left.equalTo(container).offset(offsetStart + CGFloat(i) * (subViewWidth + space))
+                make.width.equalTo(subViewWidth)
+                make.height.equalTo(containerSize.height)
+                
             }
         }
     }

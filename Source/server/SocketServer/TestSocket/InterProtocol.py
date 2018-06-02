@@ -14,6 +14,7 @@ sock_result_data = "result-data"
 resp_players = "players"
 resp_seated_players = "seated-players"
 resp_room = "room"
+resp_seats_ids = "seats"
 
 
 client_req_cmd_join_game = "join-game"   # 加入游戏
@@ -60,6 +61,7 @@ cmd_data_cards = "cards"
 room_id = "roomid"
 user_id = "userid"
 game_id = "gameid"
+seat_id = "seatid"
 
 
 player_state = "player-state"

@@ -11,6 +11,8 @@ room_is_full = 117
 room_no_empty_seat = 118
 player_not_in_room = 119
 player_not_in_game = 120
+invalid_seat_id = 121
+seat_id_occupied = 122
 
 
 
@@ -28,5 +30,7 @@ Errors = {
     room_no_empty_seat:"no more empty seat",
     player_not_in_game: "player is not in game",
     player_not_in_room: "player is not in room",
+    invalid_seat_id: "invalid seat id",
+    seat_id_occupied : "seat has been occupied by other player"
 
 }

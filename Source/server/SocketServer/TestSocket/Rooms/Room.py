@@ -58,12 +58,13 @@ class Room:
     def can_new_player_enter(self):
         return len(self._all_players) < self._max_players_number
 
-    def add_seated_player(self, player):
+    def add_seated_player(self, player, seatid):
         try:
             if self._lock_seated_players.acquire(5):
                 if self.can_new_player_seated():
                     self._seated_players.append(player)
                     player.set_my_room(self)
+                    player.set_seat_id(seatid)
                     return True, Errors.ok
                 else:
                     return False, Errors.room_no_empty_seat
@@ -141,7 +142,8 @@ class Room:
         elif req_cmd == InterProtocol.client_req_cmd_leave_room:
             self.process_player_leave_room(player)
         elif req_cmd == InterProtocol.client_req_cmd_join_game:
-            self.process_join_game(player)
+            seatid = req_json[InterProtocol.seat_id]
+            self.process_join_game(player, seatid)
         elif req_cmd == InterProtocol.client_req_cmd_leave_game:
             self.process_player_leave_game(player)
         elif req_cmd == InterProtocol.client_req_type_exe_cmd:
@@ -209,7 +211,8 @@ class Room:
             if ret:
                 roomObj = {
                     InterProtocol.room_id : self._room_id,
-                    InterProtocol.resp_players: self.get_players_status()
+                    InterProtocol.resp_players: self.get_players_status(),
+                    InterProtocol.resp_seats_ids:self._game_rule.get_seats_ids()
                 }
                 resp_pack = InterProtocol.create_success_resp_data_pack(cmd, InterProtocol.resp_room, roomObj)
             else:
@@ -217,16 +220,22 @@ class Room:
             player.send_server_cmd_packet(resp_pack)
             self.publish_players_status()
 
-    def process_join_game(self, player):
+    def process_join_game(self, player, seatid):
         cmd = InterProtocol.client_req_cmd_join_game
-        if player not in self._all_players:
+        if not self.is_seatid_valid(seatid):
+            resp_pack = InterProtocol.create_error_pack(cmd, Errors.invalid_seat_id)
+            player.send_server_cmd_packet(resp_pack)
+        elif player not in self._all_players:
             resp_pack = InterProtocol.create_error_pack(cmd, Errors.player_not_in_room)
             player.send_server_cmd_packet(resp_pack)
         elif player in self._seated_players:
             resp_pack = InterProtocol.create_error_pack(cmd, Errors.player_already_in_game)
             player.send_server_cmd_packet(resp_pack)
+        elif self.is_seatid_has_been_occupied(seatid):
+            resp_pack = InterProtocol.create_error_pack(cmd, Errors.seat_id_occupied)
+            player.send_server_cmd_packet(resp_pack)
         else:
-            ret, errCode = self.add_seated_player(player)
+            ret, errCode = self.add_seated_player(player, seatid)
             if not ret:
                 resp_pack = InterProtocol.create_error_pack(cmd, errCode)
                 player.send_server_cmd_packet(resp_pack)
@@ -240,12 +249,29 @@ class Room:
                 if self.get_seated_player_count() >= self._min_seated_players:
                     self.test_continue_next_round()
 
+    def is_seatid_has_been_occupied(self, seatid):
+        if seatid < 1:
+            return False
+
+        for p in self._all_players:
+            if p.get_seat_id() == seatid:
+                return True
+
+        return False
+
+    def is_seatid_valid(self, seatid):
+        seatids = self._game_rule.get_seats_ids()
+        if seatids is None or len(seatids) < 2: #at least two players
+            return True
+
+        return seatid in self._game_rule.get_seats_ids()
 
     def get_players_status(self):
         players = []
         for i in range(0, len(self._all_players)):
             player = self._all_players[i]
-            seated = 1 if player in self._seated_players else 0
+            # seated = 1 if player in self._seated_players else 0
+            seated = player.get_seat_id()
 
             players.append({'userid': player.get_user_id(), 'seated': seated})
 

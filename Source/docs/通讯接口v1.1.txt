@@ -381,11 +381,13 @@ user-info，用户信息，具体待定
 	"result-data":"room"，
 	"room":{       //room 的属性
 		”roomid": 12,
-		"players": [], //在房间的玩家列表
-		“seated-players":[], //已入座的玩家列表
+		"players": [{"userid": 111, "seated": 1}, {"userid": 222, "seated": 2}, {"userid": 333, "seated": 0}], //在房间的玩家列表
+		“seats":[1，2，3，4], //座位的编号列表，如果此项为空，游戏没有座位编号，任何玩家可坐任何座位
 	},  
 }
 说明：
+players 的示例：
+"players": [{"userid": 111, "seated": 1}, {"userid": 222, "seated": 2}, {"userid": 333, "seated": 0}]
 
 用户可成功进入房间，result 为“OK", ”room" 中包含了房间的有关信息
 不可进入房间：result 为“error”， errmsg：错误原因，可能值：用户未登录，房间不存在,房间已满人
@@ -417,7 +419,8 @@ user-info，用户信息，具体待定
 	"sockreq":"join-game"
 	"userid":123456,
 	"roomid":123333,  //roomid为0，-1，或空时，为进入游戏大厅
-	"gameid":123432
+	"gameid":123432,
+	"seadid":1,        //座位的编号，对于没有座位编号的游戏，此项为空或0，-1，对于有座位编号的游戏，如果缺乏此参数，默认值为1
 	"token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN"
 }
 服务器返回：

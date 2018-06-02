@@ -8,6 +8,7 @@ class GameRule:
         self.__cards = []
         # self.__stages = []
         self.__game_stages = []
+        self.__seats_ids = []
         self.__default_cmd_resp_timeout = -1  # timeout in seconds for player to pick up a command
 
         # self.__call_actions = []
@@ -24,6 +25,9 @@ class GameRule:
 
     def get_win_patterns(self):
         return self.__win_patterns
+
+    def get_seats_ids(self):
+        return self.__seats_ids
 
     @staticmethod
     def get_is_round_end(game_round):
@@ -162,6 +166,9 @@ class GameRule:
 
     def set_cards(self, cards):
         self.__cards = cards
+
+    def set_seats_ids(self, ids):
+        self.__seats_ids = ids
 
     # def set_stages(self, stages):
     #     self.__stages = stages
