@@ -458,10 +458,10 @@ players 的示例：
 	"cmdtype":"sockpush",
 	"sockpush":"game-players",
 	"players": [{"userid": 111, 
-				"seated":1, //是否已入座，1:入座；0: 未入座
+				"seated":1, //座位编号
 				}, 
 				{"userid": 222
-				“seated":0,
+				“seated":0, //0 表示未入座； -1，表示无座位编号
 				}, {"userid": 333}] //玩家按照入场顺序排序
 }
 说明：
