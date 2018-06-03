@@ -10,7 +10,11 @@ import UIKit
 import SnapKit
 import SwiftyJSON
 
+import SDWebImage
+
 class MahongTableViewController: UIViewController, SockClientDelegate{
+    
+//    var cardsInHand: NSMutableArray = NSMutableArray()
     func onCardsState(cardsUserId: UInt32, activeCards: [UInt8], freezedCards: [UInt8], publicShownCards: [[UInt8]]) {
         
     }
@@ -24,17 +28,16 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     }
     
     func onDealCards(receivePlayer: PlayerInfo, cards: [UInt8]) {
-        let newCards = NSMutableArray()
         for c in cards{
-            
             let btn = UIButton()
             let img = UIImage(named: String(c))
             btn.tag = Int(c)
             btn.addTarget(self, action:#selector(playCardBtnClicked(_:)), for:.touchUpInside)
             btn.setBackgroundImage(img, for: UIControlState.normal)
-            newCards.add(btn)
+            self.cardsInHand.add(btn)
         }
-        horzStackSubviews(panel: cardsPanel, subviews: newCards, panelSize:cardsPanelSize)
+        
+        horzStackSubviews(panel: cardsPanel, subviews: cardsInHand, panelSize:cardsPanelSize)
     }
     
     func onGameStatusChanged(status: String, statusData: String) {
@@ -42,7 +45,18 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     }
     
     func onPlayerPlayCards(player: PlayerInfo, cards: [UInt8]) {
-
+        var cardBtns = [UIButton]()
+        for c in cards{
+            for cb in self.cardsPanel.subviews{
+                if cb.tag == c && !cardBtns.contains(cb as! UIButton){
+                    cardBtns.append(cb as! UIButton)
+                }
+            }
+        }
+        
+        for cb in cardBtns{
+            cardsPanel.willRemoveSubview(cb)
+        }
     }
     
     func onCmdOptions(player: PlayerInfo, cmds: [CmdPush], timeoutSec: Int32, defaultCmd: CmdPush) {
@@ -63,6 +77,10 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     func onPlayerExedCmd(player: PlayerInfo, cmd: String, cmdParam: [Int32]) {
         let txt = "\(player.userid ?? 000) : \(cmd)"
         self.cmdExedPanel.text = txt
+    }
+    
+    func updateRoomPlayers(players: [PlayerInfo]) {
+        
     }
     
     
@@ -136,7 +154,36 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             make.bottom.equalTo(cardsPanel.snp.top).offset(-10)
             make.centerX.equalTo(self.view)
         }
+    }
+    
+    func createPlayersPanel() {
         
+       let stack = UIStackView()
+        stack.axis = UILayoutConstraintAxis.horizontal
+        stack.backgroundColor = UIColor.blue
+        self.view.addSubview(stack)
+        stack.snp.makeConstraints{
+            (make) -> Void in
+            make.height.equalTo(50)
+            make.width.equalTo(self.view).multipliedBy(0.3)
+            make.left.equalTo(self.view.snp.left).multipliedBy(0.6)
+            make.right.equalTo(self.view)
+        }
+        stack.spacing = 2
+        stack.distribution = UIStackViewDistribution.fillEqually
+    
+        
+        var img = UIImageView()
+        img.sd_setImage(with: URL(string: "http://ww2.sinaimg.cn/bmiddle/632dab64jw1ehgcjf2rd5j20ak07w767.jpg"), placeholderImage: UIImage(named: "placeholder.png"))
+        stack.addArrangedSubview(img)
+        
+        let img2 = UIImageView(image: UIImage(named: "profile2"))
+        stack.addArrangedSubview(img2)
+        
+        let img3 = UIImageView(image: UIImage(named: "profile3"))
+        stack.addArrangedSubview(img3)
+        
+//        
     }
     
     override func viewDidLoad() {
@@ -149,6 +196,8 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         createOptCmdsPanel()
         
         createPlayerExecutionPanel()
+        
+        createPlayersPanel()
         
         
         // Do any additional setup after loading the view.

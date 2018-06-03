@@ -70,15 +70,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/GameEntryViewController.swift"
-            timestampString = "549543782.6920691"
+            timestampString = "549732402.8529871"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "99"
-            endingLineNumber = "99"
+            startingLineNumber = "84"
+            endingLineNumber = "84"
             landmarkName = "EnterRoom(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -154,11 +154,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/GameEntryViewController.swift"
-            timestampString = "549543782.693269"
+            timestampString = "549732402.853176"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "224"
-            endingLineNumber = "224"
+            startingLineNumber = "209"
+            endingLineNumber = "209"
             landmarkName = "onPlayerConnectStateChanged(oldState:newState:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -198,33 +198,17 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "LXQEnjoy/MahongTableViewController.swift"
-            timestampString = "549543782.694095"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "147"
-            endingLineNumber = "147"
-            landmarkName = "viewDidLoad()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/GameEntryViewController.swift"
-            timestampString = "549543782.694223"
+            timestampString = "549732402.853792"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "166"
-            endingLineNumber = "166"
-            landmarkName = "test_push_cards_state()"
-            landmarkType = "7">
+            startingLineNumber = "151"
+            endingLineNumber = "151"
+            landmarkName = "GameEntryViewController"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -266,11 +250,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/GameEntryViewController.swift"
-            timestampString = "549543782.694994"
+            timestampString = "549732402.853905"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "170"
-            endingLineNumber = "170"
+            startingLineNumber = "155"
+            endingLineNumber = "155"
             landmarkName = "test_push_game_players()"
             landmarkType = "7">
          </BreakpointContent>
@@ -346,11 +330,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/MahongTableViewController.swift"
-            timestampString = "549543782.696264"
+            timestampString = "549734053.4905159"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "53"
-            endingLineNumber = "53"
+            startingLineNumber = "55"
+            endingLineNumber = "55"
             landmarkName = "onCmdOptions(player:cmds:timeoutSec:defaultCmd:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -362,11 +346,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/MahongTableViewController.swift"
-            timestampString = "549543782.6966161"
+            timestampString = "549734053.490907"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "246"
-            endingLineNumber = "246"
+            startingLineNumber = "312"
+            endingLineNumber = "312"
             landmarkName = "cmdBtnClicked(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -378,11 +362,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/GameEntryViewController.swift"
-            timestampString = "549543782.696854"
+            timestampString = "549732402.8545589"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "65"
-            endingLineNumber = "65"
+            startingLineNumber = "80"
+            endingLineNumber = "80"
             landmarkName = "EnterRoom(_:)"
             landmarkType = "7">
          </BreakpointContent>

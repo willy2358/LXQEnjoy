@@ -15,4 +15,12 @@ func printLog(_ item: Any, _ file: String = #file, _ line: Int = #line, _ functi
     }
 }
 
+func printErrorLog(_ item: Any, _ file: String = #file, _ line: Int = #line, _ function: String = #function) {
+    let debug = true
+    if debug {
+        print(file + ":\(line):" + function, item)
+    }
+}
+
+
 

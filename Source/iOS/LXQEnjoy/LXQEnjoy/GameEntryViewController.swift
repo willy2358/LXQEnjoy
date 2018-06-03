@@ -62,40 +62,23 @@ class GameEntryViewController: UIViewController, SockClientDelegate{
     
     @IBAction func EnterRoom(_ sender: Any) {
         
-        guard let sockPlayer = NetworkProxy.getSockClient() else{
-            printLog("no available connection")
-            return
-        }
+//        guard let sockPlayer = NetworkProxy.getSockClient() else{
+//            printLog("no available connection")
+//            return
+//        }
+//
+//        sockPlayer.enterRoom(roomId: "LX888", gameId: 111,
+//                                    okCallBack: {
+//                                        let myStoryBoard = self.storyboard
+//                                        let mjTable = myStoryBoard?.instantiateViewController(withIdentifier: "MJTable")
+//                                        self.present(mjTable!, animated: true, completion: nil)
+//                                            },
+//                                    failCallback: {errCode,errMsg in
+//                                        printErrorLog(errMsg)
+//        })
+//
         
-        sockPlayer.enterRoom(roomId: "LX888", gameId: 111,
-                                    okCallBack: {
-                                        let myStoryBoard = self.storyboard
-                                        let mjTable = myStoryBoard?.instantiateViewController(withIdentifier: "MJTable")
-                                        self.present(mjTable!, animated: true, completion: nil)
-                                            },
-                                    failCallback: {errCode,errMsg in
-//                                        let alertView = UIAlertView()
-//                                        alertView.title = ""
-//                                        alertView.message = errMsg
-//                                        alertView.addButton(withTitle: "点击我")
-//                                        alertView.show()
-                                        printLog(errMsg)
-        })
-        
-        
-//        test_push_cards_state()
-//        test_push_game_players()
-//        test_push_new_banker()
-//        test_push_deal_cards()
-//        test_push_play_cards()
-//        test_push_cmd_opts()
-//        test_push_exed_cmd()
-//        return;
 
-//        playerSockClient = SockClient(serverIP: AppConfig.sockServerIP, serverPort: AppConfig.sockServerPort)
-//        playerSockClient?.playerDelegate = self
-//        NetworkProxy.sockPlayer = playerSockClient
-//        playerSockClient?.connect()
         
         
         let myStoryBoard = self.storyboard
