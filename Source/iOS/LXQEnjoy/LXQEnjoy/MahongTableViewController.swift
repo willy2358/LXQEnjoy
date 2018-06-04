@@ -37,6 +37,10 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             self.cardsInHand.add(btn)
         }
         
+        for s in cardsPanel.subviews{
+            s.removeFromSuperview()
+        }
+        
         horzStackSubviews(panel: cardsPanel, subviews: cardsInHand, panelSize:cardsPanelSize)
     }
     
@@ -56,8 +60,13 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         
         for cb in cardBtns{
             cardsPanel.willRemoveSubview(cb)
+            
+            self.cardsInHand.remove(cb)
         }
     }
+    
+
+    
     
     func onCmdOptions(player: PlayerInfo, cmds: [CmdPush], timeoutSec: Int32, defaultCmd: CmdPush) {
         let cmdBtns = NSMutableArray()
@@ -173,8 +182,8 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         stack.distribution = UIStackViewDistribution.fillEqually
     
         
-        var img = UIImageView()
-        img.sd_setImage(with: URL(string: "http://ww2.sinaimg.cn/bmiddle/632dab64jw1ehgcjf2rd5j20ak07w767.jpg"), placeholderImage: UIImage(named: "placeholder.png"))
+        let img = UIImageView()
+        img.sd_setImage(with: URL(string: "https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo_top_ca79a146.png"), placeholderImage: UIImage(named: "placeholder.png"))
         stack.addArrangedSubview(img)
         
         let img2 = UIImageView(image: UIImage(named: "profile2"))
@@ -182,8 +191,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         
         let img3 = UIImageView(image: UIImage(named: "profile3"))
         stack.addArrangedSubview(img3)
-        
-//        
+      
     }
     
     override func viewDidLoad() {
@@ -283,12 +291,23 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     }
     
     @objc func sitDownTabed(_ button:UIButton){
-//        let seatNo = button.tag
+        let seatNo = button.tag
 //        sockPlayer = NetworkProxy.sockPlayer
 //        sockPlayer.playerDelegate = self
 //        sockPlayer.joinGame(roomId: "LX888", gameId: 111, seatNo: UInt16(seatNo))
 //        test_push_cmd_opts()
-        test_push_exed_cmd()
+//        test_push_exed_cmd()
+//        test_push_deal_cards()
+        guard let playerClient = NetworkProxy.getSockClient() else{
+            return
+        }
+        
+        playerClient.playerDelegate = self
+        
+        playerClient.joinGame(seatNo: UInt16(seatNo),
+                              okCallBack: { }) { (_, _) in
+            
+        }
     }
     
     @objc func cmdBtnClicked(_ button: UIButton) {
@@ -302,12 +321,13 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     @objc func playCardBtnClicked(_ button: UIButton) {
         let card = button.tag
         let cards = [UInt8(card)]
-        let client = SockClient(serverIP: "testIP", serverPort: 34)
-//        client.executeCmd(cmdText: (cmd?.cmdText)!, cmdParam: (cmd?.cmdParams)!,
-//                          okCallBack: {}, failCallback: {_,_ in })
+
+        guard let playerClient = NetworkProxy.getSockClient() else{
+            return
+        }
         
-        client.playCards(cards: cards, okCallBack:{}, failCallback: {_,_ in })
-        self.cardsPanel.willRemoveSubview(button)
+        playerClient.playCards(cards: cards, okCallBack:{}, failCallback: {_,_ in })
+        button.removeFromSuperview()
         
     }
     
@@ -366,6 +386,16 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         client.testServerPack(pack: test_pack)
         
     }
+    
+    func test_push_deal_cards()  {
+        let client = SockClient(serverIP: "testIP", serverPort: 34)
+        client.playerDelegate = self
+        let test_pack = """
+        {"cmdtype": "sockpush", "sockpush": "deal-cards", "cards": [31, 24, 33, 39, 11, 38, 13, 15, 31, 24, 18, 37, 37]}
+"""
+        client.testServerPack(pack: test_pack)
+    }
+    
     func centerSubviews(container:UIView, subViews:NSMutableArray, containerSize:CGSize, space:CGFloat = 0) -> Void {
         
         let bestRatio:CGFloat = 0.618

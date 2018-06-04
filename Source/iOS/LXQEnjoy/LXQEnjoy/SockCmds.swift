@@ -50,6 +50,8 @@ class SockCmds{
     static let userid = "userid"
     static let gameid = "gameid"
     static let roomid = "roomid"
+    static let room = "room"
+    static let seatid = "seatid"
     
     static let seat_no = "seatno" //ToDo not implemented feature.
     

@@ -10,21 +10,21 @@ import Foundation
 
 class PlayerInfo{
     var alias : String?
-    var userid : UInt?
-    var seated : UInt8?  //1, seated; 0: unseated
-    var roomId : Int32 = 0
+    var userid : UInt
+    var seatid : UInt8?  //1, seated; 0: unseated
+    var roomId : String = ""
     var gameId : UInt8 = 0
  
-    public init(){
-        
+    public init(userid: UInt){
+        self.userid = userid
     }
     
     class func getPlayerByUserid(userid:UInt) -> PlayerInfo?{
-        let player = PlayerInfo()
+        let player = PlayerInfo(userid: userid)
         return player
     }
     
     class func getMyPlayer() -> PlayerInfo? {
-        return PlayerInfo()
+        return PlayerInfo(userid: 111)
     }
 }

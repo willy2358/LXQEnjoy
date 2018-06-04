@@ -19,7 +19,7 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
     let sockClient = GCDAsyncSocket()
     var serverIP : String!
     var serverPort : UInt16!
-    let myPlayer = PlayerInfo()
+    let myPlayer = PlayerInfo(userid: 111)
     
     var cmdCallbacks = Dictionary<String, ServerRespCallBacks>()
     var connectSuccessCB : (() -> Void)?
@@ -48,19 +48,19 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
             SockCmds.gameid : gameId,
             SockCmds.roomid : roomId
         ] as [String:Any]
-
+        
         sendClientPack(cmd: cmd, pack: packet, okCallBack: okCallBack, failCallback: failCallback)
     }
     
-    func joinGame(roomId:String, gameId:UInt16, seatNo:UInt16, okCallBack : @escaping OKCallBack, failCallback: @escaping FailCallBack) {
+    func joinGame(seatNo:UInt16, okCallBack : @escaping OKCallBack, failCallback: @escaping FailCallBack) {
         let cmd = SockCmds.join_game
         let packet = [
             SockCmds.pack_key_cmd_type : SockCmds.cmd_type_sock_req,
             SockCmds.cmd_type_sock_req : cmd,
-            "seatno":seatNo,
+            SockCmds.seatid:seatNo,
             SockCmds.userid : myPlayer.userid,
-            SockCmds.gameid : gameId,
-            SockCmds.roomid : roomId
+            SockCmds.gameid : self.myPlayer.gameId,
+            SockCmds.roomid : self.myPlayer.roomId
             ] as [String:Any]
         
         sendClientPack(cmd: cmd, pack: packet, okCallBack: okCallBack, failCallback: failCallback)
@@ -173,20 +173,7 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
         
         playerDelegate?.onPlayerConnectStateChanged(oldState: oldStatus, newState: self.Status)
         
-//        let beat = ["c":"3"]
-//        socketWriteDataToServer(body:beat)
-        //        socketDidConnectCreatLogin()
-        //        socketDidConnectBeginSendBeat()
     }
-    
-    //    func socketWriteDataToServer(body: Dictionary<String, Any>) {
-    //        // 1: do   2: try?    3: try!
-    //        guard let data:Data = try? Data(JSONSerialization.data(withJSONObject: body,
-    //                                                               options: JSONSerialization.WritingOptions(rawValue: 1))) else { return }
-    //        print(body)
-    ////        clientSocket.write(data, withTimeout: -1, tag: 0)
-    ////        clientSocket.readData(to: GCDAsyncSocket.crlfData(), withTimeout: -1, tag: 0)
-    //    }
     
     func socketWriteDataToServer(body: Dictionary<String, Any>) {
         // 1: do   2: try?    3: try!
@@ -239,13 +226,12 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
         
         let result = respJson[SockCmds.pack_part_result].stringValue
         
-//        let result = respJson[SockCmds.pack_part_result].stringValue else{
-//            //print no result field
-//            return;
-//        }
-        
         if result == SockCmds.result_ok {
             cmdCallbacks[cmd]?.successCallBack()
+            if cmd == SockCmds.enter_room{
+                self.myPlayer.roomId = respJson[SockCmds.room][SockCmds.roomid].stringValue
+                self.myPlayer.gameId = UInt8(respJson[SockCmds.room][SockCmds.gameid].intValue)
+            }
         }
         else{
             let errCode = respJson[SockCmds.error_code].intValue
@@ -308,9 +294,8 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
             let players = pushJson[SockCmds.game_players].arrayObject as! [[String:AnyObject]]
             var playerInfos = [PlayerInfo]()
             for p in players{
-                let pi = PlayerInfo()
-                pi.userid = p[SockCmds.userid] as! UInt
-                pi.seated = p[SockCmds.game_player_seated] as! UInt8
+                let pi = PlayerInfo(userid: (p[SockCmds.userid] as? UInt)!)
+                pi.seatid = p[SockCmds.game_player_seated] as? UInt8
                 playerInfos.append(pi)
             }
             delegate.onPlayersStateChanged(players: playerInfos)

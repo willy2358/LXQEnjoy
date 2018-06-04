@@ -62,28 +62,28 @@ class GameEntryViewController: UIViewController, SockClientDelegate{
     
     @IBAction func EnterRoom(_ sender: Any) {
         
-//        guard let sockPlayer = NetworkProxy.getSockClient() else{
-//            printLog("no available connection")
-//            return
-//        }
-//
-//        sockPlayer.enterRoom(roomId: "LX888", gameId: 111,
-//                                    okCallBack: {
-//                                        let myStoryBoard = self.storyboard
-//                                        let mjTable = myStoryBoard?.instantiateViewController(withIdentifier: "MJTable")
-//                                        self.present(mjTable!, animated: true, completion: nil)
-//                                            },
-//                                    failCallback: {errCode,errMsg in
-//                                        printErrorLog(errMsg)
-//        })
-//
+        guard let sockPlayer = NetworkProxy.getSockClient() else{
+            printLog("no available connection")
+            return
+        }
+
+        sockPlayer.enterRoom(roomId: "LX888", gameId: 111,
+                                    okCallBack: {
+                                        let myStoryBoard = self.storyboard
+                                        let mjTable = myStoryBoard?.instantiateViewController(withIdentifier: "MJTable")
+                                        self.present(mjTable!, animated: true, completion: nil)
+                                            },
+                                    failCallback: {errCode,errMsg in
+                                        printErrorLog(errMsg)
+        })
+
         
 
         
         
-        let myStoryBoard = self.storyboard
-        let mjTable = myStoryBoard?.instantiateViewController(withIdentifier: "MJTable")
-        self.present(mjTable!, animated: true, completion: nil)
+//        let myStoryBoard = self.storyboard
+//        let mjTable = myStoryBoard?.instantiateViewController(withIdentifier: "MJTable")
+//        self.present(mjTable!, animated: true, completion: nil)
 
 
      
