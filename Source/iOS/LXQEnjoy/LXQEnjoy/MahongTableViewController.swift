@@ -328,7 +328,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         
         playerClient.playCards(cards: cards, okCallBack:{}, failCallback: {_,_ in })
         button.removeFromSuperview()
-        
+        self.cardsInHand.remove(button)
     }
     
     func horzStackSubviews(panel:UIView, subviews:NSMutableArray, panelSize:CGSize) -> Void {
