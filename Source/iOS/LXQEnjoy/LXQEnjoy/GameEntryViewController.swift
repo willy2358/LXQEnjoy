@@ -11,7 +11,7 @@ import UIKit
 import SwiftyJSON
 
 class GameEntryViewController: UIViewController, SockClientDelegate{
-    func onPlayerExedCmd(player: PlayerInfo, cmd: String, cmdParam: [Int32]) {
+    func onPlayerExedCmd(player: PlayerInfo, cmd: String, cmdParam: [Int32]?) {
         print("onPlayerExedCmd")
     }
     

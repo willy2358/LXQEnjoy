@@ -24,5 +24,5 @@ protocol SockClientDelegate{
     func onGameStatusChanged(status:String, statusData:String)
     func onPlayerPlayCards(player: PlayerInfo, cards:[UInt8])
     func onCmdOptions(player:PlayerInfo, cmds: [CmdPush], timeoutSec: Int32, defaultCmd: CmdPush)
-    func onPlayerExedCmd(player:PlayerInfo, cmd:String, cmdParam:[Int32])
+    func onPlayerExedCmd(player:PlayerInfo, cmd:String, cmdParam:[Int32]?)
 }

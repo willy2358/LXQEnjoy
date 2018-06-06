@@ -285,10 +285,10 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
         
         if pushCmd == SockCmds.push_cards_state{
             let userid = pushJson[SockCmds.userid].uIntValue
-            let act_cards = pushJson[SockCmds.card_state_active_cards].arrayObject as! [UInt8]
-            let frozen_cards = pushJson[SockCmds.card_state_frozen_cards].arrayObject as! [UInt8]
-            let shown_cards = pushJson[SockCmds.card_state_shown_cards].arrayObject as! [[UInt8]]
-            delegate.onCardsState(cardsUserId: UInt32(userid), activeCards: act_cards, freezedCards: frozen_cards, publicShownCards: shown_cards)
+            let act_cards = pushJson[SockCmds.card_state_active_cards].arrayObject as? [UInt8]
+            let frozen_cards = pushJson[SockCmds.card_state_frozen_cards].arrayObject as? [UInt8]
+            let shown_cards = pushJson[SockCmds.card_state_shown_cards].arrayObject as? [[UInt8]]
+            delegate.onCardsState(cardsUserId: UInt32(userid), activeCards: act_cards!, freezedCards: frozen_cards!, publicShownCards: shown_cards!)
         }
         else if pushCmd == SockCmds.push_game_players{
             let players = pushJson[SockCmds.game_players].arrayObject as! [[String:AnyObject]]
@@ -325,7 +325,7 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
                 let cmd = CmdPush()
 
                 cmd.cmdText = c[SockCmds.pack_part_cmd] as! String
-                cmd.cmdParams = c[SockCmds.pack_part_cmd_param] as! [AnyObject] as! [Int32]
+                cmd.cmdParams = c[SockCmds.pack_part_cmd_param] as? [Int32]
                 cmd_opts.append(cmd)
             }
             let dc = pushJson[SockCmds.cmd_opts_default_cmd]
@@ -340,7 +340,7 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
             let exeUserId = pushJson[SockCmds.userid].uIntValue
             let exedCmd = pushJson[SockCmds.push_exed_cmd].stringValue
             //Todo maybe some other type of arrayObject
-            let cmd_param = pushJson[SockCmds.pack_part_cmd_param].arrayObject as! [Int32]
+            let cmd_param = pushJson[SockCmds.pack_part_cmd_param].arrayObject as? [Int32]
             let exePlayer = PlayerInfo.getPlayerByUserid(userid: exeUserId)
             delegate.onPlayerExedCmd(player: exePlayer!, cmd: exedCmd, cmdParam: cmd_param)
         }

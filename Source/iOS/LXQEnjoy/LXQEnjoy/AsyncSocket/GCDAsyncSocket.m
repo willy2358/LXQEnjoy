@@ -8100,7 +8100,7 @@ static void CFWriteStreamCallback (CFWriteStreamRef stream, CFStreamEventType ty
 		// Error occurred creating streams (perhaps socket isn't open)
 		return NO;
 	}
-	
+
 	BOOL r1, r2;
 	
 	LogVerbose(@"Enabling backgrouding on socket");

@@ -13,6 +13,8 @@ import SwiftyJSON
 import SDWebImage
 
 class MahongTableViewController: UIViewController, SockClientDelegate{
+
+    
     
 //    var cardsInHand: NSMutableArray = NSMutableArray()
     func onCardsState(cardsUserId: UInt32, activeCards: [UInt8], freezedCards: [UInt8], publicShownCards: [[UInt8]]) {
@@ -24,7 +26,12 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     }
     
     func onNewBanker(bankPlayer: PlayerInfo) {
+        if PlayerInfo.getMyPlayer()?.userid == bankPlayer.userid{
+            canPlayCard = true
+        }
         
+        let txt = "banker: \(bankPlayer.userid )"
+        self.cmdExedPanel.text = txt
     }
     
     func onDealCards(receivePlayer: PlayerInfo, cards: [UInt8]) {
@@ -49,42 +56,56 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     }
     
     func onPlayerPlayCards(player: PlayerInfo, cards: [UInt8]) {
-        var cardBtns = [UIButton]()
-        for c in cards{
-            for cb in self.cardsPanel.subviews{
-                if cb.tag == c && !cardBtns.contains(cb as! UIButton){
-                    cardBtns.append(cb as! UIButton)
-                }
-            }
-        }
-        
-        for cb in cardBtns{
-            cardsPanel.willRemoveSubview(cb)
-            
-            self.cardsInHand.remove(cb)
-        }
+//        var cardBtns = [UIButton]()
+//        for c in cards{
+//            for cb in self.cardsPanel.subviews{
+//                if cb.tag == c && !cardBtns.contains(cb as! UIButton){
+//                    cardBtns.append(cb as! UIButton)
+//                }
+//            }
+//        }
+//
+//        for cb in cardBtns{
+//            cardsPanel.willRemoveSubview(cb)
+//
+//            self.cardsInHand.remove(cb)
+//        }
+        let txt = "player: \(player.userid ), play cards:\(cards)"
+        self.cmdExedPanel.text = txt
     }
     
 
     
     
     func onCmdOptions(player: PlayerInfo, cmds: [CmdPush], timeoutSec: Int32, defaultCmd: CmdPush) {
-        let cmdBtns = NSMutableArray()
-        self.cmdBtns.removeAll()
-        for c in cmds{
-            
-            let btn = UIButton()
-            btn.setTitle(c.cmdText, for: UIControlState.normal)
-            btn.backgroundColor = UIColor.blue
-            self.cmdBtns[btn] = c
-            btn.addTarget(self, action:#selector(cmdBtnClicked(_:)), for:.touchUpInside)
-            cmdBtns.add(btn)
-            centerSubviews(container: self.cmdsPanel, subViews: cmdBtns, subViewWidth: CGFloat(80), space: CGFloat(20))
+        
+        for (k,_) in self.cmdBtns {
+            k.removeFromSuperview()
         }
+        self.cmdBtns.removeAll()
+        
+        for c in cmds{
+            if c.cmdText == SockCmds.push_play_cards{
+                self.canPlayCard = true
+            }
+            else {
+                let btn = UIButton()
+                btn.setTitle(c.cmdText, for: UIControlState.normal)
+                btn.backgroundColor = UIColor.blue
+                self.cmdBtns[btn] = c
+                btn.addTarget(self, action:#selector(cmdBtnClicked(_:)), for:.touchUpInside)
+            }
+        }
+        let cmds = NSMutableArray()
+        for (k, _) in self.cmdBtns{
+            cmds.add(k)
+        }
+        
+        centerSubviews(container: self.cmdsPanel, subViews: cmds, subViewWidth: CGFloat(80), space: CGFloat(20))
     }
     
-    func onPlayerExedCmd(player: PlayerInfo, cmd: String, cmdParam: [Int32]) {
-        let txt = "\(player.userid ?? 000) : \(cmd)"
+    func onPlayerExedCmd(player: PlayerInfo, cmd: String, cmdParam: [Int32]?) {
+        let txt = "\(player.userid ) : \(cmd)"
         self.cmdExedPanel.text = txt
     }
     
@@ -99,6 +120,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     var sockPlayer : SockClient!
     var cmdsPanel :UIView!
     var cmdExedPanel : UILabel!
+    var canPlayCard : Bool = false
     
     var cmdBtns = [UIButton : CmdPush]()
     
@@ -312,20 +334,27 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     
     @objc func cmdBtnClicked(_ button: UIButton) {
         let cmd = self.cmdBtns[button]
-        let client = SockClient(serverIP: "testIP", serverPort: 34)
-        client.executeCmd(cmdText: (cmd?.cmdText)!, cmdParam: (cmd?.cmdParams)!,
+        
+        guard let playerClient = NetworkProxy.getSockClient() else{
+            return
+        }
+        self.canPlayCard = false
+        playerClient.executeCmd(cmdText: (cmd?.cmdText)!, cmdParam: (cmd?.cmdParams)!,
                           okCallBack: {}, failCallback: {_,_ in })
         
     }
     
     @objc func playCardBtnClicked(_ button: UIButton) {
+        if !self.canPlayCard{
+            return
+        }
         let card = button.tag
         let cards = [UInt8(card)]
 
         guard let playerClient = NetworkProxy.getSockClient() else{
             return
         }
-        
+        self.canPlayCard = false
         playerClient.playCards(cards: cards, okCallBack:{}, failCallback: {_,_ in })
         button.removeFromSuperview()
         self.cardsInHand.remove(button)
