@@ -31,6 +31,10 @@ class SockCmds{
     static let push_new_banker = "new-banker"
     static let push_play_cards = "play-cards"
     static let push_exed_cmd = "exed-cmd"
+    static let push_game_status = "game-status"
+    static let push_game_end = "game-end"
+    static let push_scores = "scores"
+    
     static let pack_part_cmd_param = "cmd-param"
     
     static let cards = "cards"
@@ -38,6 +42,8 @@ class SockCmds{
     static let pack_part_cmd = "cmd"
 //    static let
     
+    static let game_status_new_round = "New round begins"
+    static let status_data = "status-data"
     
     static let pack_part_push = "sockpush"
     static let pack_part_resp = "sockresp"
@@ -52,6 +58,11 @@ class SockCmds{
     static let roomid = "roomid"
     static let room = "room"
     static let seatid = "seatid"
+    
+    static let winners = "winners"
+    static let losers = "losers"
+    static let score = "score"
+    
     
     static let seat_no = "seatno" //ToDo not implemented feature.
     

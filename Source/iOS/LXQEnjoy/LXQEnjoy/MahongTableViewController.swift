@@ -13,7 +13,13 @@ import SwiftyJSON
 import SDWebImage
 
 class MahongTableViewController: UIViewController, SockClientDelegate{
-
+    func onGameRoundEnded(winners: [PlayerInfo], losers: [PlayerInfo]) {
+        printLog("onGameRoundEnded")
+    }
+    
+    func onUpdateScores(players: [PlayerInfo]) {
+        printLog("onUpdateScores")
+    }
     
     
 //    var cardsInHand: NSMutableArray = NSMutableArray()
@@ -22,7 +28,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     }
     
     func onPlayersStateChanged(players: [PlayerInfo]) {
-        
+//        let log = "player status:"
     }
     
     func onNewBanker(bankPlayer: PlayerInfo) {
@@ -52,7 +58,12 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     }
     
     func onGameStatusChanged(status: String, statusData: String) {
+        let log = "status: \(status), data:\(statusData)"
+        print(log)
         
+        if status == SockCmds.game_status_new_round{
+            self.beginNewRound()
+        }
     }
     
     func onPlayerPlayCards(player: PlayerInfo, cards: [UInt8]) {
@@ -70,11 +81,19 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
 //
 //            self.cardsInHand.remove(cb)
 //        }
-        let txt = "player: \(player.userid ), play cards:\(cards)"
+        let txt = "p: \(player.userid ), cards:\(cards)"
         self.cmdExedPanel.text = txt
     }
     
-
+    
+    func beginNewRound() -> Void {
+        for s in cardsPanel.subviews{
+            s.removeFromSuperview()
+        }
+        
+        self.cardsInHand.removeAllObjects()
+        
+    }
     
     
     func onCmdOptions(player: PlayerInfo, cmds: [CmdPush], timeoutSec: Int32, defaultCmd: CmdPush) {
@@ -320,6 +339,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
 //        test_push_cmd_opts()
 //        test_push_exed_cmd()
 //        test_push_deal_cards()
+
         guard let playerClient = NetworkProxy.getSockClient() else{
             return
         }
@@ -411,6 +431,26 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         client.playerDelegate = self
         let test_pack = """
         {"cmdtype": "sockpush", "sockpush": "exed-cmd", "exed-cmd": "peng", "cmd-param": [31], "userid": 333}
+"""
+        client.testServerPack(pack: test_pack)
+        
+    }
+    
+    func test_push_game_end() {
+        let client = SockClient(serverIP: "testIP", serverPort: 34)
+        client.playerDelegate = self
+        let test_pack = """
+        {"cmdtype": "sockpush", "sockpush": "game-end", "winners": [{"userid": 111, "score": 40}], "losers": [{"userid": 333, "score": -40}]}
+"""
+        client.testServerPack(pack: test_pack)
+        
+    }
+    
+    func test_push_scores() {
+        let client = SockClient(serverIP: "testIP", serverPort: 34)
+        client.playerDelegate = self
+        let test_pack = """
+        {"cmdtype": "sockpush", "sockpush": "scores", "scores": [{"userid": 222, "score": 0}, {"userid": 333, "score": -40}, {"userid": 111, "score": 40}]}
 """
         client.testServerPack(pack: test_pack)
         

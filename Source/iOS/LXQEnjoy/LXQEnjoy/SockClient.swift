@@ -344,7 +344,44 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
             let exePlayer = PlayerInfo.getPlayerByUserid(userid: exeUserId)
             delegate.onPlayerExedCmd(player: exePlayer!, cmd: exedCmd, cmdParam: cmd_param)
         }
-    
+        else if pushCmd == SockCmds.push_game_status{
+            let status = pushJson[SockCmds.push_game_status].stringValue
+            let statusData = pushJson[SockCmds.status_data].stringValue
+            delegate.onGameStatusChanged(status: status, statusData: statusData)
+        }
+        else if pushCmd == SockCmds.push_game_end{
+            let winners = pushJson[SockCmds.winners].arrayObject as! [[String:AnyObject]]
+            let losers = pushJson[SockCmds.losers].arrayObject as! [[String:AnyObject]]
+            var win_players = [PlayerInfo]()
+            var lose_players = [PlayerInfo]()
+            for p in winners{
+                let userid = p[SockCmds.userid]?.uintValue
+                let scoreDelta = p[SockCmds.score]?.int32Value
+                guard let player = PlayerInfo.getPlayerByUserid(userid: userid!) else{ continue}
+                player.setRoundGainScore(score: scoreDelta!)
+                win_players.append(player)
+            }
+            for p in losers{
+                let userid = p[SockCmds.userid]?.uintValue
+                let scoreDelta = p[SockCmds.score]?.int32Value
+                guard let player = PlayerInfo.getPlayerByUserid(userid: userid!) else{ continue}
+                player.setRoundGainScore(score: scoreDelta!)
+                lose_players.append(player)
+            }
+            delegate.onGameRoundEnded(winners: win_players, losers: lose_players)
+        }
+        else if pushCmd == SockCmds.push_scores{
+            let scores = pushJson[SockCmds.push_scores].arrayObject as![[String:AnyObject]]
+            var players = [PlayerInfo]()
+            for p in scores{
+                let userid = p[SockCmds.userid]?.uintValue
+                let score = p[SockCmds.score]?.int32Value
+                guard let player = PlayerInfo.getPlayerByUserid(userid: userid!) else{ continue}
+                player.updateTotalScore(newTotalScore: score!)
+                players.append(player)
+            }
+            delegate.onUpdateScores(players: players)
+        }
     }
     
     func tryParseJsonString(jsonStr: String) -> JSON? {

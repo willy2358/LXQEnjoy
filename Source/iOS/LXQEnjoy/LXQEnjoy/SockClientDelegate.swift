@@ -25,4 +25,7 @@ protocol SockClientDelegate{
     func onPlayerPlayCards(player: PlayerInfo, cards:[UInt8])
     func onCmdOptions(player:PlayerInfo, cmds: [CmdPush], timeoutSec: Int32, defaultCmd: CmdPush)
     func onPlayerExedCmd(player:PlayerInfo, cmd:String, cmdParam:[Int32]?)
+    func onGameRoundEnded(winners: [PlayerInfo], losers:[PlayerInfo]) -> Void
+    func onUpdateScores(players:[PlayerInfo])
+    
 }

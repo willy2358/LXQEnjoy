@@ -14,7 +14,13 @@ class GameEntryViewController: UIViewController, SockClientDelegate{
     func onPlayerExedCmd(player: PlayerInfo, cmd: String, cmdParam: [Int32]?) {
         print("onPlayerExedCmd")
     }
+    func onGameRoundEnded(winners: [PlayerInfo], losers: [PlayerInfo]) {
+        printLog("onGameRoundEnded")
+    }
     
+    func onUpdateScores(players: [PlayerInfo]) {
+        printLog("onUpdateScores")
+    }
 //    func processServerSuccessResponse(respCmd: String, jsonObj: JSON) {
 //        
 //    }
@@ -61,7 +67,7 @@ class GameEntryViewController: UIViewController, SockClientDelegate{
     var playerSockClient : SockClient?
     
     @IBAction func EnterRoom(_ sender: Any) {
-        
+
         guard let sockPlayer = NetworkProxy.getSockClient() else{
             printLog("no available connection")
             return
@@ -121,6 +127,25 @@ class GameEntryViewController: UIViewController, SockClientDelegate{
         
     }
     
+    func test_push_game_end() {
+        let client = SockClient(serverIP: "testIP", serverPort: 34)
+        client.playerDelegate = self
+        let test_pack = """
+        {"cmdtype": "sockpush", "sockpush": "game-end", "winners": [{"userid": 111, "score": 40}], "losers": [{"userid": 333, "score": -40}]}
+"""
+        client.testServerPack(pack: test_pack)
+        
+    }
+    
+    func test_push_scores() {
+        let client = SockClient(serverIP: "testIP", serverPort: 34)
+        client.playerDelegate = self
+        let test_pack = """
+        {"cmdtype": "sockpush", "sockpush": "scores", "scores": [{"userid": 222, "score": 0}, {"userid": 333, "score": -40}, {"userid": 111, "score": 40}]}
+"""
+        client.testServerPack(pack: test_pack)
+        
+    }
     func test_push_new_banker()  {
         let client = SockClient(serverIP: "testIP", serverPort: 34)
         client.playerDelegate = self
