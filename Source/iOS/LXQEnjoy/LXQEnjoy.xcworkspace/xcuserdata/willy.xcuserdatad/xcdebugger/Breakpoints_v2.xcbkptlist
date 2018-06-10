@@ -74,11 +74,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/GameEntryViewController.swift"
-            timestampString = "550323243.519213"
+            timestampString = "550339738.53469"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "96"
-            endingLineNumber = "96"
+            startingLineNumber = "93"
+            endingLineNumber = "93"
             landmarkName = "EnterRoom(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -154,11 +154,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/GameEntryViewController.swift"
-            timestampString = "550323243.520081"
+            timestampString = "550339738.535058"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "237"
-            endingLineNumber = "237"
+            startingLineNumber = "234"
+            endingLineNumber = "234"
             landmarkName = "onPlayerConnectStateChanged(oldState:newState:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -202,11 +202,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/GameEntryViewController.swift"
-            timestampString = "550323243.520511"
+            timestampString = "550339738.5351551"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "179"
-            endingLineNumber = "179"
+            startingLineNumber = "176"
+            endingLineNumber = "176"
             landmarkName = "GameEntryViewController"
             landmarkType = "3">
          </BreakpointContent>
@@ -218,11 +218,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/SockClient.swift"
-            timestampString = "550323243.5208091"
+            timestampString = "550339738.535212"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "282"
-            endingLineNumber = "282"
+            startingLineNumber = "292"
+            endingLineNumber = "292"
             landmarkName = "processServerPushCmd(pushCmd:pushJson:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -234,11 +234,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/SockClient.swift"
-            timestampString = "550323243.52112"
+            timestampString = "550339738.535848"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "294"
-            endingLineNumber = "294"
+            startingLineNumber = "304"
+            endingLineNumber = "304"
             landmarkName = "processServerPushCmd(pushCmd:pushJson:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -250,11 +250,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/GameEntryViewController.swift"
-            timestampString = "550323243.5212049"
+            timestampString = "550339738.536126"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "183"
-            endingLineNumber = "183"
+            startingLineNumber = "180"
+            endingLineNumber = "180"
             landmarkName = "test_push_game_players()"
             landmarkType = "7">
          </BreakpointContent>
@@ -266,11 +266,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/SockClient.swift"
-            timestampString = "550323243.5215729"
+            timestampString = "550339738.536181"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "309"
-            endingLineNumber = "309"
+            startingLineNumber = "319"
+            endingLineNumber = "319"
             landmarkName = "processServerPushCmd(pushCmd:pushJson:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -282,11 +282,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/SockClient.swift"
-            timestampString = "550323243.521648"
+            timestampString = "550339738.536433"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "314"
-            endingLineNumber = "314"
+            startingLineNumber = "324"
+            endingLineNumber = "324"
             landmarkName = "processServerPushCmd(pushCmd:pushJson:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -298,11 +298,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/SockClient.swift"
-            timestampString = "550323243.521752"
+            timestampString = "550339738.536679"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "320"
-            endingLineNumber = "320"
+            startingLineNumber = "330"
+            endingLineNumber = "330"
             landmarkName = "processServerPushCmd(pushCmd:pushJson:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -314,11 +314,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/SockClient.swift"
-            timestampString = "550323243.521889"
+            timestampString = "550339738.536952"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "340"
-            endingLineNumber = "340"
+            startingLineNumber = "350"
+            endingLineNumber = "350"
             landmarkName = "processServerPushCmd(pushCmd:pushJson:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -330,7 +330,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/MahongTableViewController.swift"
-            timestampString = "550323243.52198"
+            timestampString = "550339738.537197"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "106"
@@ -346,11 +346,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/MahongTableViewController.swift"
-            timestampString = "550323243.522246"
+            timestampString = "550339738.537415"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "362"
-            endingLineNumber = "362"
+            startingLineNumber = "374"
+            endingLineNumber = "374"
             landmarkName = "cmdBtnClicked(_:)"
             landmarkType = "7">
             <Locations>
@@ -362,11 +362,11 @@
                   moduleName = "LXQEnjoy"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/willy/MyCodes/lxqenjoy/Source/iOS/LXQEnjoy/LXQEnjoy/MahongTableViewController.swift"
-                  timestampString = "550323243.774561"
+                  timestampString = "550339738.784429"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "362"
-                  endingLineNumber = "362"
+                  startingLineNumber = "374"
+                  endingLineNumber = "374"
                   offsetFromSymbolStart = "264">
                </Location>
                <Location
@@ -377,11 +377,11 @@
                   moduleName = "LXQEnjoy"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/willy/MyCodes/lxqenjoy/Source/iOS/LXQEnjoy/LXQEnjoy/MahongTableViewController.swift"
-                  timestampString = "550323243.777256"
+                  timestampString = "550339738.786968"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "362"
-                  endingLineNumber = "362"
+                  startingLineNumber = "374"
+                  endingLineNumber = "374"
                   offsetFromSymbolStart = "836">
                </Location>
             </Locations>
@@ -394,11 +394,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/SockClient.swift"
-            timestampString = "550323243.522306"
+            timestampString = "550339738.53748"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "232"
-            endingLineNumber = "232"
+            startingLineNumber = "231"
+            endingLineNumber = "231"
             landmarkName = "processCmdResponse(cmd:respJson:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -410,11 +410,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/MahongTableViewController.swift"
-            timestampString = "550323243.522359"
+            timestampString = "550339738.5378031"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "378"
-            endingLineNumber = "378"
+            startingLineNumber = "390"
+            endingLineNumber = "390"
             landmarkName = "playCardBtnClicked(_:)"
             landmarkType = "7">
             <Locations>
@@ -426,11 +426,11 @@
                   moduleName = "LXQEnjoy"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/willy/MyCodes/lxqenjoy/Source/iOS/LXQEnjoy/LXQEnjoy/MahongTableViewController.swift"
-                  timestampString = "550323243.790321"
+                  timestampString = "550339738.7991869"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "378"
-                  endingLineNumber = "378"
+                  startingLineNumber = "390"
+                  endingLineNumber = "390"
                   offsetFromSymbolStart = "385">
                </Location>
                <Location
@@ -441,11 +441,11 @@
                   moduleName = "LXQEnjoy"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/willy/MyCodes/lxqenjoy/Source/iOS/LXQEnjoy/LXQEnjoy/MahongTableViewController.swift"
-                  timestampString = "550323243.792949"
+                  timestampString = "550339738.802"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "378"
-                  endingLineNumber = "378"
+                  startingLineNumber = "390"
+                  endingLineNumber = "390"
                   offsetFromSymbolStart = "4">
                </Location>
                <Location
@@ -456,11 +456,11 @@
                   moduleName = "LXQEnjoy"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/willy/MyCodes/lxqenjoy/Source/iOS/LXQEnjoy/LXQEnjoy/MahongTableViewController.swift"
-                  timestampString = "550323243.795655"
+                  timestampString = "550339738.8045959"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "378"
-                  endingLineNumber = "378"
+                  startingLineNumber = "390"
+                  endingLineNumber = "390"
                   offsetFromSymbolStart = "4">
                </Location>
             </Locations>
@@ -473,11 +473,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/MahongTableViewController.swift"
-            timestampString = "550323243.52241"
+            timestampString = "550339738.537868"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "342"
-            endingLineNumber = "342"
+            startingLineNumber = "354"
+            endingLineNumber = "354"
             landmarkName = "sitDownTabed(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -489,11 +489,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/SockClient.swift"
-            timestampString = "550323243.522452"
+            timestampString = "550339738.537917"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "353"
-            endingLineNumber = "353"
+            startingLineNumber = "363"
+            endingLineNumber = "363"
             landmarkName = "processServerPushCmd(pushCmd:pushJson:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -505,12 +505,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LXQEnjoy/SockClient.swift"
-            timestampString = "550323264.7226681"
+            timestampString = "550339738.538148"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "374"
-            endingLineNumber = "374"
+            startingLineNumber = "384"
+            endingLineNumber = "384"
             landmarkName = "processServerPushCmd(pushCmd:pushJson:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "LXQEnjoy/MahongTableViewController.swift"
+            timestampString = "550339738.5383691"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "225"
+            endingLineNumber = "225"
+            landmarkName = "createPlayersPanel()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

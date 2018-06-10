@@ -227,11 +227,21 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
         let result = respJson[SockCmds.pack_part_result].stringValue
         
         if result == SockCmds.result_ok {
-            cmdCallbacks[cmd]?.successCallBack()
             if cmd == SockCmds.enter_room{
                 self.myPlayer.roomId = respJson[SockCmds.room][SockCmds.roomid].stringValue
                 self.myPlayer.gameId = UInt8(respJson[SockCmds.room][SockCmds.gameid].intValue)
+                let ps = respJson[SockCmds.room][SockCmds.game_players].arrayObject as? [[String:AnyObject]]
+                guard let players = ps else{ return }
+                for p in players{
+                    let userid = p[SockCmds.userid]?.uintValue
+                    let player = PlayerInfo(userid: userid!)
+                    gGameStatus.addRoomPlayer(player: player)
+                    let seatid = p[SockCmds.game_player_seated]?.uint8Value
+                    guard let sid = seatid else{ continue }
+                    player.seatid = sid
+                }
             }
+            cmdCallbacks[cmd]?.successCallBack()
         }
         else{
             let errCode = respJson[SockCmds.error_code].intValue

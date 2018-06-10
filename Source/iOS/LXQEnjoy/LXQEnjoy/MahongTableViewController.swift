@@ -222,16 +222,28 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         stack.spacing = 2
         stack.distribution = UIStackViewDistribution.fillEqually
     
-        
-        let img = UIImageView()
-        img.sd_setImage(with: URL(string: "https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo_top_ca79a146.png"), placeholderImage: UIImage(named: "placeholder.png"))
-        stack.addArrangedSubview(img)
-        
-        let img2 = UIImageView(image: UIImage(named: "profile2"))
-        stack.addArrangedSubview(img2)
-        
-        let img3 = UIImageView(image: UIImage(named: "profile3"))
-        stack.addArrangedSubview(img3)
+        for p in gGameStatus.getRoomPlayers(){
+            let pi = p as! PlayerInfo
+            let imgPath = pi.getMyProfileImgPath()
+            if imgPath.starts(with: "http"){
+                let img = UIImageView()
+                img.sd_setImage(with: URL(string: imgPath), placeholderImage: UIImage(named: "userprofile.png"))
+                stack.addArrangedSubview(img)
+            }
+            else{
+                let img2 = UIImageView(image: UIImage(named: imgPath))
+                stack.addArrangedSubview(img2)
+            }
+        }
+//        let img = UIImageView()
+//        img.sd_setImage(with: URL(string: "https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo_top_ca79a146.png"), placeholderImage: UIImage(named: "placeholder.png"))
+//        stack.addArrangedSubview(img)
+//
+//        let img2 = UIImageView(image: UIImage(named: "profile2"))
+//        stack.addArrangedSubview(img2)
+//
+//        let img3 = UIImageView(image: UIImage(named: "profile3"))
+//        stack.addArrangedSubview(img3)
       
     }
     

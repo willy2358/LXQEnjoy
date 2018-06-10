@@ -11,11 +11,12 @@ import Foundation
 class PlayerInfo{
     var alias : String?
     var userid : UInt
-    var seatid : UInt8?  //1, seated; 0: unseated
+    var seatid : Int8? = 0
     var roomId : String = ""
     var gameId : UInt8 = 0
     var roundScore : Int32 = 0 // >0 gained score in one round , <0 lost score
     var totalScore : Int32 = 0
+    var profileImg : String?
  
     public init(userid: UInt){
         self.userid = userid
@@ -31,6 +32,15 @@ class PlayerInfo{
     
     public func getTotalScore() -> Int32{
         return self.totalScore
+    }
+    
+    public func getMyProfileImgPath() -> String{
+        guard let img = profileImg else{
+            
+            return "profile" + String(Int.random(lower: 1, 4))
+        }
+        
+        return img
     }
     
     //all scores are controlled in server 

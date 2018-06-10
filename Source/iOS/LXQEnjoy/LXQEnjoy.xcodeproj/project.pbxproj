@@ -30,6 +30,7 @@
 		3F9D289E20B03FD300CEC330 /* SockClientDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F9D289D20B03FD300CEC330 /* SockClientDelegate.swift */; };
 		3F9D28A020B0823300CEC330 /* Client_Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F9D289F20B0823300CEC330 /* Client_Status.swift */; };
 		3FA78F2920C4384300A4E91E /* profiles.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3FA78F2820C4384300A4E91E /* profiles.xcassets */; };
+		3FF7ECCA20CD7C51006672D7 /* GameStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FF7ECC920CD7C51006672D7 /* GameStatus.swift */; };
 		6F341BD67471BE754FF5D669 /* Pods_LXQEnjoy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72A72F78D6116089E07B1854 /* Pods_LXQEnjoy.framework */; };
 /* End PBXBuildFile section */
 
@@ -64,6 +65,7 @@
 		3F9D289D20B03FD300CEC330 /* SockClientDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SockClientDelegate.swift; sourceTree = "<group>"; };
 		3F9D289F20B0823300CEC330 /* Client_Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Client_Status.swift; path = images/Client_Status.swift; sourceTree = "<group>"; };
 		3FA78F2820C4384300A4E91E /* profiles.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = profiles.xcassets; sourceTree = "<group>"; };
+		3FF7ECC920CD7C51006672D7 /* GameStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStatus.swift; sourceTree = "<group>"; };
 		72A72F78D6116089E07B1854 /* Pods_LXQEnjoy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LXQEnjoy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F7FABC60A321100971F495C /* Pods-LXQEnjoy.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LXQEnjoy.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LXQEnjoy/Pods-LXQEnjoy.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -135,6 +137,7 @@
 				3F64902A20B5B1240014FBA8 /* PlayerInfo.swift */,
 				3F64902C20B712E70014FBA8 /* CmdPush.swift */,
 				3F64902E20C1586A0014FBA8 /* Utils.swift */,
+				3FF7ECC920CD7C51006672D7 /* GameStatus.swift */,
 			);
 			path = LXQEnjoy;
 			sourceTree = "<group>";
@@ -302,6 +305,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3FF7ECCA20CD7C51006672D7 /* GameStatus.swift in Sources */,
 				3F51178720ADCBF80005BEFB /* GCDAsyncSocket.m in Sources */,
 				3F9D289A20AF229200CEC330 /* AppConfig.swift in Sources */,
 				3F64902920B465180014FBA8 /* StringRes.swift in Sources */,
