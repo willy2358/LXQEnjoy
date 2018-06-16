@@ -238,7 +238,7 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
                     gGameStatus.addRoomPlayer(player: player)
                     let seatid = p[SockCmds.game_player_seated]?.uint8Value
                     guard let sid = seatid else{ continue }
-                    player.seatid = sid
+                    player.seatid = Int8(sid)
                 }
             }
             cmdCallbacks[cmd]?.successCallBack()
@@ -305,7 +305,7 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
             var playerInfos = [PlayerInfo]()
             for p in players{
                 let pi = PlayerInfo(userid: (p[SockCmds.userid] as? UInt)!)
-                pi.seatid = p[SockCmds.game_player_seated] as? UInt8
+                pi.seatid = p[SockCmds.game_player_seated] as? Int8
                 playerInfos.append(pi)
             }
             delegate.onPlayersStateChanged(players: playerInfos)

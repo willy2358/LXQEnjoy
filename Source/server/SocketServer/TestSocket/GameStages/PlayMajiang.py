@@ -24,13 +24,24 @@ class PlayMajiang(PlayInTurn):
         rule = game_round.get_rule()
         starter = game_round.get_bank_player()
         cmd_opts = rule.get_player_cmd_options_for_cards(starter, [], True, False)
-        if not cmd_opts:
+        if not cmd_opts or not PlayMajiang.is_contain_win_cmd(cmd_opts):
             def_cmd = PlayCmd(starter, InterProtocol.majiang_player_act_play_card)
             def_cmd.set_cmd_param(PlayMajiang.get_player_default_play_card(starter))
             cmd_opts.append(def_cmd)
 
         def_cmd = PlayMajiang.get_better_default_cmd_for_player(starter, cmd_opts, cmd_opts[0])
         game_round.send_player_cmd_options(starter, cmd_opts, def_cmd)
+
+    @staticmethod
+    def is_contain_win_cmd(cmds):
+        if not cmds:
+            return False
+
+        for c in cmds:
+            if c.get_cmd() == InterProtocol.majiang_player_act_hu or c.get_cmd() == InterProtocol.majiang_player_act_zimo:
+                return True
+
+        return False
 
     @staticmethod
     def get_better_default_cmd_for_player(player, cmd_opts, default_opt):
@@ -69,7 +80,7 @@ class PlayMajiang(PlayInTurn):
             game_round.deal_cards_for_player(next_player, 1)
             cmd_opts = rule.get_player_cmd_options_for_cards(next_player, [], True, False)
             def_cmd = None
-            if not cmd_opts:
+            if not cmd_opts or not PlayMajiang.is_contain_win_cmd(cmd_opts):
                 def_cmd = PlayCmd(next_player, InterProtocol.majiang_player_act_play_card)
                 def_cmd.set_cmd_param(PlayMajiang.get_player_default_play_card(next_player))
                 cmd_opts.append(def_cmd)

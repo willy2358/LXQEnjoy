@@ -29,6 +29,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     
     func onPlayersStateChanged(players: [PlayerInfo]) {
 //        let log = "player status:"
+        self.updateRoomPlayers(players: players)
     }
     
     func onNewBanker(bankPlayer: PlayerInfo) {
@@ -129,7 +130,24 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     }
     
     func updateRoomPlayers(players: [PlayerInfo]) {
+        for (_, m) in self.playersProfile{
+            m.isHidden = true
+        }
         
+        for p in players{
+            
+            if let sid = p.seatid, sid > 0{
+                let usid = UInt8(sid)
+                self.playersProfile[usid]?.isHidden = false
+                let imgPath = p.getMyProfileImgPath()
+                if imgPath.starts(with: "http"){
+                    self.playersProfile[usid]?.sd_setImage(with: URL(string: imgPath), placeholderImage: UIImage(named: "userprofile.png"))
+                }
+                else{
+                    self.playersProfile[usid]?.image = UIImage(named: imgPath)
+                }
+            }
+        }
     }
     
     
@@ -140,8 +158,16 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     var cmdsPanel :UIView!
     var cmdExedPanel : UILabel!
     var canPlayCard : Bool = false
+    var center_img : UIImageView!
+    let const_table_center_size  = 100
     
+    var imgNorthPlayer : UIImageView!
+    var imgSouthPlayer : UIImageView!
+    var imgEastPlayer :UIImageView!
+    var img2 :UIImageView!
     var cmdBtns = [UIButton : CmdPush]()
+    
+    var playersProfile  = [UInt8 : UIImageView]() //seatid : profile
     
     func processServerSuccessResponse(respCmd: String, jsonObj: JSON) {
         
@@ -171,10 +197,57 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         
     }
     
+    func createPlayersProfileImages() {
+        let imgSize = 48
+        
+        let img1 = UIImageView(image: UIImage(named: "profile3"))
+        self.view.addSubview(img1)
+        img1.snp.makeConstraints{
+            (make) -> Void in
+            make.top.equalTo(self.view).offset(10)
+            make.centerX.equalTo(self.view.snp.centerX).offset(-100)
+            make.width.equalTo(imgSize)
+            make.height.equalTo(imgSize)
+        }
+        playersProfile[1] = img1
+        
+        let img2 = UIImageView(image:UIImage(named: "profile3"))
+        self.view.addSubview(img2)
+        img2.snp.makeConstraints{
+            (make) -> Void in
+            make.left.equalTo(self.view.snp.left).offset(10)
+            make.centerY.equalTo(self.view.snp.centerY).offset(-100)
+            make.width.equalTo(imgSize)
+            make.height.equalTo(imgSize)
+        }
+        playersProfile[2] = img2
+        
+        let imgMy = UIImageView(image:UIImage(named: "profile3"))
+        self.view.addSubview(imgMy)
+        imgMy.snp.makeConstraints{
+            (make) -> Void in
+            make.left.equalTo(self.view.snp.left).offset(10)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-10)
+            make.width.equalTo(imgSize + 10)
+            make.height.equalTo(imgSize + 10)
+        }
+        playersProfile[3] = imgMy
+        
+        let img4 = UIImageView(image: UIImage(named: "profile3"))
+        self.view.addSubview(img4)
+        img4.snp.makeConstraints{
+            (make) -> Void in
+            make.right.equalTo(self.view.snp.right).offset(-10)
+            make.centerY.equalTo(self.view).offset(-100)
+            make.width.equalTo(imgSize)
+            make.height.equalTo(imgSize)
+        }
+        playersProfile[4] = img4
+    }
 
     fileprivate func createCardsPanel() {
         let rect = self.view.frame
-        let yStart = rect.height * CGFloat(2.0 / 3.0)
+        let yStart = rect.height * CGFloat(0.85)
         let myAreaHeight = rect.height - yStart
         let myProfileWidth = myAreaHeight
         let space = CGFloat(10)
@@ -182,13 +255,45 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         
         
         let cardsPanelWidth = rect.width - myProfileWidth - 2.0 * space
-        let cardsPanelHeight = myAreaHeight * CGFloat(0.5)
+        let cardsPanelHeight = myAreaHeight * CGFloat(0.8)
         
         cardsPanelSize = CGSize(width: cardsPanelWidth, height: cardsPanelHeight)
         let rectPanel = CGRect(origin: CGPoint(x:xStart, y:yStart), size:cardsPanelSize )
         cardsPanel = UIView(frame:rectPanel)
         cardsPanel.backgroundColor = UIColor.yellow
         self.view.addSubview(cardsPanel)
+    }
+    
+    func rotateTableForMyChoice(selSeatId: UInt8) {
+        var rotate = 0
+        switch selSeatId {
+        case 1:
+            rotate = 2
+            break
+        case 2:
+            rotate = 1
+            break
+        case 3:
+            rotate = 0
+            break
+        case 4:
+            rotate = 3
+            break
+        default:
+            break
+        }
+        
+        for _ in 0..<rotate{
+            let bak = playersProfile[4]
+            playersProfile[4] = playersProfile[3]
+            playersProfile[3] = playersProfile[2]
+            playersProfile[2] = playersProfile[1]
+            playersProfile[1] = bak
+        }
+        
+        let trans = self.center_img.transform
+        let newTrans = trans.rotated(by: CGFloat(Double.pi/2.0 * Double(rotate)))
+        center_img.transform = newTrans
     }
     
     func createOptCmdsPanel() {
@@ -214,9 +319,10 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         self.view.addSubview(stack)
         stack.snp.makeConstraints{
             (make) -> Void in
+            
+//            make.left.equalTo(self.view.snp.left).multipliedBy(0.6)
             make.height.equalTo(50)
-            make.width.equalTo(self.view).multipliedBy(0.3)
-            make.left.equalTo(self.view.snp.left).multipliedBy(0.6)
+            make.width.equalTo(self.view.snp.width).multipliedBy(0.4)
             make.right.equalTo(self.view)
         }
         stack.spacing = 2
@@ -250,7 +356,11 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        createTableCenterImage()
+        
         createSeatButtons()
+        
+        createPlayersProfileImages()
         
         createCardsPanel()
 
@@ -283,67 +393,83 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         
     }
     
+    func createTableCenterImage() {
+        center_img = UIImageView(image: UIImage(named: "table_center"))
+//        let transform = center_img.transform
+//        transform.rotated(by: CGFloat(Double.pi/2))
+//        center_img.transform = transform
+        self.view.addSubview(center_img)
+        
+        center_img.snp.makeConstraints{
+            (make) -> Void in
+            make.width.equalTo(const_table_center_size)
+            make.height.equalTo(const_table_center_size)
+            make.center.equalTo(self.view)
+        }
+        
+    }
+    
     func createSeatButtons() {
-        let tableRect = self.view.frame
-        let horzSpan = CGFloat(80.0)
-        let vertSpan = CGFloat(50.0)
+        let disVert = const_table_center_size / 2 + 20
+        let disHorz = const_table_center_size / 2 + 30
         let btnWidth = 80.0
         let btnHeight = 30.0
-        let btnSize = CGSize(width: 80.0, height: 30.0)
-        let x = (tableRect.width - btnSize.width)/2.0
-        let y = (tableRect.height - btnSize.height)/2.0
         
+        //top north
         let btn1 = UIButton()
         btn1.setTitle(StringRes.Join_game, for: UIControlState.normal)
         btn1.tag = 1
         btn1.addTarget(self, action:#selector(sitDownTabed(_:)), for:.touchUpInside)
         self.view.addSubview(btn1)
         btn1.snp.makeConstraints{(make) -> Void in
-            make.top.equalTo(self.view).offset(vertSpan)
-            make.left.equalTo(self.view).offset(x)
+            make.centerX.equalTo(self.center_img.snp.centerX)
+            make.centerY.equalTo(self.center_img.snp.centerY).offset(-disVert)
             make.width.equalTo(btnWidth)
             make.height.equalTo(btnHeight)
         }
-        
+
+        //bottom south
         let btn2 = UIButton()
-        btn2.tag = 2
+        btn2.tag = 3
         btn2.addTarget(self, action:#selector(sitDownTabed(_:)), for:.touchUpInside)
         btn2.setTitle(StringRes.Join_game, for: UIControlState.normal)
         self.view.addSubview(btn2)
         btn2.snp.makeConstraints{ (make) -> Void in
-            make.bottom.equalTo(self.view).offset(-vertSpan)
-            make.left.equalTo(self.view).offset(x)
+            make.centerX.equalTo(self.center_img.snp.centerX)
+            make.centerY.equalTo(self.center_img.snp.centerY).offset(disVert)
             make.width.equalTo(btnWidth)
             make.height.equalTo(btnHeight)
         }
-        
+
+        //left west
         let btn3 = UIButton()
-        btn3.tag = 3
+        btn3.tag = 4
         btn3.setTitle(StringRes.Join_game, for: UIControlState.normal)
         btn3.addTarget(self, action:#selector(sitDownTabed(_:)), for:.touchUpInside)
         self.view.addSubview(btn3)
         btn3.snp.makeConstraints{(make) -> Void in
-            make.left.equalTo(self.view).offset(horzSpan)
-            make.top.equalTo(self.view).offset(y)
+            make.centerX.equalTo(self.center_img.snp.centerX).offset(-disHorz)
+            make.centerY.equalTo(self.center_img.snp.centerY)
             make.width.equalTo(btnWidth)
             make.height.equalTo(btnHeight)
         }
-        
+
+        //right east
         let btn4 = UIButton()
-        btn4.tag = 4
+        btn4.tag = 2
         btn4.setTitle(StringRes.Join_game, for: UIControlState.normal)
         btn4.addTarget(self, action:#selector(sitDownTabed(_:)), for:.touchUpInside)
         self.view.addSubview(btn4)
         btn4.snp.makeConstraints{(make) -> Void in
-            make.right.equalTo(self.view).offset(-horzSpan)
-            make.top.equalTo(self.view).offset(y)
+            make.centerX.equalTo(self.center_img.snp.centerX).offset(disHorz)
+            make.centerY.equalTo(self.center_img.snp.centerY)
             make.width.equalTo(btnWidth)
             make.height.equalTo(btnHeight)
         }
-    
     }
     
     @objc func sitDownTabed(_ button:UIButton){
+        
         let seatNo = button.tag
 //        sockPlayer = NetworkProxy.sockPlayer
 //        sockPlayer.playerDelegate = self
@@ -359,7 +485,10 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         playerClient.playerDelegate = self
         
         playerClient.joinGame(seatNo: UInt16(seatNo),
-                              okCallBack: { }) { (_, _) in
+                              okCallBack: {
+                                self.rotateTableForMyChoice(selSeatId: UInt8(seatNo))
+                                
+        }) { (_, _) in
             
         }
     }

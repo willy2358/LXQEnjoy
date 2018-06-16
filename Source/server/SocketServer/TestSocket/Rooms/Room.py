@@ -210,6 +210,7 @@ class Room:
             resp_pack = None
             if ret:
                 roomObj = {
+                    InterProtocol.game_id : self._game_rule.get_rule_id(),
                     InterProtocol.room_id : self._room_id,
                     InterProtocol.resp_players: self.get_players_status(),
                     InterProtocol.resp_seats_ids:self._game_rule.get_seats_ids()

@@ -74,26 +74,7 @@ class GameListViewController: UIViewController{
         let gameEntry = GameEntryViewController()
         self.present(gameEntry, animated: true, completion: nil)
         
-//        switch(tag!)
-//        {
-//
-//        case 2000:// 连接设备
-//            print("连接设备");
-//            break;
-//        case 2001:// 添加设备
-//            print("添加设备");
-//            break;
-//        case 2002:// 编辑设备
-//            print("编辑设备");
-//            break;
-//        case 2003://移除设备
-//            print("移除设备");
-//            break;
-//        default:
-//            break;
-//
-//
-//        }
+
         
     }
     
