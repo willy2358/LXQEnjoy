@@ -51,6 +51,9 @@ class PlayerClient:
     def get_shown_card_groups(self):
         return self.__shown_card_groups
 
+    def get_private_cards_count(self):
+        return len(self.__active_cards)
+
     def get_user_id(self):
         return self.__user_id
 
@@ -206,9 +209,9 @@ class PlayerClient:
 
     def send_server_cmd_packet(self, cmd_pack_obj):
 
-        pack = InterProtocol.create_cards_state_packet(self)
-        j_str = json.dumps(pack)
-        self.send_api_pack_msg_str(j_str)
+        # pack = InterProtocol.create_cards_state_packet(self)
+        # j_str = json.dumps(pack)
+        # self.send_api_pack_msg_str(j_str)
 
         # self.send_cards_state() # for viewing data in test client
 
