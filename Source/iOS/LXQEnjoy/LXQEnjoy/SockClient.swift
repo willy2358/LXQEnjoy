@@ -298,7 +298,8 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
             let act_cards = pushJson[SockCmds.card_state_active_cards].arrayObject as? [UInt8]
             let frozen_cards = pushJson[SockCmds.card_state_frozen_cards].arrayObject as? [UInt8]
             let shown_cards = pushJson[SockCmds.card_state_shown_cards].arrayObject as? [[UInt8]]
-            delegate.onCardsState(cardsUserId: UInt32(userid), activeCards: act_cards!, freezedCards: frozen_cards!, publicShownCards: shown_cards!)
+            let pcc = pushJson[SockCmds.card_state_private_cards_count].int8Value
+            delegate.onCardsState(cardsUserId: UInt32(userid), activeCards: act_cards!, freezedCards: frozen_cards!, publicShownCards: shown_cards!, private_cards_count:pcc)
         }
         else if pushCmd == SockCmds.push_game_players{
             let players = pushJson[SockCmds.game_players].arrayObject as! [[String:AnyObject]]

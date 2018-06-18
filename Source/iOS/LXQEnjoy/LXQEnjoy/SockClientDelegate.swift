@@ -17,7 +17,7 @@ protocol SockClientDelegate{
     
     func onPlayerConnectStateChanged(oldState:client_status, newState:client_status)
     
-    func onCardsState(cardsUserId: UInt32, activeCards:[UInt8], freezedCards:[UInt8], publicShownCards:[[UInt8]])
+    func onCardsState(cardsUserId: UInt32, activeCards:[UInt8], freezedCards:[UInt8], publicShownCards:[[UInt8]], private_cards_count : Int8)
     func onPlayersStateChanged(players: [PlayerInfo])
     func onNewBanker(bankPlayer: PlayerInfo)
     func onDealCards(receivePlayer:PlayerInfo, cards:[UInt8])

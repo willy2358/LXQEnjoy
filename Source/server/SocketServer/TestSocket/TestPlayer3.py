@@ -33,7 +33,7 @@ cmd = {
     "userid":userid,
     "roomid":roomid,
     "gameid":gameid,
-    "seatid":3
+    "seatid":4
 }
 cmd_str = json.dumps(cmd)
 client.send_message(cmd_str)

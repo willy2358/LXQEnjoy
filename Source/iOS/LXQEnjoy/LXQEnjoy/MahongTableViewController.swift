@@ -22,9 +22,11 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     }
     
     
-//    var cardsInHand: NSMutableArray = NSMutableArray()
-    func onCardsState(cardsUserId: UInt32, activeCards: [UInt8], freezedCards: [UInt8], publicShownCards: [[UInt8]]) {
+    func onCardsState(cardsUserId userid: UInt32, activeCards aCards: [UInt8], freezedCards fCards: [UInt8], publicShownCards sCards: [[UInt8]], private_cards_count pcc : Int8) {
         
+        
+        guard let r = self.getPlayerRegion(playerId: UInt(userid)) else{ return}
+        r.UpdateCardsState(activeCards: aCards, freezedCards: fCards, publicShownCards: sCards, private_cards_count: pcc)
     }
     
     func onPlayersStateChanged(players: [PlayerInfo]) {
@@ -55,7 +57,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             s.removeFromSuperview()
         }
         
-        horzStackSubviews(panel: cardsPanel, subviews: cardsInHand, panelSize:cardsPanelSize)
+        HorzStackSubviews(panel: cardsPanel, subviews: cardsInHand, panelSize:cardsPanelSize)
     }
     
     func onGameStatusChanged(status: String, statusData: String) {
@@ -121,7 +123,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             cmds.add(k)
         }
         
-        centerSubviews(container: self.cmdsPanel, subViews: cmds, subViewWidth: CGFloat(80), space: CGFloat(20))
+        HorzCenterSubviews(container: self.cmdsPanel, subViews: cmds, subViewWidth: CGFloat(80), space: CGFloat(20))
     }
     
     func onPlayerExedCmd(player: PlayerInfo, cmd: String, cmdParam: [Int32]?) {
@@ -130,21 +132,22 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     }
     
     func updateRoomPlayers(players: [PlayerInfo]) {
-        for (_, m) in self.playersProfile{
-            m.isHidden = true
+        for (_, m) in self.players{
+            m.ProfileImg.isHidden = true
         }
         
         for p in players{
-            
             if let sid = p.seatid, sid > 0{
                 let usid = UInt8(sid)
-                self.playersProfile[usid]?.isHidden = false
+                self.players[usid]?.ProfileImg.isHidden = false
+                self.players[usid]?.Player = p
+//                self.playersProfile[usid]?.isHidden = false
                 let imgPath = p.getMyProfileImgPath()
                 if imgPath.starts(with: "http"){
-                    self.playersProfile[usid]?.sd_setImage(with: URL(string: imgPath), placeholderImage: UIImage(named: "userprofile.png"))
+                    self.players[usid]?.ProfileImg.sd_setImage(with: URL(string: imgPath), placeholderImage: UIImage(named: "userprofile.png"))
                 }
                 else{
-                    self.playersProfile[usid]?.image = UIImage(named: imgPath)
+                    self.players[usid]?.ProfileImg.image = UIImage(named: imgPath)
                 }
             }
         }
@@ -169,8 +172,23 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     
     var playersProfile  = [UInt8 : UIImageView]() //seatid : profile
     
+    //seats order:        1
+    //                 4     2
+    //                    3
+    var players = [UInt8 : PlayerRegion]()
+    
     func processServerSuccessResponse(respCmd: String, jsonObj: JSON) {
         
+    }
+    
+    private func getPlayerRegion(playerId: UInt) -> PlayerRegion?{
+        for (_, r) in players{
+            if let p = r.Player, p.userid == playerId{
+                return r
+            }
+        }
+        
+        return nil
     }
     
     public func setSockPlayer(player:SockClient) {
@@ -197,31 +215,103 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         
     }
     
-    func createPlayersProfileImages() {
-        let imgSize = 48
-        
-        let img1 = UIImageView(image: UIImage(named: "profile3"))
-        self.view.addSubview(img1)
-        img1.snp.makeConstraints{
+    fileprivate func createTopPlayerRegion(_ imgSize: Int) {
+        //top
+        let imgT = UIImageView(image: UIImage(named: "profile3"))
+        self.view.addSubview(imgT)
+        imgT.snp.makeConstraints{
             (make) -> Void in
             make.top.equalTo(self.view).offset(10)
-            make.centerX.equalTo(self.view.snp.centerX).offset(-100)
+            make.left.equalTo(self.view).offset(20)
             make.width.equalTo(imgSize)
             make.height.equalTo(imgSize)
         }
-        playersProfile[1] = img1
         
-        let img2 = UIImageView(image:UIImage(named: "profile3"))
-        self.view.addSubview(img2)
-        img2.snp.makeConstraints{
+        let topCardsPanel = UIView()
+        topCardsPanel.backgroundColor = .green
+        self.view.addSubview(topCardsPanel)
+        topCardsPanel.snp.makeConstraints{
+            (make) -> Void in
+            make.left.equalTo(imgT.snp.right).offset(20)
+            make.top.equalTo(self.view).offset(5)
+            make.height.equalTo(50)
+            make.width.equalTo(self.view).multipliedBy(0.7)
+        }
+        
+        let topPlayer = PlayerRegion()
+        topPlayer.CardsPanel = topCardsPanel
+        topPlayer.ProfileImg = imgT
+        topPlayer.PrivateCardFaceImageName = "faced_handed"
+        topPlayer.TableCardImageNameSuffix = "_faced_table"
+        self.players[1] = topPlayer
+    }
+    
+    fileprivate func createLeftPlayerRegion(_ imgSize: Int) {
+        //left
+        let imgL = UIImageView(image:UIImage(named: "profile3"))
+        self.view.addSubview(imgL)
+        imgL.snp.makeConstraints{
             (make) -> Void in
             make.left.equalTo(self.view.snp.left).offset(10)
             make.centerY.equalTo(self.view.snp.centerY).offset(-100)
             make.width.equalTo(imgSize)
             make.height.equalTo(imgSize)
         }
-        playersProfile[2] = img2
+//        playersProfile[2] = img2
         
+        let leftCardsPanel = UIView()
+        leftCardsPanel.backgroundColor = .red
+        self.view.addSubview(leftCardsPanel)
+        leftCardsPanel.snp.makeConstraints { (make)->Void in
+            make.left.equalTo(imgL.snp.right).offset(20)
+            make.centerY.equalTo(self.view.snp.centerY)
+            make.height.equalTo(self.view).multipliedBy(0.7)
+            make.width.equalTo(50)
+        }
+        
+        let leftPlayer = PlayerRegion()
+        leftPlayer.CardsPanel = leftCardsPanel
+        leftPlayer.ProfileImg = imgL
+        leftPlayer.PrivateCardFaceImageName = "left_handed"
+        leftPlayer.TableCardImageNameSuffix = "_left_table"
+        leftPlayer.IsVerticalCardsPanel = true
+        players[4] = leftPlayer
+    }
+    
+    fileprivate func createRightPlayerRegion(_ imgSize: Int) {
+        //right
+        let imgR = UIImageView(image: UIImage(named: "profile3"))
+        self.view.addSubview(imgR)
+        imgR.snp.makeConstraints{
+            (make) -> Void in
+            make.right.equalTo(self.view.snp.right).offset(-10)
+            make.centerY.equalTo(self.view).offset(-100)
+            make.width.equalTo(imgSize)
+            make.height.equalTo(imgSize)
+        }
+//        playersProfile[4] = imgR
+        
+        let rightCardsPanel = UIView()
+        rightCardsPanel.backgroundColor = .blue
+        self.view.addSubview(rightCardsPanel)
+        rightCardsPanel.snp.makeConstraints { (make) in
+            make.right.equalTo(imgR.snp.left).offset(-20)
+            make.centerY.equalTo(self.view.snp.centerY)
+            make.width.equalTo(50)
+            make.height.equalTo(self.view).multipliedBy(0.7)
+        }
+        
+        let rightPlayerRegion = PlayerRegion()
+        rightPlayerRegion.CardsPanel = rightCardsPanel
+        rightPlayerRegion.ProfileImg = imgR
+        rightPlayerRegion.PrivateCardFaceImageName = "right_handed"
+        rightPlayerRegion.TableCardImageNameSuffix = "_right_table"
+        rightPlayerRegion.IsVerticalCardsPanel = true
+        players[2] = rightPlayerRegion
+    }
+    
+    fileprivate func createBottomMyPlayerRegion(_ imgSize: Int) {
+        //my, bottom
         let imgMy = UIImageView(image:UIImage(named: "profile3"))
         self.view.addSubview(imgMy)
         imgMy.snp.makeConstraints{
@@ -231,21 +321,8 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             make.width.equalTo(imgSize + 10)
             make.height.equalTo(imgSize + 10)
         }
-        playersProfile[3] = imgMy
+//        playersProfile[3] = imgMy
         
-        let img4 = UIImageView(image: UIImage(named: "profile3"))
-        self.view.addSubview(img4)
-        img4.snp.makeConstraints{
-            (make) -> Void in
-            make.right.equalTo(self.view.snp.right).offset(-10)
-            make.centerY.equalTo(self.view).offset(-100)
-            make.width.equalTo(imgSize)
-            make.height.equalTo(imgSize)
-        }
-        playersProfile[4] = img4
-    }
-
-    fileprivate func createCardsPanel() {
         let rect = self.view.frame
         let yStart = rect.height * CGFloat(0.85)
         let myAreaHeight = rect.height - yStart
@@ -262,7 +339,48 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         cardsPanel = UIView(frame:rectPanel)
         cardsPanel.backgroundColor = UIColor.yellow
         self.view.addSubview(cardsPanel)
+        
+        let myPlayerRegion = PlayerRegion()
+        myPlayerRegion.ProfileImg = imgMy
+        myPlayerRegion.CardsPanel = cardsPanel
+        myPlayerRegion.TableCardImageNameSuffix = "_my_table"
+        players[3] = myPlayerRegion
     }
+    
+    func createPlayerRegions() {
+        let imgSize = 36
+        
+        createTopPlayerRegion(imgSize)
+        
+        createLeftPlayerRegion(imgSize)
+        
+        createBottomMyPlayerRegion(imgSize)
+        
+        createRightPlayerRegion(imgSize)
+    }
+
+//    fileprivate func createCardsPanel() {
+//        let rect = self.view.frame
+//        let yStart = rect.height * CGFloat(0.85)
+//        let myAreaHeight = rect.height - yStart
+//        let myProfileWidth = myAreaHeight
+//        let space = CGFloat(10)
+//        let xStart = myProfileWidth + space
+//
+//
+//        let cardsPanelWidth = rect.width - myProfileWidth - 2.0 * space
+//        let cardsPanelHeight = myAreaHeight * CGFloat(0.8)
+//
+//        cardsPanelSize = CGSize(width: cardsPanelWidth, height: cardsPanelHeight)
+//        let rectPanel = CGRect(origin: CGPoint(x:xStart, y:yStart), size:cardsPanelSize )
+//        cardsPanel = UIView(frame:rectPanel)
+//        cardsPanel.backgroundColor = UIColor.yellow
+//        self.view.addSubview(cardsPanel)
+//
+//
+//        //top
+//
+//    }
     
     func rotateTableForMyChoice(selSeatId: UInt8) {
         var rotate = 0
@@ -284,11 +402,11 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         }
         
         for _ in 0..<rotate{
-            let bak = playersProfile[4]
-            playersProfile[4] = playersProfile[3]
-            playersProfile[3] = playersProfile[2]
-            playersProfile[2] = playersProfile[1]
-            playersProfile[1] = bak
+            let bak = players[4]?.Player
+            players[4]?.Player = players[3]?.Player
+            players[3]?.Player = players[2]?.Player
+            players[2]?.Player = players[1]?.Player
+            players[1]?.Player = bak
         }
         
         let trans = self.center_img.transform
@@ -360,15 +478,15 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         
         createSeatButtons()
         
-        createPlayersProfileImages()
+        createPlayerRegions()
         
-        createCardsPanel()
+//        createCardsPanel()
 
         createOptCmdsPanel()
         
         createPlayerExecutionPanel()
         
-        createPlayersPanel()
+//        createPlayersPanel()
         
         
         // Do any additional setup after loading the view.
@@ -521,41 +639,41 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         self.cardsInHand.remove(button)
     }
     
-    func horzStackSubviews(panel:UIView, subviews:NSMutableArray, panelSize:CGSize) -> Void {
-        
-        let vCount = subviews.count
-        let bestRatio:CGFloat = 0.618
-        let bestSubviewWidth = bestRatio * panelSize.height
-        let viewsWidthSum:CGFloat = CGFloat(vCount) * bestSubviewWidth
-        if viewsWidthSum < panelSize.width{
-            self.centerSubviews(container: panel, subViews: subviews, containerSize: panelSize, space: 0.0)
-        }
-        else{
-            self.overlapSubviews(container: panel, subViews: subviews, containerSize: panelSize, subViewWidth: bestSubviewWidth)
-            
-        }
-        
-    }
-    
-    func overlapSubviews(container:UIView, subViews:NSMutableArray, containerSize:CGSize, subViewWidth:CGFloat) -> Void {
-        let overlapWidth = (containerSize.width - subViewWidth)/CGFloat(subViews.count - 1)
-        
-        var offset : CGFloat = 0
-        for i in 0..<subViews.count{
-            let subView = subViews[i] as! UIView
-            if !container.subviews.contains(subView){
-                container.addSubview(subView)
-            }
-            
-            offset = CGFloat(i) * overlapWidth
-            subView.snp.makeConstraints{(make) -> Void in
-                make.top.equalTo(container)
-                make.left.equalTo(container).offset(offset)
-                make.width.equalTo(subViewWidth)
-                make.height.equalTo(container)
-            }
-        }
-    }
+//    func horzStackSubviews(panel:UIView, subviews:NSMutableArray, panelSize:CGSize) -> Void {
+//
+//        let vCount = subviews.count
+//        let bestRatio:CGFloat = 0.618
+//        let bestSubviewWidth = bestRatio * panelSize.height
+//        let viewsWidthSum:CGFloat = CGFloat(vCount) * bestSubviewWidth
+//        if viewsWidthSum < panelSize.width{
+//            self.centerSubviews(container: panel, subViews: subviews, containerSize: panelSize, space: 0.0)
+//        }
+//        else{
+//            self.overlapSubviews(container: panel, subViews: subviews, containerSize: panelSize, subViewWidth: bestSubviewWidth)
+//
+//        }
+//
+//    }
+//
+//    func overlapSubviews(container:UIView, subViews:NSMutableArray, containerSize:CGSize, subViewWidth:CGFloat) -> Void {
+//        let overlapWidth = (containerSize.width - subViewWidth)/CGFloat(subViews.count - 1)
+//
+//        var offset : CGFloat = 0
+//        for i in 0..<subViews.count{
+//            let subView = subViews[i] as! UIView
+//            if !container.subviews.contains(subView){
+//                container.addSubview(subView)
+//            }
+//
+//            offset = CGFloat(i) * overlapWidth
+//            subView.snp.makeConstraints{(make) -> Void in
+//                make.top.equalTo(container)
+//                make.left.equalTo(container).offset(offset)
+//                make.width.equalTo(subViewWidth)
+//                make.height.equalTo(container)
+//            }
+//        }
+//    }
     
     func test_push_cmd_opts() {
         let client = SockClient(serverIP: "testIP", serverPort: 34)
@@ -606,53 +724,53 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         client.testServerPack(pack: test_pack)
     }
     
-    func centerSubviews(container:UIView, subViews:NSMutableArray, containerSize:CGSize, space:CGFloat = 0) -> Void {
-        
-        let bestRatio:CGFloat = 0.618
-        let bestSubviewWidth = bestRatio * containerSize.height
-        let viewsWidthSum:CGFloat = CGFloat(subViews.count) * bestSubviewWidth + CGFloat(subViews.count - 1) * space
-        let offsetStart = (containerSize.width - viewsWidthSum)/2
-        
-        for i in 0..<subViews.count{
-            let subView = subViews[i] as! UIView
-            if !container.subviews.contains(subView ){
-                container.addSubview(subView )
-            }
-
-            subView.snp.makeConstraints { (make) -> Void in
-                make.top.equalTo(container)
-                make.left.equalTo(container).offset(offsetStart + CGFloat(i) * (bestSubviewWidth + space))
-                make.width.equalTo(bestSubviewWidth)
-                make.height.equalTo(containerSize.height)
-
-            }
-        }
-    }
-    
-    
-    func centerSubviews(container:UIView, subViews:NSMutableArray, subViewWidth:CGFloat, space:CGFloat = 0) -> Void {
-        
+//    func centerSubviews(container:UIView, subViews:NSMutableArray, containerSize:CGSize, space:CGFloat = 0) -> Void {
+//
 //        let bestRatio:CGFloat = 0.618
 //        let bestSubviewWidth = bestRatio * containerSize.height
-        let containerSize = container.frame.size;
-        let viewsWidthSum:CGFloat = CGFloat(subViews.count) * subViewWidth + CGFloat(subViews.count - 1) * space
-        let offsetStart = (containerSize.width - viewsWidthSum)/2
-        
-        for i in 0..<subViews.count{
-            let subView = subViews[i] as! UIView
-            if !container.subviews.contains(subView ){
-                container.addSubview(subView )
-            }
-            
-            subView.snp.makeConstraints { (make) -> Void in
-                make.top.equalTo(container)
-                make.left.equalTo(container).offset(offsetStart + CGFloat(i) * (subViewWidth + space))
-                make.width.equalTo(subViewWidth)
-                make.height.equalTo(containerSize.height)
-                
-            }
-        }
-    }
+//        let viewsWidthSum:CGFloat = CGFloat(subViews.count) * bestSubviewWidth + CGFloat(subViews.count - 1) * space
+//        let offsetStart = (containerSize.width - viewsWidthSum)/2
+//
+//        for i in 0..<subViews.count{
+//            let subView = subViews[i] as! UIView
+//            if !container.subviews.contains(subView ){
+//                container.addSubview(subView )
+//            }
+//
+//            subView.snp.makeConstraints { (make) -> Void in
+//                make.top.equalTo(container)
+//                make.left.equalTo(container).offset(offsetStart + CGFloat(i) * (bestSubviewWidth + space))
+//                make.width.equalTo(bestSubviewWidth)
+//                make.height.equalTo(containerSize.height)
+//
+//            }
+//        }
+//    }
+//
+//
+//    func centerSubviews(container:UIView, subViews:NSMutableArray, subViewWidth:CGFloat, space:CGFloat = 0) -> Void {
+//
+////        let bestRatio:CGFloat = 0.618
+////        let bestSubviewWidth = bestRatio * containerSize.height
+//        let containerSize = container.frame.size;
+//        let viewsWidthSum:CGFloat = CGFloat(subViews.count) * subViewWidth + CGFloat(subViews.count - 1) * space
+//        let offsetStart = (containerSize.width - viewsWidthSum)/2
+//
+//        for i in 0..<subViews.count{
+//            let subView = subViews[i] as! UIView
+//            if !container.subviews.contains(subView ){
+//                container.addSubview(subView )
+//            }
+//
+//            subView.snp.makeConstraints { (make) -> Void in
+//                make.top.equalTo(container)
+//                make.left.equalTo(container).offset(offsetStart + CGFloat(i) * (subViewWidth + space))
+//                make.width.equalTo(subViewWidth)
+//                make.height.equalTo(containerSize.height)
+//
+//            }
+//        }
+//    }
     
 
     

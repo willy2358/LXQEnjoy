@@ -17,6 +17,7 @@ class DealMaJiangs(GameStage):
                 game_round.deal_cards_for_player(p, banker_cards_num)
             else:
                 game_round.deal_cards_for_player(p, player_cards_num)
+            game_round.publish_player_cards_update(p)
 
     @staticmethod
     def is_ended_in_round(game_round):
