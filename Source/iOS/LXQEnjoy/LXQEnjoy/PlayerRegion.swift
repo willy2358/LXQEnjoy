@@ -14,6 +14,7 @@ class PlayerRegion{
     var CardsPanel : UIView!
     var IsVerticalCardsPanel : Bool = false
     var CardSpace : CGFloat = 0
+    var VertCardHeight : CGFloat = 0
     
     var PrivateCardFaceImageName : String?
     
@@ -46,8 +47,15 @@ class PlayerRegion{
                 let face = UIImageView(image: UIImage(named: PrivateCardFaceImageName!))
                 cards.add(face)
             }
+            for g in sCards {
+                for c in g{
+                    let card = "\(c)" + TableCardImageNameSuffix
+                    let face = UIImageView(image: UIImage(named: card))
+                    cards.add(face)
+                }
+            }
             
-            VertCenterSubviews(container: CardsPanel, subViews: cards, space: self.CardSpace)
+            VertCenterSubviews(container: CardsPanel, subViews: cards, space: self.CardSpace, subViewHeight: VertCardHeight)
         }
     }
 }

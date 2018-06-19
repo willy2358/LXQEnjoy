@@ -91,12 +91,18 @@ func HorzCenterSubviews(container:UIView, subViews:NSMutableArray, containerSize
     }
 }
 
-func VertCenterSubviews(container: UIView, subViews: NSMutableArray, space:CGFloat){
+func VertCenterSubviews(container: UIView, subViews: NSMutableArray, space:CGFloat = 0.0, subViewHeight:CGFloat=0){
     let containerSize = container.frame.size
     let bestRatio:CGFloat = 0.618
-    let bestSubviewHeight = bestRatio * containerSize.width
+    var bestSubviewHeight = bestRatio * containerSize.width
+    if subViewHeight > 0{
+        bestSubviewHeight = subViewHeight
+    }
     let viewsHeightSum:CGFloat = CGFloat(subViews.count) * bestSubviewHeight + CGFloat(subViews.count - 1) * space
-    let offsetStart = (containerSize.width - viewsHeightSum)/2
+    var offsetStart = (containerSize.height - viewsHeightSum)/2
+    if offsetStart < 0{
+        offsetStart = CGFloat(0.0)
+    }
     
     for i in 0..<subViews.count{
         let subView = subViews[i] as! UIView

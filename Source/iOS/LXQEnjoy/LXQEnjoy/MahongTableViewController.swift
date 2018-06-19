@@ -266,7 +266,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             make.left.equalTo(imgL.snp.right).offset(20)
             make.centerY.equalTo(self.view.snp.centerY)
             make.height.equalTo(self.view).multipliedBy(0.7)
-            make.width.equalTo(50)
+            make.width.equalTo(16)
         }
         
         let leftPlayer = PlayerRegion()
@@ -275,6 +275,9 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         leftPlayer.PrivateCardFaceImageName = "left_handed"
         leftPlayer.TableCardImageNameSuffix = "_left_table"
         leftPlayer.IsVerticalCardsPanel = true
+        leftPlayer.VertCardHeight = CGFloat(32.0)
+        leftPlayer.CardSpace = CGFloat(-20.0)
+        
         players[4] = leftPlayer
     }
     
@@ -289,7 +292,6 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             make.width.equalTo(imgSize)
             make.height.equalTo(imgSize)
         }
-//        playersProfile[4] = imgR
         
         let rightCardsPanel = UIView()
         rightCardsPanel.backgroundColor = .blue
@@ -297,7 +299,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         rightCardsPanel.snp.makeConstraints { (make) in
             make.right.equalTo(imgR.snp.left).offset(-20)
             make.centerY.equalTo(self.view.snp.centerY)
-            make.width.equalTo(50)
+            make.width.equalTo(16)
             make.height.equalTo(self.view).multipliedBy(0.7)
         }
         
@@ -307,6 +309,8 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         rightPlayerRegion.PrivateCardFaceImageName = "right_handed"
         rightPlayerRegion.TableCardImageNameSuffix = "_right_table"
         rightPlayerRegion.IsVerticalCardsPanel = true
+        rightPlayerRegion.VertCardHeight = CGFloat(32.0)
+        rightPlayerRegion.CardSpace = CGFloat(-20.0)
         players[2] = rightPlayerRegion
     }
     
@@ -480,8 +484,6 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         
         createPlayerRegions()
         
-//        createCardsPanel()
-
         createOptCmdsPanel()
         
         createPlayerExecutionPanel()
@@ -588,6 +590,8 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     
     @objc func sitDownTabed(_ button:UIButton){
         
+        testLayoutLeftPanelCards()
+        return;
         let seatNo = button.tag
 //        sockPlayer = NetworkProxy.sockPlayer
 //        sockPlayer.playerDelegate = self
@@ -674,6 +678,11 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
 //            }
 //        }
 //    }
+    
+    func testLayoutLeftPanelCards() -> Void{
+        let r = players[2]
+        r?.UpdateCardsState(activeCards: [], freezedCards: [], publicShownCards: [[11,12,13]], private_cards_count: 13)
+    }
     
     func test_push_cmd_opts() {
         let client = SockClient(serverIP: "testIP", serverPort: 34)
