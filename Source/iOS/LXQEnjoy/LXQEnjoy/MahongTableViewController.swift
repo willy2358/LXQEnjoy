@@ -39,8 +39,10 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             canPlayCard = true
         }
         
-        let txt = "banker: \(bankPlayer.userid )"
-        self.cmdExedPanel.text = txt
+//        let txt = "banker: \(bankPlayer.userid )"
+//        self.cmdExedPanel.text = txt
+        let r = getPlayerRegion(playerId: bankPlayer.userid)
+        r?.SetBanker(isBanker: true)
     }
     
     func onDealCards(receivePlayer: PlayerInfo, cards: [UInt8]) {
@@ -127,8 +129,10 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     }
     
     func onPlayerExedCmd(player: PlayerInfo, cmd: String, cmdParam: [Int32]?) {
-        let txt = "\(player.userid ) : \(cmd)"
-        self.cmdExedPanel.text = txt
+//        let txt = "\(player.userid ) : \(cmd)"
+//        self.cmdExedPanel.text = txt
+        let r = self.getPlayerRegion(playerId: player.userid)
+        r?.ShowExedCmd(cmdText: cmd)
     }
     
     func updateRoomPlayers(players: [PlayerInfo]) {
@@ -238,11 +242,34 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             make.width.equalTo(self.view).multipliedBy(0.7)
         }
         
+        let cmdView = UILabel()
+        cmdView.text = "Chi"
+        self.view.addSubview(cmdView)
+        cmdView.snp.makeConstraints{ (make) -> Void in
+            make.centerX.equalTo(topCardsPanel.snp.centerX)
+            make.top.equalTo(topCardsPanel.snp.bottom).offset(10)
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+        }
+        
+        let bankerView = UILabel()
+        bankerView.text = "庄"
+        self.view.addSubview(bankerView)
+        bankerView.snp.makeConstraints{ (make) -> Void in
+            make.top.equalTo(imgT)
+            make.right.equalTo(imgT)
+            make.width.equalTo(16)
+            make.height.equalTo(16)
+        }
+        
         let topPlayer = PlayerRegion()
         topPlayer.CardsPanel = topCardsPanel
         topPlayer.ProfileImg = imgT
         topPlayer.PrivateCardFaceImageName = "faced_handed"
         topPlayer.TableCardImageNameSuffix = "_faced_table"
+        topPlayer.CmdView = cmdView
+        topPlayer.BankerView = bankerView
+        topPlayer.SetBanker(isBanker: false)
         self.players[1] = topPlayer
     }
     
@@ -257,7 +284,6 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             make.width.equalTo(imgSize)
             make.height.equalTo(imgSize)
         }
-//        playersProfile[2] = img2
         
         let leftCardsPanel = UIView()
         leftCardsPanel.backgroundColor = .red
@@ -269,6 +295,26 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             make.width.equalTo(16)
         }
         
+        let cmdView = UILabel()
+        cmdView.text = "Chi"
+        self.view.addSubview(cmdView)
+        cmdView.snp.makeConstraints{ (make) -> Void in
+            make.centerY.equalTo(leftCardsPanel.snp.centerY)
+            make.left.equalTo(leftCardsPanel.snp.right).offset(10)
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+        }
+        
+        let bankerView = UILabel()
+        bankerView.text = "庄"
+        self.view.addSubview(bankerView)
+        bankerView.snp.makeConstraints{ (make) -> Void in
+            make.top.equalTo(imgL)
+            make.right.equalTo(imgL)
+            make.width.equalTo(16)
+            make.height.equalTo(16)
+        }
+        
         let leftPlayer = PlayerRegion()
         leftPlayer.CardsPanel = leftCardsPanel
         leftPlayer.ProfileImg = imgL
@@ -277,7 +323,9 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         leftPlayer.IsVerticalCardsPanel = true
         leftPlayer.VertCardHeight = CGFloat(32.0)
         leftPlayer.CardSpace = CGFloat(-20.0)
-        
+        leftPlayer.CmdView = cmdView
+        leftPlayer.BankerView = bankerView
+        leftPlayer.SetBanker(isBanker: false)
         players[4] = leftPlayer
     }
     
@@ -303,6 +351,26 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             make.height.equalTo(self.view).multipliedBy(0.7)
         }
         
+        let cmdView = UILabel()
+        cmdView.text = "Chi"
+        self.view.addSubview(cmdView)
+        cmdView.snp.makeConstraints{ (make) -> Void in
+            make.centerY.equalTo(rightCardsPanel.snp.centerY)
+            make.right.equalTo(rightCardsPanel.snp.left).offset(-10)
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+        }
+        
+        let bankerView = UILabel()
+        bankerView.text = "庄"
+        self.view.addSubview(bankerView)
+        bankerView.snp.makeConstraints{ (make) -> Void in
+            make.top.equalTo(imgR)
+            make.right.equalTo(imgR)
+            make.width.equalTo(16)
+            make.height.equalTo(16)
+        }
+        
         let rightPlayerRegion = PlayerRegion()
         rightPlayerRegion.CardsPanel = rightCardsPanel
         rightPlayerRegion.ProfileImg = imgR
@@ -311,6 +379,9 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         rightPlayerRegion.IsVerticalCardsPanel = true
         rightPlayerRegion.VertCardHeight = CGFloat(32.0)
         rightPlayerRegion.CardSpace = CGFloat(-20.0)
+        rightPlayerRegion.CmdView = cmdView
+        rightPlayerRegion.BankerView = bankerView
+        rightPlayerRegion.SetBanker(isBanker: false)
         players[2] = rightPlayerRegion
     }
     
@@ -325,7 +396,6 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             make.width.equalTo(imgSize + 10)
             make.height.equalTo(imgSize + 10)
         }
-//        playersProfile[3] = imgMy
         
         let rect = self.view.frame
         let yStart = rect.height * CGFloat(0.85)
@@ -344,10 +414,33 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         cardsPanel.backgroundColor = UIColor.yellow
         self.view.addSubview(cardsPanel)
         
+        let cmdView = UILabel()
+        cmdView.text = "Chi"
+        self.view.addSubview(cmdView)
+        cmdView.snp.makeConstraints{ (make) -> Void in
+            make.centerX.equalTo(cardsPanel.snp.centerX).offset(100)
+            make.bottom.equalTo(cardsPanel.snp.top).offset(-60)
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+        }
+        
+        let bankerView = UILabel()
+        bankerView.text = "庄"
+        self.view.addSubview(bankerView)
+        bankerView.snp.makeConstraints{ (make) -> Void in
+            make.top.equalTo(imgMy)
+            make.right.equalTo(imgMy)
+            make.width.equalTo(16)
+            make.height.equalTo(16)
+        }
+        
         let myPlayerRegion = PlayerRegion()
         myPlayerRegion.ProfileImg = imgMy
         myPlayerRegion.CardsPanel = cardsPanel
         myPlayerRegion.TableCardImageNameSuffix = "_my_table"
+        myPlayerRegion.CmdView = cmdView
+        myPlayerRegion.BankerView = bankerView
+        myPlayerRegion.SetBanker(isBanker: false)
         players[3] = myPlayerRegion
     }
     
@@ -590,8 +683,8 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     
     @objc func sitDownTabed(_ button:UIButton){
         
-        testLayoutLeftPanelCards()
-        return;
+//        testLayoutLeftPanelCards()
+//        return;
         let seatNo = button.tag
 //        sockPlayer = NetworkProxy.sockPlayer
 //        sockPlayer.playerDelegate = self
@@ -680,7 +773,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
 //    }
     
     func testLayoutLeftPanelCards() -> Void{
-        let r = players[2]
+        let r = players[1]
         r?.UpdateCardsState(activeCards: [], freezedCards: [], publicShownCards: [[11,12,13]], private_cards_count: 13)
     }
     
