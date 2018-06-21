@@ -21,6 +21,16 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         printLog("onUpdateScores")
     }
     
+    func onPendingPlayer(player: PlayerInfo){
+        for (_, r) in self.players{
+            if r.Player?.userid == player.userid {
+                r.ShowPendingFlag()
+            }
+            else{
+                r.HidePendingFlag()
+            }
+        }
+    }
     
     func onCardsState(cardsUserId userid: UInt32, activeCards aCards: [UInt8], freezedCards fCards: [UInt8], publicShownCards sCards: [[UInt8]], private_cards_count pcc : Int8) {
         
@@ -43,6 +53,9 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
 //        self.cmdExedPanel.text = txt
         let r = getPlayerRegion(playerId: bankPlayer.userid)
         r?.SetBanker(isBanker: true)
+        
+        self.table_cards_panel.isHidden = false
+        self.center_img.isHidden = true
     }
     
     func onDealCards(receivePlayer: PlayerInfo, cards: [UInt8]) {
@@ -72,22 +85,35 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     }
     
     func onPlayerPlayCards(player: PlayerInfo, cards: [UInt8]) {
-//        var cardBtns = [UIButton]()
-//        for c in cards{
-//            for cb in self.cardsPanel.subviews{
-//                if cb.tag == c && !cardBtns.contains(cb as! UIButton){
-//                    cardBtns.append(cb as! UIButton)
-//                }
-//            }
-//        }
+        let cardWidth = 18
+        let cardHeight = 24
+        let cols = Int(self.table_cards_panel.frame.size.width) / cardWidth
+        let rows = Int(self.table_cards_panel.frame.size.height) / cardHeight
+        for c in cards{
+
+            let cardFace = "\(c)_my_table"
+            let cardImg = UIImageView(image: UIImage(named: cardFace))
+            self.table_cards_panel.addSubview(cardImg)
+            let curRow = table_cards_panel.subviews.count / cols
+            let curCol = table_cards_panel.subviews.count % rows - 1
+            
+            cardImg.snp.makeConstraints{ (make) -> Void in
+                make.left.equalTo(table_cards_panel).offset(curCol * cardWidth)
+                make.top.equalTo(table_cards_panel).offset(curRow * cardHeight)
+                make.width.equalTo(cardWidth)
+                make.height.equalTo(cardHeight)
+            }
+        }
 //
 //        for cb in cardBtns{
 //            cardsPanel.willRemoveSubview(cb)
 //
 //            self.cardsInHand.remove(cb)
 //        }
-        let txt = "p: \(player.userid ), cards:\(cards)"
-        self.cmdExedPanel.text = txt
+//        let txt = "p: \(player.userid ), cards:\(cards)"
+//        self.cmdExedPanel.text = txt
+        
+//        let cardImg = UIImageView
     }
     
     
@@ -98,6 +124,9 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         
         self.cardsInHand.removeAllObjects()
         
+        for btn in self.seatsButtons{
+            (btn as! UIButton).isHidden = true
+        }
     }
     
     
@@ -167,12 +196,17 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     var canPlayCard : Bool = false
     var center_img : UIImageView!
     let const_table_center_size  = 100
+    let const_cards_table_size = 120
+    let table_card_width = 18
+    let table_card_height = 24
     
     var imgNorthPlayer : UIImageView!
     var imgSouthPlayer : UIImageView!
     var imgEastPlayer :UIImageView!
     var img2 :UIImageView!
     var cmdBtns = [UIButton : CmdPush]()
+    
+    var table_cards_panel : UIView!
     
     var playersProfile  = [UInt8 : UIImageView]() //seatid : profile
     
@@ -252,6 +286,15 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             make.height.equalTo(50)
         }
         
+        let pendingFlag = UIImageView(image: UIImage(named: "pending_player"))
+        self.view.addSubview(pendingFlag)
+        pendingFlag.snp.makeConstraints{ (make) -> Void in
+            make.left.equalTo(cmdView.snp.right).offset(10)
+            make.top.equalTo(cmdView)
+            make.width.equalTo(32)
+            make.height.equalTo(32)
+        }
+        
         let bankerView = UILabel()
         bankerView.text = "庄"
         self.view.addSubview(bankerView)
@@ -269,7 +312,10 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         topPlayer.TableCardImageNameSuffix = "_faced_table"
         topPlayer.CmdView = cmdView
         topPlayer.BankerView = bankerView
+        topPlayer.PendingFlag = pendingFlag
         topPlayer.SetBanker(isBanker: false)
+        topPlayer.HidePendingFlag()
+        topPlayer.HideExedCmd()
         self.players[1] = topPlayer
     }
     
@@ -305,6 +351,15 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             make.height.equalTo(50)
         }
         
+        let pendingFlag = UIImageView(image: UIImage(named: "pending_player"))
+        self.view.addSubview(pendingFlag)
+        pendingFlag.snp.makeConstraints{ (make) -> Void in
+            make.left.equalTo(cmdView)
+            make.bottom.equalTo(cmdView.snp.top).offset(-10)
+            make.width.equalTo(32)
+            make.height.equalTo(32)
+        }
+        
         let bankerView = UILabel()
         bankerView.text = "庄"
         self.view.addSubview(bankerView)
@@ -325,7 +380,10 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         leftPlayer.CardSpace = CGFloat(-20.0)
         leftPlayer.CmdView = cmdView
         leftPlayer.BankerView = bankerView
+        leftPlayer.PendingFlag = pendingFlag
         leftPlayer.SetBanker(isBanker: false)
+        leftPlayer.HidePendingFlag()
+        leftPlayer.HideExedCmd()
         players[4] = leftPlayer
     }
     
@@ -361,6 +419,15 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             make.height.equalTo(50)
         }
         
+        let pendingFlag = UIImageView(image: UIImage(named: "pending_player"))
+        self.view.addSubview(pendingFlag)
+        pendingFlag.snp.makeConstraints{ (make) -> Void in
+            make.left.equalTo(cmdView)
+            make.bottom.equalTo(cmdView.snp.top).offset(-10)
+            make.width.equalTo(32)
+            make.height.equalTo(32)
+        }
+        
         let bankerView = UILabel()
         bankerView.text = "庄"
         self.view.addSubview(bankerView)
@@ -381,7 +448,10 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         rightPlayerRegion.CardSpace = CGFloat(-20.0)
         rightPlayerRegion.CmdView = cmdView
         rightPlayerRegion.BankerView = bankerView
+        rightPlayerRegion.PendingFlag = pendingFlag
         rightPlayerRegion.SetBanker(isBanker: false)
+        rightPlayerRegion.HidePendingFlag()
+        rightPlayerRegion.HideExedCmd()
         players[2] = rightPlayerRegion
     }
     
@@ -424,6 +494,15 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             make.height.equalTo(50)
         }
         
+        let pendingFlag = UIImageView(image: UIImage(named: "pending_player"))
+        self.view.addSubview(pendingFlag)
+        pendingFlag.snp.makeConstraints{ (make) -> Void in
+            make.left.equalTo(cmdView.snp.right).offset(10)
+            make.bottom.equalTo(cmdView)
+            make.width.equalTo(32)
+            make.height.equalTo(32)
+        }
+        
         let bankerView = UILabel()
         bankerView.text = "庄"
         self.view.addSubview(bankerView)
@@ -440,7 +519,10 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         myPlayerRegion.TableCardImageNameSuffix = "_my_table"
         myPlayerRegion.CmdView = cmdView
         myPlayerRegion.BankerView = bankerView
+        myPlayerRegion.PendingFlag = pendingFlag
         myPlayerRegion.SetBanker(isBanker: false)
+        myPlayerRegion.HidePendingFlag()
+        myPlayerRegion.HideExedCmd()
         players[3] = myPlayerRegion
     }
     
@@ -579,7 +661,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         
         createOptCmdsPanel()
         
-        createPlayerExecutionPanel()
+//        createPlayerExecutionPanel()
         
 //        createPlayersPanel()
         
@@ -620,8 +702,18 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             make.center.equalTo(self.view)
         }
         
+        self.table_cards_panel = UIView()
+    
+        self.view.addSubview(table_cards_panel)
+        self.table_cards_panel.isHidden = true
+        table_cards_panel.snp.makeConstraints{ (make) -> Void in
+            make.width.equalTo(table_card_width * 12)
+            make.height.equalTo(table_card_height * 8)
+            make.center.equalTo(self.view)
+        }
     }
     
+    private var seatsButtons = NSMutableArray()
     func createSeatButtons() {
         let disVert = const_table_center_size / 2 + 20
         let disHorz = const_table_center_size / 2 + 30
@@ -640,6 +732,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             make.width.equalTo(btnWidth)
             make.height.equalTo(btnHeight)
         }
+        self.seatsButtons.add(btn1)
 
         //bottom south
         let btn2 = UIButton()
@@ -653,6 +746,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             make.width.equalTo(btnWidth)
             make.height.equalTo(btnHeight)
         }
+        self.seatsButtons.add(btn2)
 
         //left west
         let btn3 = UIButton()
@@ -666,6 +760,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             make.width.equalTo(btnWidth)
             make.height.equalTo(btnHeight)
         }
+        self.seatsButtons.add(btn3)
 
         //right east
         let btn4 = UIButton()
@@ -679,6 +774,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             make.width.equalTo(btnWidth)
             make.height.equalTo(btnHeight)
         }
+        self.seatsButtons.add(btn4)
     }
     
     @objc func sitDownTabed(_ button:UIButton){

@@ -27,5 +27,6 @@ protocol SockClientDelegate{
     func onPlayerExedCmd(player:PlayerInfo, cmd:String, cmdParam:[Int32]?)
     func onGameRoundEnded(winners: [PlayerInfo], losers:[PlayerInfo]) -> Void
     func onUpdateScores(players:[PlayerInfo])
+    func onPendingPlayer(player: PlayerInfo)
     
 }

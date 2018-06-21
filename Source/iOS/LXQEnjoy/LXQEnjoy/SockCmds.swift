@@ -34,6 +34,7 @@ class SockCmds{
     static let push_game_status = "game-status"
     static let push_game_end = "game-end"
     static let push_scores = "scores"
+    static let push_pending_player = "pending-player"
     
     static let pack_part_cmd_param = "cmd-param"
     

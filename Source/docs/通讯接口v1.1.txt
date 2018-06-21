@@ -624,6 +624,22 @@ score > 0 赢的分数，score < 0 输的分数
 	"shown-cards-groups": [[13,13,13],[11,12,13]] 
 }
 
+4.11 向玩家推送当前等待的玩家
+推送参数：
+{
+	"cmdtype": "sockpush", 
+	"sockpush": "pending-player", 
+	"userid": 333
+	
+}
+
+示例
+{
+	"cmdtype": "sockpush", 
+	"sockpush": "pending-player", 
+	"userid": 333
+}
+
 5.玩家发送
 5.1出牌
 请求参数：

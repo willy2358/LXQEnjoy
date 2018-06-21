@@ -54,6 +54,7 @@ server_push_active_cards = "active-cards"
 server_push_freezed_cards = "frozen-cards"
 server_push_shown_card_groups = "shown-cards-groups"
 server_push_private_cards_count = "private-cards-count"
+server_push_pending_player = "pending-player"
 
 
 cmd_data_cards = "cards"
@@ -119,6 +120,15 @@ def create_cards_state_packet(player, isForOwn = True):
         server_push_active_cards: player.get_active_cards() if isForOwn else [],
         server_push_freezed_cards: player.get_frozen_cards() if isForOwn else [],
         server_push_shown_card_groups:player.get_shown_card_groups()
+    }
+
+    return packet
+
+def create_pending_player_packet(player):
+    packet = {
+        cmd_type: server_cmd_type_push,
+        server_cmd_type_push: server_push_pending_player,
+        user_id: player.get_user_id()
     }
 
     return packet

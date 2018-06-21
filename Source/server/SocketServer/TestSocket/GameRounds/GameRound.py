@@ -174,6 +174,8 @@ class GameRound:
         player.set_banker()
         banker_json = InterProtocol.create_publish_bank_player_json_packet(player)
         self.publish_round_states(banker_json)
+        pending_player_json = InterProtocol.create_pending_player_packet(player)
+        self.publish_round_states(pending_player_json)
 
     def set_round_end_callback(self, func):
         self.__round_end_callback = func
@@ -332,5 +334,7 @@ class GameRound:
         self.set_player_waiting_for_cmd_resp(player, cmd_opts)
         packet = InterProtocol.create_cmd_options_json_packet(player, cmd_opts, def_cmd, timeout)
         player.send_server_cmd_packet(packet)
+        pending_player_json = InterProtocol.create_pending_player_packet(player)
+        self.publish_round_states(pending_player_json)
         if def_cmd and timeout > 1:
             self.setup_timer_to_select_default_act_for_player(player, def_cmd, timeout)

@@ -18,6 +18,7 @@ class PlayerRegion{
     var CmdView : UILabel!
     var IsBanker : Bool = false
     var BankerView : UIView!
+    var PendingFlag : UIView!
     
     var PrivateCardFaceImageName : String?
     
@@ -29,7 +30,21 @@ class PlayerRegion{
     
     public func ShowExedCmd(cmdText: String!) -> Void{
         CmdView.text = cmdText
+        CmdView.isHidden = false
     }
+    
+    public func HideExedCmd(){
+        CmdView.isHidden = true
+    }
+    
+    public func ShowPendingFlag(){
+        PendingFlag.isHidden = false
+    }
+    
+    public func HidePendingFlag(){
+        PendingFlag.isHidden = true
+    }
+    
     
     public func SetBanker(isBanker : Bool){
         self.IsBanker = isBanker

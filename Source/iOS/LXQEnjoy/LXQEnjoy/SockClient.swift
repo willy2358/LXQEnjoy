@@ -360,6 +360,11 @@ class SockClient : NSObject, GCDAsyncSocketDelegate {
             let statusData = pushJson[SockCmds.status_data].stringValue
             delegate.onGameStatusChanged(status: status, statusData: statusData)
         }
+        else if pushCmd == SockCmds.push_pending_player{
+            let userid = pushJson[SockCmds.userid].uIntValue
+            let player = PlayerInfo.getPlayerByUserid(userid: userid)
+            delegate.onPendingPlayer(player: player!)
+        }
         else if pushCmd == SockCmds.push_game_end{
             let winners = pushJson[SockCmds.winners].arrayObject as! [[String:AnyObject]]
             let losers = pushJson[SockCmds.losers].arrayObject as! [[String:AnyObject]]
