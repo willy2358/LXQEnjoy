@@ -205,6 +205,8 @@ class GameRound:
         packet = InterProtocol.create_deal_cards_json_packet(player, cards)
         player.send_server_cmd_packet(packet)
 
+        self.publish_player_cards_update(player)
+
     def start_process_for_players_want_played_out_cards(self, player_cmds):
         self.__pending_player_cmds.empty()
         for i in range(0, len(player_cmds)):
@@ -338,3 +340,8 @@ class GameRound:
         self.publish_round_states(pending_player_json)
         if def_cmd and timeout > 1:
             self.setup_timer_to_select_default_act_for_player(player, def_cmd, timeout)
+
+    def publish_player_cards_update(self, player):
+        for p in self.get_players():
+            pack = InterProtocol.create_cards_state_packet(player, player == p)
+            p.send_server_cmd_packet(pack)

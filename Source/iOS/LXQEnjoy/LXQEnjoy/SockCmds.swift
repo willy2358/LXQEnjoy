@@ -76,6 +76,9 @@ class SockCmds{
     static let cmd_opts_resp_timeout = "resp-timeout"
     static let cmd_opts_default_cmd = "def-cmd"
     
+    static let majiang_cmd_peng = "peng"
+    static let majiang_cmd_hu = "hu"
+    static let majiang_cmd_gang = "gang"
     
 }
 

@@ -34,9 +34,40 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     
     func onCardsState(cardsUserId userid: UInt32, activeCards aCards: [UInt8], freezedCards fCards: [UInt8], publicShownCards sCards: [[UInt8]], private_cards_count pcc : Int8) {
         
-        
         guard let r = self.getPlayerRegion(playerId: UInt(userid)) else{ return}
-        r.UpdateCardsState(activeCards: aCards, freezedCards: fCards, publicShownCards: sCards, private_cards_count: pcc)
+        
+        if UInt(userid) == PlayerInfo.getMyPlayer()?.userid{
+            for s in cardsPanel.subviews{
+                s.removeFromSuperview()
+            }
+            
+            let cards = NSMutableArray()
+            for c in aCards.sorted() {
+                let card = "\(c)" + "_my_handed"
+                let btn = UIButton()
+                let img = UIImage(named: String(card))
+                btn.tag = Int(c)
+                btn.addTarget(self, action:#selector(cardBtnClicked(_:)), for:.touchUpInside)
+                btn.setBackgroundImage(img, for: UIControlState.normal)
+                cards.add(btn)
+            }
+            
+            for g in sCards {
+                for c in g{
+                    let card = "\(c)" + r.TableCardImageNameSuffix
+                    let face = UIImageView(image: UIImage(named: card))
+                    cards.add(face)
+                }
+            }
+            
+            HorzStackSubviews(panel: cardsPanel, subviews: cards, panelSize:cardsPanelSize)
+        }
+        else{
+            
+            r.UpdateCardsState(activeCards: aCards, freezedCards: fCards, publicShownCards: sCards, private_cards_count: pcc)
+        }
+        
+        
     }
     
     func onPlayersStateChanged(players: [PlayerInfo]) {
@@ -63,7 +94,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
             let btn = UIButton()
             let img = UIImage(named: String(c))
             btn.tag = Int(c)
-            btn.addTarget(self, action:#selector(playCardBtnClicked(_:)), for:.touchUpInside)
+            btn.addTarget(self, action:#selector(cardBtnClicked(_:)), for:.touchUpInside)
             btn.setBackgroundImage(img, for: UIControlState.normal)
             self.cardsInHand.add(btn)
         }
@@ -84,6 +115,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         }
     }
     
+    var _lastPlayedOutCard : UIView?
     func onPlayerPlayCards(player: PlayerInfo, cards: [UInt8]) {
         let cardWidth = 18
         let cardHeight = 24
@@ -103,6 +135,7 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
                 make.width.equalTo(cardWidth)
                 make.height.equalTo(cardHeight)
             }
+            _lastPlayedOutCard = cardImg
         }
 //
 //        for cb in cardBtns{
@@ -138,14 +171,16 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         self.cmdBtns.removeAll()
         
         for c in cmds{
+            let btn = UIButton()
+            btn.setTitle(c.cmdText, for: UIControlState.normal)
+            btn.backgroundColor = UIColor.blue
+            self.cmdBtns[btn] = c
+            
             if c.cmdText == SockCmds.push_play_cards{
                 self.canPlayCard = true
+                btn.addTarget(self, action:#selector(cmdPlayCardsClicked(_:)), for:.touchUpInside)
             }
             else {
-                let btn = UIButton()
-                btn.setTitle(c.cmdText, for: UIControlState.normal)
-                btn.backgroundColor = UIColor.blue
-                self.cmdBtns[btn] = c
                 btn.addTarget(self, action:#selector(cmdBtnClicked(_:)), for:.touchUpInside)
             }
         }
@@ -162,6 +197,14 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
 //        self.cmdExedPanel.text = txt
         let r = self.getPlayerRegion(playerId: player.userid)
         r?.ShowExedCmd(cmdText: cmd)
+        
+        if cmd == SockCmds.majiang_cmd_hu
+            || cmd == SockCmds.majiang_cmd_gang
+            || cmd == SockCmds.majiang_cmd_peng{
+            if (nil != _lastPlayedOutCard){
+                _lastPlayedOutCard?.removeFromSuperview()
+            }
+        }
     }
     
     func updateRoomPlayers(players: [PlayerInfo]) {
@@ -209,6 +252,8 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
     var table_cards_panel : UIView!
     
     var playersProfile  = [UInt8 : UIImageView]() //seatid : profile
+    
+    var _seledCardButton : UIButton?
     
     //seats order:        1
     //                 4     2
@@ -816,20 +861,45 @@ class MahongTableViewController: UIViewController, SockClientDelegate{
         
     }
     
-    @objc func playCardBtnClicked(_ button: UIButton) {
-        if !self.canPlayCard{
-            return
+    @objc func cmdPlayCardsClicked(_ button:UIButton){
+        if _seledCardButton != nil && canPlayCard {
+            let card = _seledCardButton!.tag
+            let cards = [UInt8(card)]
+    
+            guard let playerClient = NetworkProxy.getSockClient() else{
+                return
+            }
+            
+            self.canPlayCard = false
+            playerClient.playCards(cards: cards, okCallBack:{}, failCallback: {_,_ in })
+            button.removeFromSuperview()
+            self.cardsInHand.remove(button)
+            _seledCardButton = nil
         }
-        let card = button.tag
-        let cards = [UInt8(card)]
+    }
+    
+    
+    
+    @objc func cardBtnClicked(_ button: UIButton) {
 
-        guard let playerClient = NetworkProxy.getSockClient() else{
-            return
+        if _seledCardButton != nil{
+
+            _seledCardButton!.snp.updateConstraints{ (make) -> Void in
+                make.top.equalTo(button.superview!)
+            }
+            
+            if _seledCardButton == button{
+                _seledCardButton = nil         //twice click, reset
+                return
+            }
         }
-        self.canPlayCard = false
-        playerClient.playCards(cards: cards, okCallBack:{}, failCallback: {_,_ in })
-        button.removeFromSuperview()
-        self.cardsInHand.remove(button)
+        
+        button.snp.updateConstraints{ (make) -> Void in
+            make.top.equalTo(button.superview!).offset(-10)
+            
+        }
+        
+        _seledCardButton = button
     }
     
 //    func horzStackSubviews(panel:UIView, subviews:NSMutableArray, panelSize:CGSize) -> Void {

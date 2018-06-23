@@ -47,7 +47,7 @@ class GameRound_Majiang(GameRound):
         player.move_cards_to_frozen([s_card, s_card], s_card)
         player.add_shown_card_group([s_card, s_card] + [s_card])
         player.set_newest_cards(s_card, False, False)
-        self.publish_player_cards_update(player)
+        # self.publish_player_cards_update(player)
 
     def player_select_gang(self, player, card):
         self.reset_player_waiting_for_cmd_resp()
@@ -55,15 +55,15 @@ class GameRound_Majiang(GameRound):
         player.move_cards_to_frozen([s_card, s_card, s_card], s_card)
         player.add_shown_card_group([s_card, s_card, s_card] + [s_card])
         player.set_newest_cards(s_card, False, False)
-        self.publish_player_cards_update(player)
+        # self.publish_player_cards_update(player)
 
     def player_select_hu(self, player, card):
         self.reset_player_waiting_for_cmd_resp()
-        self.publish_player_cards_update(player)
+        # self.publish_player_cards_update(player)
 
-    def publish_player_cards_update(self, player):
-        for p in self.get_players():
-            pack = InterProtocol.create_cards_state_packet(player, player == p)
-            p.send_server_cmd_packet(pack)
+    # def publish_player_cards_update(self, player):
+    #     for p in self.get_players():
+    #         pack = InterProtocol.create_cards_state_packet(player, player == p)
+    #         p.send_server_cmd_packet(pack)
 
 

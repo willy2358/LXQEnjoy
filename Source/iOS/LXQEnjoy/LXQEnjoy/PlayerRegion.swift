@@ -57,18 +57,24 @@ class PlayerRegion{
     }
     
     public func UpdateCardsState(activeCards aCards: [UInt8], freezedCards fCards: [UInt8], publicShownCards sCards: [[UInt8]], private_cards_count  pCount: Int8) {
-        if aCards.count > 0 {
-            return;
-        }
         
         for s in CardsPanel.subviews{
             s.removeFromSuperview()
         }
         
         let cards = NSMutableArray()
-        for _ in 0..<pCount{
-            let face = UIImageView(image: UIImage(named: PrivateCardFaceImageName!))
-            cards.add(face)
+        if aCards.count > 0 {
+            for c in aCards.sorted() {
+                let card = "\(c)" + "_my_handed"
+                let face = UIImageView(image: UIImage(named: card))
+                cards.add(face)
+            }
+        }
+        else{
+            for _ in 0..<pCount{
+                let face = UIImageView(image: UIImage(named: PrivateCardFaceImageName!))
+                cards.add(face)
+            }
         }
         
         for g in sCards {

@@ -135,6 +135,7 @@ class PlayMajiang(PlayInTurn):
         if cmd == InterProtocol.majiang_player_act_peng:
             card = cmd_data
             game_round.player_select_peng(player, card)
+            game_round.publish_player_cards_update(player)
             play_card = PlayCmd(player, InterProtocol.majiang_player_act_play_card)
             play_card.set_cmd_param(PlayMajiang.get_player_default_play_card(player))
             cmd_opts = [play_card]
@@ -143,6 +144,7 @@ class PlayMajiang(PlayInTurn):
             card = cmd_data
             game_round.player_select_gang(player, card)
             game_round.deal_cards_for_player(player, 1)
+            game_round.publish_player_cards_update(player)
             cmd_opts = game_round.get_rule().get_player_cmd_options_for_cards(player, [], True, False)
             if not cmd_opts:
                 play_card = PlayCmd(player, InterProtocol.majiang_player_act_play_card)
@@ -172,6 +174,7 @@ class PlayMajiang(PlayInTurn):
                 for p in game_round.get_players():
                     if p != player:
                         losers.append(p)
+            game_round.publish_player_cards_update(player)
             game_round.set_winners([player])
             game_round.set_losers(losers)
             game_round.test_and_update_current_stage()
@@ -182,11 +185,12 @@ class PlayMajiang(PlayInTurn):
             for p in game_round.get_players():
                 if p != player:
                     losers.append(p)
-
+            game_round.publish_player_cards_update(player)
             game_round.set_winners([player])
             game_round.set_losers(losers)
             game_round.test_and_update_current_stage()
         elif cmd == InterProtocol.majiang_player_act_play_card:
             player.play_out_cards(cmd_data)
+            game_round.publish_player_cards_update(player)
             game_round.record_last_out_cards(player, cmd_data)
             PlayMajiang.on_one_card_played_out(game_round, player, cmd_data)
