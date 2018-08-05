@@ -1,0 +1,712 @@
+<!--terms: round, circle --->
+<game name="shengji">
+  <!--Poker: 
+            约定：m,n,k: 有确定数字， x,y,z无确定数字，在程序运行时确定。
+            card, c:单张，确定牌
+            x,y,z ：单张，不确定牌
+            cards, cs：多张，确定牌
+            xs,ys,zs：多张，不确定牌
+
+            **牌色
+              ctype: s:spade, h:heart, c:club,d:diamond
+              方法：
+              ctype_of(x)   
+              如果x为列表，有时候取任意一个，有时候遍历每一个。
+              用法：1）ctype_of="x" //取花色
+                    2）value="ctype_of, x" //取花色，并赋值于value
+                  *）取花色
+                  *）取花色，判定
+                  *）将花色，赋值于变量
+                  *）取变量的花色
+                  *) 花色相同判定
+                  
+                  
+            **牌点
+              cfigure: 牌的数字, 1 - 13（A - K)，js：Joker Sun 大王， jm：Joker Moon 小王
+              方法：
+              cfigure_of(x)
+              min_cfigure_of(xs)   //取x表示的变量的最小牌点数
+              max_cfigure_of(xs)   //取x表示的变量的最大牌点数
+              用法：1）cfigure_of="x" //取x的点数
+                    2) value="cfigure_of,x" //取x的点数，并赋值给value
+                    3）min_cfigure_of="xs"
+                    4) value="min_cfigure_of,xs"
+                    5) max_cfigure_of="xs"
+                    6) value="max_cfigure_of,xs"
+
+                  *）取牌点
+                  *）取牌点，判定
+                  *）将牌点，赋值于变量
+                  *）取变量的牌点
+                  *) 点数相等判定
+
+            **牌面
+              card: 表示法：ctype(一个字符）-cfigure，中间无横线"-"
+                    c1-c13
+                    d1-d13
+                    h1-h13
+                    s1-s13
+                    j1,j2, 小王，大王
+        
+            **牌型
+              ****同点
+              通式：same_cfigure(x,n)  ：泛指有n个牌同点，x：牌的点数未确定，
+              示例: 
+                same_cfigure(2,4), 4个2；
+                same_cfigure(5,2), 2个5
+                same_cfigure(x,3), 任意点数牌3张，3张同点
+                                              
+              特例：
+              single(n): 单牌, <=> same_cfigure(x,1)
+              pair(n): 对子    <=> same_cfigure(x,2)
+              triple(n): 三张，相同Figure <=> same_cfigure(x,3)
+              quad(n): 四张，相同Figure  <=> same_cfigure(x,4)
+              用法：
+              <same_cfigure cards_var="var_x", count="n">
+
+              ****同色，同花色牌
+              通式：same_ctype(x)     //x表示的牌都是同花色
+                   same_ctype(x:ctype)  //x表示的牌都是ctype的牌     
+                   same_ctype(x|n) x表示的牌中，有n个是同花色
+                   same_ctype(x:ctype|n) x表示的牌中，有n个是花色是ctype
+                   same_ctype(m,n,k,...[:ctype]|n)
+
+              特例：
+              same_heart(x)  <=> same_ctype(x,"h")
+              same_diamond(x)  <=> same_ctype(x,"d")
+              same_club(x) <=> same_ctype(x,"c")
+              same_spade(x) <=> same_ctype(x, "s")
+
+              ****连牌  
+              通式：seq(x,y) 从x开始，个数无限制, y>2 ,不必同花色
+                   seq(x,y:ctype) 从x开始，个数无限制, y>2 ,同花色，花色确定
+                   seq(x,y:x) 从x开始，个数无限制, y>2 ,同花色，花色任意
+                   seq(x,y[:ctype]|x约束，约束)
+                   seq(m,n,j,...[:ctype/x]) //（同花色）确定的连牌，m,n,j数字递增。
+
+              特例：
+              //同花色连牌
+              seq_x   //任意花色
+              seq_heart
+              seq_diamond
+              seq_spade
+              seq_club
+                *******多重数字连牌
+                通式：seqm(m|x,y) 从x开始，个数无限制, y>2 ,不必同花色
+                    seqm(m|x,y:ctype) 从x开始，个数无限制, y>2 ,同花色，花色确定，只有多副牌时才会出现
+                    seqm(m|x,y:x) 从x开始，个数无限制, y>2 ,同花色，花色任意
+                    seqm(m|x,y[:ctype]|x约束，约束), 只有多副牌时才会出现
+                    seqm(m|m,n,j,...[:ctype/x]) //（同花色）确定的连牌，m,n,j数字递增。只有多副牌时才会出现
+                示例:
+                    seqm(2|1,2,3)   11,22,33
+                    seqm(3|3,4) 333,444
+
+              ****牌型组
+              comp(m,n,k,.....): 牌型组，m,n,k确定，但无约束
+              comp(x|y) : y张任意牌, x的约束在由y描述，支持&&,||
+              comp(x,y,z[,u,v,w]|constraints)
+              comp(xx,yyy,zzzz)
+              comp(mmm,nn,k)
+              comp(mm,n, xxxx)
+              使用示例：
+              <comp params="x,y,z" constraint_param_1="x的约束" 
+                                    constraint_param_2="y的约束" 
+                                    constraint_param_3="z的约束"/>
+              <comp params="xx,yyy,z" constraint_param_1="x的约束" 
+                                    constraint_param_2="y的约束" 
+                                    constraint_param_3="z的约束"/>
+              <comp params="3,yy,z" constraint_param_1="none" 
+                                    constraint_param_2="y的约束" 
+                                    constraint_param_3="z的约束"/>
+
+              ****牌型操作：
+                cpattern_of(x)
+                cpattern_of(xs)
+
+                *) 取牌型
+                *) 牌型相同判定
+              
+      元函数/表达式：
+      说明：以_as为后缀的函数中，参数是变量的值
+      取点数：
+      cfigure_of, 
+      cfigure
+      cfigure_as
+      min_cfigure_of(cards)   //取x表示的变量的最小牌点数
+      max_cfigure_of(cards)   //取x表示的变量的最大牌点数
+
+      取花色：
+      ctype_of, 用于属性名  ctype(m)，用于属性值
+      ctype_as
+      ctype
+
+      取能级
+      power_of(xs)
+      power_of(x)
+      power_as
+      max_power_of(cards)
+
+      取牌型
+      cpattern_of(x)
+      cpattern_of(xs)
+      cpattern_as
+
+      //取得cards的花色个数
+      ctype_count_of(card)    
+      ctype_count_of(cards)
+
+      //是否有某花色牌
+      cards_contain_ctype(cards, ctype)
+      cards_not_contain_ctype(cards, ctype)
+
+      cards_contain_ctype_as(cards, ctype)
+      cards_not_contain_ctype_as(cards, ctype)
+
+      //是否有某数字牌
+      cards_contain_cfigure(cards, cfigure)
+      cards_contain_cfigure_as(cards, cfigure)
+
+      cards_not_contain_cfigure(cards, cfigure)
+      cards_not_contain_cfigure_as(cards, cfigure)
+
+      //是否全为某花色牌
+      cards_all_ctype(cards, ctype)  return true/false
+      cards_all_ctype_as(cards, ctype) return true/false
+
+      //是否为某牌型
+      cards_is_typed_pattern(cards, pattern_type)
+      cards_is_named_pattern(cards, pattern_name)
+      cards_is_pattern_as(cards, :(cards))
+
+      cards_count_not_deal() return number
+      cards_not_deal() return cards
+
+      cards_of_ctype(cards, ctype) return cards 
+      
+      cards_in_cur_player_hand, return cards
+      cards_out_on_table,  return cards
+      cards_in_all_players_hand, return cards
+      cards_in_other_players_hnad return cards
+
+      cards_of_ctype_in_cur_player_hands
+      cards_of_ctype_in_other_players_hands
+      cards_of_ctype_in_all_players_hands
+      cards_of_ctype_out_on_table     
+    
+      //玩家是否有某牌色
+      player_has_cards_of_ctype(ctype)
+      player_has_cards_of_ctype_as(ctype)
+      player_not_has_cards_of_ctype(ctype)
+      player_not_has_cards_of_ctype_as(ctype)
+
+      //玩家是否有某数字牌
+      player_has_cards_of_cfigure(cfigure)
+      player_has_cards_of_cfigure_as(cfigure)
+      player_not_has_cards_of_cfigure(cfigure)
+      player_not_has_cards_of_cfigure_as(cfigure)
+
+      //玩家是否有某牌型
+      player_has_cards_of_named_pattern(pattern_name)
+      player_not_has_cards_of_named_pattern(pattern_name)
+      player_has_cards_of_typed_pattern(pattern_type)
+      player_not_has_cards_of_typed_pattern(pattern_type)
+
+      //取得指定张数的花色牌
+      player_get_cards_of_ctype(ctype, count, candidate_ctype)
+      player_get_cares_of_ctype_as(ctype, count, candidate_ctype)
+
+      player_cards_in_hand()
+      player_cards_count_in_hand()  return number
+      
+    返回值测试：
+
+    相等/不相等
+    ret_is, ret_not_is, 
+    ret_as, ret_not_as:  
+
+    小于/不小于
+    ret_lt, ret_not_lt:  ret_less_than, ret_not_less_than
+    ret_lt_as, ret_not_lt_as:
+
+    大于/不大于
+    ret_gt, ret_not_gt:  ret_greater_than, ret_not_greater_than
+    ret_gt_as, ret_not_gt_as:
+   
+    //定义round变量
+    <round_attr name="cur_level" value_type="int" init_value="2"/>
+
+    //定义player变量
+    <player_attr name="IsMainPlayer" value_type="bool"/>
+
+    //条件测试, 测试结果为真，执行case的内部节点
+    <case testee="card" cfigure_of="card" ret_as=":(cur_level)">
+    </case>
+
+    //条件测试嵌套
+    <case>
+      <case>
+         //do 
+      </case>
+    </case>
+
+  -->
+  <round_attrs>
+    <round_attr name="cur_level" value_type="int" init_value="2"/>
+    <round_attr name="defenders" value_type="list" init_value="none">
+    <round_attr name="jiangpai" value="int" init_value="none">
+
+    <!--不亮底牌-->
+    <show_dipai value="false">
+
+    <!--庄牌点数-->
+    <round_attr name="bank_cfigure" value_type="int" init_value="2"/>
+
+    <!--庄牌花色-->
+    <round_attr name="bank_ctype" value_type="string" init_value="none">
+
+    <!--起牌玩家，第一个摸牌的人-->
+    <round_attr name="init_player" value_type="Player" init_value="random">
+
+  </round_attrs>
+
+  <cards type="M/P">
+    <!--去牌-->
+    <excludes>
+      <exclude></exclude>
+      <exclude></exclude>
+    </excludes>
+
+    <!--分数牌-->
+    <score_cards>
+      <score_card cfigure_of="5" score="5"/>
+      <score_card cgigure_of="10" score="10"/>
+      <score_card cfigure_of="13" score="10">
+    </score_cards>
+    <!--牌型，如有对同一牌型不同的配置，后面的覆盖前面的 power_range 属性为方便配置参考，无代码执行影响 
+    
+    
+    -->
+    <!--leading 是否可作为起始牌，默认为true, 可以由一圈的起始打牌人打出, false,只能用于跟牌-->
+
+    <patterns>
+      
+      <!--单牌-->
+      <xml_collapse_group>    
+        <single cfigure="1" power="14"/>
+ 
+      </xml_collapse_group>
+
+      <!--主牌-->
+      <single>
+        <!--主牌花色牌-->
+        <case ctype_of="card" ret_as=":(bank_ctype)">
+          <set property="power" value=":((cfigure_of(card)) + 20)" power_range="21-33"/>
+        </case>
+        <!--主牌数字牌-->
+        <case cfigure_of="card" ret_as=":(bank_cfigure)">
+          <set property="power" value="35" />
+        </case>
+        <!--正主牌-->
+        <cases>
+          <case ctype_of="card" ret_as=":(bank_ctype)"/>
+          <case cfigure_of="card" ret_as=":(bank_cfigure)"/>
+          <set property="power" value="36"/>
+        </cases>
+      </single>
+
+      <!--四张-->
+      <quad name="zha" leading_text="" follow_text="" power=":((max_cfigure_of(cards)) + 5)" range="6-18"/>
+      
+      <!--四张的跟牌-->
+      <comp name="zha_follow" params="x,y,z,u" leading="false" power="0">
+        <!--非枪毙牌，最小-->
+        <case ctype_count_of="cards" ret_not_is="1">
+          <set property="power" value="0"/>
+        </case>
+        <!--枪毙牌，大过四张牌, 前提是手中已没有其他花牌-->
+         <cases>
+          <case ctype_count_of="cards" ret_is="1"/> 
+          <case ctype_of="cards[0]" ret_as=":(bank_ctype)"/>
+          <set property="power" value=":(max_power_of(cards))">
+        </cases>
+      </comp>
+
+      <!--甩牌-->
+      <same_ctype name="shuai" power=":(max_power_of(cards))">
+        <cases>
+          <!--大于一张牌-->
+          <case count_of="cards" ret_gt="1"/>
+          <!--不能有主牌数字-->
+          <case is_contain_cfigure_as="cards,:(bank_cfigure)" ret_not_is="true"/> 
+          <!--都是大牌-->
+          <case min_cfigure_of="cards" ret_gt_as=":(cards_in_other_players_hnad|cards_of_ctype(ctype_of(cards[0]))|max_cfigure)"/>
+          <set property="leading" value="true">
+        </cases>
+        
+      </same_ctype>
+      <!--甩牌跟牌-->
+      <comp name="shuai_follow" params="x|y" leading="false">  
+        <!--非枪毙牌，最小-->
+        <case is_all_ctype_as=":(bank_ctype)" ret_not_is="false">
+          <set property="power" value="0"/>
+        </case>
+        <!--枪毙牌，大过四张牌, 前提是手中已没有其他花牌-->
+        <case is_all_ctype_as=":(bank_ctype)" ret_not_is="true">
+          <set property="power" value=":(max_power_of(cards))"/>
+        </case>
+      </comp>
+    </patterns>
+
+  </cards>
+
+  <!--跟牌规则：
+  是否跟牌：
+  1. 必须出牌
+    牌型要求
+      无相同牌型的处理
+      与起牌人的牌型相同
+      与上家的牌型相同
+    牌张要求
+  2. 大才出牌
+
+  pattern_ref_as=":(circle_init_player)"
+  pattern_ref_as=":(prev_player)"
+  --->
+  <following must_follow="true" 
+               pattern_ref_as=":(circle_init_player)">    
+    
+    <leading pattern_type="single">
+      <case player_has_cards_of_ctype_as="card">
+        <following_cards ctype_as="card" count="1"/>
+      </case>
+      <case player_not_has_cards_of_ctype_as="card">
+        <following_cards ctype_of="any" count="1"/>
+      </case>
+    </leading>
+
+    <leading pattern_name="zha">
+      <case player_has_cards_of_pattern="zha">
+        <following_cards pattern_name="zha"/>
+      </case>
+      <case player_not_has_cards_of_pattern="zha">
+        <following_cards>
+          <card>
+             <case player_has_cards_of_ctype="club">
+              <card_type ctype_of="club"/>
+             </case>
+             <case player_not_has_cards_of_ctype="club">
+              <card_type ctype_of="any">
+             </case>
+          </card>
+          <card>
+             <case player_has_cards_of_ctype="diamond">
+              <card_type ctype_of="diamond"/>
+             </case>
+             <case player_not_has_cards_of_ctype="diamond">
+              <card_type ctype_of="any">
+             </case>
+          </card>
+          <card>
+             <case player_has_cards_of_ctype="heart">
+              <card_type ctype_of="heart"/>
+             </case>
+             <case player_not_has_cards_of_ctype="heart">
+              <card_type ctype_of="any">
+             </case>
+          </card>
+          <card>
+             <case player_has_cards_of_ctype="spade">
+              <card_type ctype_of="spade"/>
+             </case>
+             <case player_not_has_cards_of_ctype="spade">
+              <card_type ctype_of="any">
+             </case>
+          </card>
+        </following_cards>
+      </case>
+    </leading>
+
+    <leading pattern_name="shuai">
+      <following_cards cards=":(get_cards_of_ctype_as(cards[0], count_of(cards), any_ctype)"/>
+    </leading>
+
+  </following>
+
+  <!--玩家-->
+  <players>
+    <player_role name="defender" text="defender"/>
+    <player_role name="attacter" text="attacter"/>
+
+    <player_attr name="level" value_type="int"/>
+    <player_attr name="IsMainPlayer" value_type="bool"/>
+    <player_attr name="IsAttacter" value_type="bool"/>
+    <player_attr name="IsDefender" value_type="bool"/>
+    <player_attr name="sum_score" value_type="int"/>
+    <player_attr name="Score" value_type="int"/>
+    <min>4</min>
+    <max>4</max>
+  
+  </players>
+
+  <!--一圈的赢家-->
+  <circle_winner>
+    <!-- <cards_power decided_by="least_power_card"/> -->
+
+    <!--通常情况下是出最大牌的player-->
+    <winner test_greatest_power="true">
+    </winner>
+    
+    <!--进攻方赢，得到分数牌, cards，一圈打出的牌-->
+    <case testee="cards" is_contain_cfigure_as=":(score_card)">
+      <circle_winner>
+        <case property="IsAttacter" ret_is="true">
+          <find_player property="IsAttacter" ret_is="true"> 
+            <update property="score" operation="add" value="card_score"/>
+          </find_player>
+        </case>
+      </circle_winner>
+    </case>
+   
+  </circle_winner>
+
+  <!---最后圈输赢测试 如果attacter win, attacter将获得底牌的分数--->
+  <test_last_circle>
+    
+  </test_last_circle>
+
+
+  <!--轮的赢家-->
+  <round_winners>
+    <!--确定输赢方-->
+    <find_player property="IsAttacter" ret_is="true">
+      <!--进攻方分数为0，防守方赢，升2级-->
+      <case property="Score" ret_is="0">
+        <winners>
+          <find_player property="IsDefender" ret_is="true"/>
+        </winnrs>
+        <losers>
+          <find_player property="IsAttacter" ret_is="true"/>
+        </losers>
+        <find_player property="IsDefender" ret_is="true"/>
+          <update property="level" operation="inc" value="2"/>
+        </find_player>
+
+         <!--防守方赢，主打换人-->
+        <find_player>
+          <case property="IsDefender" ret_is="true"/>
+          <case property="IsMainPlayer" ret_is="true">
+          <update property="IsMainPlayer" value="false"/>
+        </find_player>
+        <find_player>
+          <case property="IsDefender" ret_is="true"/>
+          <case property="IsMainPlayer" ret_is="false">
+          <update property="IsMainPlayer" value="true"/>
+        </find_player>
+      </case>
+      <!--进攻方没分数<40，防守方赢，升一级-->
+      <case property="Score" ret_lt="40">
+        <winners>
+          <find_player property="IsDefender" ret_is="true"/>
+        </winnrs>
+        <losers>
+          <find_player property="IsAttacter" ret_is="true"/>
+        </losers>
+        <find_player property="IsDefender" ret_is="true">
+          <update property="level" operation="inc" value="1"/>
+        </find_player>
+
+        <find_player>
+          <case property="IsDefender" ret_is="true"/>
+          <case property="IsMainPlayer" ret_is="true">
+          <update property="IsMainPlayer" value="false"/>
+        </find_player>
+        <find_player>
+          <case property="IsDefender" ret_is="true"/>
+          <case property="IsMainPlayer" ret_is="false">
+          <update property="IsMainPlayer" value="true"/>
+        </find_player>
+      </case>
+
+      <!--进攻方分数40<x<80，进攻方赢，升一级-->
+      <case property="Score" ret_lt="80">
+        <winners>
+          <find_player property="IsAttacter" ret_is="true"/>
+        </winnrs>
+        <losers>
+          <find_player property="IsDefender" ret_is="true"/>
+        </losers>
+        <find_player property="IsAttacter" ret_is="true">
+          <update property="level" operation="inc" value="1"/>
+        </find_player>
+        <!--进攻方赢，攻守角色互换，本轮主打的下家为主打（主防守）-->
+        <find_player var="p1" property="IsMainPlayer" ret_is="true">
+          <find_player property="seatid" ret_as=":(p1.seatid+1)">
+            <update property="IsMainPlayer" value="true">
+          </find_player>
+        </find_player>
+
+        <find_player property="IsDefender" ret_is="true">        
+          <update property="IsDefender" value="false"/>
+          <update property="IsAttacter" value="true">
+        </find_player>
+        <find_player property="IsAttacter" ret_is="true">        
+          <update property="IsDefender" value="true"/>
+          <update property="IsAttacter" value="false">
+        </find_player>
+
+      </case>
+
+      <!--进攻方分数>80，进攻方赢，升2级-->
+      <case property="Score" ret_gt="80">
+        <winners>
+          <find_player property="IsAttacter" ret_is="true"/>
+        </winnrs>
+        <losers>
+          <find_player property="IsDefender" ret_is="true"/>
+        </losers>
+        <find_player property="IsAttacter" ret_is="true">
+          <update property="level" operation="inc" value="2"/>
+        </find_player>
+
+        <!--进攻方赢，攻守角色互换，本轮主打的下家为主打（主防守）-->
+        <find_player var="p1" property="IsMainPlayer" ret_is="true">
+          <find_player property="seatid" ret_as=":(p1.seatid+1)">
+            <update property="IsMainPlayer" value="true">
+          </find_player>
+        </find_player>
+
+        <find_player property="IsDefender" ret_is="true">        
+          <update property="IsDefender" value="false"/>
+          <update property="IsAttacter" value="true">
+        </find_player>
+        <find_player property="IsAttacter" ret_is="true">        
+          <update property="IsDefender" value="true"/>
+          <update property="IsAttacter" value="false">
+        </find_player>
+      </case>
+    </find_player>
+
+    <!--一轮结束，更新各玩家状态-->
+  </round_winners>
+
+  <running>
+
+    <!--发牌（摸牌，起牌）-->
+    <!--每次一张牌-->
+    <dealcard_loop start_player=":(init_player)" card_number_per_time="1">
+    <!--底牌6张-->
+      
+      <case  cards_coount_not_deal="6">
+        <stoploop/>
+      </case>
+
+      <!--摸到将牌，可以叫主，前提是还没主-->
+      <case testee="card" cfigure_of="card" ret_as=":(cur_level)">
+        <case testee="round" property="bank_ctype" ret_is="none">
+           <actions timeout_seconds="30" timeout_def_act="pass" to_player="pp" wait_until_player_response="true"> 
+            <action act_ref="jiaozhu"/>
+            <action act_ref="pass"/>
+          </actions>
+        </case>
+      </case>
+    </dealcard_loop>
+
+    <!--发牌结束，必须有防守方，否则流局，此情况只发生刚开始的几局-->
+    <continue_must_test>
+      <case testee="round" property="defenders" ret_is="none">
+        <action act_ref="liuju"/>
+      </case>
+    </continue_must_test>
+
+    <!--底牌归于主打-->
+    <find_player roperty="IsMainPlayer" ret_is="true">
+      <deal_table_cards/>
+    </find_player>
+
+    <!--等待主打扣牌-->
+    <find_player property="IsMainPlayer" ret_is="true">
+      <actions timeout_seconds="30" timeout_def_act="force_koupai" wait_until_player_response="true" >
+        <action act_ref="koupai"/>
+        <action act_ref="force_koupai"/>
+      </actions>
+    </find_player>
+
+
+    <!--进入打牌，从主打开始-->
+    <playcard_loop>
+      <start_player>
+        <find_player property="IsMainPlayer" ret_is="true"/>
+      </start_player>
+
+      <!--每玩家的命令列表，出牌，如超时，强制出牌-->
+      <actions timeout_seconds="30" timeout_def_act="force_chupai" wait_until_player_response="true">
+          <action act_ref="playcard"/>
+          <action act_ref="force_chupai"/>
+      </actions>
+
+      <wait_play_cards/>
+
+      <!--一局结束，主打手里没牌-->
+      <case>
+        <find_player property="IsMainPlayer" ret_is="true">
+          <case property=":(cards_count_in_player_hand)" ret_is="0">
+            <stoploop/>
+          </case>
+        </find_player>
+      </case>
+    </playcard_loop>
+  
+    <!--出牌结束，确定一局输赢玩家-->
+    <tell_round_winners/>
+
+    <!--广播一局胜负-->
+    <publish_round_winners_losers/>
+
+    <!--广播累积胜负-->
+    <publish_total_scores/>
+  </running>
+
+  <!--玩家操作命令列表-->
+  <actions>
+    <!--叫主-->
+    <action name="jiaozhu">
+      <!-- <consequences for_round0="1"></consequences>
+      <consequences for_roundX="1"></consequences> -->
+      <update_round property="jiangpai" value="card">
+      </update_round>
+      <update_card_power>
+        <cards_of_type operation="add" value="+20">
+        <exe_card power="45">
+        <cards_of_figure power="40">
+      </update_card_power>
+
+    </action>
+    <action name="liuju">
+      <finish_round/>
+      <publish_players message=""/>
+      <new_round/>
+    </action>
+
+    <!-- <aciton name="peng" text="peng">
+      <update_round property="next_player" value="act_exe_player"/>
+    </action> -->
+
+    <action name="pass" text="pass">
+      <consequences></consequences>
+    </action>>
+    <action name="koupai" text="koupai">
+    </action>
+    <action name="chupai" text="chupai">
+    </action>
+    <action name="force_chupai">
+    </force_chupai>
+    <action name="force_koupai" text="none" >
+       <consequences>
+         <consequences>
+            <random_pick_cards number="6" as="di"/>
+            <play_cards_to_table cards="di">
+         </consequences>
+       </consequences>
+    </action>
+  </actions>
+</game>
