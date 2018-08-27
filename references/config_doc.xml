@@ -1,6 +1,17 @@
-<!--terms: round, circle --->
+<!--terms: round, trick --->
 <game name="shengji">
   <!--Poker: 
+            术语：bid: 叫牌
+                 draw: 摸牌
+                 overbid:造反
+                 trick: 一圈
+                 round: 一局，从玩家拿到牌到决出胜负玩家，一局由一圈或多圈组成
+                 void: 绝牌，没有一门牌
+                 rank: 牌点
+                 suit: 花色
+
+
+
             约定：m,n,k: 有确定数字， x,y,z无确定数字，在程序运行时确定。
             card, c:单张，确定牌
             x,y,z ：单张，不确定牌
@@ -22,7 +33,7 @@
                   
                   
             **牌点
-              cfigure: 牌的数字, 1 - 13（A - K)，js：Joker Sun 大王， jm：Joker Moon 小王
+              cfigure: 牌的数字, 1 - 13（A - K)，21, jm：Joker Moon 小王;  22, js：Joker Sun 大王， 
               方法：
               cfigure_of(x)
               min_cfigure_of(xs)   //取x表示的变量的最小牌点数
@@ -242,6 +253,9 @@
     <case testee="card" cfigure_of="card" ret_as=":(cur_level)">
     </case>
 
+    round属性：
+    
+
     //条件测试嵌套
     <case>
       <case>
@@ -249,6 +263,17 @@
       </case>
     </case>
 
+    <set property="x" value="newValue">
+      <cases>
+      </cases>
+    </set>
+
+    <conditions>
+      <case/>
+      <case/>
+      <update>
+      </update>
+    </conditions>
   -->
   <round_attrs>
     <round_attr name="cur_level" value_type="int" init_value="2"/>
@@ -369,11 +394,11 @@
     牌张要求
   2. 大才出牌
 
-  pattern_ref_as=":(circle_init_player)"
+  pattern_ref_as=":(trick_init_player)"
   pattern_ref_as=":(prev_player)"
   --->
   <following must_follow="true" 
-               pattern_ref_as=":(circle_init_player)">    
+               pattern_ref_as=":(trick_init_player)">    
     
     <leading pattern_type="single">
       <case player_has_cards_of_ctype_as="card">
@@ -449,7 +474,7 @@
   </players>
 
   <!--一圈的赢家-->
-  <circle_winner>
+  <trick_winner>
     <!-- <cards_power decided_by="least_power_card"/> -->
 
     <!--通常情况下是出最大牌的player-->
@@ -458,21 +483,21 @@
     
     <!--进攻方赢，得到分数牌, cards，一圈打出的牌-->
     <case testee="cards" is_contain_cfigure_as=":(score_card)">
-      <circle_winner>
+      <trick_winner>
         <case property="IsAttacter" ret_is="true">
           <find_player property="IsAttacter" ret_is="true"> 
             <update property="score" operation="add" value="card_score"/>
           </find_player>
         </case>
-      </circle_winner>
+      </trick_winner>
     </case>
    
-  </circle_winner>
+  </trick_winner>
 
   <!---最后圈输赢测试 如果attacter win, attacter将获得底牌的分数--->
-  <test_last_circle>
+  <test_last_trick>
     
-  </test_last_circle>
+  </test_last_trick>
 
 
   <!--轮的赢家-->

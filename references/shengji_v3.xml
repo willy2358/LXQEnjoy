@@ -1,9 +1,143 @@
-<!--terms: round, circle --->
+<!--terms: round, trick --->
 <game name="shengji">
   
-  <round_attrs>
-    <!--不亮底牌-->
+  <!--
+    type:类型
+    sets:牌副数：默认值：1
+  -->
+  <cards type="M/P" sets="1">
+    <!--去牌
+    valid: 节点是否生效，true：生效；false: 无效-->
+    <excludes valid="false">
+      <!--
+      ctype:s|h|d|c|j
+            *: 所有类型,默认值，也即，如果card的属性中不包括ctype属性时，ctype取默认值*,所有类型
+            -: 未指定
+      cfigure: 1 - 13, 21,22
+            *：所有数字，默认值，也即，如果card的属性中不包括cfigure属性时，cfigure取默认值*，不限数字
+            -: 未指定  
+                    
+      -->
+      <card ctype="-" cfigure="-"/>
+    </excludes>
+
+    <!--底牌
+        count: 留牌张数
+        public_shown: 底牌是否对其他玩家可见：true: 可见；false: 不可见
+    -->
+    <kitty valid="true" count="6" public_shown="false"/>
+
+    <!--分数牌-->
+    <score_cards valid="true">
+      <!--
+         card 说明 同excludes
+      -->
+      <card ctype="*" cfigure="5" score="5"/>
+      <card ctype="*" cgigure="10" score="10"/>
+      <card ctype="*" cfigure="13" score="10"/>
+    </score_cards>
+
+    <!--牌型，如有对同一牌型不同的配置，后面的覆盖前面的 power_range 属性为方便配置参考，无代码执行影响  
+       leading 是否可作为起始牌，默认为true, 可以由一圈的起始打牌人打出, false,只能用于跟牌
+       由于牌的power有牌的组合方式确定，而牌在打出后组合方式才确定，所以，牌的power在牌打出后，由服务器计算
+       玩家出牌的power.
+    -->
+    <patterns>    
+      <!--单牌-->
+      <static_power>    
+        <single ctype="*" cfigure="1" power="14"/>
+        <single ctype="*" cfigure="2" power="2" />
+        <single ctype="*" cfigure="3" power="3" />
+        <single ctype="*" cfigure="4" power="4" />
+        <single ctype="*" cfigure="5" power="5" />
+        <single ctype="*" cfigure="6" power="6" />
+        <single ctype="*" cfigure="7" power="7" />
+        <single ctype="*" cfigure="8" power="8" />
+        <single ctype="*" cfigure="9" power="9" />
+        <single ctype="*" cfigure="10" power="10" />
+        <single ctype="*" cfigure="11" power="11" />
+        <single ctype="*" cfigure="12" power="12" />
+        <single ctype="*" cfigure="13" power="13" />
+
+        <single ctype="j" cfigure="21" power="50" power_range="50"/>
+        <single ctype="j" cfigure="22" power="51" power_range="51"/>
+      </static_power>
+
+      <runtime_power>
+        <!--主牌-->
+        <single>
+          <!--主牌花色牌-->
+          <set property="power" value=":((cfigure_of(card)) + 20)" power_range="21-33">
+            <case testee="card" ctype_of="card" ret_as=":(round.bank_ctype)"/>
+          </set>
+          
+          <!--主牌数字牌-->
+          <set property="power" value="35" >
+            <case cfigure_of="card" ret_as=":(round.bank_cfigure)"/>
+          </set>
+          
+          <!--正主牌--> 
+          <set property="power" value="36">
+            <!--
+              多条件判断，test_type: and 与运算，缺省值
+                                   or  或运算              
+            -->
+            <cases testee="card" test_type="and">
+              <case ctype_of="card" ret_as=":(round.bank_ctype)"/>
+              <case cfigure_of="card" ret_as=":(round.bank_cfigure)"/>
+            </cases>
+          </set>
+        </single>
+
+        <!--四张-->
+        <quad testee="cards" name="zha" power=":((max_cfigure_of(cards)) + 5)" range="6-18"/>
+        
+        <!--四张的跟牌-->
+        <comp name="zha_follow" leading="false" params="x,y,z,u">
+          <!--非枪毙牌，最小-->
+          <set property="power" value="0">
+            <case ctype_count_of="cards" ret_not_is="1"/>
+          </set>
+          
+          <!--枪毙牌，大过四张牌, 前提是手中已没有其他花牌-->
+          <set property="power" value=":(max_power_of(cards))">
+            <cases test_type="and">
+              <case ctype_count_of="cards" ret_is="1"/> 
+              <case ctype_of="cards[0]" ret_as=":(round.bank_ctype)"/>
+            </cases>
+          </set>        
+        </comp>
+
+        <!--甩牌, 同色，多张-->
+        <same_ctype name="shuai" power=":(max_power_of(cards))">
+          <set property="leading" value="true">
+            <cases>            
+              <!--不能有主牌数字-->
+              <case cards_contain_cfigure_as=":(round.bank_cfigure)" ret_not_is="true"/> 
+              <!--都是大牌-->
+              <case min_cfigure_of="cards" ret_gt_as=":(cards_in_other_players_hnad|cards_of_ctype(ctype_of(cards[0]))|max_cfigure)"/>
+            </cases> 
+          </set>
     
+        </same_ctype>
+
+        <!--甩牌跟牌-->
+        <comp name="shuai_follow" params="x|y" leading="false">  
+          <!--非枪毙牌，最小-->
+          <set property="power" value="0">
+            <case is_all_ctype_as=":(round.bank_ctype)" ret_not_is="false"/>
+          </set>
+
+          <!--枪毙牌，大过四张牌, 前提是手中已没有其他花牌-->
+          <set property="power" value=":(max_power_of(cards))">
+            <case is_all_ctype_as=":(round.bank_ctype)" ret_not_is="true"/>
+          </set> 
+        </comp>
+      </runtime_power>
+    </patterns>
+  </cards>
+
+   <round_attrs>
     <round_attr name="cur_level" value_type="int" init_value="2"/>
     <round_attr name="defenders" value_type="list" init_value="none"/>
     <round_attr name="attacters" value_type="list" init_value="none"/>
@@ -15,114 +149,9 @@
     <round_attr name="bank_ctype" value_type="string" init_value="none"/>
 
     <!--起牌玩家，第一个摸牌的人-->
-    <round_attr name="init_player" value_type="Player" init_value="random"/>
+    <round_attr name="init_drawer" value_type="Player" init_value="random"/>
 
   </round_attrs>
-
-  <cards type="M/P">
-    <!--去牌-->
-    <excludes>
-      <exclude></exclude>
-      <exclude></exclude>
-    </excludes>
-
-    <dipai count="6" public_shown="false"/>
-
-    <!--分数牌-->
-    <score_cards>
-      <score_card cfigure="5" score="5"/>
-      <score_card cgigure="10" score="10"/>
-      <score_card cfigure="13" score="10">
-    </score_cards>
-    <!--牌型，如有对同一牌型不同的配置，后面的覆盖前面的 power_range 属性为方便配置参考，无代码执行影响  
-       leading 是否可作为起始牌，默认为true, 可以由一圈的起始打牌人打出, false,只能用于跟牌
-    -->
-    <patterns>
-      
-      <!--单牌-->
-      <static_power>    
-        <single cfigure="1" power="14"/>
-        <single cfigure="2" power="2" />
-        <single cfigure="3" power="3" />
-        <single cfigure="4" power="4" />
-        <single cfigure="5" power="5" />
-        <single cfigure="6" power="6" />
-        <single cfigure="7" power="7" />
-        <single cfigure="8" power="8" />
-        <single cfigure="9" power="9" />
-        <single cfigure="10" power="10" />
-        <single cfigure="11" power="11" />
-        <single cfigure="12" power="12" />
-        <single cfigure="13" power="13" />
-
-        <single cfigure="JM" power="50" power_range="50"/>
-        <single cfigure="JS" power="51" power_range="51"/>
-      </static_power>
-
-      <runtime_power>
-        <!--主牌-->
-        <single >
-          <!--主牌花色牌-->
-          <case testee="card" ctype_of="card" ret_as=":(round.bank_ctype)">
-            <set property="power" value=":((cfigure_of(card)) + 20)" power_range="21-33"/>
-          </case>
-          <!--主牌数字牌-->
-          <case cfigure_of="card" ret_as=":(round.bank_cfigure)">
-            <set property="power" value="35" />
-          </case>
-          <!--正主牌-->
-          <cases>
-            <case ctype_of="card" ret_as=":(round.bank_ctype)"/>
-            <case cfigure_of="card" ret_as=":(round.bank_cfigure)"/>
-            <set property="power" value="36"/>
-          </cases>
-        </single>
-
-        <!--四张-->
-        <quad testee="cards" name="zha" power=":((max_cfigure_of(cards)) + 5)" range="6-18"/>
-        
-        <!--四张的跟牌-->
-        <comp name="zha_follow" leading="false" params="x,y,z,u">
-          <!--非枪毙牌，最小-->
-          <case ctype_count_of="cards" ret_not_is="1">
-            <set property="power" value="0"/>
-          </case>
-          <!--枪毙牌，大过四张牌, 前提是手中已没有其他花牌-->
-          <cases>
-            <case ctype_count_of="cards" ret_is="1"/> 
-            <case ctype_of="cards[0]" ret_as=":(round.bank_ctype)"/>
-            <set property="power" value=":(max_power_of(cards))"/>
-          </cases>
-        </comp>
-
-        <!--甩牌-->
-        <same_ctype name="shuai" power=":(max_power_of(cards))">
-          <cases>
-            <!--大于一张牌-->
-            <case count_of="cards" ret_gt="1"/>
-            <!--不能有主牌数字-->
-            <case cards_contain_cfigure_as="cards,:(round.bank_cfigure)" ret_not_is="true"/> 
-            <!--都是大牌-->
-            <case min_cfigure_of="cards" ret_gt_as=":(cards_in_other_players_hnad|cards_of_ctype(ctype_of(cards[0]))|max_cfigure)"/>
-            <set property="leading" value="true"/>
-          </cases>   
-        </same_ctype>
-
-        <!--甩牌跟牌-->
-        <comp name="shuai_follow" params="x|y" leading="false">  
-          <!--非枪毙牌，最小-->
-          <case is_all_ctype_as=":(round.bank_ctype)" ret_not_is="false">
-            <set property="power" value="0"/>
-          </case>
-          <!--枪毙牌，大过四张牌, 前提是手中已没有其他花牌-->
-          <case is_all_ctype_as=":(round.bank_ctype)" ret_not_is="true">
-            <set property="power" value=":(max_power_of(cards))"/>
-          </case>
-        </comp>
-      </runtime_power>
-    </patterns>
-
-  </cards>
 
   <!--跟牌规则：
   是否跟牌：
@@ -134,61 +163,77 @@
     牌张要求
   2. 大才出牌
 
-  pattern_ref_as=":(circle_init_player)"
+  pattern_ref_as=":(trick_init_player)"
   pattern_ref_as=":(prev_player)"
   --->
   <following must_follow="true" 
-             pattern_ref_as=":(circle_init_player)">    
+             pattern_ref_as=":(trick_init_player)">    
     
     <leading pattern_type="single">
       <case player_has_cards_of_ctype_as="card">
-        <following_cards ctype_as="card" count="1"/>
-      </case>
-      <case player_not_has_cards_of_ctype_as="card">
+        <yes>
+          <following_cards ctype_as="card" count="1"/>
+        </yes>  
+        <not>
         <following_cards ctype_of="any" count="1"/>
+        </not>
       </case>
     </leading>
 
     <leading pattern_name="zha">
       <case player_has_cards_of_pattern="zha">
-        <following_cards pattern_name="zha"/>
+        <yes>
+          <following_cards pattern_name="zha"/>
+        </yes>
+        <not>
+          <following_cards>
+            <card>
+              <case player_has_cards_of_ctype="club">
+                <yes>
+                  <card_type ctype_of="club"/>
+                </yes>
+                <not>
+                  <card_type ctype_of="any"/>
+                </not>       
+              </case>
+            </card>
+            <card>
+              <case player_has_cards_of_ctype="diamond">
+                <yes>
+                  <card_type ctype_of="diamond"/>
+                </yes>
+                <not>
+                  <card_type ctype_of="any"/>
+                </not>       
+              </case>
+            </card>
+            <card>
+              <case player_has_cards_of_ctype="heart">
+                <yes>
+                  <card_type ctype_of="heart"/>
+                </yes>
+                <not>
+                  <card_type ctype_of="any"/>
+                </not>       
+              </case>
+            </card>
+            <card>
+            <card>
+              <case player_has_cards_of_ctype="spade">
+                <yes>
+                  <card_type ctype_of="spade"/>
+                </yes>
+                <not>
+                  <card_type ctype_of="any"/>
+                </not>       
+              </case>
+            </card>
+             
+          </following_cards>
+        </not>
+        
       </case>
-      <case player_not_has_cards_of_pattern="zha">
-        <following_cards>
-          <card>
-             <case player_has_cards_of_ctype="club">
-              <card_type ctype_of="club"/>
-             </case>
-             <case player_not_has_cards_of_ctype="club">
-              <card_type ctype_of="any">
-             </case>
-          </card>
-          <card>
-             <case player_has_cards_of_ctype="diamond">
-              <card_type ctype_of="diamond"/>
-             </case>
-             <case player_not_has_cards_of_ctype="diamond">
-              <card_type ctype_of="any">
-             </case>
-          </card>
-          <card>
-             <case player_has_cards_of_ctype="heart">
-              <card_type ctype_of="heart"/>
-             </case>
-             <case player_not_has_cards_of_ctype="heart">
-              <card_type ctype_of="any">
-             </case>
-          </card>
-          <card>
-             <case player_has_cards_of_ctype="spade">
-              <card_type ctype_of="spade"/>
-             </case>
-             <case player_not_has_cards_of_ctype="spade">
-              <card_type ctype_of="any">
-             </case>
-          </card>
-        </following_cards>
-      </case>
+      
     </leading>
 
     <leading pattern_name="shuai">
@@ -213,34 +258,43 @@
   
   </players>
 
-  <!--一圈的赢家-->
-  <circle_winner>
+  <!--一圈结束-->
+  <trick_end>
     <!-- <cards_power decided_by="least_power_card"/> -->
 
     <!--通常情况下是出最大牌的player-->
-    <winner test_greatest_power="true">
-    </winner>
-    
+    <trick_winner test_greatest_power="true">
+    </trick_winner>
+
     <!--进攻方赢，得到分数牌, cards，一圈打出的牌-->
-    <case testee="cards" cards_contain_cfigure_as=":(score_card)">
-      <circle_winner>
-        <case property="IsAttacter" ret_is="true">
-          <find_player property="IsAttacter" ret_is="true"> 
-            <update property="score" operation="add" value="card_score"/>
-          </find_player>
-        </case>
-      </circle_winner>
-    </case>
-   
-  </circle_winner>
+    <conditions>
+      <case testee="cards" cards_contain_cfigure_as=":(score_card)"/>
+      <case>
+        <trick_winner property="IsAttacter" ret_is="true"/>
+      </case>
+      <update>
+        <find_player property="IsAttacter" ret_is="true"> 
+          <update property="score" operation="add" value="card_score"/>
+        </find_player>  
+      </update>
+    </conditions>
 
-  <!---最后圈输赢测试 如果attacter win, attacter将获得底牌的分数--->
-  <test_last_circle>
-    
-  </test_last_circle>
+      <!---最后圈输赢测试 如果attacter win, attacter将获得底牌的分数--->
+    <conditions>
+      <case/>
+        <trick_winner value=":(player_cards_count_in_hand)" ret_is="0"/>
+      <case>
+        <trick_winner property="IsAttacter" ret_is="true"/>
+      </case>
+      <update>
+        <find_player property="IsAttacter" ret_is="true"> 
+          <update property="score" operation="add" value=":(cards_in_kitty|sum_score)"/>
+        </find_player>  
+      </update>
+    </conditions>
+  </trick_end>
 
-
-  <!--轮的赢家-->
+  <!--局的赢家-->
   <round_winners>
     <!--确定输赢方-->
     <find_player property="IsAttacter" ret_is="true">
