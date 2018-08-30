@@ -175,7 +175,7 @@
           <following_cards ctype_as="card" count="1"/>
         </yes>  
         <not>
-        <following_cards ctype_of="any" count="1"/>
+          <following_cards ctype_of="any" count="1"/>
         </not>
       </case>
     </leading>
@@ -268,10 +268,13 @@
 
     <!--进攻方赢，得到分数牌, cards，一圈打出的牌-->
     <conditions>
-      <case testee="cards" cards_contain_cfigure_as=":(score_card)"/>
-      <case>
-        <trick_winner property="IsAttacter" ret_is="true"/>
-      </case>
+      <cases>
+        <case testee="cards" cards_contain_cfigure_as=":(score_card)"/>
+        <case>
+          <trick_winner property="IsAttacter" ret_is="true"/>
+        </case>
+      </cases>
+
       <update>
         <find_player property="IsAttacter" ret_is="true"> 
           <update property="score" operation="add" value="card_score"/>
@@ -281,11 +284,15 @@
 
       <!---最后圈输赢测试 如果attacter win, attacter将获得底牌的分数--->
     <conditions>
-      <case/>
-        <trick_winner value=":(player_cards_count_in_hand)" ret_is="0"/>
-      <case>
-        <trick_winner property="IsAttacter" ret_is="true"/>
-      </case>
+      <cases>
+        <case>
+          <trick_winner value=":(player_cards_count_in_hand)" ret_is="0"/>
+        </case>
+        <case>
+          <trick_winner property="IsAttacter" ret_is="true"/>
+        </case>
+      </cases>
+
       <update>
         <find_player property="IsAttacter" ret_is="true"> 
           <update property="score" operation="add" value=":(cards_in_kitty|sum_score)"/>
@@ -312,13 +319,18 @@
 
          <!--防守方赢，主打换人-->
         <find_player>
-          <case property="IsDefender" ret_is="true"/>
-          <case property="IsMainPlayer" ret_is="true">
+          <cases>
+            <case property="IsDefender" ret_is="true"/>
+            <case property="IsMainPlayer" ret_is="true"/>
+          </cases>
+         
           <update property="IsMainPlayer" value="false"/>
         </find_player>
         <find_player>
-          <case property="IsDefender" ret_is="true"/>
-          <case property="IsMainPlayer" ret_is="false">
+          <cases>
+            <case property="IsDefender" ret_is="true"/>
+            <case property="IsMainPlayer" ret_is="false"/>
+          </cases>
           <update property="IsMainPlayer" value="true"/>
         </find_player>
       </case>
@@ -335,13 +347,17 @@
         </find_player>
 
         <find_player>
-          <case property="IsDefender" ret_is="true"/>
-          <case property="IsMainPlayer" ret_is="true">
+          <cases>
+            <case property="IsDefender" ret_is="true"/>
+            <case property="IsMainPlayer" ret_is="true">
+          </cases>
           <update property="IsMainPlayer" value="false"/>
         </find_player>
         <find_player>
-          <case property="IsDefender" ret_is="true"/>
-          <case property="IsMainPlayer" ret_is="false">
+          <cases>
+            <case property="IsDefender" ret_is="true"/>
+            <case property="IsMainPlayer" ret_is="false">
+          </cases>
           <update property="IsMainPlayer" value="true"/>
         </find_player>
       </case>
@@ -357,21 +373,35 @@
         <find_player property="IsAttacter" ret_is="true">
           <update property="level" operation="inc" value="1"/>
         </find_player>
-        <!--进攻方赢，攻守角色互换，本轮主打的下家为主打（主防守）-->
-        <find_player var="p1" property="IsMainPlayer" ret_is="true">
-          <find_player property="seatid" ret_as=":(p1.seatid+1)">
-            <update property="IsMainPlayer" value="true">
-          </find_player>
-        </find_player>
+        
 
-        <find_player property="IsDefender" ret_is="true">        
-          <update property="IsDefender" value="false"/>
-          <update property="IsAttacter" value="true">
-        </find_player>
-        <find_player property="IsAttacter" ret_is="true">        
-          <update property="IsDefender" value="true"/>
-          <update property="IsAttacter" value="false">
-        </find_player>
+        <block>
+          <!--进攻方赢，攻守角色互换，本轮主打的下家为主打（主防守）-->
+          <block>
+            <find_player var="p1" property="IsMainPlayer" ret_is="true">
+            </find_player>
+            <find_player var="p2" property="seatid" ret_as=":(p1.seatid+1)">         
+            </find_player>
+          </block>
+          <find_player var="p3" property="IsDefender" ret_is="true">        
+          </find_player>
+          <find_player var="p4" property="IsAttacter" ret_is="true">           
+          </find_player>
+          <updates>
+            <players var="p2">
+              <update property="IsMainPlayer" value="true">
+            </players>
+            <players var="p3">
+              <update property="IsDefender" value="false"/>
+              <update property="IsAttacter" value="true"/>
+            </players>
+            <players var="p4">
+              <update property="IsDefender" value="true"/>
+              <update property="IsAttacter" value="false"/>  
+            </players>
+          </updates>
+        </block>
+
 
       </case>
 
@@ -388,20 +418,33 @@
         </find_player>
 
         <!--进攻方赢，攻守角色互换，本轮主打的下家为主打（主防守）-->
-        <find_player var="p1" property="IsMainPlayer" ret_is="true">
-          <find_player property="seatid" ret_as=":(p1.seatid+1)">
-            <update property="IsMainPlayer" value="true">
+        <block>
+          <!--进攻方赢，攻守角色互换，本轮主打的下家为主打（主防守）-->
+          <block>
+            <find_player var="p1" property="IsMainPlayer" ret_is="true">
+            </find_player>
+            <find_player var="p2" property="seatid" ret_as=":(p1.seatid+1)">         
+            </find_player>
+          </block>
+          <find_player var="p3" property="IsDefender" ret_is="true">        
           </find_player>
-        </find_player>
+          <find_player var="p4" property="IsAttacter" ret_is="true">           
+          </find_player>
+          <updates>
+            <players var="p2">
+              <update property="IsMainPlayer" value="true">
+            </players>
+            <players var="p3">
+              <update property="IsDefender" value="false"/>
+              <update property="IsAttacter" value="true"/>
+            </players>
+            <players var="p4">
+              <update property="IsDefender" value="true"/>
+              <update property="IsAttacter" value="false"/>  
+            </players>
+          </updates>
+        </block>
 
-        <find_player property="IsDefender" ret_is="true">        
-          <update property="IsDefender" value="false"/>
-          <update property="IsAttacter" value="true">
-        </find_player>
-        <find_player property="IsAttacter" ret_is="true">        
-          <update property="IsDefender" value="true"/>
-          <update property="IsAttacter" value="false">
-        </find_player>
       </case>
     </find_player>
 
@@ -414,8 +457,7 @@
     <!--每次一张牌-->
     <dealcard_loop start_player=":(init_player)" card_number_per_time="1">
     <!--底牌6张-->
-      
-      <case  cards_coount_not_deal="6">
+      <case  cards_count_not_deal="6">
         <stoploop/>
       </case>
 

@@ -197,7 +197,7 @@
       cards_in_cur_player_hand, return cards
       cards_out_on_table,  return cards
       cards_in_all_players_hand, return cards
-      cards_in_other_players_hnad return cards
+      cards_in_other_players_hand return cards
 
       cards_of_ctype_in_cur_player_hands
       cards_of_ctype_in_other_players_hands
@@ -228,6 +228,12 @@
 
       player_cards_in_hand()
       player_cards_count_in_hand()  return number
+
+      //底牌
+      cards_in_kitty()
+
+      sum_score(cards)
+
       
     返回值测试：
 
@@ -274,6 +280,18 @@
       <update>
       </update>
     </conditions>
+
+    //找到Player,然后进一步判断
+    <find_player>
+      <case/>|<cases/>
+      
+    <find_player>
+
+    //找到Player, 设置其属性
+    <find_player>
+      <update />
+    </find_player>
+
   -->
   <round_attrs>
     <round_attr name="cur_level" value_type="int" init_value="2"/>
