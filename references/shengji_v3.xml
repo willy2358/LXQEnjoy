@@ -37,10 +37,10 @@
       <card ctype="*" cfigure="13" score="10"/>
     </score_cards>
 
-    <!--牌型，如有对同一牌型不同的配置，后面的覆盖前面的 power_range 属性为方便配置参考，无代码执行影响  
+    <!--牌型，如有对同一牌型不同的配置，后面的覆盖前面的
+        power_range 属性为方便配置参考，无代码执行影响  
        leading 是否可作为起始牌，默认为true, 可以由一圈的起始打牌人打出, false,只能用于跟牌
-       由于牌的power有牌的组合方式确定，而牌在打出后组合方式才确定，所以，牌的power在牌打出后，由服务器计算
-       玩家出牌的power.
+       由于牌的power由牌的组合方式确定，而牌在打出后组合方式才确定，所以，牌的power在牌打出后，由服务器计算玩家出牌的power.
     -->
     <patterns>    
       <!--单牌-->
@@ -170,7 +170,7 @@
              pattern_ref_as=":(trick_init_player)">    
     
     <leading pattern_type="single">
-      <case player_has_cards_of_ctype_as="card">
+      <case if_ctype_void_as="card">
         <yes>
           <following_cards ctype_as="card" count="1"/>
         </yes>  
@@ -230,10 +230,8 @@
             </card>
              
           </following_cards>
-        </not>
-        
-      </case>
-      
+        </not> 
+      </case>  
     </leading>
 
     <leading pattern_name="shuai">
@@ -253,53 +251,57 @@
     <player_attr name="IsDefender" value_type="bool"/>
     <player_attr name="sum_score" value_type="int"/>
     <player_attr name="Score" value_type="int"/>
+    <player_attr name="IsTrickWinner" value_type="bool">
     <min>4</min>
     <max>4</max>
   
   </players>
 
-  <!--一圈结束-->
-  <trick_end>
+  <!--一圈-->
+  <trick>
     <!-- <cards_power decided_by="least_power_card"/> -->
 
     <!--通常情况下是出最大牌的player-->
-    <trick_winner test_greatest_power="true">
-    </trick_winner>
+    <winner test_greatest_power="true">
+    </winner>
 
-    <!--进攻方赢，得到分数牌, cards，一圈打出的牌-->
-    <conditions>
-      <cases>
-        <case testee="cards" cards_contain_cfigure_as=":(score_card)"/>
-        <case>
-          <trick_winner property="IsAttacter" ret_is="true"/>
-        </case>
-      </cases>
+    <end>
+      <!--进攻方赢，得到分数牌, cards，一圈打出的牌-->
+      <conditions>
+        <cases>
+          <case testee="cards" cards_contain_cfigure_as=":(score_card)"/>
+          <case>
+            <!--Key string -->
+            <trick_winner property="IsAttacter" ret_is="true"/>
+          </case>
+        </cases>
 
-      <update>
-        <find_player property="IsAttacter" ret_is="true"> 
-          <update property="score" operation="add" value="card_score"/>
-        </find_player>  
-      </update>
-    </conditions>
+        <update>
+          <find_player property="IsAttacter" ret_is="true"> 
+            <update property="score" operation="add" value="card_score"/>
+          </find_player>  
+        </update>
+      </conditions>
 
-      <!---最后圈输赢测试 如果attacter win, attacter将获得底牌的分数--->
-    <conditions>
-      <cases>
-        <case>
-          <trick_winner value=":(player_cards_count_in_hand)" ret_is="0"/>
-        </case>
-        <case>
-          <trick_winner property="IsAttacter" ret_is="true"/>
-        </case>
-      </cases>
+        <!---最后圈输赢测试 如果attacter win, attacter将获得底牌的分数--->
+      <conditions>
+        <cases>
+          <case>
+            <trick_winner value=":(player_cards_count_in_hand)" ret_is="0"/>
+          </case>
+          <case>
+            <trick_winner property="IsAttacter" ret_is="true"/>
+          </case>
+        </cases>
 
-      <update>
-        <find_player property="IsAttacter" ret_is="true"> 
-          <update property="score" operation="add" value=":(cards_in_kitty|sum_score)"/>
-        </find_player>  
-      </update>
-    </conditions>
-  </trick_end>
+        <update>
+          <find_player property="IsAttacter" ret_is="true"> 
+            <update property="score" operation="add" value=":(cards_in_kitty|sum_score)"/>
+          </find_player>  
+        </update>
+      </conditions>
+    </end>
+  </trick>
 
   <!--局的赢家-->
   <round_winners>
@@ -307,12 +309,12 @@
     <find_player property="IsAttacter" ret_is="true">
       <!--进攻方分数为0，防守方赢，升2级-->
       <case property="Score" ret_is="0">
-        <winners>
+        <set_winners>
           <find_player property="IsDefender" ret_is="true"/>
-        </winnrs>
-        <losers>
+        </set_winnrs>
+        <set_losers>
           <find_player property="IsAttacter" ret_is="true"/>
-        </losers>
+        </set_losers>
         <find_player property="IsDefender" ret_is="true"/>
           <update property="level" operation="inc" value="2"/>
         </find_player>
@@ -336,12 +338,12 @@
       </case>
       <!--进攻方没分数<40，防守方赢，升一级-->
       <case property="Score" ret_lt="40">
-        <winners>
+        <set_winners>
           <find_player property="IsDefender" ret_is="true"/>
-        </winnrs>
-        <losers>
+        </set_winnrs>
+        <set_losers>
           <find_player property="IsAttacter" ret_is="true"/>
-        </losers>
+        </set_losers>
         <find_player property="IsDefender" ret_is="true">
           <update property="level" operation="inc" value="1"/>
         </find_player>
@@ -349,14 +351,14 @@
         <find_player>
           <cases>
             <case property="IsDefender" ret_is="true"/>
-            <case property="IsMainPlayer" ret_is="true">
+            <case property="IsMainPlayer" ret_is="true"/>
           </cases>
           <update property="IsMainPlayer" value="false"/>
         </find_player>
         <find_player>
           <cases>
             <case property="IsDefender" ret_is="true"/>
-            <case property="IsMainPlayer" ret_is="false">
+            <case property="IsMainPlayer" ret_is="false"/>
           </cases>
           <update property="IsMainPlayer" value="true"/>
         </find_player>
@@ -407,12 +409,12 @@
 
       <!--进攻方分数>80，进攻方赢，升2级-->
       <case property="Score" ret_gt="80">
-        <winners>
+        <set_winners>
           <find_player property="IsAttacter" ret_is="true"/>
-        </winnrs>
-        <losers>
+        </set_winnrs>
+        <set_losers>
           <find_player property="IsDefender" ret_is="true"/>
-        </losers>
+        </set_losers>
         <find_player property="IsAttacter" ret_is="true">
           <update property="level" operation="inc" value="2"/>
         </find_player>
@@ -495,26 +497,34 @@
 
     <!--进入打牌，从主打开始-->
     <playcard_loop>
-      <start_player>
-        <find_player property="IsMainPlayer" ret_is="true"/>
-      </start_player>
-
-      <!--每玩家的命令列表，出牌，如超时，强制出牌-->
-      <actions timeout_seconds="30" timeout_def_act="force_chupai" wait_until_player_response="true">
-          <action act_ref="playcard"/>
-          <action act_ref="force_chupai"/>
-      </actions>
-
-      <wait_play_cards/>
-
-      <!--一局结束，主打手里没牌-->
-      <case>
-        <find_player property="IsMainPlayer" ret_is="true">
-          <case property=":(cards_count_in_player_hand)" ret_is="0">
-            <stoploop/>
-          </case>
+      <block>
+        <find_player var="p1" property="IsMainPlayer" ret_is="true">
+          <actions timeout_seconds="30" timeout_def_act="force_chupai" wait_until_player_response="true">
+            <action act_ref="playcard"/>
+            <action act_ref="force_chupai"/>
+          </actions>
         </find_player>
-      </case>
+        <wait_play_cards/>
+        <test_valid_leading/>
+        <loop_for i_range="1,2,3">
+          <find_player property="seatid" ret_as=":(p1.seatid+(:(i)))">
+              <actions timeout_seconds="30" timeout_def_act="force_chupai" wait_until_player_response="true">
+                <action act_ref="playcard"/>
+                <action act_ref="force_chupai"/>
+              </actions>
+          </find_player>
+          <wait_play_cards/>
+        </loop_for>
+
+        <!--一局结束，主打手里没牌-->
+        <case>
+          <find_player property="IsMainPlayer" ret_is="true">
+            <case property=":(cards_count_in_player_hand)" ret_is="0">
+              <stoploop/>
+            </case>
+          </find_player>
+        </case>
+      </block>
     </playcard_loop>
   
     <!--出牌结束，确定一局输赢玩家-->

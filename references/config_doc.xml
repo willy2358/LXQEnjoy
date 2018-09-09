@@ -205,10 +205,12 @@
       cards_of_ctype_out_on_table     
     
       //玩家是否有某牌色
-      player_has_cards_of_ctype(ctype)
-      player_has_cards_of_ctype_as(ctype)
-      player_not_has_cards_of_ctype(ctype)
-      player_not_has_cards_of_ctype_as(ctype)
+      player_has_cards_of_ctype(ctype) == not_void
+      player_has_cards_of_ctype_as(ctype) == not_void_as
+      player_not_has_cards_of_ctype(ctype) == is_void
+      player_not_has_cards_of_ctype_as(ctype) == is_void_as
+      if_ctype_void //是否绝牌
+      if_ctype_void_as
 
       //玩家是否有某数字牌
       player_has_cards_of_cfigure(cfigure)
@@ -292,6 +294,14 @@
       <update />
     </find_player>
 
+    函数返回值类型：
+    1. True/False
+    2. Cards
+    3. Count
+
+
+    关键词：
+    trick_winner ： get the player who won one trick
   -->
   <round_attrs>
     <round_attr name="cur_level" value_type="int" init_value="2"/>
