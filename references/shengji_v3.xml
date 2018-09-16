@@ -1,4 +1,4 @@
-<!--terms: round, trick --->
+<!--terms: round, trick -->
 <game name="shengji">
   
   <!--
@@ -7,7 +7,7 @@
   -->
   <cards type="M/P" sets="1">
     <!--去牌
-    valid: 节点是否生效，true：生效；false: 无效-->
+    valid: 节点是否生效，true：生效, 默认值；false: 无效-->
     <excludes valid="false">
       <!--
       ctype:s|h|d|c|j
@@ -38,11 +38,14 @@
     </score_cards>
 
     <!--牌型，如有对同一牌型不同的配置，后面的覆盖前面的
-        power_range 属性为方便配置参考，无代码执行影响  
        leading 是否可作为起始牌，默认为true, 可以由一圈的起始打牌人打出, false,只能用于跟牌
        由于牌的power由牌的组合方式确定，而牌在打出后组合方式才确定，所以，牌的power在牌打出后，由服务器计算玩家出牌的power.
     -->
-    <patterns>    
+    <patterns>
+      <aliases>
+        <alias name="card" ref="card_played_out"/>
+        <alias name="cards" ref="cards_played_out"/>
+      </aliases>
       <!--单牌-->
       <static_power>    
         <single ctype="*" cfigure="1" power="14"/>
@@ -66,92 +69,91 @@
       <runtime_power>
         <!--主牌-->
         <single>
-          <!--主牌花色牌-->
-          <set property="power" value=":((cfigure_of(card)) + 20)" power_range="21-33">
-            <case testee="card" ctype_of="card" ret_as=":(round.bank_ctype)"/>
-          </set>
+          <!--主牌花色牌, power range="21-33"-->
+          <let target="@card" property="power" value=":((cfigure_of(@card)) + 20)">
+            <when ctype_of="@card" ret_as="@round.bank_ctype"/>
+          </let>
           
           <!--主牌数字牌-->
-          <set property="power" value="35" >
-            <case cfigure_of="card" ret_as=":(round.bank_cfigure)"/>
-          </set>
+          <let property="@card.power" value="35" >
+            <when cfigure_of="@card" ret_as="@round.bank_cfigure"/>
+          </let>
           
-          <!--正主牌--> 
-          <set property="power" value="36">
+          <!--正主牌-->
+          <let property="@card.power" value="36">
             <!--
               多条件判断，test_type: and 与运算，缺省值
                                    or  或运算              
             -->
-            <cases testee="card" test_type="and">
-              <case ctype_of="card" ret_as=":(round.bank_ctype)"/>
-              <case cfigure_of="card" ret_as=":(round.bank_cfigure)"/>
-            </cases>
-          </set>
+            <when ttype="and">
+              <case ctype_of="@card" ret_as="@round.bank_ctype"/>
+              <case cfigure_of="@card" ret_as="@round.bank_cfigure"/>
+            </when>
+          </let>
         </single>
 
-        <!--四张-->
-        <quad testee="cards" name="zha" power=":((max_cfigure_of(cards)) + 5)" range="6-18"/>
+        <!--四张 range="6-18"-->
+        <quad name="zha" power=":(max_cfigure_of(@cards) + 5)"/>
         
         <!--四张的跟牌-->
         <comp name="zha_follow" leading="false" params="x,y,z,u">
+ 
           <!--非枪毙牌，最小-->
-          <set property="power" value="0">
-            <case ctype_count_of="cards" ret_not_is="1"/>
-          </set>
+          <let property="@cards.power" value="0">
+            <when ttype="or">
+              <case ctype_count_of="@cards" ret_gt="1"/>
+              <cases ttype="and">
+                <case ctype_count_of="@cards" ret_is="1"/>
+                <case ctype_count_of="@cards[0]" ret_not_as="@round.bank_ctype"/>
+              </cases>
+            </when>    
+          </let>
           
           <!--枪毙牌，大过四张牌, 前提是手中已没有其他花牌-->
-          <set property="power" value=":(max_power_of(cards))">
-            <cases test_type="and">
-              <case ctype_count_of="cards" ret_is="1"/> 
-              <case ctype_of="cards[0]" ret_as=":(round.bank_ctype)"/>
-            </cases>
-          </set>        
+          <let property="@cards.power" value=":(max_power_of(@cards))">
+            <when ttype="and">
+              <case ctype_count_of="@cards" ret_is="1"/> 
+              <case ctype_of="@cards[0]" ret_as="@round.bank_ctype"/>
+            </when>
+          </let>        
         </comp>
 
         <!--甩牌, 同色，多张-->
         <same_ctype name="shuai" power=":(max_power_of(cards))">
-          <set property="leading" value="true">
-            <cases>            
+          <let property="@cards.leading" value="true">
+            <when>            
               <!--不能有主牌数字-->
-              <case cards_contain_cfigure_as=":(round.bank_cfigure)" ret_not_is="true"/> 
+              <case cards_contain_cfigure_as="@round.bank_cfigure" ret_not_is="true"/> 
               <!--都是大牌-->
-              <case min_cfigure_of="cards" ret_gt_as=":(cards_in_other_players_hnad|cards_of_ctype(ctype_of(cards[0]))|max_cfigure)"/>
-            </cases> 
-          </set>
-    
+              <case min_cfigure_of="@cards" ret_gt_as=":(cards_in_other_players_hand|cards_of_ctype(ctype_of(@cards[0]))|max_cfigure)"/>
+            </when> 
+          </let>
         </same_ctype>
 
         <!--甩牌跟牌-->
         <comp name="shuai_follow" params="x|y" leading="false">  
           <!--非枪毙牌，最小-->
-          <set property="power" value="0">
-            <case is_all_ctype_as=":(round.bank_ctype)" ret_not_is="false"/>
-          </set>
+          <let property="@cards.power" value="0">
+            <when ttype="or">
+              <case ctype_count_of="@cards" ret_gt="1"></case>
+              <cases ttype="and">
+                <case ctype_count_of="@cards" ret_is="1"></case>
+                <case ctype_of="@cards[0]" ret_not_as="@round.bank_ctype"/>
+              </cases>
+            </when>
+          </let>
 
           <!--枪毙牌，大过四张牌, 前提是手中已没有其他花牌-->
-          <set property="power" value=":(max_power_of(cards))">
-            <case is_all_ctype_as=":(round.bank_ctype)" ret_not_is="true"/>
-          </set> 
+          <let property="@cards.power" value=":(max_power_of(@cards))">
+            <when ttype="and">
+              <case ctype_count_of="@cards" ret_is="1"></case>
+              <case ctype_of="@cards[0]" ret_as="@round.bank_ctype"/>
+            </when> 
+          </let> 
         </comp>
       </runtime_power>
     </patterns>
   </cards>
-
-   <round_attrs>
-    <round_attr name="cur_level" value_type="int" init_value="2"/>
-    <round_attr name="defenders" value_type="list" init_value="none"/>
-    <round_attr name="attacters" value_type="list" init_value="none"/>
-
-    <!--庄牌点数-->
-    <round_attr name="bank_cfigure" value_type="int" init_value="2"/>
-
-    <!--庄牌花色-->
-    <round_attr name="bank_ctype" value_type="string" init_value="none"/>
-
-    <!--起牌玩家，第一个摸牌的人-->
-    <round_attr name="init_drawer" value_type="Player" init_value="random"/>
-
-  </round_attrs>
 
   <!--跟牌规则：
   是否跟牌：
@@ -163,321 +165,225 @@
     牌张要求
   2. 大才出牌
 
-  pattern_ref_as=":(trick_init_player)"
-  pattern_ref_as=":(prev_player)"
-  --->
+  pattern_ref_as="@trick_init_player"
+  pattern_ref_as="@prev_cards"
+  -->
   <following must_follow="true" 
-             pattern_ref_as=":(trick_init_player)">    
-    
-    <leading pattern_type="single">
-      <case if_ctype_void_as="card">
-        <yes>
-          <following_cards ctype_as="card" count="1"/>
-        </yes>  
-        <not>
-          <following_cards ctype_of="any" count="1"/>
-        </not>
+             pattern_ref_as="@trick_init_cards">
+    <alias name="leading" ref="@trick_init_cards"></alias>
+    <case cpattern_type_of="@leading" ret_is="@single">
+      <case is_player_void_as="@trick_init_cards[0]" ret_is="true">
+        <set>
+          <!-- 绝牌 -->
+          <card ctype_of="@any_ctype"></card>
+        </set>
+        <!-- 没有绝牌， 须出同花色牌 -->
+        <else>
+          <set>
+            <card ctype_as="@trick_init_cards[0]"></card>
+          </set>
+        </else>
       </case>
-    </leading>
-
-    <leading pattern_name="zha">
-      <case player_has_cards_of_pattern="zha">
-        <yes>
-          <following_cards pattern_name="zha"/>
-        </yes>
-        <not>
-          <following_cards>
-            <card>
-              <case player_has_cards_of_ctype="club">
-                <yes>
-                  <card_type ctype_of="club"/>
-                </yes>
-                <not>
-                  <card_type ctype_of="any"/>
-                </not>       
-              </case>
-            </card>
-            <card>
-              <case player_has_cards_of_ctype="diamond">
-                <yes>
-                  <card_type ctype_of="diamond"/>
-                </yes>
-                <not>
-                  <card_type ctype_of="any"/>
-                </not>       
-              </case>
-            </card>
-            <card>
-              <case player_has_cards_of_ctype="heart">
-                <yes>
-                  <card_type ctype_of="heart"/>
-                </yes>
-                <not>
-                  <card_type ctype_of="any"/>
-                </not>       
-              </case>
-            </card>
-            <card>
-            <card>
-              <case player_has_cards_of_ctype="spade">
-                <yes>
-                  <card_type ctype_of="spade"/>
-                </yes>
-                <not>
-                  <card_type ctype_of="any"/>
-                </not>       
-              </case>
-            </card>
-             
-          </following_cards>
-        </not> 
-      </case>  
-    </leading>
-
-    <leading pattern_name="shuai">
-      <following_cards cards=":(get_cards_of_ctype_as(cards[0], count_of(cards), any_ctype)"/>
-    </leading>
-
+    </case>
+   
+    <case cpattern_name_of="@leading" ret_is="zha">
+      <case is_player_has_named_pattern=":(get_pattern_of_name(@zha)">
+        <set>
+          <cards cpattern_type_of="@cards" ret_is="zha"/>
+        </set>
+      </case>
+      <else>
+        <set>
+          <!--ctype:count-->
+          <cards cards="c:1,d:1,s:1,h:1" when_void="@any_ctype">
+          </cards>
+        </set>
+      </eslse>
+    </case>
+   
+   <case cpattern_name_of="@leading" ret_is="shuai">
+      <cards cards=":(get_cards_of_ctype_as(@cards[0], count_of(@cards), @any_ctype)"/>
+   </case >
+   
   </following>
 
   <!--玩家-->
   <players>
+    <min>4</min>
+    <max>4</max>
     <player_role name="defender" text="defender"/>
     <player_role name="attacter" text="attacter"/>
 
-    <player_attr name="level" value_type="int"/>
-    <player_attr name="IsMainPlayer" value_type="bool"/>
-    <player_attr name="IsAttacter" value_type="bool"/>
-    <player_attr name="IsDefender" value_type="bool"/>
-    <player_attr name="sum_score" value_type="int"/>
-    <player_attr name="Score" value_type="int"/>
-    <player_attr name="IsTrickWinner" value_type="bool">
-    <min>4</min>
-    <max>4</max>
-  
+    <attr name="level" value_type="int"/>
+    <attr name="IsMainPlayer" value_type="bool"/>
+    <attr name="IsAttacter" value_type="bool"/>
+    <attr name="IsDefender" value_type="bool"/>
+    <attr name="sum_score" value_type="int"/>
+    <attr name="Score" value_type="int"/>
+    <attr name="IsTrickWinner" value_type="bool"/>
   </players>
 
   <!--一圈-->
   <trick>
-    <!-- <cards_power decided_by="least_power_card"/> -->
-
     <!--通常情况下是出最大牌的player-->
-    <winner test_greatest_power="true">
+    <winner alias_as="trick_winner">
+      <find_player player="@trick.max_power_player">
+      </find_player>
     </winner>
 
     <end>
       <!--进攻方赢，得到分数牌, cards，一圈打出的牌-->
-      <conditions>
-        <cases>
-          <case testee="cards" cards_contain_cfigure_as=":(score_card)"/>
-          <case>
-            <!--Key string -->
-            <trick_winner property="IsAttacter" ret_is="true"/>
-          </case>
-        </cases>
-
-        <update>
-          <find_player property="IsAttacter" ret_is="true"> 
+      <cases ttype="and">
+        <case cards_contain_cfigure_as=":(@cards_trick,@score_cards)"/>
+        <case value_of="@trick_winner.IsAttacter" ret_is="true"/>
+        <set>
+          <find_players property="IsAttacter" ret_is="true"> 
             <update property="score" operation="add" value="card_score"/>
-          </find_player>  
-        </update>
-      </conditions>
+          </find_players>  
+        </set>
+      </cases>
 
-        <!---最后圈输赢测试 如果attacter win, attacter将获得底牌的分数--->
-      <conditions>
-        <cases>
-          <case>
-            <trick_winner value=":(player_cards_count_in_hand)" ret_is="0"/>
-          </case>
-          <case>
-            <trick_winner property="IsAttacter" ret_is="true"/>
-          </case>
-        </cases>
-
-        <update>
-          <find_player property="IsAttacter" ret_is="true"> 
-            <update property="score" operation="add" value=":(cards_in_kitty|sum_score)"/>
-          </find_player>  
-        </update>
-      </conditions>
+      <!---最后圈输赢测试 如果attacter win, attacter将获得底牌的分数--->
+      <cases>
+        <case value_of=":(player_cards_count_in_hand(@trick_winner))" ret_is="0"/> 
+        <case value_of="@trick_winner.IsAttacter" ret_is="true"/>
+        <set>
+          <find_players property="IsAttacter" ret_is="true"> 
+            <update property="score" operation="add" value=":(sum_score(@kitty_cards))"/>
+          </find_players>  
+        </set>
+      </cases>
     </end>
   </trick>
 
-  <!--局的赢家-->
-  <round_winners>
-    <!--确定输赢方-->
-    <find_player property="IsAttacter" ret_is="true">
-      <!--进攻方分数为0，防守方赢，升2级-->
-      <case property="Score" ret_is="0">
-        <set_winners>
-          <find_player property="IsDefender" ret_is="true"/>
-        </set_winnrs>
-        <set_losers>
-          <find_player property="IsAttacter" ret_is="true"/>
-        </set_losers>
-        <find_player property="IsDefender" ret_is="true"/>
-          <update property="level" operation="inc" value="2"/>
-        </find_player>
-
-         <!--防守方赢，主打换人-->
-        <find_player>
-          <cases>
-            <case property="IsDefender" ret_is="true"/>
-            <case property="IsMainPlayer" ret_is="true"/>
-          </cases>
-         
-          <update property="IsMainPlayer" value="false"/>
-        </find_player>
-        <find_player>
-          <cases>
-            <case property="IsDefender" ret_is="true"/>
-            <case property="IsMainPlayer" ret_is="false"/>
-          </cases>
-          <update property="IsMainPlayer" value="true"/>
-        </find_player>
-      </case>
-      <!--进攻方没分数<40，防守方赢，升一级-->
-      <case property="Score" ret_lt="40">
-        <set_winners>
-          <find_player property="IsDefender" ret_is="true"/>
-        </set_winnrs>
-        <set_losers>
-          <find_player property="IsAttacter" ret_is="true"/>
-        </set_losers>
-        <find_player property="IsDefender" ret_is="true">
-          <update property="level" operation="inc" value="1"/>
-        </find_player>
-
-        <find_player>
-          <cases>
-            <case property="IsDefender" ret_is="true"/>
-            <case property="IsMainPlayer" ret_is="true"/>
-          </cases>
-          <update property="IsMainPlayer" value="false"/>
-        </find_player>
-        <find_player>
-          <cases>
-            <case property="IsDefender" ret_is="true"/>
-            <case property="IsMainPlayer" ret_is="false"/>
-          </cases>
-          <update property="IsMainPlayer" value="true"/>
-        </find_player>
-      </case>
-
-      <!--进攻方分数40<x<80，进攻方赢，升一级-->
-      <case property="Score" ret_lt="80">
-        <winners>
-          <find_player property="IsAttacter" ret_is="true"/>
-        </winnrs>
-        <losers>
-          <find_player property="IsDefender" ret_is="true"/>
-        </losers>
-        <find_player property="IsAttacter" ret_is="true">
-          <update property="level" operation="inc" value="1"/>
-        </find_player>
+  <!--一局-->
+  <round>
+    <alias />
+    <attrs>
+      <attr name="cur_level" value_type="int" init_value="2"/>
+      <attr name="defenders" value_type="list" init_value="none"/>
+      <attr name="attacters" value_type="list" init_value="none"/>
+      <!--庄牌点数-->
+      <attr name="bank_cfigure" value_type="int" init_value="2"/>
+      <!--庄牌花色-->
+      <attr name="bank_ctype" value_type="string" init_value="none"/>
+      <!--起牌玩家，第一个摸牌的人-->
+      <attr name="init_drawer" value_type="Player" init_value="random"/>
+    </attrs>
+    <end>
+      <lets>
+        <!--进攻方分数<40，防守方赢 -->
+        <let property="@round.winners" value=":(find_players(IsDefender=true))"/>
+        <let property="@round.losers" value=":(find_players(IsDefender=false))"/>
+        <when value_of="@round.attacters[0].Score" ret_lt="40"/>
+      </lets>
+      <lets>
+        <<!--进攻方分数>=40，进攻方赢 -->
+        <let property="@round.winners" value=":(find_players(IsAttacter=true))"/>
+        <let property="@round.losers" value=":(find_players(IsAttacter=false))"/>
+        <when value_of="@round.attacters[0].Score" ret_not_lt="40"/>
+      </lets>
+      
+      <case value_of="@round.winners[0].IsDefender" ret_is="true">
+        <vars>
+          <var name="p1" value_of=":(find_player(IsDefender==true&&IsMainPlayer==true))"/>
+          <var name="p2" value_of=":(find_player(IsDefender==true&&IsMainPlayer==false))"/>
+          <var name="seatid" value_of=":(find_player(IsDefender==true&&IsMainPlayer==true)|player_seatid)"/>
+        </vars>
         
-
-        <block>
-          <!--进攻方赢，攻守角色互换，本轮主打的下家为主打（主防守）-->
-          <block>
-            <find_player var="p1" property="IsMainPlayer" ret_is="true">
-            </find_player>
-            <find_player var="p2" property="seatid" ret_as=":(p1.seatid+1)">         
-            </find_player>
-          </block>
-          <find_player var="p3" property="IsDefender" ret_is="true">        
+        <!--防守方赢 -->
+        <set>
+          <!--交换主打人-->
+          <find_player player_of="#p1">
+            <update property="IsMainPlayer" value="false"/>
           </find_player>
-          <find_player var="p4" property="IsAttacter" ret_is="true">           
-          </find_player>
-          <updates>
-            <players var="p2">
-              <update property="IsMainPlayer" value="true">
-            </players>
-            <players var="p3">
+          <find_player player_of="#p2">
+            <update property="IsMainPlayer" value="true"/>
+          </find_player>     
+          <case value_of="@round.losers[0].Score" ret_is="0">
+            <set>
+              <!--进攻方分数为0，防守方升2级-->
+              <find_players players="@round.winners">
+                <update property="level" operation="inc" value="2"/>
+              </find_players>
+            </set>
+            <else>
+              <!--进攻方分数>0，防守方升1级-->
+              <set>
+                <find_players players="@round.winners">
+                  <update property="level" operation="inc" value="1"/>
+                </find_players>
+              </set>
+            </else>
+          </case>
+        </set>
+        <!--进攻方赢 -->
+        <else>
+          <!--攻守角色互换-->
+          <set>
+            <find_players players="@round.winners">
+              <update property="IsDefender" value="true"/>
+              <update property="IsAttacter" value="false"/>
+            </find_players>
+            <find_players players="@round.losers">
               <update property="IsDefender" value="false"/>
               <update property="IsAttacter" value="true"/>
-            </players>
-            <players var="p4">
-              <update property="IsDefender" value="true"/>
-              <update property="IsAttacter" value="false"/>  
-            </players>
-          </updates>
-        </block>
-
-
-      </case>
-
-      <!--进攻方分数>80，进攻方赢，升2级-->
-      <case property="Score" ret_gt="80">
-        <set_winners>
-          <find_player property="IsAttacter" ret_is="true"/>
-        </set_winnrs>
-        <set_losers>
-          <find_player property="IsDefender" ret_is="true"/>
-        </set_losers>
-        <find_player property="IsAttacter" ret_is="true">
-          <update property="level" operation="inc" value="2"/>
-        </find_player>
-
-        <!--进攻方赢，攻守角色互换，本轮主打的下家为主打（主防守）-->
-        <block>
-          <!--进攻方赢，攻守角色互换，本轮主打的下家为主打（主防守）-->
-          <block>
-            <find_player var="p1" property="IsMainPlayer" ret_is="true">
+              <update property="IsMainPlayer" value="false"/>
+            </find_players>
+            <find_player property="seatid" value="#seatid + 1">
+              <update property="IsMainPlayer" value="true"/>
             </find_player>
-            <find_player var="p2" property="seatid" ret_as=":(p1.seatid+1)">         
-            </find_player>
-          </block>
-          <find_player var="p3" property="IsDefender" ret_is="true">        
-          </find_player>
-          <find_player var="p4" property="IsAttacter" ret_is="true">           
-          </find_player>
-          <updates>
-            <players var="p2">
-              <update property="IsMainPlayer" value="true">
-            </players>
-            <players var="p3">
-              <update property="IsDefender" value="false"/>
-              <update property="IsAttacter" value="true"/>
-            </players>
-            <players var="p4">
-              <update property="IsDefender" value="true"/>
-              <update property="IsAttacter" value="false"/>  
-            </players>
-          </updates>
-        </block>
-
+          </set>
+          <case value_of="@round.winners[0].Score" ret_not_lt="80">
+            <set>
+              <!--进攻方分数>=80，进攻方升2级-->
+              <find_players layers="@round.winners">
+                <update property="level" operation="inc" value="2"/>
+              </find_players>
+            </set>
+            <else>
+              <!--进攻方分数<80，进攻方升1级-->
+              <set>
+                <find_players layers="@round.winners">
+                  <update property="level" operation="inc" value="1"/>
+              </find_players>
+              </set>
+            </else>
+          </case>
+        </else>
       </case>
-    </find_player>
-
-    <!--一轮结束，更新各玩家状态-->
-  </round_winners>
+    </end>
+  </round>
 
   <running>
 
     <!--发牌（摸牌，起牌）-->
     <!--每次一张牌-->
-    <dealcard_loop start_player=":(init_player)" card_number_per_time="1">
+    <dealcard_loop start_player="@round.init_drawer" card_number_per_time="1">
     <!--底牌6张-->
       <case  cards_count_not_deal="6">
         <stoploop/>
       </case>
 
       <!--摸到将牌，可以叫主，前提是还没主-->
-      <case testee="card" cfigure_of="card" ret_as=":(cur_level)">
-        <case testee="round" property="bank_ctype" ret_is="none">
-           <actions timeout_seconds="30" timeout_def_act="pass" to_player="pp" wait_until_player_response="true"> 
+      <cases>
+        <case cfigure_of="@drawn_card" ret_as="@round.cur_level"/>
+        <case value_of="@round.bank_ctype" ret_is="none"/>
+        <actions timeout_seconds="30" timeout_def_act="pass" to_player="pp" > 
             <action act_ref="jiaozhu"/>
             <action act_ref="pass"/>
-          </actions>
-        </case>
-      </case>
+        </actions>
+      </cases>
+      
     </dealcard_loop>
 
     <!--发牌结束，必须有防守方，否则流局，此情况只发生刚开始的几局-->
     <continue_must_test>
-      <case testee="round" property="defenders" ret_is="none">
-        <action act_ref="liuju"/>
+      <case property="@round.defenders" ret_is="none">
+        <actions>
+          <action act_ref="liuju"/>
+          <round_exit/>
+        </actions>
       </case>
     </continue_must_test>
 
@@ -488,47 +394,52 @@
 
     <!--等待主打扣牌-->
     <find_player property="IsMainPlayer" ret_is="true">
-      <actions timeout_seconds="30" timeout_def_act="force_koupai" wait_until_player_response="true" >
+      <actions timeout_seconds="30" timeout_def_act="force_koupai">
         <action act_ref="koupai"/>
         <action act_ref="force_koupai"/>
       </actions>
     </find_player>
 
-
-    <!--进入打牌，从主打开始-->
-    <playcard_loop>
-      <block>
-        <find_player var="p1" property="IsMainPlayer" ret_is="true">
-          <actions timeout_seconds="30" timeout_def_act="force_chupai" wait_until_player_response="true">
+    <var name="trick_init_player" value_of=":(find_player(IsMainPlayer==true))"/>
+    <var name="valid_leading_cards" value="false">
+    <!--进入打牌，从主打开始, 一局结束，主打手里没牌-->
+    <loop_until value_of=":(cards_count_in_player_hand(#trick_init_player))" ret_gt="0">
+      <loop_until value_of="#valid_leading_cards" ret_is="false">
+        <find_player player="#trick_init_player">
+          <actions timeout_seconds="30" timeout_def_act="force_chupai">
             <action act_ref="playcard"/>
             <action act_ref="force_chupai"/>
           </actions>
         </find_player>
-        <wait_play_cards/>
-        <test_valid_leading/>
-        <loop_for i_range="1,2,3">
-          <find_player property="seatid" ret_as=":(p1.seatid+(:(i)))">
-              <actions timeout_seconds="30" timeout_def_act="force_chupai" wait_until_player_response="true">
-                <action act_ref="playcard"/>
-                <action act_ref="force_chupai"/>
-              </actions>
-          </find_player>
-          <wait_play_cards/>
-        </loop_for>
-
-        <!--一局结束，主打手里没牌-->
-        <case>
-          <find_player property="IsMainPlayer" ret_is="true">
-            <case property=":(cards_count_in_player_hand)" ret_is="0">
-              <stoploop/>
-            </case>
-          </find_player>
+        <case is_valid_leading_cards="#trick_init_player.played_cards" ret_is="true">
+          <set property="#valid_leading_cards" value="true">
         </case>
-      </block>
-    </playcard_loop>
+      </loop_until>
+       
+      <loop_for i_range="1,2,3">
+        <var name="valid_following_cards" value="false"/>
+        <var name="follower" value_of=":(find_player(seatid==#trick_init_player.seatid + #i))">
+        <loop_until value_of="#valid_following_cards" ret_is="false">
+          <find_player player="#follower">
+            <actions timeout_seconds="30" timeout_def_act="force_chupai">
+              <action act_ref="playcard"/>
+              <action act_ref="force_chupai"/>
+            </actions>
+          </find_player>
+         
+          <case is_valid_following_cards="#follower.played_cards" ret_is="true">
+            <set property="#valid_following_cards" value="true">
+          </case>
+        </loop_until>
+      </loop_for>
+
+      <set property="trick_init_player" value="@trick.winner"/>
+      <exe ref="@trick.end"/>
+    
+    </loop_until>
   
     <!--出牌结束，确定一局输赢玩家-->
-    <tell_round_winners/>
+    <exe ref="@round.end"/>
 
     <!--广播一局胜负-->
     <publish_round_winners_losers/>
@@ -541,43 +452,34 @@
   <actions>
     <!--叫主-->
     <action name="jiaozhu">
-      <!-- <consequences for_round0="1"></consequences>
-      <consequences for_roundX="1"></consequences> -->
-      <update_round property="jiangpai" value="card">
-      </update_round>
-      <update_card_power>
-        <cards_of_type operation="add" value="+20">
-        <exe_card power="45">
-        <cards_of_figure power="40">
-      </update_card_power>
-
+      <set property="@round.bank_ctype" value_of=":(ctype_of(@token_card))"/>
     </action>
+
     <action name="liuju">
-      <finish_round/>
-      <publish_players message=""/>
+      <publish_players message="liu ju"/>
       <new_round/>
     </action>
-
-    <!-- <aciton name="peng" text="peng">
-      <update_round property="next_player" value="act_exe_player"/>
-    </action> -->
 
     <action name="pass" text="pass">
       <consequences></consequences>
     </action>>
+
     <action name="koupai" text="koupai">
+      <send_cards_to_table cards="@selected_cards"/>
+      <publish_players message="kou pai"/>
     </action>
+
     <action name="chupai" text="chupai">
+      <playcards cards="@selected_cards"/>
     </action>
+
     <action name="force_chupai">
-    </force_chupai>
+      <playcards cards=":(random_pick_cards(count=1))"/>
+    </action>
+
     <action name="force_koupai" text="none" >
-       <consequences>
-         <consequences>
-            <random_pick_cards number="6" as="di"/>
-            <play_cards_to_table cards="di">
-         </consequences>
-       </consequences>
+      <send_cards_to_table cards=":(random_pick_cards(count=6))"/>
+      <publish_players message="kou pai"/>
     </action>
   </actions>
 </game>
