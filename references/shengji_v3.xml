@@ -1,7 +1,9 @@
-<!--terms: round, trick -->
+<?xml version="1.0" encoding="UTF-8"?>
 <!--gtype:M, mahong; P: Poker
+    solo_round: true, 各局状态独立
+                false, 新局状态不复位
 -->
-<game name="shengji" gtype="P">
+<game name="shengji" gtype="P" solo_round="false">
   
   <!--
     sets:牌副数：默认值：1
@@ -171,7 +173,7 @@
   -->
   <following must_follow="true" 
              pattern_ref_as="@trick_init_cards">
-    <var name="leading" value="@trick_init_cards"></alias>
+    <var name="leading" value="@trick_init_cards"/>
     <case cpattern_type_of="@leading" ret_is="@single">
       <case is_player_void_as="@trick_init_cards[0]" ret_is="true">
         <set>
@@ -199,7 +201,7 @@
           <cards cards="c:1,d:1,s:1,h:1" when_void="@any_ctype">
           </cards>
         </set>
-      </eslse>
+      </else>
     </case>
    
    <case cpattern_name_of="@leading" ret_is="shuai">
@@ -244,7 +246,7 @@
         </set>
       </cases>
 
-      <!---最后圈输赢测试 如果attacter win, attacter将获得底牌的分数--->
+      <!-- 最后圈输赢测试 如果attacter win, attacter将获得底牌的分数 -->
       <cases>
         <case value_of=":(player_cards_count_in_hand(@trick_winner))" ret_is="0"/> 
         <case value_of="@trick_winner.IsAttacter" ret_is="true"/>
@@ -260,15 +262,18 @@
   <!--一局-->
   <round>
     <attrs>
-      <attr name="cur_level" value_type="int" init_value="2"/>
-      <attr name="defenders" value_type="list" init_value="none"/>
-      <attr name="attacters" value_type="list" init_value="none"/>
+      <!--
+        reset: 新局是否复位属性，false:不复位；true:复位, 默认值
+      -->
+      <attr name="cur_level" reset="false" value_type="int" init_value="2"/>
+      <attr name="defenders" reset="false" value_type="list" init_value="none"/>
+      <attr name="attacters" reset="false" value_type="list" init_value="none"/>
       <!--庄牌点数-->
-      <attr name="bank_cfigure" value_type="int" init_value="2"/>
+      <attr name="bank_cfigure" reset="false" value_type="int" init_value="2"/>
       <!--庄牌花色-->
-      <attr name="bank_ctype" value_type="string" init_value="none"/>
+      <attr name="bank_ctype" reset="true" value_type="string" init_value="none"/>
       <!--起牌玩家，第一个摸牌的人-->
-      <attr name="init_drawer" value_type="Player" init_value="random"/>
+      <attr name="init_drawer" reset="false" value_type="Player" init_value="random"/>
     </attrs>
     <end>
       <lets>
@@ -278,7 +283,7 @@
         <when value_of="@round.attacters[0].Score" ret_lt="40"/>
       </lets>
       <lets>
-        <<!--进攻方分数>=40，进攻方赢 -->
+        <!--进攻方分数>=40，进攻方赢 -->
         <let property="@round.winners" value=":(find_players(IsAttacter=true))"/>
         <let property="@round.losers" value=":(find_players(IsAttacter=false))"/>
         <when value_of="@round.attacters[0].Score" ret_not_lt="40"/>
@@ -286,20 +291,21 @@
       
       <case value_of="@round.winners[0].IsDefender" ret_is="true">
         <vars>
-          <var name="p1" value=":(find_player(IsDefender==true&&IsMainPlayer==true))"/>
-          <var name="p2" value=":(find_player(IsDefender==true&&IsMainPlayer==false))"/>
-          <var name="seatid" value=":(find_player(IsDefender==true&&IsMainPlayer==true)|player_seatid)"/>
+          <var name="p1" value=":(find_player(IsDefender==true ## IsMainPlayer==true))"/>
+          <var name="p2" value=":(find_player(IsDefender==true ## IsMainPlayer==false))"/>
+          <var name="seatid" value=":(find_player(IsDefender==true ## IsMainPlayer==true)|player_seatid)"/>
         </vars>
         
         <!--防守方赢 -->
         <set>
           <!--交换主打人-->
-          <find_player player="#p1">
+          <find_player player="@p1">
             <update property="IsMainPlayer" value="false"/>
           </find_player>
-          <find_player player="#p2">
+          <find_player player="@p2">
             <update property="IsMainPlayer" value="true"/>
-          </find_player>     
+          </find_player> 
+           
           <case value_of="@round.losers[0].Score" ret_is="0">
             <set>
               <!--进攻方分数为0，防守方升2级-->
@@ -316,6 +322,10 @@
               </set>
             </else>
           </case>
+
+          <update property="@round.cur_level" value="@round.winners[0].level"/>   
+          <update property="@round.init_drawer" value="@p2"/>
+
         </set>
         <!--进攻方赢 -->
         <else>
@@ -330,7 +340,7 @@
               <update property="IsAttacter" value="true"/>
               <update property="IsMainPlayer" value="false"/>
             </find_players>
-            <find_player property="seatid" value="#seatid + 1">
+            <find_player property="seatid" value="@seatid + 1">
               <update property="IsMainPlayer" value="true"/>
             </find_player>
           </set>
@@ -401,7 +411,7 @@
     <var name="trick_init_player" value=":(find_player(IsMainPlayer==true))"/>
     <var name="valid_leading_cards" value="false"/>
     <!--进入打牌，从主打开始, 一局结束，主打手里没牌-->
-    <loop_until value_of=":(cards_count_in_player_hand(#trick_init_player))" ret_gt="0">
+    <loop_until value_of=":(cards_count_in_player_hand(@trick_init_player))" ret_gt="0">
       <loop_until value_of="@valid_leading_cards" ret_is="false">
         <find_player player="@trick_init_player">
           <actions timeout_seconds="30" timeout_def_act="force_chupai">
@@ -416,7 +426,7 @@
        
       <loop_for i_range="1,2,3">
         <var name="valid_following_cards" value="false"/>
-        <var name="follower" value=":(find_player(seatid==@trick_init_player.seatid + @i))">
+        <var name="follower" value=":(find_player(seatid==@trick_init_player.seatid + @i))"/>
         <loop_until value_of="@valid_following_cards" ret_is="false">
           <find_player player="@follower">
             <actions timeout_seconds="30" timeout_def_act="force_chupai">
@@ -426,7 +436,7 @@
           </find_player>
          
           <case is_valid_following_cards="@follower.played_cards" ret_is="true">
-            <set property="@valid_following_cards" value="true">
+            <set property="@valid_following_cards" value="true"/>
           </case>
         </loop_until>
       </loop_for>

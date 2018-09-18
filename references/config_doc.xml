@@ -1,4 +1,4 @@
-<!--terms: round, trick --->
+<!--terms: round, trick -->
 <game name="shengji">
   <!--Poker: 
             术语：bid: 叫牌
@@ -69,9 +69,16 @@
                                               
               特例：
               single(n): 单牌, <=> same_cfigure(x,1)
-              pair(n): 对子    <=> same_cfigure(x,2)
-              triple(n): 三张，相同Figure <=> same_cfigure(x,3)
+              <single ctype="*" cfigure="1" power="14"></single>
+              
+              pair(n): 对子    <=> same_cfigure(x,2)  
+              <pair ctype="*" cfigure="1" power="14"/>
+              
+              triple(n): 三张，相同Figure <=> same_cfigure(x,3) 
+              <triple ctype="*" cfigure="1" power="14"/>
               quad(n): 四张，相同Figure  <=> same_cfigure(x,4)
+              <quad ctype="*" cfigure="2" power="115"/>
+              
               用法：
               <same_cfigure cards_var="var_x", count="n">
 
@@ -93,8 +100,9 @@
                    seq(x,y:ctype) 从x开始，个数无限制, y>2 ,同花色，花色确定
                    seq(x,y:x) 从x开始，个数无限制, y>2 ,同花色，花色任意
                    seq(x,y[:ctype]|x约束，约束)
-                   seq(m,n,j,...[:ctype/x]) //（同花色）确定的连牌，m,n,j数字递增。
-
+                   seq(m,n,j,...[:ctype|x]) //（同花色）确定的连牌，m,n,j数字递增。
+                   
+              <seq start_cfigure="-" min_len="2" max_len="*" ctype="*" />
               特例：
               //同花色连牌
               seq_x   //任意花色
@@ -111,6 +119,8 @@
                 示例:
                     seqm(2|1,2,3)   11,22,33
                     seqm(3|3,4) 333,444
+                    
+               <seqm m="2" start_cfigure="3" min_len="3" max_len="*" power=":(cfigure_of(max_cfigure_of(@cards)))"></seqm>
 
               ****牌型组
               comp(m,n,k,.....): 牌型组，m,n,k确定，但无约束
@@ -145,6 +155,8 @@
       cfigure_as
       min_cfigure_of(cards)   //取x表示的变量的最小牌点数
       max_cfigure_of(cards)   //取x表示的变量的最大牌点数
+      distinct_cfigures(cards)
+      distinct_cfigures_of(cards)
 
       取花色：
       ctype_of, 用于属性名  ctype(m)，用于属性值
@@ -170,6 +182,9 @@
       取数组,列表的元素
       cards[0]
 
+      取列表长度
+      count_of: 列表中的元素不一定是single card
+      
       //取得cards的花色个数
       ctype_count_of(card)    
       ctype_count_of(cards)
@@ -431,10 +446,19 @@
     <find_player player="@trick.max_power_player">
     </find_player>
 
+    <find_players property="IsAttacter" ret_is="true"> 
+      </find_player>
+
+
     <let property="@round.winners" value=":(find_players(IsDefender=true))"/>
+    
+     <must power_of="@cards" ret_gt="@prev_cards"/>
 
+    ##: && 条件与
 
-
+    valid_as : 节点是否有效
+    <action act_ref="jiaodizhu-50" valid_as="@j50Avail" />
+    
   -->
   
 </game>
