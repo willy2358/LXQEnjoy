@@ -1,11 +1,12 @@
 <!--terms: round, trick -->
-<game name="shengji">
+<!--gtype:M, mahong; P: Poker
+-->
+<game name="shengji" gtype="P">
   
   <!--
-    type:类型
     sets:牌副数：默认值：1
   -->
-  <cards type="M/P" sets="1">
+  <cards sets="1">
     <!--去牌
     valid: 节点是否生效，true：生效, 默认值；false: 无效-->
     <excludes valid="false">
@@ -42,10 +43,10 @@
        由于牌的power由牌的组合方式确定，而牌在打出后组合方式才确定，所以，牌的power在牌打出后，由服务器计算玩家出牌的power.
     -->
     <patterns>
-      <aliases>
-        <alias name="card" ref="card_played_out"/>
-        <alias name="cards" ref="cards_played_out"/>
-      </aliases>
+      <vars>
+        <var name="card" value="@card_played_out"/>
+        <var name="cards" value="@cards_played_out"/>
+      </vars>
       <!--单牌-->
       <static_power>    
         <single ctype="*" cfigure="1" power="14"/>
@@ -62,8 +63,8 @@
         <single ctype="*" cfigure="12" power="12" />
         <single ctype="*" cfigure="13" power="13" />
 
-        <single ctype="j" cfigure="21" power="50" power_range="50"/>
-        <single ctype="j" cfigure="22" power="51" power_range="51"/>
+        <single ctype="j" cfigure="21" power="50"/>
+        <single ctype="j" cfigure="22" power="51"/>
       </static_power>
 
       <runtime_power>
@@ -119,7 +120,7 @@
         </comp>
 
         <!--甩牌, 同色，多张-->
-        <same_ctype name="shuai" power=":(max_power_of(cards))">
+        <same_ctype name="shuai" power=":(max_power_of(@cards))">
           <let property="@cards.leading" value="true">
             <when>            
               <!--不能有主牌数字-->
@@ -170,7 +171,7 @@
   -->
   <following must_follow="true" 
              pattern_ref_as="@trick_init_cards">
-    <alias name="leading" ref="@trick_init_cards"></alias>
+    <var name="leading" value="@trick_init_cards"></alias>
     <case cpattern_type_of="@leading" ret_is="@single">
       <case is_player_void_as="@trick_init_cards[0]" ret_is="true">
         <set>
@@ -226,7 +227,7 @@
   <!--一圈-->
   <trick>
     <!--通常情况下是出最大牌的player-->
-    <winner alias_as="trick_winner">
+    <winner var_as="trick_winner">
       <find_player player="@trick.max_power_player">
       </find_player>
     </winner>
@@ -258,7 +259,6 @@
 
   <!--一局-->
   <round>
-    <alias />
     <attrs>
       <attr name="cur_level" value_type="int" init_value="2"/>
       <attr name="defenders" value_type="list" init_value="none"/>
@@ -286,18 +286,18 @@
       
       <case value_of="@round.winners[0].IsDefender" ret_is="true">
         <vars>
-          <var name="p1" value_of=":(find_player(IsDefender==true&&IsMainPlayer==true))"/>
-          <var name="p2" value_of=":(find_player(IsDefender==true&&IsMainPlayer==false))"/>
-          <var name="seatid" value_of=":(find_player(IsDefender==true&&IsMainPlayer==true)|player_seatid)"/>
+          <var name="p1" value=":(find_player(IsDefender==true&&IsMainPlayer==true))"/>
+          <var name="p2" value=":(find_player(IsDefender==true&&IsMainPlayer==false))"/>
+          <var name="seatid" value=":(find_player(IsDefender==true&&IsMainPlayer==true)|player_seatid)"/>
         </vars>
         
         <!--防守方赢 -->
         <set>
           <!--交换主打人-->
-          <find_player player_of="#p1">
+          <find_player player="#p1">
             <update property="IsMainPlayer" value="false"/>
           </find_player>
-          <find_player player_of="#p2">
+          <find_player player="#p2">
             <update property="IsMainPlayer" value="true"/>
           </find_player>     
           <case value_of="@round.losers[0].Score" ret_is="0">
@@ -337,14 +337,14 @@
           <case value_of="@round.winners[0].Score" ret_not_lt="80">
             <set>
               <!--进攻方分数>=80，进攻方升2级-->
-              <find_players layers="@round.winners">
+              <find_players players="@round.winners">
                 <update property="level" operation="inc" value="2"/>
               </find_players>
             </set>
             <else>
               <!--进攻方分数<80，进攻方升1级-->
               <set>
-                <find_players layers="@round.winners">
+                <find_players players="@round.winners">
                   <update property="level" operation="inc" value="1"/>
               </find_players>
               </set>
@@ -378,17 +378,15 @@
     </dealcard_loop>
 
     <!--发牌结束，必须有防守方，否则流局，此情况只发生刚开始的几局-->
-    <continue_must_test>
-      <case property="@round.defenders" ret_is="none">
-        <actions>
-          <action act_ref="liuju"/>
-          <round_exit/>
-        </actions>
-      </case>
-    </continue_must_test>
+    <case property="@round.defenders" ret_is="none">
+      <actions>
+        <action act_ref="liuju"/>
+        <round_exit/>
+      </actions>
+    </case>
 
     <!--底牌归于主打-->
-    <find_player roperty="IsMainPlayer" ret_is="true">
+    <find_player property="IsMainPlayer" ret_is="true">
       <deal_table_cards/>
     </find_player>
 
@@ -400,35 +398,35 @@
       </actions>
     </find_player>
 
-    <var name="trick_init_player" value_of=":(find_player(IsMainPlayer==true))"/>
-    <var name="valid_leading_cards" value="false">
+    <var name="trick_init_player" value=":(find_player(IsMainPlayer==true))"/>
+    <var name="valid_leading_cards" value="false"/>
     <!--进入打牌，从主打开始, 一局结束，主打手里没牌-->
     <loop_until value_of=":(cards_count_in_player_hand(#trick_init_player))" ret_gt="0">
-      <loop_until value_of="#valid_leading_cards" ret_is="false">
-        <find_player player="#trick_init_player">
+      <loop_until value_of="@valid_leading_cards" ret_is="false">
+        <find_player player="@trick_init_player">
           <actions timeout_seconds="30" timeout_def_act="force_chupai">
             <action act_ref="playcard"/>
             <action act_ref="force_chupai"/>
           </actions>
         </find_player>
-        <case is_valid_leading_cards="#trick_init_player.played_cards" ret_is="true">
-          <set property="#valid_leading_cards" value="true">
+        <case is_valid_leading_cards="@trick_init_player.played_cards" ret_is="true">
+          <set property="@valid_leading_cards" value="true"/>
         </case>
       </loop_until>
        
       <loop_for i_range="1,2,3">
         <var name="valid_following_cards" value="false"/>
-        <var name="follower" value_of=":(find_player(seatid==#trick_init_player.seatid + #i))">
-        <loop_until value_of="#valid_following_cards" ret_is="false">
-          <find_player player="#follower">
+        <var name="follower" value=":(find_player(seatid==@trick_init_player.seatid + @i))">
+        <loop_until value_of="@valid_following_cards" ret_is="false">
+          <find_player player="@follower">
             <actions timeout_seconds="30" timeout_def_act="force_chupai">
               <action act_ref="playcard"/>
               <action act_ref="force_chupai"/>
             </actions>
           </find_player>
          
-          <case is_valid_following_cards="#follower.played_cards" ret_is="true">
-            <set property="#valid_following_cards" value="true">
+          <case is_valid_following_cards="@follower.played_cards" ret_is="true">
+            <set property="@valid_following_cards" value="true">
           </case>
         </loop_until>
       </loop_for>

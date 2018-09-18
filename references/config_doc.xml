@@ -419,6 +419,8 @@
 
     变量：
     定义：
+      <var name="p1" value="@card_played_out"/>
+      <var name="p1" value="none"/>
        var="p1", 字母，数字，下划线
     引用变量或关键词:@p1, @trick_winner
     
@@ -430,6 +432,9 @@
     </find_player>
 
     <let property="@round.winners" value=":(find_players(IsDefender=true))"/>
+
+
+
   -->
   
 </game>
