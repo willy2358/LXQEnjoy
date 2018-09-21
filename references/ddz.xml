@@ -26,7 +26,9 @@
       <pair cfigure="2" power="15"/>
 
       <!--两王-->
-      <pair ctype="j" power="1000"></pair>
+      <pair name="zha" ctype="j" power="1000">
+        <set property="@round.stake" operation="times" value="2"/>
+      </pair>
 
       <!--三张-->
       <triple power=":(cfigure_of(@cards[0]))"/>
@@ -34,9 +36,15 @@
       <triple cfigure="2" power="15"/>
 
       <!--炸弹-->
-      <quad power=":(cfigure_of(@cards[0]) + 100)"/>
-      <quad cfigure="1" power="114" />
-      <quad cfigure="2" power="115" />
+      <quad name="zha" power=":(cfigure_of(@cards[0]) + 100)">
+        <set property="@round.stake" operation="times" value="2"/>
+      </quad>
+      <quad name="zha" cfigure="1" power="114" >
+        <set property="@round.stake" operation="times" value="2"/>
+      </quad>
+      <quad name="zha" cfigure="2" power="115" >
+        <set property="@round.stake" operation="times" value="2"/>
+      </quad>
 
       <!--串-->
       <seq start_cfigure="3" min_count="5" power=":(cfigure_of(max_cfigure_of(@cards)))"></seq>
@@ -128,6 +136,35 @@
       <attr name="stake" value_type="int" init_value="5"/>
     </attrs>
     <end>
+      <case property="@round.winners[0].IsPoor" ret_is="true">
+        <clear property="@round.winners"></clear>
+        <find_players players=":(players_of(@IsPoor==true))" value="true">
+          <set property="@round.winners" value="@players"></set>
+        </find_players>
+        <set property="@round.losers" value_of=":(find_player(@IsRich==true))"/>
+      
+        <find_players players="@round.winners">
+          <set property="@player.win_score" value="@round.stake"></set>
+        </find_players>
+        
+        <find_player player="@round.loser[0]">
+          <set property="@player.lose_score" value=":(@round.stake * 2)"></set>
+        </find_player>
+      </case>
+    
+      <case property="@round.winners[0].IsRich" ret_is="true">
+        <find_players players=":(players_of(@IsPoor==true))">
+          <set property="@round.losers" value="@players"></set>
+        </find_players>
+      
+        <find_players players="@round.losers">
+          <set property="@player.lose_score" value="@round.stake"></set>
+        </find_players>
+        
+        <find_player player="@round.winners[0]">
+          <set property="@player.win_score" value="@round.stake * 2"></set>
+        </find_player>
+      </case>
     </end>
   </round>
 
@@ -142,13 +179,14 @@
     </dealcard_loop>
 
     <set property="@round.cur_player" value="@round.init_drawer"/>
-    <set property="@round.call_order" value="0">
+    <set property="@round.call_order" value="0"/>
     <loop_until>
-      <stop_cases ttype="or">
+      <cases ttype="or">
         <case value_of="@round.stake" ret_is="100"/>
-        <case value_of="round.call_order" ret_gt="3">
-      </stop_cases>
-      <set property="@round.call_order" value="@round.call_order + 1">
+        <case value_of="round.call_order" ret_gt="3"/>
+        <exit_loop></exit_loop>
+      </cases>
+      <set property="@round.call_order" value="@round.call_order + 1"/>
       <find_player player="@round.cur_player">
         <actions timeout_seconds="30" timeout_def_act="bujiao">
           <action act_ref="bujiao"/>
@@ -166,54 +204,39 @@
       </cases>
     </loop_until>
 
-    <var name="trick_init_player" value=":(find_player(IsMainPlayer==true))"/>
-    <var name="valid_leading_cards" value="false"/>
 
-    <loop_until value_of=":(cards_count_in_player_hand(@trick_init_player))" ret_gt="0">
-      <loop_until value_of="@valid_leading_cards" ret_is="false">
-        <find_player player="@trick_init_player">
-          <actions timeout_seconds="30" timeout_def_act="force_chupai">
-            <action act_ref="playcard"/>
-            <action act_ref="force_chupai"/>
+    <set property="@trick.cur_player" value="@round.landlord"/>
+    <loop_until count_of="@round.winners" ret_is="0">    
+      <set property="@trick.holder" value="none"/>
+      <find_player>
+        <actions timeout_seconds="30" timeout_def_act="chupai">
+            <action act_ref="chupai"/>
+          </actions>
+      </find_player>
+
+      <loop_until>
+        <case value_of="@trick.holder" ret_as="@trick.cur_player">
+          <exit_loop/>
+        </case>
+        <find_player player=":(next_player_of(@trick.cur_player))">
+          <set property="@trick.cur_player" value="@player"/>    
+        </find_player>
+
+        <find_player player="@trick.cur_player">
+          <actions timeout_seconds="30" timeout_def_act="yaobuqi">
+            <action act_ref="yaobuqi"></action>
+            <action act_ref="chupai"></action>
           </actions>
         </find_player>
-        <case is_valid_leading_cards="@trick_init_player.played_cards" ret_is="true">
-          <set property="@valid_leading_cards" value="true"/>
-        </case>
       </loop_until>
-
-      <loop_for i_range="1,2,3">
-        <var name="valid_following_cards" value="false"/>
-        <var name="follower" value=":(find_player(seatid==@trick_init_player.seatid + @i))"/>
-        <loop_until value_of="@valid_following_cards" ret_is="false">
-          <find_player player="@follower">
-            <actions timeout_seconds="30" timeout_def_act="force_chupai">
-              <action act_ref="playcard"/>
-              <action act_ref="force_chupai"/>
-            </actions>
-          </find_player>
-
-          <case is_valid_following_cards="@follower.played_cards" ret_is="true">
-            <set property="@valid_following_cards" value="true"/>
-          </case>
-        </loop_until>
-      </loop_for>
-
-      <set property="trick_init_player" value="@trick.winner"/>
-      <exe ref="@trick.end"/>
-
     </loop_until>
-
 
     <exe ref="@round.end"/>
 
-
     <publish_round_winners_losers/>
-
 
     <publish_total_scores/>
   </running>
-
 
   <actions>
 
@@ -231,9 +254,20 @@
     </action>
 
     <action name="pass" text="bujiao">
-      
-    </action>>
 
+    </action>>
     
+    <action name="chupai" text="chupai" player="@player">
+      <set property="@trick.holder" value="@player"/>
+      <case property=":(player_cards_count_in_hand(@player))" ret_is="0">
+        <add property="@round.winners" value="@player"></add>
+      </case>
+    </action>
+    
+    <action name="yaobuqi" text="yaobuqi">
+
+    </action>
+
+  </actions>
 
 </game>

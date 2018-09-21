@@ -1,15 +1,29 @@
 <!--terms: round, trick -->
 <game name="shengji">
   <!--Poker: 
-            术语：bid: 叫牌
+            术语：bid: 叫牌/押注
                  draw: 摸牌
                  overbid:造反
+                 play: 出牌
+
                  trick: 一圈
                  round: 一局，从玩家拿到牌到决出胜负玩家，一局由一圈或多圈组成
                  void: 绝牌，没有一门牌
                  rank: 牌点
                  suit: 花色
+                 scene: 场合，几个玩家从开始到有一个或多个玩家退出的期间,这期间玩家没有变化，有时候一局结束，会影响scene的属性
+              
+            内建属性：
+            @round.winners
+            @round.losers
+            @round.cur_player   正在等待执行命令的玩家
 
+            @trick.winner
+
+            @player.round_won_token
+            @player.round_lost_token
+            @player.scene_won_token
+            @player.scene_lost_token
 
 
             约定：m,n,k: 有确定数字， x,y,z无确定数字，在程序运行时确定。
@@ -19,56 +33,57 @@
             xs,ys,zs：多张，不确定牌
 
             **牌色
-              ctype: s:spade, h:heart, c:club,d:diamond
+              ctype: 
+                s:spade, 
+                h:heart, 
+                c:club,
+                d:diamond；
+                j:joker
+
               方法：
-              ctype_of(x)   
-              如果x为列表，有时候取任意一个，有时候遍历每一个。
-              用法：1）ctype_of="x" //取花色
-                    2）value="ctype_of, x" //取花色，并赋值于value
-                  *）取花色
-                  *）取花色，判定
-                  *）将花色，赋值于变量
-                  *）取变量的花色
-                  *) 花色相同判定
-                  
+              ctype_of(card)    //取一张牌的花色
+              
+              用法：1）ctype_of="@x"            //取花色, 一般用于判断
+                    2）value=":(ctype_of(@x))" //取花色，并赋值于value
+
+                  *）取变量的花色，判定
+                  *）将变量的花色，赋值于变量
                   
             **牌点
               cfigure: 牌的数字, 1 - 13（A - K)，21, jm：Joker Moon 小王;  22, js：Joker Sun 大王， 
               方法：
-              cfigure_of(x)
-              min_cfigure_of(xs)   //取x表示的变量的最小牌点数
-              max_cfigure_of(xs)   //取x表示的变量的最大牌点数
-              用法：1）cfigure_of="x" //取x的点数
-                    2) value="cfigure_of,x" //取x的点数，并赋值给value
+              cfigure_of(card)
+              min_cfigure_of(cards)   //取x表示的变量的最小牌点数
+              max_cfigure_of(cards)   //取x表示的变量的最大牌点数
+              用法：1）cfigure_of="@x" //取x的点数
+                    2) value=":(cfigure_of(@x))" //取x的点数，并赋值给value
                     3）min_cfigure_of="xs"
-                    4) value="min_cfigure_of,xs"
+                    4) value=":(min_cfigure_of(@xs))"
                     5) max_cfigure_of="xs"
-                    6) value="max_cfigure_of,xs"
-
-                  *）取牌点
-                  *）取牌点，判定
-                  *）将牌点，赋值于变量
-                  *）取变量的牌点
-                  *) 点数相等判定
+                    6) value=":(max_cfigure_of(@xs))"
+                    7) cfigures="1,3,5" //牌点数列
 
             **牌面
-              card: 表示法：ctype(一个字符）-cfigure，中间无横线"-"
+              card: 表示法：ctype(一个字符)-cfigure，中间无横线"-"
                     c1-c13
                     d1-d13
                     h1-h13
                     s1-s13
-                    j1,j2, 小王，大王
+                    j21,j22, 小王，大王
         
             **牌型
               ****同点
               通式：same_cfigure(x,n)  ：泛指有n个牌同点，x：牌的点数未确定，
+              用法：
+              <same_cfigure cfigure="*", count="n">
+
               示例: 
                 same_cfigure(2,4), 4个2；
                 same_cfigure(5,2), 2个5
                 same_cfigure(x,3), 任意点数牌3张，3张同点
                                               
               特例：
-              single(n): 单牌, <=> same_cfigure(x,1)
+              single(n)牌, <=> same_cfigure(x,1)
               <single ctype="*" cfigure="1" power="14"></single>
               
               pair(n): 对子    <=> same_cfigure(x,2)  
@@ -76,24 +91,34 @@
               
               triple(n): 三张，相同Figure <=> same_cfigure(x,3) 
               <triple ctype="*" cfigure="1" power="14"/>
+
               quad(n): 四张，相同Figure  <=> same_cfigure(x,4)
               <quad ctype="*" cfigure="2" power="115"/>
               
-              用法：
-              <same_cfigure cards_var="var_x", count="n">
-
+              
               ****同色，同花色牌
               通式：same_ctype(x)     //x表示的牌都是同花色
                    same_ctype(x:ctype)  //x表示的牌都是ctype的牌     
                    same_ctype(x|n) x表示的牌中，有n个是同花色
                    same_ctype(x:ctype|n) x表示的牌中，有n个是花色是ctype
                    same_ctype(m,n,k,...[:ctype]|n)
+              用法:
+              <same_type ctype="*" count="*"/> //任意个数的同花色牌
+              <same_type ctype="*" count="n"/> //n个同花色牌
+              <same_type ctype="*" cfigures="1,2,4"/> //同花色的指定牌点
 
               特例：
               same_heart(x)  <=> same_ctype(x,"h")
+              用法:<same_heart count="n"/>
+
               same_diamond(x)  <=> same_ctype(x,"d")
+              用法:<same_diamond count="n"/>
+
               same_club(x) <=> same_ctype(x,"c")
+              用法:<same_club count="n"/>
+
               same_spade(x) <=> same_ctype(x, "s")
+              用法:<same_spade count="n"/>
 
               ****连牌  
               通式：seq(x,y) 从x开始，个数无限制, y>2 ,不必同花色
@@ -122,9 +147,9 @@
                     
                <seqm m="2" start_cfigure="3" min_len="3" max_len="*" power=":(cfigure_of(max_cfigure_of(@cards)))"></seqm>
 
-              ****牌型组
+              *牌型组
               comp(m,n,k,.....): 牌型组，m,n,k确定，但无约束
-              comp(x|y) : y张任意牌, x的约束在由y描述，支持&&,||
+              comp(x|y) : y牌, x的约束在由y描述，支持&&,||
               comp(x,y,z[,u,v,w]|constraints)
               comp(xx,yyy,zzzz)
               comp(mmm,nn,k)
@@ -140,7 +165,7 @@
                                     constraint_param_2="y的约束" 
                                     constraint_param_3="z的约束"/>
 
-              ****牌型操作：
+              *牌型操作：
                 cpattern_of(x)
                 cpattern_of(xs)
 
@@ -257,6 +282,9 @@
 
       player_cards_in_hand()
       player_cards_count_in_hand()  return number
+      
+      next_player_of(@player)
+      next_players_of(@player)  return list of players
 
 
       //底牌
@@ -459,6 +487,15 @@
     valid_as : 节点是否有效
     <action act_ref="jiaodizhu-50" valid_as="@j50Avail" />
     
+    <exit_loop></exit_loop>
+    
+    数组操作：
+    set 整体更新
+    add
+    clear
+	
+    非数组操作
+    set
   -->
   
 </game>
