@@ -82,14 +82,14 @@
   -->
   <following must_follow="false"
              pattern_ref_as="@prev_cards">
-    <case cpattern_type_of="@prev_cards" ret_as="@zha">
+    <case value_of=":(cpattern_type_of(@prev_cards))" ret_as="@zha">
       <cards>
         <property cpattern_type_of="@cards" ret_as="@zha"/>
         <property power_of="@cards" ret_gt="@prev_cards"/>
       </cards>
     </case>
 
-    <case cpattern_type_of="@prev_cards" ret_not_as="@zha">
+    <case value_of=":(cpattern_type_of(@prev_cards))" ret_not_as="@zha">
       <cases ttype="or">
         <case>
           <cards cpattern_type_of="@cards" ret_as="@zha"/>
@@ -137,11 +137,11 @@
     </attrs>
     <end>
       <case property="@round.winners[0].IsPoor" ret_is="true">
-        <clear property="@round.winners"></clear>
+        <set property="@round.winners" operation="clear"></set>
         <find_players players=":(players_of(@IsPoor==true))" value="true">
           <set property="@round.winners" value="@players"></set>
         </find_players>
-        <set property="@round.losers" value_of=":(find_player(@IsRich==true))"/>
+        <set property="@round.losers" value=":(find_player(@IsRich==true))"/>
       
         <find_players players="@round.winners">
           <set property="@player.win_score" value="@round.stake"></set>
@@ -152,7 +152,7 @@
         </find_player>
       </case>
     
-      <case property="@round.winners[0].IsRich" ret_is="true">
+      <case value_of="@round.winners[0].IsRich" ret_is="true">
         <find_players players=":(players_of(@IsPoor==true))">
           <set property="@round.losers" value="@players"></set>
         </find_players>

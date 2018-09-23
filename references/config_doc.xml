@@ -13,19 +13,8 @@
                  suit: 花色
                  scene: 场合，几个玩家从开始到有一个或多个玩家退出的期间,这期间玩家没有变化，有时候一局结束，会影响scene的属性
               
-            内建属性：
-            @round.winners
-            @round.losers
-            @round.cur_player   正在等待执行命令的玩家
-
-            @trick.winner
-
-            @player.round_won_token
-            @player.round_lost_token
-            @player.scene_won_token
-            @player.scene_lost_token
-
-
+            
+          
             约定：m,n,k: 有确定数字， x,y,z无确定数字，在程序运行时确定。
             card, c:单张，确定牌
             x,y,z ：单张，不确定牌
@@ -41,10 +30,15 @@
                 j:joker
 
               方法：
+              ctype
               ctype_of(card)    //取一张牌的花色
+              ctypes
+              ctype_count_of(cards) //取几张牌的牌色个数
               
-              用法：1）ctype_of="@x"            //取花色, 一般用于判断
+              用法： 1）ctype_of="@x"            //取花色, 一般用于判断
                     2）value=":(ctype_of(@x))" //取花色，并赋值于value
+                    3) ctypes="c,d,h,s,j"
+                    4) ctype="-|*|c|d|h|s|j"
 
                   *）取变量的花色，判定
                   *）将变量的花色，赋值于变量
@@ -52,9 +46,13 @@
             **牌点
               cfigure: 牌的数字, 1 - 13（A - K)，21, jm：Joker Moon 小王;  22, js：Joker Sun 大王， 
               方法：
+              cfigure
               cfigure_of(card)
               min_cfigure_of(cards)   //取x表示的变量的最小牌点数
               max_cfigure_of(cards)   //取x表示的变量的最大牌点数
+              cfigures
+              cfigure_count_of(cards) //取得cards的牌点数
+
               用法：1）cfigure_of="@x" //取x的点数
                     2) value=":(cfigure_of(@x))" //取x的点数，并赋值给value
                     3）min_cfigure_of="xs"
@@ -70,6 +68,9 @@
                     h1-h13
                     s1-s13
                     j21,j22, 小王，大王
+              用法：
+              cards="c1,d2,j1"
+              cards="c:1,d:1,s:1,h:1" : c,d,s,h 各1张，点数无限定 
         
             **牌型
               ****同点
@@ -94,10 +95,9 @@
 
               quad(n): 四张，相同Figure  <=> same_cfigure(x,4)
               <quad ctype="*" cfigure="2" power="115"/>
-              
-              
+                 
               ****同色，同花色牌
-              通式：same_ctype(x)     //x表示的牌都是同花色
+              通式：same_ctype(x), sctype   //x表示的牌都是同花色
                    same_ctype(x:ctype)  //x表示的牌都是ctype的牌     
                    same_ctype(x|n) x表示的牌中，有n个是同花色
                    same_ctype(x:ctype|n) x表示的牌中，有n个是花色是ctype
@@ -108,16 +108,16 @@
               <same_type ctype="*" cfigures="1,2,4"/> //同花色的指定牌点
 
               特例：
-              same_heart(x)  <=> same_ctype(x,"h")
+              same_heart(x)，mhearts  <=> same_ctype(x,"h")
               用法:<same_heart count="n"/>
 
-              same_diamond(x)  <=> same_ctype(x,"d")
+              same_diamond(x), mdiamonds  <=> same_ctype(x,"d")
               用法:<same_diamond count="n"/>
 
-              same_club(x) <=> same_ctype(x,"c")
+              same_club(x), mclubs <=> same_ctype(x,"c")
               用法:<same_club count="n"/>
 
-              same_spade(x) <=> same_ctype(x, "s")
+              same_spade(x), mspades <=> same_ctype(x, "s")
               用法:<same_spade count="n"/>
 
               ****连牌  
@@ -131,10 +131,10 @@
               特例：
               //同花色连牌
               seq_x   //任意花色
-              seq_heart
-              seq_diamond
-              seq_spade
-              seq_club
+              seq_heart, shearts
+              seq_diamond, sdiamonds
+              seq_spade, sspade
+              seq_club,  sclubs
                 *******多重数字连牌
                 通式：seqm(m|x,y) 从x开始，个数无限制, y>2 ,不必同花色
                     seqm(m|x,y:ctype) 从x开始，个数无限制, y>2 ,同花色，花色确定，只有多副牌时才会出现
@@ -146,53 +146,116 @@
                     seqm(3|3,4) 333,444
                     
                <seqm m="2" start_cfigure="3" min_len="3" max_len="*" power=":(cfigure_of(max_cfigure_of(@cards)))"></seqm>
+              
+              ****同型组
+              qgroup(pattern, start_cfigure, min_len, max_len, ctype, cfigure) 
+                  //start_cfigure,min_len, max_len, ctype, cfigure 是pattern的通用约束，
+              用法：
+                <qgroup start_cfigure="" min_len="", max_len="" ctype="" cfigure="">
+                  <single/>
+                </qgroup>
 
-              *牌型组
-              comp(m,n,k,.....): 牌型组，m,n,k确定，但无约束
-              comp(x|y) : y牌, x的约束在由y描述，支持&&,||
-              comp(x,y,z[,u,v,w]|constraints)
-              comp(xx,yyy,zzzz)
-              comp(mmm,nn,k)
-              comp(mm,n, xxxx)
-              使用示例：
-              <comp params="x,y,z" constraint_param_1="x的约束" 
-                                    constraint_param_2="y的约束" 
-                                    constraint_param_3="z的约束"/>
-              <comp params="xx,yyy,z" constraint_param_1="x的约束" 
-                                    constraint_param_2="y的约束" 
-                                    constraint_param_3="z的约束"/>
-              <comp params="3,yy,z" constraint_param_1="none" 
-                                    constraint_param_2="y的约束" 
-                                    constraint_param_3="z的约束"/>
+                <qgroup start_cfigure="" min_len="", max_len="" ctype="" cfigure="">
+                  <pair/>
+                </qgroup>
 
+              ****牌型组
+              comp(p1, p2, p3,...)
+              <comp>
+                <triple/>
+                <single/>    
+              </comp>
+
+              <comp>
+                <qgroup/>
+                <single/>    
+              </comp>
+              
               *牌型操作：
-                cpattern_of(x)
+                cpattern_of(cards)
                 cpattern_of(xs)
 
-                *) 取牌型
-                *) 牌型相同判定
+                cpattern_name_of(cards)  //取牌型的名称，返回：name(string), none
+                cpattern_type_of(cards)  //取牌型的类型，返回，pattern, none
+                is_same_pattern(cards1, cards2) //牌型相同判定, 返回: true/false
+
+        内建属性：
+
+            @card.power
+            @cards.power
+
+            @drawn_card  :摸到的一张牌
+            @drawn_cards :摸到的牌（有可能是一张）
+            @cur_player  :正在等待执行命令的玩家, 与@round.cur_player同
+
+            @round.winners
+            @round.losers
+            @round.cur_player   正在等待执行命令的玩家
+            @round.played_cards //已经打出的所有牌，不包括底牌
+            @round.table_cards  //在桌面上的牌，包括底牌，有时候与@round.played_cards相同
+            @round.handing_cards //还未打出的牌
+
+
+            @trick.winner
+            @trick.played_cards 一圈打出的所有牌
+            @trick.init_player //起始出牌玩家
+            @trick.init_cards  //起始的出牌
+            @trick.max_power_player 
+
+            @player.round_won_token
+            @player.round_lost_token
+            @player.scene_won_token
+            @player.scene_lost_token
+            @player.played_cards         //一次打出的牌
+            @player.played_history_cards //打出的历史牌
+            @player.cards_in_hand
+            @player.exed_cmd             //执行的命令
+
+        关键词：
+            @score_cards
+            方法：
+            is_contain_score_cards(cards)
+            is_score_card(card)
+
+            @prev_player 上家
+            @prev_cards 最近前面出的牌，有可能不是上家的牌
+            @prev_cmd   最近前面的命令，可能不是是上家的命令
+
+            //最新打出的牌
+            @played_card
+            @played_cards
+
+            //最新执行的命令
+            @exed_cmd
+
+
               
       元函数/表达式：
-      说明：以_as为后缀的函数中，参数是变量的值
+      说明：以_as为后缀的函数中，参数是变量，函数或表达式）的值
+
+      取个数/取列表长度, 列表中的元素不一定是single card
+      count_of(cards)
+
       取点数：
-      cfigure_of, 
-      cfigure
-      cfigure_as
-      min_cfigure_of(cards)   //取x表示的变量的最小牌点数
-      max_cfigure_of(cards)   //取x表示的变量的最大牌点数
+      cfigure                //指定一个牌点， ex: cfigure="3"
+      cfigures               //指定多个牌点， ex: cfigures="2,3"
+      cfigure_of(card)       //取牌的点数
+      min_cfigure_of(cards)   //取最小牌点数
+      max_cfigure_of(cards)   //取最大牌点数
       distinct_cfigures(cards)
-      distinct_cfigures_of(cards)
+      distinct_cfigures_of(cards)    
+      cfigure_count_of(cards) //取得cards的牌点的个数，
 
       取花色：
-      ctype_of, 用于属性名  ctype(m)，用于属性值
-      ctype_as
-      ctype
+      ctype             //指定一个花色，e.x ctype="c|d|h|s|j|-|*"
+      ctypes            //指定多个花色  ex: ctypes="c,d,j"
+      ctype_of(card)    //取一张牌的花色
+      ctype_count_of(cards) //取几张牌的牌色个数
+      is_void(player,ctype)  //玩家是否有某花色牌
 
       取能级
       power_of(xs)
       power_of(x)
-      power_as
-      max_power_of(cards)
 
       取牌型
       cpattern_of(x)
@@ -206,14 +269,7 @@
       
       取数组,列表的元素
       cards[0]
-
-      取列表长度
-      count_of: 列表中的元素不一定是single card
       
-      //取得cards的花色个数
-      ctype_count_of(card)    
-      ctype_count_of(cards)
-
       //是否有某花色牌
       cards_contain_ctype(cards, ctype)
       cards_not_contain_ctype(cards, ctype)
@@ -286,6 +342,7 @@
       next_player_of(@player)
       next_players_of(@player)  return list of players
 
+      get_cards_of_ctype(ctype, count, void_ctype=any_ctype, player=@cur_player)
 
       //底牌
       cards_in_kitty()
@@ -293,6 +350,8 @@
       sum_score(cards)
 
       player_seatid(@player)
+
+      select_random_cards(count)
 
       
     返回值测试：
@@ -309,18 +368,13 @@
     ret_gt, ret_not_gt:  ret_greater_than, ret_not_greater_than
     ret_gt_as, ret_not_gt_as:
    
-    //定义round变量
-    <round_attr name="cur_level" value_type="int" init_value="2"/>
+    //定义属性
+    <attr name="cur_level" value_type="int" init_value="2"/>
 
-    //定义player变量
-    <player_attr name="IsMainPlayer" value_type="bool"/>
 
     //条件测试, 测试结果为真，执行case的内部节点
     <case testee="card" cfigure_of="card" ret_as=":(cur_level)">
     </case>
-
-    round属性：
-    
 
     //条件测试嵌套
     <case>
@@ -409,27 +463,13 @@
        
        
     关键词：
-    trick_winner ： 一圈的赢家， get the player who won one trick
-    card_played_out: 一个玩家打出的一张牌
-    cards_played_out: 一个玩家打出的几张牌（包括一张）
-    @cards_trick: 一圈打出的所有牌
-    
-    @trick_init_player
-    @trick_init_cards， 一圈的起始牌
-    @prev_player 上家
-    @prev_cards 最近前面出的牌，有可能不是上家的牌
-
-    @score_cards 分数牌
-
-    
-    @trick.max_power_player
+  
     
     @round
     @round.init_drawer : 起始摸牌人
     @card
     @cards
-    @drawn_card  :摸到的一张牌
-    @drawn_cards :摸到的牌（有可能是一张）
+
     
     @player.played_cards
     
@@ -496,6 +536,28 @@
 	
     非数组操作
     set
+
+    <case value_of="" [ret]="">
+    </case>
+    <when value_of=" ret_as=""/>
+
+    op
+    <let property="" operation="" value="">
+    <set >
+    <update>
+    
+
+    <cards cards="c:1,d:1,s:1,h:1" void_ctype="*">
+    <cards cards=":(cpattern_name_of(@cards))" ret_is="zha"/>
+
+    ttype="and|or"
+
+    operation: inc, +1
+               dec, -1
+               times, 倍数
+               add, 增加
+               alter, 默认值
+               clear, 清空列表
   -->
   
 </game>
