@@ -11,6 +11,7 @@
                  void: 绝牌，没有一门牌
                  rank: 牌点
                  suit: 花色
+                 kitty: 底牌
                  scene: 场合，几个玩家从开始到有一个或多个玩家退出的期间,这期间玩家没有变化，有时候一局结束，会影响scene的属性
               
             
@@ -172,21 +173,14 @@
               </comp>
               
               *牌型操作：
-                cpattern_of(cards)
-                cpattern_of(xs)
-
                 cpattern_name_of(cards)  //取牌型的名称，返回：name(string), none
                 cpattern_type_of(cards)  //取牌型的类型，返回，pattern, none
-                is_same_pattern(cards1, cards2) //牌型相同判定, 返回: true/false
+                is_same_cpattern(cards1, cards2) //牌型相同判定, 返回: true/false
 
         内建属性：
 
             @card.power
             @cards.power
-
-            @drawn_card  :摸到的一张牌
-            @drawn_cards :摸到的牌（有可能是一张）
-            @cur_player  :正在等待执行命令的玩家, 与@round.cur_player同
 
             @round.winners
             @round.losers
@@ -210,6 +204,10 @@
             @player.played_history_cards //打出的历史牌
             @player.cards_in_hand
             @player.exed_cmd             //执行的命令
+            @player.drawn_card           //摸到的一张牌
+            @player.drawn_cards          //摸到的牌（有可能是一张）
+
+            @kitty.cards
 
         关键词：
             @score_cards
@@ -221,14 +219,31 @@
             @prev_cards 最近前面出的牌，有可能不是上家的牌
             @prev_cmd   最近前面的命令，可能不是是上家的命令
 
+
+            扩展
+            cards_in_cur_player_hand, return cards
+            cards_out_on_table,  return cards
+            cards_in_all_players_hand, return cards
+            cards_in_other_players_hand return cards
+
+            cards_of_ctype_in_cur_player_hands
+            cards_of_ctype_in_other_players_hands
+            cards_of_ctype_in_all_players_hands
+            cards_of_ctype_out_on_table   
+
+
+        简写：
+
+            @cur_player    <=@round.cur_player
+
             //最新打出的牌
-            @played_card
-            @played_cards
-
+            @played_card   <= @player.played_card
+            @played_cards  <= @player.played_cards
             //最新执行的命令
-            @exed_cmd
+            @exed_cmd      <= @player.exed_cmd
 
-
+            @drawn_card  <= @player.drawn_card  //摸到的一张牌
+            @drawn_cards <= @player.drawn_cards //摸到的牌（有可能是一张）
               
       元函数/表达式：
       说明：以_as为后缀的函数中，参数是变量，函数或表达式）的值
@@ -254,90 +269,37 @@
       is_void(player,ctype)  //玩家是否有某花色牌
 
       取能级
-      power_of(xs)
-      power_of(x)
+      power_of(cards)
+      power_of(card)
 
       取牌型
-      cpattern_of(x)
-      cpattern_of(xs)
-      cpattern_as
       cpattern_type_of
-      cpattern_name_of
-      get_pattern_of_name
-      get_pattern_of_type
+      cpattern_name_of    
       
-      
-      取数组,列表的元素
+      取数组、列表的元素
       cards[0]
       
       //是否有某花色牌
-      cards_contain_ctype(cards, ctype)
-      cards_not_contain_ctype(cards, ctype)
-
-      cards_contain_ctype_as(cards, ctype)
-      cards_not_contain_ctype_as(cards, ctype)
+      is_cards_contain_ctype(cards, ctype)       return true/false
 
       //是否有某数字牌
-      cards_contain_cfigure(cards, cfigure)
-      cards_contain_cfigure_as(cards, cfigure)
-
-      cards_not_contain_cfigure(cards, cfigure)
-      cards_not_contain_cfigure_as(cards, cfigure)
+      is_cards_contain_cfigure(cards, cfigure)   return true/false
 
       //是否全为某花色牌
-      cards_all_ctype(cards, ctype)  return true/false
-      cards_all_ctype_as(cards, ctype) return true/false
+      is_cards_all_ctype(cards, ctype)  return true/false
 
-      //是否为某牌型
-      cards_is_typed_pattern(cards, pattern_type)
-      cards_is_named_pattern(cards, pattern_name)
-      cards_is_pattern_as(cards, :(cards))
-
-      cards_count_not_deal() return number
-      cards_not_deal() return cards
-
+      //取指定花色牌
       cards_of_ctype(cards, ctype) return cards 
       
-      cards_in_cur_player_hand, return cards
-      cards_out_on_table,  return cards
-      cards_in_all_players_hand, return cards
-      cards_in_other_players_hand return cards
-
-      cards_of_ctype_in_cur_player_hands
-      cards_of_ctype_in_other_players_hands
-      cards_of_ctype_in_all_players_hands
-      cards_of_ctype_out_on_table     
-    
       //玩家是否有某牌色
-      player_has_cards_of_ctype(ctype) == player_not_void
-      player_has_cards_of_ctype_as(ctype) == player_not_void_as
-      player_not_has_cards_of_ctype(ctype) == player_is_void
-      player_not_has_cards_of_ctype_as(ctype) == player_is_void_as
-      if_ctype_void //是否绝牌
-      if_ctype_void_as
-      is_player_void
-      is_player_void_as
+      is_player_has_ctype(player, ctype) return true/false
 
       //玩家是否有某数字牌
-      player_has_cards_of_cfigure(cfigure)
-      player_has_cards_of_cfigure_as(cfigure)
-      player_not_has_cards_of_cfigure(cfigure)
-      player_not_has_cards_of_cfigure_as(cfigure)
+      is_player_has_cfigure(player, cfigure)
 
       //玩家是否有某牌型
-      player_has_cards_of_named_pattern(pattern_name)
-      player_not_has_cards_of_named_pattern(pattern_name)
-      player_has_cards_of_typed_pattern(pattern_type)  
-      player_not_has_cards_of_typed_pattern(pattern_type)
-      is_player_has_named_pattern
+      is_player_has_named_pattern(player, pattern_name)
       is_player_has_typed_pattern
-
-      //取得指定张数的花色牌
-      player_get_cards_of_ctype(ctype, count, candidate_ctype)
-      player_get_cares_of_ctype_as(ctype, count, candidate_ctype)
-
-      player_cards_in_hand()
-      player_cards_count_in_hand()  return number
       
       next_player_of(@player)
       next_players_of(@player)  return list of players
@@ -345,29 +307,34 @@
       get_cards_of_ctype(ctype, count, void_ctype=any_ctype, player=@cur_player)
 
       //底牌
-      cards_in_kitty()
-
       sum_score(cards)
 
-      player_seatid(@player)
+      seatid_of_player(@player)
 
       select_random_cards(count)
 
+    扩展方法：
+      //是否为某牌型
+      cards_is_typed_pattern(cards, pattern_type)
+      cards_is_named_pattern(cards, pattern_name)
+      cards_is_pattern_as(cards, :(cards))
+  
+      cards_count_not_deal() return number
+      cards_not_deal() return cards
       
     返回值测试：
+      相等/不相等
+      ret_is, ret_not_is, 
+      ret_as, ret_not_as:  
 
-    相等/不相等
-    ret_is, ret_not_is, 
-    ret_as, ret_not_as:  
+      小于/不小于
+      ret_lt, ret_not_lt:  ret_less_than, ret_not_less_than
+      ret_lt_as, ret_not_lt_as:
 
-    小于/不小于
-    ret_lt, ret_not_lt:  ret_less_than, ret_not_less_than
-    ret_lt_as, ret_not_lt_as:
-
-    大于/不大于
-    ret_gt, ret_not_gt:  ret_greater_than, ret_not_greater_than
-    ret_gt_as, ret_not_gt_as:
-   
+      大于/不大于
+      ret_gt, ret_not_gt:  ret_greater_than, ret_not_greater_than
+      ret_gt_as, ret_not_gt_as:
+    
     //定义属性
     <attr name="cur_level" value_type="int" init_value="2"/>
 
@@ -410,6 +377,7 @@
     1. True/False
     2. Cards
     3. Count
+    3. Player
 
     判断语句：
     1. objT = find object of condtionT(在某些context下，objT为已知，此句可省略）
@@ -459,28 +427,6 @@
        //当有一个条件时，这个条件可以通过when的属性来表示，也可以用一个case来表达
        //当有多个条件时，各条件用多个case来表达
 
-    
-       
-       
-    关键词：
-  
-    
-    @round
-    @round.init_drawer : 起始摸牌人
-    @card
-    @cards
-
-    
-    @player.played_cards
-    
-    @single
-    
-    @any
-    @any_ctype / @ctype_any
-    @ctype_c
-    @ctype_d
-    @ctype_h
-    @ctype_s
 
     属性操作符：.
     <case value_of="@trick_winner.IsAttacter" ret_is="true"/>    
@@ -502,26 +448,21 @@
 
     变量：
     定义：
-      <var name="p1" value="@card_played_out"/>
+      <var name="p1" value="@card_played_out" value_type="bool/player/int"/>
       <var name="p1" value="none"/>
        var="p1", 字母，数字，下划线
     引用变量或关键词:@p1, @trick_winner
     
-    变量别名：
-    定义：<alias name="card" ref="card_played_out"/>
-          <alias name="cards" ref="cards_played_out"/>
-
+    
     <find_player player="@trick.max_power_player">
     </find_player>
 
-    <find_players property="IsAttacter" ret_is="true"> 
+    <find_players property="IsAttacter" value="true"> 
       </find_player>
 
 
     <let property="@round.winners" value=":(find_players(IsDefender=true))"/>
     
-     <must power_of="@cards" ret_gt="@prev_cards"/>
-
     ##: && 条件与
 
     valid_as : 节点是否有效
@@ -541,11 +482,27 @@
     </case>
     <when value_of=" ret_as=""/>
 
+    <case >
+      <set/>
+    </case>
+
+    
+    <case >
+      <set>
+      </set>
+    </case>
+
+    <case >
+      <then>
+      </then>
+      <else>
+      </else>
+    </case>
+
     op
     <let property="" operation="" value="">
     <set >
     <update>
-    
 
     <cards cards="c:1,d:1,s:1,h:1" void_ctype="*">
     <cards cards=":(cpattern_name_of(@cards))" ret_is="zha"/>
