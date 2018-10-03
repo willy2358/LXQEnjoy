@@ -126,7 +126,7 @@
               <!--不能有主牌数字-->
               <case value_of=":(is_cards_contain_cfigure(@cards, @round.bank_cfigure))" ret_not_is="true"/> 
               <!--都是大牌-->
-              <case value_of=":(min_cfigure_of(@cards))" ret_gt_as=":(cards_in_other_players_hand|cards_of_ctype(ctype_of(@cards[0]))|max_cfigure_of)"/>
+              <case value_of=":(min_cfigure_of(@cards))" ret_gt_as=":(var cs1 = cards_in_other_players_hand(@cards); var cs2 = cards_of_ctype(@cs1, ctype_of(@cards[0])); return max_cfigure_of(@cs2);)"/>
             </when> 
           </let>
         </same_ctype>
