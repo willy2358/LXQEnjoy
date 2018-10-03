@@ -124,9 +124,9 @@
           <let property="@cards.leading" value="true">
             <when>            
               <!--不能有主牌数字-->
-              <case value_of=":(cards_contain_cfigure(@cards, @round.bank_cfigure))" ret_not_is="true"/> 
+              <case value_of=":(is_cards_contain_cfigure(@cards, @round.bank_cfigure))" ret_not_is="true"/> 
               <!--都是大牌-->
-              <case value_of=":(min_cfigure_of(@cards))" ret_gt_as=":(cards_in_other_players_hand|cards_of_ctype(ctype_of(@cards[0]))|max_cfigure_of)"/>
+              <case value_of=":(min_cfigure_of(@cards))" ret_gt_as=":(var cs1 = cards_in_other_players_hand(@cards); var cs2 = cards_of_ctype(@cs1, ctype_of(@cards[0])); return max_cfigure_of(@cs2);)"/>
             </when> 
           </let>
         </same_ctype>
@@ -174,31 +174,31 @@
     <var name="leading" value="@trick_init_cards"/>
     <case value_of=":(cpattern_type_of(@leading))" ret_is="@single">
       <case value_of=":(is_void(@round.cur_player, ctype_of(@leading[0])))" ret_is="true">
-        <set>
+        <then>
           <!-- 绝牌 -->
           <card ctype="*"></card>
-        </set>
+        </then>
         <!-- 没有绝牌， 须出同花色牌 -->
         <else>
-          <set>
+          <then>
             <card ctype=":(ctype_of(@trick_init_cards[0])"></card>
-          </set>
+          </then>
         </else>
       </case>
     </case>
    
     <case value_of=":(cpattern_name_of(@leading))" ret_is="zha">
       <case value_of=":(is_player_has_named_pattern(@cur_player, zha))" ret_is="true">
-        <set>
+        <then>
           <cards cards=":(cpattern_name_of(@cards))" ret_is="zha"/>
-        </set>
+        </then>
       </case>
       <else>
-        <set>
+        <then>
           <!--ctype:count-->
           <cards cards="c:1,d:1,s:1,h:1" void_ctype="*">
           </cards>
-        </set>
+        </then>
       </else>
     </case>
    
@@ -233,24 +233,24 @@
     <end>
       <!--进攻方赢，得到分数牌, cards，一圈打出的牌-->
       <cases ttype="and">
-        <case value_of=":(cards_contain_cfigure(@trick.played_cards,@score_cards))" ret_is="true"/>
+        <case value_of=":(is_cards_contain_cfigure(@trick.played_cards,@score_cards))" ret_is="true"/>
         <case value_of="@trick_winner.IsAttacter" ret_is="true"/>
-        <set>
+        <then>
           <find_players property="IsAttacter" ret_is="true"> 
             <update property="score" operation="add" value="card_score"/>
           </find_players>  
-        </set>
+        </then>
       </cases>
 
       <!-- 最后圈输赢测试 如果attacter win, attacter将获得底牌的分数 -->
       <cases>
         <case value_of=":(player_cards_count_in_hand(@trick.winner))" ret_is="0"/> 
         <case value_of="@trick_winner.IsAttacter" ret_is="true"/>
-        <set>
+        <then>
           <find_players property="IsAttacter" ret_is="true"> 
             <update property="score" operation="add" value=":(sum_score(@kitty_cards))"/>
           </find_players>  
-        </set>
+        </then>
       </cases>
     </end>
   </trick>
@@ -289,11 +289,11 @@
         <vars>
           <var name="p1" value=":(find_player(IsDefender==true ## IsMainPlayer==true))"/>
           <var name="p2" value=":(find_player(IsDefender==true ## IsMainPlayer==false))"/>
-          <var name="seatid" value=":(find_player(IsDefender==true ## IsMainPlayer==true)|player_seatid)"/>
+          <var name="seatid" value=":(find_player(IsDefender==true ## IsMainPlayer==true)|seatid_of_player)"/>
         </vars>
         
         <!--防守方赢 -->
-        <set>
+        <then>
           <!--交换主打人-->
           <find_player player="@p1">
             <update property="IsMainPlayer" value="false"/>
@@ -303,30 +303,30 @@
           </find_player> 
            
           <case value_of="@round.losers[0].Score" ret_is="0">
-            <set>
+            <then>
               <!--进攻方分数为0，防守方升2级-->
               <find_players players="@round.winners">
                 <update property="level" operation="inc" value="2"/>
               </find_players>
-            </set>
+            </then>
             <else>
               <!--进攻方分数>0，防守方升1级-->
-              <set>
+              <then>
                 <find_players players="@round.winners">
                   <update property="level" operation="inc" value="1"/>
                 </find_players>
-              </set>
+              </then>
             </else>
           </case>
 
           <update property="@round.cur_level" value="@round.winners[0].level"/>   
           <update property="@round.init_drawer" value="@p2"/>
 
-        </set>
+        </then>
         <!--进攻方赢 -->
         <else>
           <!--攻守角色互换-->
-          <set>
+          <then>
             <find_players players="@round.winners">
               <update property="IsDefender" value="true"/>
               <update property="IsAttacter" value="false"/>
@@ -339,21 +339,21 @@
             <find_player property="seatid" value="@seatid + 1">
               <update property="IsMainPlayer" value="true"/>
             </find_player>
-          </set>
+          </then>
           <case value_of="@round.winners[0].Score" ret_not_lt="80">
-            <set>
+            <then>
               <!--进攻方分数>=80，进攻方升2级-->
               <find_players players="@round.winners">
                 <update property="level" operation="inc" value="2"/>
               </find_players>
-            </set>
+            </then>
             <else>
               <!--进攻方分数<80，进攻方升1级-->
-              <set>
+              <then>
                 <find_players players="@round.winners">
                   <update property="level" operation="inc" value="1"/>
               </find_players>
-              </set>
+              </then>
             </else>
           </case>
         </else>
