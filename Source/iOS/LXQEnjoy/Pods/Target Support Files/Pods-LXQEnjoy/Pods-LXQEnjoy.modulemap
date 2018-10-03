@@ -1,0 +1,6 @@
+framework module Pods_LXQEnjoy {
+  umbrella header "Pods-LXQEnjoy-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -34,7 +34,9 @@ class DealCards(GameStage):
                 # players[j].deal_one_card(cards_one_deal[j])
             Utils.list_remove_parts(cards_b, cards_one_deal)
         for p in players:
+
             p.finish_new_deal()
+            self.get_my_round().publish_player_cards_update(p)
 
         self.__cards_sent = True
         self.get_my_round().test_and_update_current_stage()

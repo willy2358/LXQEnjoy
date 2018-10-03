@@ -1,0 +1,247 @@
+<!--terms: round, circle --->
+<gm name="raise levels">
+  <cards type="M/P">
+    <excludes>
+      <exclude></exclude>
+      <exclude></exclude>
+    </excludes>
+    <patterns>
+      <single_card power_as_figure="true">
+      <card figure="1" power="14">
+      <card figure="JM" power="50">
+      <card figure="JS" power="51">
+
+      <!--n为牌的figure-->
+      <pattern cards="Sn,Cn,Hn,Dn" power="n+20">
+      <!--甩牌-->
+      <pattern cards="Hx1,Hx2...Hxn">
+        <valid_condition>
+          <express test="min(x1,x2...xn) > max(H in other players)">
+        </valid_condition>
+      </pattern>
+
+    </patterns>
+  </cards>
+  <players>
+    <player_role name="defender" text="defender"/>
+    <player_role name="attacter" text="attacter"/>
+
+    <player_attr name="level" value_type="int"/>
+    <player_attr name="IsMainPlayer" value_type="bool"/>
+    <player_attr name="IsAttacter" value_type="bool"/>
+    <player_attr name="IsDefender" value_type="bool">
+    <player_attr name="sum_score" value_type="int">
+    <player_attr name="Score" value="int">
+
+    <min>4</min>
+    <max>4</max>
+    <groups fixed_group="true">
+      <!-- <group_attr name="level" value_type="int"></group_attr> -->
+      <group name="g1" group_level="2">
+        
+        <seated_player>1</seated_player>
+        <seated_player>3</seated_player>
+
+      </group>
+      <group name="g2" group_level="2">
+        <seated_player>2</seated_player>
+        <seated_player>4</seated_player>
+      </group>
+
+      <roles>
+        <role name="defender" diff_players="true">
+          <condition>
+            <round0>
+              <group_with_player exed="jiaozhu"></group_with_player>
+            </round0>
+            <roundX>
+              <last_win_group></last_win_group>
+            </roundX>
+          </condition>
+          <player_role key="main player" player_number="1">
+            <conditions>
+              <round0>
+                <player exed="jiaozhu"></player>
+              </round0>
+              <roundX></roundX>
+            </conditions>
+          </player_role>
+          <player_role key="minor player" player_number="1">
+            <conditions>
+              <round0>
+                <player not="main player"></player>
+              </round0>
+              <roundX></roundX>
+            </conditions>
+          </player_role>
+        </role>
+        <role name="attacter" diffPlayers="false">
+          <condition>
+            <round0>
+              <group_with_player not="defender"></group_with_player>
+            </round0>
+            <roundX>
+              <last_lose_group></last_lose_group>
+            </roundX>
+          </condition>
+        </role>
+      </roles>
+    </groups>
+
+  </players>
+  <circle_winner>
+    <!--通常情况下是出最大牌的player-->
+    <test_cards contain="score_card">
+      <test_circle_winner property="IsAttacter" value="true">
+        <update player_of_attr="IsAttacter" value="true" property="score" operation="add" value="card_score"/>
+      </test_circle_winner>
+    </test_cards>
+  </circle_winner>
+  <tell_round_winners>
+    <test player_of_attr="IsAttacter" value="true" property="Score" >
+      <value_range lower="0" upper="0">
+        <winners player_of_attr="IsDefender" value="true">
+          <update property="level" operation="inc" value="2" >
+        </winners>
+        <losers player_of_attr="IsAttacter" value="true">
+        </losers>
+      </value_range>
+      <value_range lower="0" upper="40" >
+        <winners player_of_attr="IsDefender" value="true">
+          <update property="level" operation="inc" value="1" >
+        </winners>
+        <losers player_of_attr="IsAttacter" value="true">
+        </losers>
+      </value_range>
+      <value_range lower="40" upper="80" >
+        <winners player_of_attr="IsAttacter" value="true">
+          <update property="level" operation="inc" value="1" >
+        </winners>
+        <losers player_of_attr="IsDefender" value="true">
+        </losers>
+      </value_range>
+      <value_range lower="80" upper="100" >
+        <winners player_of_attr="IsAttacter" value="true">
+          <update property="level" operation="inc" value="2" >
+        </winners>
+        <losers player_of_attr="IsDefender" value="true">
+        </losers>
+      </value_range>
+    </test>
+    <players_update>
+      <test winner_of_attr="IsDefender">
+        <value is="true">
+          <test property="IsMainPlayer">
+            <value is="true">
+              <update_player_of>
+                <property="IsDefender" value="true"/>
+                <property="IsMainPlayer" value="false">
+                <update property="IsMainPlayer" value="true">
+              </update_player_of>
+              <!--update self-->
+              <update property="IsMainPlayer" value="false"/>
+            </value>
+          </test>
+          <update_player_of_attr attr="IsDefender" >
+        </value>
+        <value is="false">
+          <update_player_of property="IsDefender" value="true">
+            <update property="IsDefender" value="false">
+            <update property="IsMainPlayer" value="false">
+            <update property="IsAttacter" value="true">
+          </update_player_of>
+          <update_player_of property="IsAttacter" value="true">
+            <update property="IsAttacter" value="false">
+            <update property="IsDefender" value="true">
+            <find_player property="seatid" equal_to_player_of_attr="IsMainPlayer" value="true" delta="+1">
+              <update property="IsMainPlayer" value="true">
+            </find_player>
+          </update_player_of>
+        </value>
+      </test>
+    </players_update>
+    <!-- <last_player>
+    </last_player> -->
+
+  </tell_round_winners>
+  <running>
+    <round_attr attr="cur_level" init_value="2"/>
+    <round_attr attr="defenders" init_value="none">
+    <round_attr attr="jiangpai" init_value="none">
+    <init_player>
+      <find_player var_as="main_player" property="IsMainPlayer" value="true">
+      </find_player>
+      <set_via_var var="main_player">
+        <case value="none" return="random_player">
+        <case value="has_value" return_var="main_player">
+      </set_via_var>
+    </init_player>
+    <dealcard_loop start_player="init_player" card_number_per_time="1">
+    <stop table_card_number = "6"/>
+    <test_card equal_to_round_attr="cur_level">
+      <test_round property="jiangpai" value="none">
+        <actions timeout_seconds="30" timeout_def_act="pass" to_player="pp" wait_until_player_response="true"> 
+          <action act_ref="jiaozhu"/>
+          <action act_ref="pass"/>
+        </actions>
+      </test_round>
+    </test_card>
+    <continue_must_test>
+      <test_round property="defenders" value="has_value" else_act="liuju"/>
+    </continue_must_test>
+    <!--if public_show_table_cards is true broadcast the di pai to all players-->
+    <public_show_table_cards value="false"/>
+    <deal_table_cards to_player_of_attr="IsMainPlayer" value="true"/>
+    <actions to_player_of_attr="IsMainPlayer" value="true" timeout_seconds="30" timeout_def_act="force_koupai" wait_until_player_response="true" >
+        <action act_ref="koupai"/>
+        <action act_ref="force_koupai"/>
+    </actions>
+
+    <playcard_loop start_player_of_attr="IsMainPlayer" value="true">
+      <test_loop_end player_of_attr="IsMainPlayer" value="true" property="cards_in_hand" value="none">
+      </test_loop_end>
+
+      <actions timeout_seconds="30" timeout_def_act="force_chupai" wait_until_player_response="true">
+          <action act_ref="chupai"/>
+          <action act_ref="force_chupai"/>
+      </actions>
+    </playcard_loop>
+    <tell_round_winners/>
+    <publish_round_winners_losers/>
+    <publish_total_scores/>
+  </running>
+  <actions>
+    <action name="jiaozhu">
+      <!-- <consequences for_round0="1"></consequences>
+      <consequences for_roundX="1"></consequences> -->
+      <update_round property="jiangpai" value="card">
+    </action>
+    <action name="liuju">
+      <finish_round/>
+      <publish_players message=""/>
+      <new_round/>
+    </action>
+
+    <!-- <aciton name="peng" text="peng">
+      <update_round property="next_player" value="act_exe_player"/>
+    </action> -->
+
+    <action name="pass" text="pass">
+      <consequences></consequences>
+    </action>>
+    <action name="koupai" text="koupai">
+    </action>
+    <action name="chupai" text="chupai">
+    </action>
+    <action name="force_chupai">
+    </force_chupai>
+    <action name="force_koupai" text="none" >
+       <consequences>
+         <consequences>
+            <random_pick_cards number="6" as="di"/>
+            <play_cards_to_table cards="di">
+         </consequences>
+       </consequences>
+    </action>
+  </actions>
+</gm>

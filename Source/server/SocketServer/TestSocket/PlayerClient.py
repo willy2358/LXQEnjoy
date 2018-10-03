@@ -24,6 +24,7 @@ class PlayerClient:
         self.__frozen_cards = []  # These cards are freezed, that is, these cards can not be played out, or used by other purpose
         self.__user_id = user_id
         self.__room_id = 0
+        self.__seat_id = 0
         self.__my_room = None
         self.__is_banker = False
         self.__final_cards = None
@@ -50,8 +51,14 @@ class PlayerClient:
     def get_shown_card_groups(self):
         return self.__shown_card_groups
 
+    def get_private_cards_count(self):
+        return len(self.__active_cards)
+
     def get_user_id(self):
         return self.__user_id
+
+    def get_seat_id(self):
+        return self.__seat_id
 
     def get_won_score(self):
         return self.__won_score
@@ -105,6 +112,9 @@ class PlayerClient:
 
     def set_my_room(self, room):
         self.__my_room = room
+
+    def set_seat_id(self, seatid):
+        self.__seat_id = seatid
 
     def reset_for_next_round(self):
         self.__cards_in_hand = []
@@ -199,9 +209,9 @@ class PlayerClient:
 
     def send_server_cmd_packet(self, cmd_pack_obj):
 
-        pack = InterProtocol.create_cards_state_packet(self)
-        j_str = json.dumps(pack)
-        self.send_api_pack_msg_str(j_str)
+        # pack = InterProtocol.create_cards_state_packet(self)
+        # j_str = json.dumps(pack)
+        # self.send_api_pack_msg_str(j_str)
 
         # self.send_cards_state() # for viewing data in test client
 

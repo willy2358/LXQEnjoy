@@ -380,12 +380,15 @@ user-info，用户信息，具体待定
 	"result":"OK"，
 	"result-data":"room"，
 	"room":{       //room 的属性
-		”roomid": 12,
-		"players": [], //在房间的玩家列表
-		“seated-players":[], //已入座的玩家列表
+		"gameid": 111, 
+		”roomid": "12",
+		"players": [{"userid": 111, "seated": 1}, {"userid": 222, "seated": 2}, {"userid": 333, "seated": 0}], //在房间的玩家列表
+		“seats":[1，2，3，4], //座位的编号列表，如果此项为空，游戏没有座位编号，任何玩家可坐任何座位
 	},  
 }
 说明：
+players 的示例：
+"players": [{"userid": 111, "seated": 1}, {"userid": 222, "seated": 2}, {"userid": 333, "seated": 0}]
 
 用户可成功进入房间，result 为“OK", ”room" 中包含了房间的有关信息
 不可进入房间：result 为“error”， errmsg：错误原因，可能值：用户未登录，房间不存在,房间已满人
@@ -417,7 +420,8 @@ user-info，用户信息，具体待定
 	"sockreq":"join-game"
 	"userid":123456,
 	"roomid":123333,  //roomid为0，-1，或空时，为进入游戏大厅
-	"gameid":123432
+	"gameid":123432,
+	"seadid":1,        //座位的编号，对于没有座位编号的游戏，此项为空或0，-1，对于有座位编号的游戏，如果缺乏此参数，默认值为1
 	"token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN"
 }
 服务器返回：
@@ -455,10 +459,10 @@ user-info，用户信息，具体待定
 	"cmdtype":"sockpush",
 	"sockpush":"game-players",
 	"players": [{"userid": 111, 
-				"seated":1, //是否已入座，1:入座；0: 未入座
+				"seated":1, //座位编号
 				}, 
 				{"userid": 222
-				“seated":0,
+				“seated":0, //0 表示未入座； -1，表示无座位编号
 				}, {"userid": 333}] //玩家按照入场顺序排序
 }
 说明：
@@ -604,6 +608,7 @@ score > 0 赢的分数，score < 0 输的分数
 	"cmdtype": "sockpush", 
 	"sockpush": "cards-state", 
 	"userid": 333, 
+	"private-cards-count": -1|数字， //向其他玩家公开的牌张数， -1 ： 牌张数保密；数字：牌张数其他玩家可见
 	"active-cards": [14, 37, 36, 21, 27, 24, 23, 16, 36, 38, 17, 25, 34, 15], //列表，每个数字对应一张牌
 	"frozen-cards": [13,13,13], //列表，每个元素对应一张牌，
 	"shown-cards-groups": [[13,13,13],[11,12,13]] //向其他玩家亮明的牌的分组，每个分组可以包括1到多张牌
@@ -617,6 +622,22 @@ score > 0 赢的分数，score < 0 输的分数
 	"active-cards": [14, 37, 36, 21, 27, 24, 23, 16, 36, 38, 17, 25, 34, 15], 
 	"frozen-cards": [13,13,13], 
 	"shown-cards-groups": [[13,13,13],[11,12,13]] 
+}
+
+4.11 向玩家推送当前等待的玩家
+推送参数：
+{
+	"cmdtype": "sockpush", 
+	"sockpush": "pending-player", 
+	"userid": 333
+	
+}
+
+示例
+{
+	"cmdtype": "sockpush", 
+	"sockpush": "pending-player", 
+	"userid": 333
 }
 
 5.玩家发送

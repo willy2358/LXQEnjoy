@@ -1,0 +1,389 @@
+<!--terms: round, circle --->
+<gm name="raise levels">
+  <!--Poker: 
+             //牌色
+             ctype: S:Spade, H:Heart, C:Club,D:Diamond
+             
+             //牌点
+             figure: 牌的数字, 1 - 13（A - K)，JS：Joker Sun 大王， JM：Joker Moon 小王
+             
+             //同点
+             single(n): 单牌
+             pair(n): 对子
+             triple(n): 三张，相同Figure
+             quad(n): 四张，相同Figure
+
+             //同色 同花色牌， 可不连续,  m: start, n:end, m < n, m,n为牌的具体数字，x,y,z指的是数字
+                   //某一花色
+             sc_x(x|y) //x:指代牌点数, y：指代牌张数，i.e: sc_x(x|4), 4张同色牌
+             sc_x(m,n)  
+                   //确定花色
+             sc_s(m,n), sc_s(m,n,x,....)  //都是spade 
+             sc_h(m,n), sc_h(m,n,x,....)  //都是heart
+             sc_c(m,n), sc_c(m,n,x,....)  //都是club
+             sc_d(m,n): sc_d(m,n,x,y,....) //都是diamond
+
+             //连牌  同花色连牌 m: start, n:end,  m < n 
+             s(m-n)，
+             h(m-n),
+             c(m-n),
+             d(m-n): 
+             fs(m-n)：m: start, n: end, m < n, Single连牌,不必同花色
+             fp(mm-nn): m: start, n: end, m < n, pair连牌,不必同花色
+             ft(mmm-nnn): m: start, n: end, m < n, Triple连牌,不必同花色
+             fq(mmm-nnn): m: start, n: end, m < n, Quad连牌,不必同花色
+
+             //牌型组
+             ts(m,n,x,.....|constrains): 牌型组，m,n,x, 各不相同, m,n,x的条件在constrict中描述, 支持&&,||
+             ts(x|y) : y张任意牌
+             tp(mm,n,xx, ......|constrains): 牌型组，m,n,x, 各不相同，但会出现 >1 个的对子，m,n,x的条件在constrict中描述, 支持&&,||
+             tt(mmm,nnn, xx, y, ......|constrains): 牌型组，m,n,x, 各不相同，但会出现 >1 个的Triple，m,n,x的条件在constrict中描述, 支持&&,||
+             tq(mmmm,nnn, xx, y, ......|constrains): 牌型组，m,n,x, 各不相同，但会出现 >1 个的Quad，m,n,x的条件在constrict中描述, 支持&&,||x
+
+      表达式：
+      取点数：figure_of, 用于属性名  figure(m)，用于属性值
+      取花色：ctype_of, 用于属性名  ctype(m)，用于属性值
+      max_figure(m,n,...)：取各牌的最大点数
+
+      in_hands_cards_x
+      out_hands_cards_x
+      max_ctype_in_hands(x)
+      
+  -->
+  
+  <cards type="M/P">
+    <!--去牌-->
+    <excludes>
+      <exclude></exclude>
+      <exclude></exclude>
+    </excludes>
+
+    <!--庄牌点数-->
+    <bank_figure figure="2" var_as="bank_figure"/>
+
+    <!--庄牌花色-->
+    <bank_ctype ctype="None" var_as="bank_ctype">
+
+    <!--牌型，如有对同一牌型不同的配置，后面的覆盖前面的 range属性为方便配置参考，无代码执行影响 
+    属性列表：
+    if_fail
+    value
+    params
+    min_figure_of
+
+    测试属性
+    figure
+    power_as
+    ctype_as
+    figure_as
+    power_base_as
+
+    表达式：
+      取点数：figure_of, 用于属性名  figure(m)，用于属性值
+      取花色：ctype_of, 用于属性名  ctype(m)，用于属性值
+      max_figure(m,n,...)：取各牌的最大点数
+      
+    测试值
+    value_as
+    
+    比较值
+    not_equal_as
+    larger_than
+    less_than
+    equal_as
+
+    -->
+    <patterns>
+      <!--leading 是否可作为起始牌，默认为true, 可以由一圈的起始打牌人打出, false,只能用于跟牌-->
+
+      <!--单牌-->
+      <single_card power_as="figure" range="1-13"/>
+      <single figure="1" power="14" range="14"/>
+      <single figure="JM" power="50" range="50"/>
+      <single figure="JS" power="51" range="51"/>
+
+      <!--主牌花色牌-->
+      <single ctype_as="bank_ctype" power_base_as="figure" delta="20" range="21-33"/>
+
+      <!--主牌数字牌-->
+      <single figure_as="bank_figure" power="35" range="35"/>
+
+      <!--正主牌-->
+      <single figure_as="bank_figure" ctype_as="bank_ctype" power="36" range="36"/>
+
+      <!--四张-->
+      <quad name="zha" leading_text="" follow_text="" power_base_as="figure" delta="5" range="6-18"/>
+      
+      <!--四张的跟牌，非枪毙牌，最小-->
+      <ts params="m,n,j,k" leading="false" power="0">
+        <constrains>
+          <constrain ctype_of="m" value="s" if_fail="any_card"/>
+          <constrain ctype_of="n" value="h" if_fail="any_card"/>
+          <constrain ctype_of="j" value="d" if_fail="any_card"/>
+          <constrain ctype_of="k" value="c" if_fail="any_card"/>
+        </constrains>
+      </ts>
+      <!--四张的跟牌，枪毙牌，大过四张牌-->
+      <ts params="m,n,j,k" leading="false" power_as="max_figure(m,n,j,k)">  
+        <constrains>
+          <constrain ctype_of="m" value_as="bank_ctype"/>
+          <constrain ctype_of="n" value_as="bank_ctype"/>
+          <constrain ctype_of="j" value_as="bank_ctype"/>
+          <constrain ctype_of="k" value_as="bank_ctype"/>
+        </constrains>
+      </ts>
+
+      <!--甩牌, 副牌-->
+      <sc_x params="x|y" power_as="max_figure(x)">
+        <constrains>
+          <constrain figure_of="x" not_equal_as="bank_figure"/>
+          <constrain value_of="y" larger_than="2"/>
+          <constrain min_figure_of="x" larger_than="max_ctype_in_hands" >
+        </constrains>
+      </sc_x>
+      <!--甩牌, 主牌-->
+      <sc_x params="x|y">
+        <constrains>
+          <constrain ctype_of="x" equal_as="bank_ctype"/>
+          <operation value_of="y" larger_than="2">
+          <constrain min_figure_of="x" larger_than="max_ctype_in_hands" >
+        </constrains>
+      </sc_x>
+      <!--甩牌跟牌-->
+      <ts params="x|y" eading="false" power_as="0">    
+      </ts>
+    </patterns>
+  </cards>
+
+  <!--玩家-->
+  <players>
+    <player_role name="defender" text="defender"/>
+    <player_role name="attacter" text="attacter"/>
+
+    <player_attr name="level" value_type="int"/>
+    <player_attr name="IsMainPlayer" value_type="bool"/>
+    <player_attr name="IsAttacter" value_type="bool"/>
+    <player_attr name="IsDefender" value_type="bool"/>
+    <player_attr name="sum_score" value_type="int"/>
+    <player_attr name="Score" value="int"/>
+    <min>4</min>
+    <max>4</max>
+  
+  </players>
+
+  <!--一圈的赢家-->
+  <circle_winner>
+    <!-- <cards_power decided_by="least_power_card"/> -->
+
+    <!--通常情况下是出最大牌的player-->
+    <winner test_greatest_power="true">
+    </winner>
+    
+    <!--进攻方赢，得到分数牌-->
+    <test_cards contain="score_card">
+      <test_circle_winner property="IsAttacter" value="true">
+        <update player_of_attr="IsAttacter" value="true" property="score" operation="add" value="card_score"/>
+      </test_circle_winner>
+    </test_cards>
+  </circle_winner>
+
+    <!---最后圈输赢测试 如果attacter win, attacter将获得底牌的分数--->
+  <test_last_circle>
+    
+  </test_last_circle>
+
+  <!--轮的赢家-->
+  <tell_round_winners>
+    <!--确定输赢方-->
+    <test player_of_attr="IsAttacter" value="true" property="Score" >
+      <!--进攻方分数为0，防守方赢，升2级-->
+      <value_range lower="0" upper="0">
+        <winners player_of_attr="IsDefender" value="true">
+          <update property="level" operation="inc" value="2" >
+        </winners>
+        <losers player_of_attr="IsAttacter" value="true">
+        </losers>
+      </value_range>
+
+      <!--进攻方没分数<40，防守方赢，升一级-->
+      <value_range lower="0" upper="40" >
+        <winners player_of_attr="IsDefender" value="true">
+          <update property="level" operation="inc" value="1" >
+        </winners>
+        <losers player_of_attr="IsAttacter" value="true">
+        </losers>
+      </value_range>
+
+      <!--进攻方没分数40<x<80，进攻方赢，升一级-->
+      <value_range lower="40" upper="80" >
+        <winners player_of_attr="IsAttacter" value="true">
+          <update property="level" operation="inc" value="1" >
+        </winners>
+        <losers player_of_attr="IsDefender" value="true">
+        </losers>
+      </value_range>
+
+      <!--进攻方没分数>80，进攻方赢，升2级-->
+      <value_range lower="80" upper="100" >
+        <winners player_of_attr="IsAttacter" value="true">
+          <update property="level" operation="inc" value="2" >
+        </winners>
+        <losers player_of_attr="IsDefender" value="true">
+        </losers>
+      </value_range>
+    </test>
+    <!--一轮结束，更新各玩家状态-->
+    <players_update>
+      <test winner_of_attr="IsDefender">
+        <!--防守方赢，主打换人-->
+        <value is="true">
+          <test property="IsMainPlayer">
+            <value is="true">
+              <update_player_of>
+                <property="IsDefender" value="true"/>
+                <property="IsMainPlayer" value="false">
+                <update property="IsMainPlayer" value="true">
+              </update_player_of>
+              <!--update self-->
+              <update property="IsMainPlayer" value="false"/>
+            </value>
+          </test>
+          <update_player_of_attr attr="IsDefender" >
+        </value>
+        <!--进攻方赢，攻守角色互换，本轮主打的下家为主打（主防守）-->
+        <value is="false">
+          <update_player_of property="IsDefender" value="true">
+            <update property="IsDefender" value="false">
+            <update property="IsMainPlayer" value="false">
+            <update property="IsAttacter" value="true">
+          </update_player_of>
+          <update_player_of property="IsAttacter" value="true">
+            <update property="IsAttacter" value="false">
+            <update property="IsDefender" value="true">
+            <find_player property="seatid" equal_to_player_of_attr="IsMainPlayer" value="true" delta="+1">
+              <update property="IsMainPlayer" value="true">
+            </find_player>
+          </update_player_of>
+        </value>
+      </test>
+    </players_update>
+  </tell_round_winners>
+
+
+  <running>
+    <round_attr attr="cur_level" init_value="2"/>
+    <round_attr attr="defenders" init_value="none">
+    <round_attr attr="jiangpai" init_value="none">
+    <!--设置起牌玩家，第一个摸牌的人-->
+    <init_player>
+      <find_player var_as="main_player" property="IsMainPlayer" value="true">
+      </find_player>
+      <set_via_var var="main_player">
+        <case value="none" return="random_player"/>
+        <case value="has_value" return_var="main_player"/>
+      </set_via_var>
+    </init_player>
+
+    <!--发牌（摸牌，起牌）-->
+    <!--每次一张牌-->
+    <dealcard_loop start_player="init_player" card_number_per_time="1">
+    <!--底牌6张-->
+      <stop table_card_number = "6"/>
+      <!--摸到将牌，可以叫主，前提是还没主-->
+      <test_card equal_to_round_attr="cur_level">
+        <test_round property="jiangpai" value="none">
+          <actions timeout_seconds="30" timeout_def_act="pass" to_player="pp" wait_until_player_response="true"> 
+            <action act_ref="jiaozhu"/>
+            <action act_ref="pass"/>
+          </actions>
+        </test_round>
+      </test_card>
+    </dealcard_loop>
+
+    <!--发牌结束，必须有防守方，否则流局，此情况只发生刚开始的几局-->
+    <continue_must_test>
+      <test_round property="defenders" value="has_value" else_act="liuju"/>
+    </continue_must_test>
+
+    <!--if public_show_table_cards is true broadcast the di pai to all players-->
+    <!--不向其他玩家亮底牌-->
+    <public_show_table_cards value="false"/>
+
+    <!--底牌归于主打-->
+    <deal_table_cards to_player_of_attr="IsMainPlayer" value="true"/>
+
+    <!--等待主打扣牌-->
+    <actions to_player_of_attr="IsMainPlayer" value="true" timeout_seconds="30" timeout_def_act="force_koupai" wait_until_player_response="true" >
+        <action act_ref="koupai"/>
+        <action act_ref="force_koupai"/>
+    </actions>
+
+    <!--进入打牌，从主打开始-->
+    <playcard_loop start_player_of_attr="IsMainPlayer" value="true">
+      <!--一局结束，主打手里没牌-->
+      <test_loop_end player_of_attr="IsMainPlayer" value="true" property="cards_in_hand" value="none">
+      </test_loop_end>
+      <!--每玩家的命令列表，出牌，如超时，强制出牌-->
+      <actions timeout_seconds="30" timeout_def_act="force_chupai" wait_until_player_response="true">
+          <action act_ref="chupai"/>
+          <action act_ref="force_chupai"/>
+      </actions>
+      <!--如果没有同色牌，除主牌外，其他牌的power为零，也即不能大于领牌人--->
+      <test cards_diff_from_start="true" exclude="jiang pai" power="0">
+      </test>
+    </playcard_loop>
+  
+    <!--出牌结束，确定一局输赢玩家-->
+    <tell_round_winners/>
+
+    <!--广播一局胜负-->
+    <publish_round_winners_losers/>
+
+    <!--广播累积胜负-->
+    <publish_total_scores/>
+  </running>
+
+  <!--玩家操作命令列表-->
+  <actions>
+    <!--叫主-->
+    <action name="jiaozhu">
+      <!-- <consequences for_round0="1"></consequences>
+      <consequences for_roundX="1"></consequences> -->
+      <update_round property="jiangpai" value="card">
+      </update_round>
+      <update_card_power>
+        <cards_of_type operation="add" value="+20">
+        <exe_card power="45">
+        <cards_of_figure power="40">
+      </update_card_power>
+
+    </action>
+    <action name="liuju">
+      <finish_round/>
+      <publish_players message=""/>
+      <new_round/>
+    </action>
+
+    <!-- <aciton name="peng" text="peng">
+      <update_round property="next_player" value="act_exe_player"/>
+    </action> -->
+
+    <action name="pass" text="pass">
+      <consequences></consequences>
+    </action>>
+    <action name="koupai" text="koupai">
+    </action>
+    <action name="chupai" text="chupai">
+    </action>
+    <action name="force_chupai">
+    </force_chupai>
+    <action name="force_koupai" text="none" >
+       <consequences>
+         <consequences>
+            <random_pick_cards number="6" as="di"/>
+            <play_cards_to_table cards="di">
+         </consequences>
+       </consequences>
+    </action>
+  </actions>
+</gm>

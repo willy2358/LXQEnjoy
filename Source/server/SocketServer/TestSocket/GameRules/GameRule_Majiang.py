@@ -26,6 +26,7 @@ class GameRule_Majiang(GameRule):
         self.__versatile_cards = []
         self.__random_versatile_cards_count = 0
         self.ScoreRule = ScoreRule_Majiang()
+        self.set_seats_ids([1,2,3,4])
 
 
     def is_player_win(self, player):

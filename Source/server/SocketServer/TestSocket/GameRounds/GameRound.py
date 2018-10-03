@@ -174,6 +174,8 @@ class GameRound:
         player.set_banker()
         banker_json = InterProtocol.create_publish_bank_player_json_packet(player)
         self.publish_round_states(banker_json)
+        pending_player_json = InterProtocol.create_pending_player_packet(player)
+        self.publish_round_states(pending_player_json)
 
     def set_round_end_callback(self, func):
         self.__round_end_callback = func
@@ -202,6 +204,8 @@ class GameRound:
         Utils.list_remove_parts(self.__cards_on_table, cards)
         packet = InterProtocol.create_deal_cards_json_packet(player, cards)
         player.send_server_cmd_packet(packet)
+
+        self.publish_player_cards_update(player)
 
     def start_process_for_players_want_played_out_cards(self, player_cmds):
         self.__pending_player_cmds.empty()
@@ -332,5 +336,12 @@ class GameRound:
         self.set_player_waiting_for_cmd_resp(player, cmd_opts)
         packet = InterProtocol.create_cmd_options_json_packet(player, cmd_opts, def_cmd, timeout)
         player.send_server_cmd_packet(packet)
+        pending_player_json = InterProtocol.create_pending_player_packet(player)
+        self.publish_round_states(pending_player_json)
         if def_cmd and timeout > 1:
             self.setup_timer_to_select_default_act_for_player(player, def_cmd, timeout)
+
+    def publish_player_cards_update(self, player):
+        for p in self.get_players():
+            pack = InterProtocol.create_cards_state_packet(player, player == p)
+            p.send_server_cmd_packet(pack)

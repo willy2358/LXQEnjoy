@@ -31,7 +31,8 @@ cmd = {
     "sockreq":"join-game",
     "userid":userid,
     "roomid":roomid,
-    "gameid":gameid
+    "gameid":gameid,
+    "seatid":3
 }
 cmd_str = json.dumps(cmd)
 client.send_message(cmd_str)

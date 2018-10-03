@@ -1,0 +1,143 @@
+<!--terms: round, circle --->
+<gm name="doudizhu">
+  <cards type="P">
+    <excludes>
+      <exclude></exclude>
+      <exclude></exclude>
+    </excludes>
+    <patterns>
+    </patterns>
+  </cards>
+  <players>
+    <min>3</min>
+    <max>3</max>
+    <groups fixed_group="false">
+      <group name="dizhu">
+
+      </group>
+      <group name="nongmin">
+      </group>
+
+      <roles>
+        <role name="dizhu" diff_players="true">
+          <condition>
+            <round0>
+              <group_with_player exed="jiaozhu"></group_with_player>
+            </round0>
+            <roundX>
+              <last_win_group></last_win_group>
+            </roundX>
+          </condition>
+          <player_role key="main player" player_number="1">
+            <conditions>
+              <round0>
+                <player exed="jiaozhu"></player>
+              </round0>
+              <roundX></roundX>
+            </conditions>
+          </player_role>
+          <player_role key="minor player" player_number="1">
+            <conditions>
+              <round0>
+                <player not="main player"></player>
+              </round0>
+              <roundX></roundX>
+            </conditions>
+          </player_role>
+        </role>
+        <role name="nongmin" diffPlayers="false">
+          <condition>
+            <round0>
+              <group_with_player not="defender"></group_with_player>
+            </round0>
+            <roundX>
+              <last_lose_group></last_lose_group>
+            </roundX>
+          </condition>
+        </role>
+      </roles>
+    </groups>
+
+  </players>
+  <circle_winner>
+  </circle_winner>
+  <round_winner>
+    <test_score role="attacter" >
+      <get_score upper_score="0" inc_level="2" winner="defender">
+      <get_score lower_score="0" upper_score="40" winner="defender">
+      <get_score lower_score="40" upper_score="80" inc_level="1" winner="attacter" >
+      <get_score score="80" inc_level="2" winner="attacter">
+    </test_score>
+
+    <!-- <last_player>
+    </last_player> -->
+
+  </runnd_winner>
+  <running>
+    <round0>
+      <random_player var_as="start_player"/>
+      <reorder_players head="start_player">
+      <dealcard_loop start_player="start_player" card_number_per_time="1"  >
+        <stop table_card_number = "6"/>
+        <when playerg_get_card_figure="2" player_as="pp">
+          <actions timeout_seconds="30" timeout_def_act="pass" to_player="pp" wait_until_player_response="true"> 
+            <action act_ref="jiaozhu"/>
+            <action act_ref="pass"/>
+          </actions>
+        </when>
+        
+      </dealcard_loop>
+      <deal_table_cards to="main player" public_cards="false"/>
+      <actions to_player="main player" timeout_seconds="30" timeout_def_act="force_koupai" wait_until_player_response="true" >
+          <action act_ref="koupai"/>
+          <action act_ref="force_koupai"/>
+      </actions>
+      <actions to_player="main player" timeout_seconds="30" timeout_def_act="force_chupai" wait_until_player_response="true">
+          <action act_ref="chupai"/>
+          <action act_ref="force_chupai"/>
+      </actions>
+
+      <!-- <skipable_play_loop>
+        <skip_conditions>
+          <played_card number="1">
+          <other_player same_figure_card="2|3">
+        </skip_conditions>
+
+      </skipable_play_loop> -->
+
+
+      <turn_play_loop skipable="false" first_start_player="main_player" new_circle_start_player="last_circle_winner">
+        <stop when="no_card_in_hand">
+        </stop>
+      </turn_play_loop>
+
+      
+    </round0>
+    <roundX>
+    </roundX>
+    
+  </running>
+  <actions>
+    <action name="jiaozhu">
+      <consequences for_round0="1"></consequences>
+      <consequences for_roundX="1"></consequences>
+    </action>
+    <action name="pass" text="pass">
+      <consequences></consequences>
+    </action>>
+    <action name="koupai" text="koupai">
+    </action>
+    <action name="chupai" text="chupai">
+    </action>
+    <action name="force_chupai">
+    </force_chupai>
+    <action name="force_koupai" text="none" >
+       <consequences>
+         <consequences>
+            <random_pick_cards number="6" as="di"/>
+            <play_cards_to_table cards="di">
+         </consequences>
+       </consequences>
+    </action>
+  </actions>
+</gm>
