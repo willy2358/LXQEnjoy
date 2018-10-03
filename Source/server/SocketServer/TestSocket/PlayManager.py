@@ -1,10 +1,15 @@
 import json
 import Errors
 import db
+import os
+from xml.dom.minidom import parse
+import xml.dom.minidom
 
 import CardsMaster
 import InterProtocol
 import Log
+
+
 from Actions.CallBank import CallBank
 from Actions.PassCall import PassCall
 from GameRules.GameRule_Majiang import GameRule_Majiang
@@ -246,10 +251,34 @@ def start_timer_to_clear_dead_connection():
 def init_play_rules():
     # init_poker_rule_doudizu()
     try:
-        init_majiang_rule_guaisanjiao()
+        # init_majiang_rule_guaisanjiao()
+        load_games()
     except Exception as ex:
         print(ex)
 
+def load_games():
+    try:
+        prefile = os.path.join(os.getcwd(), "games")
+        for (root, _, files) in os.walk(prefile):
+            for f in files:
+                if f.endswith(".xml"):
+                    load_game(os.path.join(root, f))
+
+    except Exception as ex:
+        Log.write_exception(ex)
+
+def load_game(gameConfig):
+    try:
+
+        DOMTree = xml.dom.minidom.parse(gameConfig)
+        game = DOMTree.documentElement
+        for c in game.childNodes:
+            if type(c) is xml.dom.minidom.Element:
+                print(c.tagName) #cards, players trick
+
+
+    except Exception as ex:
+        Log.write_exception(ex)
 
 def set_call_banker_action_options(call_banker_stage):
     call_bank = CallBank("Call", "1")

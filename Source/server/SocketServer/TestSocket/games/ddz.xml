@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<game name="ddz" gtype="P">
+
+
+  <cards sets="1">
+    <excludes valid="false">
+      <card ctype="-" cfigure="-"/>
+    </excludes>
+
+    <kitty valid="true" count="3" public_shown="true"/>
+
+    <score_cards valid="false">
+      <card ctype="*" cfigure="5" score="5"/>
+    </score_cards>
+
+    <patterns>
+      <!--单牌-->
+      <!--range: 1-13 -->
+      <single power=":(cfigure_of(@card))"></single>
+      <single ctype="*" cfigure="1" power="14"></single>
+      <single ctype="*" cfigure="2" power="15"></single>
+
+      <!--对子-->
+      <pair power=":(cfigure_of(@cards[0]))"/>
+      <pair cfigure="1" power="14"/>
+      <pair cfigure="2" power="15"/>
+
+      <!--两王-->
+      <pair name="zha" ctype="j" power="1000">
+        <set property="@round.stake" operation="times" value="2"/>
+      </pair>
+
+      <!--三张-->
+      <triple power=":(cfigure_of(@cards[0]))"/>
+      <triple cfigure="1" power="14"/>
+      <triple cfigure="2" power="15"/>
+
+      <!--炸弹-->
+      <quad name="zha" power=":(cfigure_of(@cards[0]) + 100)">
+        <set property="@round.stake" operation="times" value="2"/>
+      </quad>
+      <quad name="zha" cfigure="1" power="114" >
+        <set property="@round.stake" operation="times" value="2"/>
+      </quad>
+      <quad name="zha" cfigure="2" power="115" >
+        <set property="@round.stake" operation="times" value="2"/>
+      </quad>
+
+      <!--串-->
+      <seq start_cfigure="3" min_count="5" power=":(cfigure_of(max_cfigure_of(@cards)))"></seq>
+
+      <!--拖拉机-->
+      <seqm m="2" start_cfigure="3" min_len="3" power=":(cfigure_of(max_cfigure_of(@cards)))"></seqm>
+
+      <!--三带-->
+      <comp name="tx_sx" power=":(cfigure_of(max_cfigure_of(@tx_sx.cards)))">
+        <seqm name="sm" m="3" start_cfigure="3" min_len="1"/>
+        <pgroup name="g1" count_of="@pgroup.elements" ret_not_gt=":(count_of(distinct_cfigures(@sm)))">
+          <single/>
+        </pgroup>
+        <pgroup count_of="@pgroup.elements" ret_not_gt=":(count_of(distinct_cfigures(@sm)) - count_of(@g1.elements))">
+          <pair ctype="*"/>
+        </pgroup>
+      </comp>
+
+      <!--四带-->
+      <comp name="qx_sx" power=":(cfigure_of(@t1.cards[0]))">
+        <seqm name="sm" m="4" start_cfigure="3" min_len="1"/>
+        <pgroup name="g1" count_of="@pgroup.elements" ret_not_gt=":(count_of(distinct_cfigures(@sm)) * 2)">
+          <single/>
+        </pgroup>
+        <pgroup count_of="@pgroup.elements" ret_not_gt=":(count_of(distinct_cfigures(@sm)) - count_of(@g1.elements))">
+          <pair ctype="*"/>
+        </pgroup>
+      </comp>
+    </patterns>
+  </cards>
+
+  <!--
+  pattern_ref_as="@trick_init_player"
+  pattern_ref_as="@prev_cards"
+  -->
+  <following must_follow="false"
+             pattern_ref_as="@prev_cards">
+    <case value_of=":(cpattern_type_of(@prev_cards))" ret_as="@zha">
+      <cards>
+        <property cpattern_type_of="@cards" ret_as="@zha"/>
+        <property power_of="@cards" ret_gt="@prev_cards"/>
+      </cards>
+    </case>
+
+    <case value_of=":(cpattern_type_of(@prev_cards))" ret_not_as="@zha">
+      <cases ttype="or">
+        <case>
+          <cards cpattern_type_of="@cards" ret_as="@zha"/>
+        </case>
+        <case>
+          <cards>
+            <property cpattern_type_of="@cards" ret_as=":(cpattern_type_of(@prev_cards))"/>
+            <property power_of="@cards" ret_gt="@prev_cards.power"/>
+          </cards>
+        </case>
+      </cases>
+    </case>
+  </following>
+
+  <players>
+    <min>3</min>
+    <max>3</max>
+
+    <attr name="IsRich" value_type="bool"/>
+    <attr name="IsPoor" value_type="bool"/>
+
+  </players>
+
+  <trick>
+
+    <winner var_as="trick_winner">
+      <find_player player="@trick.max_power_player">
+      </find_player>
+    </winner>
+
+    <end>
+
+    </end>
+  </trick>
+
+  <round>
+    <attrs>
+      <attr name="init_drawer" value_type="Player" init_value="random"/>
+      <attr name="landlord" value_type="Player" init_value="none"/>
+
+      <attr name="j50Avail" value_type="bool" init_value="true"/>
+      <attr name="j100Avail" value_type="bool" init_value="true"/>
+      <attr name="call_order" value_type="int" init_value="0"/>
+      <attr name="stake" value_type="int" init_value="5"/>
+    </attrs>
+    <end>
+      <case property="@round.winners[0].IsPoor" ret_is="true">
+        <set property="@round.winners" operation="clear"></set>
+        <find_players players=":(players_of(@IsPoor==true))" value="true">
+          <set property="@round.winners" value="@players"></set>
+        </find_players>
+        <set property="@round.losers" value=":(find_player(@IsRich==true))"/>
+      
+        <find_players players="@round.winners">
+          <set property="@player.win_score" value="@round.stake"></set>
+        </find_players>
+        
+        <find_player player="@round.loser[0]">
+          <set property="@player.lose_score" value=":(@round.stake * 2)"></set>
+        </find_player>
+      </case>
+    
+      <case value_of="@round.winners[0].IsRich" ret_is="true">
+        <find_players players=":(players_of(@IsPoor==true))">
+          <set property="@round.losers" value="@players"></set>
+        </find_players>
+      
+        <find_players players="@round.losers">
+          <set property="@player.lose_score" value="@round.stake"></set>
+        </find_players>
+        
+        <find_player player="@round.winners[0]">
+          <set property="@player.win_score" value="@round.stake * 2"></set>
+        </find_player>
+      </case>
+    </end>
+  </round>
+
+  <running>
+
+    <dealcard_loop start_player="@round.init_drawer" card_number_per_time="17">
+
+      <case  cards_count_not_deal="3">
+        <stoploop/>
+      </case>
+
+    </dealcard_loop>
+
+    <set property="@round.cur_player" value="@round.init_drawer"/>
+    <set property="@round.call_order" value="0"/>
+    <loop_until>
+      <cases ttype="or">
+        <case value_of="@round.stake" ret_is="100"/>
+        <case value_of="round.call_order" ret_gt="3"/>
+        <exit_loop></exit_loop>
+      </cases>
+      <set property="@round.call_order" value="@round.call_order + 1"/>
+      <find_player player="@round.cur_player">
+        <actions timeout_seconds="30" timeout_def_act="bujiao">
+          <action act_ref="bujiao"/>
+          <action act_ref="jiaodizhu-50" valid_as="@j50Avail"/>
+          <action act_ref="jiaodizhu-100" valid_as="@j100Avail" />
+        </actions>
+      </find_player>
+
+      <!--无人叫地主， 起牌人为地主-->
+      <cases ttype="and">
+        <case value_of="@round.landlord" ret_is="none"/>
+        <case value_of="@round.call_order" ret_is="3"/>
+        <set property="@round.landlord" value="@round.init_drawer"/>
+        <set property="@round.stake" value="50"/>
+      </cases>
+    </loop_until>
+
+
+    <set property="@trick.cur_player" value="@round.landlord"/>
+    <loop_until count_of="@round.winners" ret_is="0">    
+      <set property="@trick.holder" value="none"/>
+      <find_player>
+        <actions timeout_seconds="30" timeout_def_act="chupai">
+            <action act_ref="chupai"/>
+          </actions>
+      </find_player>
+
+      <loop_until>
+        <case value_of="@trick.holder" ret_as="@trick.cur_player">
+          <exit_loop/>
+        </case>
+        <find_player player=":(next_player_of(@trick.cur_player))">
+          <set property="@trick.cur_player" value="@player"/>    
+        </find_player>
+
+        <find_player player="@trick.cur_player">
+          <actions timeout_seconds="30" timeout_def_act="yaobuqi">
+            <action act_ref="yaobuqi"></action>
+            <action act_ref="chupai"></action>
+          </actions>
+        </find_player>
+      </loop_until>
+    </loop_until>
+
+    <exe ref="@round.end"/>
+
+    <publish_round_winners_losers/>
+
+    <publish_total_scores/>
+  </running>
+
+  <actions>
+
+    <action name="jiaodizhu-50" player="@player" cards="@cards">
+      <set property="@round.landlord" value="@player"/>
+      <set property="@round.stake" value="50"/>
+      <set property="@round.j50Avail" value="false"/>
+    </action>
+
+    <action name="jiaodizhu-100" player="@player" cards="@cards">
+      <set property="@round.landlord" value="@player"/>
+      <set property="@round.stake" value="100"/>
+      <set property="@round.j50Avail" value="false"/>
+      <set property="@round.j100Avail" value="false"/>
+    </action>
+
+    <action name="pass" text="bujiao">
+
+    </action>>
+    
+    <action name="chupai" text="chupai" player="@player">
+      <set property="@trick.holder" value="@player"/>
+      <case property=":(player_cards_count_in_hand(@player))" ret_is="0">
+        <add property="@round.winners" value="@player"></add>
+      </case>
+    </action>
+    
+    <action name="yaobuqi" text="yaobuqi">
+
+    </action>
+
+  </actions>
+
+</game>
