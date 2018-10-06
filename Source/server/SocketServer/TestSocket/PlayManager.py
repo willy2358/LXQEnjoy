@@ -2,8 +2,7 @@ import json
 import Errors
 import db
 import os
-from xml.dom.minidom import parse
-import xml.dom.minidom
+
 
 import CardsMaster
 import InterProtocol
@@ -45,11 +44,15 @@ from CardsPattern.Mode_Pair import Mode_Pair
 from CardsPattern.Mode_Seq import Mode_Seq
 from CardsPattern.Mode_Triple import Mode_Triple
 
+from GRules.GRule import GRule
+
+
 Conn_Players = {} #{connection, player}
 # __Players = []
 Players={}   #{userid:player}
 Rooms = {}   #{roomid:room}
-GameRules = {} #{ruleid:rule}
+GameRules = {} #{gameid:rule}
+
 __Waiting_Players = {}
 __PlayRules = {}
 
@@ -262,23 +265,28 @@ def load_games():
         for (root, _, files) in os.walk(prefile):
             for f in files:
                 if f.endswith(".xml"):
-                    load_game(os.path.join(root, f))
+                    gRuleXml = os.path.join(root, f)
+                    gf = GRule(gRuleXml)
+                    if gf.load():
+                        GameRules[gf.get_gameid()] = gf
+                    else:
+                        Log.write_error("game config error:" + gRuleXml)
 
     except Exception as ex:
         Log.write_exception(ex)
 
-def load_game(gameConfig):
-    try:
-
-        DOMTree = xml.dom.minidom.parse(gameConfig)
-        game = DOMTree.documentElement
-        for c in game.childNodes:
-            if type(c) is xml.dom.minidom.Element:
-                print(c.tagName) #cards, players trick
-
-
-    except Exception as ex:
-        Log.write_exception(ex)
+# def load_game(gameConfig):
+#     try:
+#
+#         DOMTree = xml.dom.minidom.parse(gameConfig)
+#         game = DOMTree.documentElement
+#         for c in game.childNodes:
+#             if type(c) is xml.dom.minidom.Element:
+#                 print(c.tagName) #cards, players trick
+#
+#
+#     except Exception as ex:
+#         Log.write_exception(ex)
 
 def set_call_banker_action_options(call_banker_stage):
     call_bank = CallBank("Call", "1")
