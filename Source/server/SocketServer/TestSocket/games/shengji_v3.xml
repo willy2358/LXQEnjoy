@@ -20,6 +20,8 @@
                     
       -->
       <card ctype="-" cfigure="-"/>
+      <card ctype="*" cfigure="1"/>
+      <card ctype="h" cfigure="2"/>
     </excludes>
 
     <!--底牌

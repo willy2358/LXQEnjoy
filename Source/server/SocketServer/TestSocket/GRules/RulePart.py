@@ -26,14 +26,15 @@ class RulePart:
                 continue
             if child.tagName != tagName:
                 continue
-
+            valid = True  #the default value is True
             if child.hasAttribute(RulePart.__attr_name_valid):
                 val = child.getAttribute(RulePart.__attr_name_valid)
-                if val.lower().startswith("t"): #True
-                    return True
+                if val.lower().startswith("f"): #False
+                    valid = False
                 else:
-                    return False
-        return False
+                    valid = True
+            return valid
+
 
 
 

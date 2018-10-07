@@ -9,6 +9,10 @@ class Card:
         self.__ctype = ctype
         self.__cfigure = cfigure
         self.__gType = gtype
+        self.__score = 0;
+
+    def set_score(self, score):
+        self.__score = score
 
     @staticmethod
     def create_cards(gtype, ctype, cfigure):
@@ -23,10 +27,12 @@ class Card:
         cards = []
         if strType.startswith("*"):
             for t in Card.get_card_ctypes(gtype):
-                cards.append(t + strFig)
-        if strFig.startswith("*"):
+                cards.append(Card(gtype, t, strFig))
+        elif strFig.startswith("*"):
             for f in Card.get_card_figures(gtype, ctype):
-                cards.append(strType + f)
+                cards.append(Card(gtype, strType, f))
+        else:
+            cards.append(Card(gtype, ctype, cfigure))
 
         return cards
 

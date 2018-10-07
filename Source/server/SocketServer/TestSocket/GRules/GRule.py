@@ -24,7 +24,7 @@ class GRule:
 
             for c in game.childNodes:
                 if type(c) is xml.dom.minidom.Element:
-                    part = RulePartFactory.create_part(c.tagName, c)
+                    part = RulePartFactory.create_part(c.tagName, c, self)
                     if part.parse():
                         self.__parts.append(part)
 
