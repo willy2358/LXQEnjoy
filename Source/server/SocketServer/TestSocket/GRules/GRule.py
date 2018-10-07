@@ -3,6 +3,7 @@ from xml.dom.minidom import parse
 import xml.dom.minidom
 
 import Log
+from Cards.GType import GType
 
 from GRules import RulePartFactory
 
@@ -12,6 +13,7 @@ class GRule:
         self.__parts = []
         self.__game_id = "0"
         self.__game_text = "game"
+        self.__game_type = GType.Poker
 
     def load(self):
         try:
@@ -43,6 +45,13 @@ class GRule:
             return False
         self.__game_text = gameElem.getAttribute("text")
 
+        if gameElem.hasAttribute("gtype"):
+            gtype = gameElem.getAttribute("gtype").lower()
+            if gtype.startswith("p"):
+                self.__game_type = GType.Poker
+            elif gtype.startswith("m"):
+                self.__game_type = GType.Mahong
+
         return True
 
 
@@ -51,4 +60,7 @@ class GRule:
 
     def get_game_text(self):
         return self.__game_text
+
+    def get_gtype(self):
+        return self.__game_type
 
