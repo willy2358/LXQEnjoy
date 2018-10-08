@@ -45,116 +45,114 @@
        由于牌的power由牌的组合方式确定，而牌在打出后组合方式才确定，所以，牌的power在牌打出后，由服务器计算玩家出牌的power.
     -->
     <patterns>
+      <!--
       <vars>
         <var name="card" value="@played_card"/>
         <var name="cards" value="@played_cards"/>
       </vars>
+      -->
       <!--单牌-->
-      <static_power>    
-        <single ctype="*" cfigure="1" power="14"/>
-        <single ctype="*" cfigure="2" power="2" />
-        <single ctype="*" cfigure="3" power="3" />
-        <single ctype="*" cfigure="4" power="4" />
-        <single ctype="*" cfigure="5" power="5" />
-        <single ctype="*" cfigure="6" power="6" />
-        <single ctype="*" cfigure="7" power="7" />
-        <single ctype="*" cfigure="8" power="8" />
-        <single ctype="*" cfigure="9" power="9" />
-        <single ctype="*" cfigure="10" power="10" />
-        <single ctype="*" cfigure="11" power="11" />
-        <single ctype="*" cfigure="12" power="12" />
-        <single ctype="*" cfigure="13" power="13" />
+      <single ctype="*" cfigure="1" power="14"/>
+      <single ctype="*" cfigure="2" power="2" />
+      <single ctype="*" cfigure="3" power="3" />
+      <single ctype="*" cfigure="4" power="4" />
+      <single ctype="*" cfigure="5" power="5" />
+      <single ctype="*" cfigure="6" power="6" />
+      <single ctype="*" cfigure="7" power="7" />
+      <single ctype="*" cfigure="8" power="8" />
+      <single ctype="*" cfigure="9" power="9" />
+      <single ctype="*" cfigure="10" power="10" />
+      <single ctype="*" cfigure="11" power="11" />
+      <single ctype="*" cfigure="12" power="12" />
+      <single ctype="*" cfigure="13" power="13" />
+      <single ctype="j" cfigure="21" power="50"/>
+      <single ctype="j" cfigure="22" power="51"/>
 
-        <single ctype="j" cfigure="21" power="50"/>
-        <single ctype="j" cfigure="22" power="51"/>
-      </static_power>
-
-      <runtime_power>
-        <!--主牌-->
-        <single>
-          <!--主牌花色牌, power range="21-33"-->
-          <let property="@card.power" value=":(cfigure_of(@card) + 20)">
-            <when value_of=":(ctype_of(@card))" ret_as="@round.bank_ctype"/>
-          </let>
-          
-          <!--主牌数字牌-->
-          <let property="@card.power" value="35" >
-            <when value_of=":(cfigure_of(@card))" ret_as="@round.bank_cfigure"/>
-          </let>
-          
-          <!--正主牌-->
-          <let property="@card.power" value="36">
-            <!--
-              多条件判断，test_type: and 与运算，缺省值
-                                   or  或运算              
-            -->
-            <when ttype="and">
-              <case value_of=":(ctype_of(@card))" ret_as="@round.bank_ctype"/>
-              <case value_of=":(cfigure_of(@card))" ret_as="@round.bank_cfigure"/>
-            </when>
-          </let>
-        </single>
-
-        <!--四张 range="6-18"-->
-        <quad name="zha" power=":(max_cfigure_of(@cards) + 5)"/>
+      <!--主牌-->
+      <single>
+        <!--主牌花色牌, power range="21-33"-->
+        <let property="@card.power" value=":(cfigure_of(@card) + 20)">
+          <when value_of=":(ctype_of(@card))" ret_as="@round.bank_ctype"/>
+        </let>
         
-        <!--四张的跟牌-->
-        <comp name="zha_follow" leading="false">
- 
-          <!--非枪毙牌，最小-->
-          <let property="@cards.power" value="0">
-            <when ttype="or">
-              <case value_of=":(ctype_count_of(@cards))" ret_gt="1"/>
-              <cases ttype="and">
-                <case value_of=":(ctype_count_of(@cards))" ret_is="1"/>
-                <case value_of=":(ctype_of(@cards[0]))" ret_not_as="@round.bank_ctype"/>
-              </cases>
-            </when>    
-          </let>
-          
-          <!--枪毙牌，大过四张牌, 前提是手中已没有其他花牌-->
-          <let property="@cards.power" value=":(power_of(max_cfigure_of(@cards)))">
-            <when ttype="and">
-              <case value_of=":(ctype_count_of(@cards))" ret_is="1"/> 
-              <case value_of=":(ctype_of(@cards[0]))" ret_as="@round.bank_ctype"/>
-            </when>
-          </let>        
-        </comp>
+        <!--主牌数字牌-->
+        <let property="@card.power" value="35" >
+          <when value_of=":(cfigure_of(@card))" ret_as="@round.bank_cfigure"/>
+        </let>
+        
+        <!--正主牌-->
+        <let property="@card.power" value="36">
+          <!--
+            多条件判断，test_type: and 与运算，缺省值
+                                  or  或运算              
+          -->
+          <when ttype="and">
+            <case value_of=":(ctype_of(@card))" ret_as="@round.bank_ctype"/>
+            <case value_of=":(cfigure_of(@card))" ret_as="@round.bank_cfigure"/>
+          </when>
+        </let>
+      </single>
 
-        <!--甩牌, 同色，多张-->
-        <same_ctype name="shuai" power=":(power_of(max_cfigure_of(@cards)))">
-          <let property="@cards.leading" value="true">
-            <when>            
-              <!--不能有主牌数字-->
-              <case value_of=":(is_cards_contain_cfigure(@cards, @round.bank_cfigure))" ret_not_is="true"/> 
-              <!--都是大牌-->
-              <case value_of=":(min_cfigure_of(@cards))" ret_gt_as=":(var cs1 = cards_in_other_players_hand(@cards); var cs2 = cards_of_ctype(@cs1, ctype_of(@cards[0])); return max_cfigure_of(@cs2);)"/>
-            </when> 
-          </let>
-        </same_ctype>
+      <!--四张 range="6-18"-->
+      <quad name="zha" power=":(max_cfigure_of(@cards) + 5)"/>
+      
+      <!--四张的跟牌-->
+      <comp name="zha_follow" leading="false">
 
-        <!--甩牌跟牌-->
-        <comp name="shuai_follow" leading="false">  
-          <!--非枪毙牌，最小-->
-          <let property="@cards.power" value="0">
-            <when ttype="or">
-              <case value_of=":(ctype_count_of(@cards))" ret_gt="1"></case>
-              <cases ttype="and">
-                <case value_of=":(ctype_count_of(@cards))" ret_is="1"></case>
-                <case value_of=":(ctype_of(@cards[0]))" ret_not_as="@round.bank_ctype"/>
-              </cases>
-            </when>
-          </let>
+        <!--非枪毙牌，最小-->
+        <let property="@cards.power" value="0">
+          <when ttype="or">
+            <case value_of=":(ctype_count_of(@cards))" ret_gt="1"/>
+            <cases ttype="and">
+              <case value_of=":(ctype_count_of(@cards))" ret_is="1"/>
+              <case value_of=":(ctype_of(@cards[0]))" ret_not_as="@round.bank_ctype"/>
+            </cases>
+          </when>    
+        </let>
+        
+        <!--枪毙牌，大过四张牌, 前提是手中已没有其他花牌-->
+        <let property="@cards.power" value=":(power_of(max_cfigure_of(@cards)))">
+          <when ttype="and">
+            <case value_of=":(ctype_count_of(@cards))" ret_is="1"/> 
+            <case value_of=":(ctype_of(@cards[0]))" ret_as="@round.bank_ctype"/>
+          </when>
+        </let>        
+      </comp>
 
-          <!--枪毙牌，大过四张牌, 前提是手中已没有其他花牌-->
-          <let property="@cards.power" value=":(power_of(max_cfigure_of(@cards)))">
-            <when ttype="and">
+      <!--甩牌, 同色，多张-->
+      <same_ctype name="shuai" power=":(power_of(max_cfigure_of(@cards)))">
+        <let property="@cards.leading" value="true">
+          <when>            
+            <!--不能有主牌数字-->
+            <case value_of=":(is_cards_contain_cfigure(@cards, @round.bank_cfigure))" ret_not_is="true"/> 
+            <!--都是大牌-->
+            <case value_of=":(min_cfigure_of(@cards))" ret_gt_as=":(var cs1 = cards_in_other_players_hand(@cards); var cs2 = cards_of_ctype(@cs1, ctype_of(@cards[0])); return max_cfigure_of(@cs2);)"/>
+          </when> 
+        </let>
+      </same_ctype>
+
+      <!--甩牌跟牌-->
+      <comp name="shuai_follow" leading="false">  
+        <!--非枪毙牌，最小-->
+        <let property="@cards.power" value="0">
+          <when ttype="or">
+            <case value_of=":(ctype_count_of(@cards))" ret_gt="1"></case>
+            <cases ttype="and">
               <case value_of=":(ctype_count_of(@cards))" ret_is="1"></case>
-              <case value_of=":(ctype_of(@cards[0]))" ret_as="@round.bank_ctype"/>
-            </when> 
-          </let> 
-        </comp>
-      </runtime_power>
+              <case value_of=":(ctype_of(@cards[0]))" ret_not_as="@round.bank_ctype"/>
+            </cases>
+          </when>
+        </let>
+
+        <!--枪毙牌，大过四张牌, 前提是手中已没有其他花牌-->
+        <let property="@cards.power" value=":(power_of(max_cfigure_of(@cards)))">
+          <when ttype="and">
+            <case value_of=":(ctype_count_of(@cards))" ret_is="1"></case>
+            <case value_of=":(ctype_of(@cards[0]))" ret_as="@round.bank_ctype"/>
+          </when> 
+        </let> 
+      </comp>
+      
     </patterns>
   </cards>
 
