@@ -1,8 +1,14 @@
 
+from xml.dom.minidom import parse
+import xml.dom.minidom
+
 from GRules.RulePart import RulePart
 from Cards.Card import Card
 from GRules.Kitty import Kitty
+from Patterns.PatternFactory import *
 import Utils
+
+
 
 
 
@@ -21,6 +27,7 @@ class RulePart_Cards(RulePart):
         self.__excluded_cards = []
         self.__kitty = None
         self.__score_cards = []
+        self.__patterns = []
 
     def parse(self):
 
@@ -115,6 +122,12 @@ class RulePart_Cards(RulePart):
         if not RulePart.is_contain_valid_child_node(RulePart_Cards.TAG_NAME_PATTERNS, xmlNode):
             return
         patterns = Utils.getFirstNamedChild(RulePart_Cards.TAG_NAME_PATTERNS, xmlNode)
+        for c in patterns.childNodes:
+            if type(c) is not xml.dom.minidom.Element:
+                continue
+            pat = create_pattern(c.tagName, c)
+            if pat is not None:
+                self.__patterns.append(pat)
 
 
 

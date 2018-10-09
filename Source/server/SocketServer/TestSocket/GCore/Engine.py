@@ -87,3 +87,6 @@ def parse_case(xmlNode):
 def parse_update(xmlNode):
     pass
 
+def parse_clause(xmlNode):
+    pass
+
