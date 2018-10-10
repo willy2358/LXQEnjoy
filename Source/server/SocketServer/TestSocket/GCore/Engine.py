@@ -20,6 +20,9 @@ def value_of(expr):
 def execute(expressions):
     pass
 
+def is_attr_expression(attrValue):
+    return True
+
 
 def is_satisfy(argExpr1, argExpr2, op):
     if op == "ret_as" or op == "ret_is":

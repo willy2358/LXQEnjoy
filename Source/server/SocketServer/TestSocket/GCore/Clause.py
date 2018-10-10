@@ -1,7 +1,8 @@
 
 from GCore.Operator import Operator
+from GCore.Expression import Expression
 
-class Clause:
+class Clause(Expression):
     def __init__(self, Op = Operator.And):
         self.__case = None
         self.__updates = []

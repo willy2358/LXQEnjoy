@@ -1,8 +1,20 @@
 from enum import Enum
 
-class CType(Enum):
-    Any = "*"
-    Undefined = "-"
+TOKEN = "cfigure"
+
+def parse_cfigure(strFig):
+    if strFig.startswith('*'):
+        return CFigure.Any
+    elif strFig.startswith('-'):
+        return CFigure.Undefined
+    elif strFig.isnumeric():
+        return CFigure(int(strFig))
+    else:
+        return CFigure.Undefined
+
+class CFigure(Enum):
+    Any = 100
+    Undefined = -1
     Fig_1 = 1
     Fig_2 = 2
     Fig_3 = 3
@@ -36,4 +48,13 @@ class CType(Enum):
     Fig_29 = 29
 
     Fig_30 = 30
+    Fig_31 = 31
+    Fig_32 = 32
+    Fig_33 = 33
+    Fig_34 = 34
+    Fig_35 = 35
+    Fig_36 = 36
+    Fig_37 = 37
+    Fig_38 = 38
+    Fig_39 = 39
 

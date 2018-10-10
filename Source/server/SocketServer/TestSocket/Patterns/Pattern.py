@@ -1,11 +1,12 @@
 
 
 class Pattern:
+    ATTR_NAME_POWER = "power"
     def __init__(self):
         self.__power = 0
-        self.__power_clauses = []
+        self.__power_expressions = []
         self.__leading = True
-        self.__leading_clauses = []
+        self.__leading_expressions = []
         self.__name
         self.__effect #just a text, user can customize against the text.
 
@@ -16,10 +17,10 @@ class Pattern:
         self.__power = power
 
     def add_power_clause(self, clause):
-        self.__power_clauses.append(clause)
+        self.__power_expressions.append(clause)
 
     def add_leading_clause(self, clause):
-        self.__leading_clauses.append(clause)
+        self.__leading_expressions.append(clause)
 
     def get_leading(self):
         return self.__leading
