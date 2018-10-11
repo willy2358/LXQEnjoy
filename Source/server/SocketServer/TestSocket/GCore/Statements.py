@@ -1,0 +1,1 @@
+from GCore.Statement import Statementclass Statements(Statement):    def __init__(self):        pass

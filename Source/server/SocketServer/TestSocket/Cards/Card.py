@@ -41,7 +41,7 @@ class Card:
         if gtype == GType.Poker:
             return ["c", "h", "d", "s", "j"] # club, heart, diamond, spade, joker
         if gtype == GType.Mahong:
-            return ["w", "s","t", "f", "z", "h"] #wan, suo, tiao, feng, zhong, hua
+            return ["w", "s","t", "f", "a", "h"] #wan, suo, tiao, feng, zhong, hua
 
     @staticmethod
     def get_card_figures(gtype, ctype):

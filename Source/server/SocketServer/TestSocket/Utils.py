@@ -9,7 +9,7 @@ def list_remove_parts(src_list, parts):
     return src_list
 
 
-def getFirstNamedChild(tagName, parentNode):
+def getXmlFirstNamedChild(tagName, parentNode):
     if not parentNode or not tagName:
         return None
 
@@ -20,3 +20,40 @@ def getFirstNamedChild(tagName, parentNode):
             return child
 
     return None
+
+def getXmlNamedChildElments(tagName, parentNode):
+    if not parentNode or not tagName:
+        return None
+
+    elems = []
+    for child in parentNode.childNodes:
+        if type(child) is not xml.dom.minidom.Element:
+            continue
+        if child.tagName == tagName:
+            elems.append(child)
+
+    return elems
+
+def getXmlChildElments(parentNode):
+    if not parentNode:
+        return None
+
+    elems = []
+    for child in parentNode.childNodes:
+        if type(child) is xml.dom.minidom.Element:
+            elems.append(child)
+
+    return elems
+
+def getXmlOtherChildElements(excludedTagName, parentNode):
+    if not parentNode or not excludedTagName:
+        return None
+
+    elems = []
+    for child in parentNode.childNodes:
+        if type(child) is not xml.dom.minidom.Element:
+            continue
+        if child.tagName != excludedTagName:
+            elems.append(child)
+
+    return elems

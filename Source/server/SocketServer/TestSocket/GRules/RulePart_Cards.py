@@ -59,7 +59,7 @@ class RulePart_Cards(RulePart):
         if not RulePart.is_contain_valid_child_node(RulePart_Cards.__tag_name_excludes, xmlNode):
             return
 
-        nodeExcludes = Utils.getFirstNamedChild(RulePart_Cards.__tag_name_excludes, xmlNode)
+        nodeExcludes = Utils.getXmlFirstNamedChild(RulePart_Cards.__tag_name_excludes, xmlNode)
         for child in nodeExcludes.getElementsByTagName(RulePart_Cards.__tag_name_card):
             ctype = "*"
             cfigure = "*"
@@ -78,7 +78,7 @@ class RulePart_Cards(RulePart):
         xmlNode = self.get_xml_node()
         if not RulePart.is_contain_valid_child_node(Kitty.__TAG_NAME_KITTY, xmlNode):
             return
-        kittyNode = Utils.getFirstNamedChild(Kitty.__TAG_NAME_KITTY, xmlNode)
+        kittyNode = Utils.getXmlFirstNamedChild(Kitty.__TAG_NAME_KITTY, xmlNode)
         count = 0
         if kittyNode.hasAttribute(Kitty.COUNT):
             count = int(kittyNode.getAttribute(Kitty.COUNT))
@@ -96,7 +96,7 @@ class RulePart_Cards(RulePart):
         xmlNode = self.get_xml_node()
         if not RulePart.is_contain_valid_child_node(RulePart_Cards.TAG_NAME_SCORE_CARDS, xmlNode):
             return
-        sNode = Utils.getFirstNamedChild(RulePart_Cards.TAG_NAME_SCORE_CARDS, xmlNode)
+        sNode = Utils.getXmlFirstNamedChild(RulePart_Cards.TAG_NAME_SCORE_CARDS, xmlNode)
         for child in sNode.getElementsByTagName(RulePart_Cards.__tag_name_card):
             ctype = "*"
             cfigure = "*"
@@ -121,7 +121,7 @@ class RulePart_Cards(RulePart):
         xmlNode = self.get_xml_node()
         if not RulePart.is_contain_valid_child_node(RulePart_Cards.TAG_NAME_PATTERNS, xmlNode):
             return
-        patterns = Utils.getFirstNamedChild(RulePart_Cards.TAG_NAME_PATTERNS, xmlNode)
+        patterns = Utils.getXmlFirstNamedChild(RulePart_Cards.TAG_NAME_PATTERNS, xmlNode)
         for c in patterns.childNodes:
             if type(c) is not xml.dom.minidom.Element:
                 continue
