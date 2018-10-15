@@ -1,14 +1,16 @@
 
+from Cards.GType import *
 
 class Pattern:
     ATTR_NAME_POWER = "power"
-    def __init__(self):
+    def __init__(self, gRule = GType.Poker):
         self.__power = 0
         self.__power_statements = []
         self.__leading = True
         self.__leading_statements = []
-        self.__name
-        self.__effect #just a text, user can customize against the text.
+        self.__gRule = gRule
+        self.__name = "unknown"
+        self.__effect ="undefined"#just a text, user can customize against the text.
 
     def get_power(self):
         return self.__power
@@ -27,6 +29,9 @@ class Pattern:
 
     def is_my_pattern(self, cards):
         pass
+
+    def getGRule(self):
+        return self.__gRule
 
     @staticmethod
     def calculate_power(cards):

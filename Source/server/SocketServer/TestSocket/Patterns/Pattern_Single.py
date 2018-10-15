@@ -7,6 +7,7 @@ from Cards.CFigure import TOKEN as CFIGURE_TOKEN
 from Cards.CType import CType, parse_ctype
 from Cards.CType import TOKEN as CTYPE_TOKEN
 from GCore.Engine import *
+import GCore.Engine
 from GCore.LeftOperand import LeftOperand
 
 
@@ -14,8 +15,8 @@ from Patterns.Pattern import Pattern
 
 class Pattern_Single(Pattern):
     ELEMENT_NAME = "single"
-    def __init__(self):
-        super(Pattern_Single, self).__init__()
+    def __init__(self, gRule):
+        super(Pattern_Single, self).__init__(gRule)
         self.__ctype = CType.Any
         self.__cfigure = CFigure.Undefined
 
@@ -25,10 +26,10 @@ class Pattern_Single(Pattern):
             return False
         try:
 
-            if xmlElement.hasAttribute(CFIGURE_TOKEN):
-                self.__cfigure = parse_cfigure(xmlElement.getAttribute(CFIGURE_TOKEN))
-            if xmlElement.hasAttribute(CTYPE_TOKEN):
-                self.__ctype = parse_ctype(xmlElement.getAttribute(CTYPE_TOKEN))
+            if xmlElement.hasAttribute(GCore.Engine.attr_name_cfigure):
+                self.__cfigure = parse_cfigure(xmlElement.getAttribute(GCore.Engine.attr_name_cfigure))
+            if xmlElement.hasAttribute(GCore.Engine.attr_name_ctype):
+                self.__ctype = parse_ctype(xmlElement.getAttribute(GCore.Engine.attr_name_ctype), self.getGRule())
             if xmlElement.hasAttribute(Pattern.ATTR_NAME_POWER):
                 powerAttrVal = xmlElement.getAttribute(Pattern.ATTR_NAME_POWER)
                 if powerAttrVal.isnumeric():

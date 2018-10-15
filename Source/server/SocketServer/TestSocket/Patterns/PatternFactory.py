@@ -7,10 +7,10 @@ from Patterns.Pattern_Seq import Pattern_Seq
 from Patterns.Pattern_SameCfigure import Pattern_SameCfigure
 from Patterns.Pattern_SameCtype import Pattern_SameCtype
 
-def create_pattern(elemName, xmlElement):
+def create_pattern(elemName, xmlElement, gRule):
     pat = None
     if elemName == Pattern_Single.ELEMENT_NAME:
-        pat = Pattern_Single()
+        pat = Pattern_Single(gRule)
     elif elemName == Pattern_SameCfigure.ELEMENT_NAME \
             or elemName == Pattern_SameCfigure.ELEMENT_PAIR\
             or elemName == Pattern_SameCfigure.ELEMENT_TRIPLE\

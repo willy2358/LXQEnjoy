@@ -6,6 +6,7 @@ from GRules.RulePart import RulePart
 from Cards.Card import Card
 from GRules.Kitty import Kitty
 from Patterns.PatternFactory import *
+import GCore.Engine
 import Utils
 
 
@@ -16,7 +17,7 @@ class RulePart_Cards(RulePart):
     __part_name = "cards"
     __attr_name_sets = "sets"
     __tag_name_excludes = "excludes"
-    __tag_name_card = "card"
+    tag_name_card = "card"
     TAG_NAME_SCORE_CARDS = "score_cards"
     ATTR_NAME_SCORE = "score"
     TAG_NAME_PATTERNS = "patterns"
@@ -60,7 +61,7 @@ class RulePart_Cards(RulePart):
             return
 
         nodeExcludes = Utils.getXmlFirstNamedChild(RulePart_Cards.__tag_name_excludes, xmlNode)
-        for child in nodeExcludes.getElementsByTagName(RulePart_Cards.__tag_name_card):
+        for child in nodeExcludes.getElementsByTagName(RulePart_Cards.tag_name_card):
             ctype = "*"
             cfigure = "*"
             if child.hasAttribute(Card.CTYPE):
@@ -76,15 +77,15 @@ class RulePart_Cards(RulePart):
 
     def read_kitty(self):
         xmlNode = self.get_xml_node()
-        if not RulePart.is_contain_valid_child_node(Kitty.__TAG_NAME_KITTY, xmlNode):
+        if not RulePart.is_contain_valid_child_node(Kitty.TAG_NAME_KITTY, xmlNode):
             return
-        kittyNode = Utils.getXmlFirstNamedChild(Kitty.__TAG_NAME_KITTY, xmlNode)
+        kittyNode = Utils.getXmlFirstNamedChild(Kitty.TAG_NAME_KITTY, xmlNode)
         count = 0
-        if kittyNode.hasAttribute(Kitty.COUNT):
-            count = int(kittyNode.getAttribute(Kitty.COUNT))
+        if kittyNode.hasAttribute(Kitty.ATTR_NAME_COUNT):
+            count = int(kittyNode.getAttribute(Kitty.ATTR_NAME_COUNT))
         pub_shown = False
-        if kittyNode.hasAttribute(Kitty.PUBLIC_SHOWN):
-            val = kittyNode.getAttribute(Kitty.PUBLIC_SHOWN)
+        if kittyNode.hasAttribute(Kitty.ATTR_NAME_PUBLIC_SHOWN):
+            val = kittyNode.getAttribute(Kitty.ATTR_NAME_PUBLIC_SHOWN)
             if val.lower().startswith("t"):
                 pub_shown = True
 
@@ -97,7 +98,7 @@ class RulePart_Cards(RulePart):
         if not RulePart.is_contain_valid_child_node(RulePart_Cards.TAG_NAME_SCORE_CARDS, xmlNode):
             return
         sNode = Utils.getXmlFirstNamedChild(RulePart_Cards.TAG_NAME_SCORE_CARDS, xmlNode)
-        for child in sNode.getElementsByTagName(RulePart_Cards.__tag_name_card):
+        for child in sNode.getElementsByTagName(GCore.Engine.tag_name_card):
             ctype = "*"
             cfigure = "*"
             if child.hasAttribute(Card.CTYPE):
@@ -125,7 +126,7 @@ class RulePart_Cards(RulePart):
         for c in patterns.childNodes:
             if type(c) is not xml.dom.minidom.Element:
                 continue
-            pat = create_pattern(c.tagName, c)
+            pat = create_pattern(c.tagName, c, self.getGRule())
             if pat is not None:
                 self.__patterns.append(pat)
 

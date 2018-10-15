@@ -3,7 +3,7 @@ from Cards.GType import GType
 
 TOKEN = "ctype"
 
-def parse_ctype(strCtype, gType):
+def parse_ctype(strCtype, gType = GType.Poker):
     if gType == GType.Poker:
         if strCtype.startswith('c'):
             return CType.P_Club
