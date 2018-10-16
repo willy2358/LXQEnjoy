@@ -1,4 +1,5 @@
 
 class PlayScene:
     def __init__(self):
-        pass
+        self.__cur_round = None
+        self.__history_rounds = []

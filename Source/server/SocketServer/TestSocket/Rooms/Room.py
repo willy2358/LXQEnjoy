@@ -4,11 +4,14 @@ import InterProtocol
 import Errors
 import Log
 
+from Rooms.Closet import Closet
 
-class Room:
-    def __init__(self, room_id, game_rule):
-        self._room_id = room_id
-        self._game_rule = game_rule
+class Room(Closet):
+    def __init__(self, gRule, roomId):
+        super(Room, self).__init__(gRule, roomId)
+
+        self._room_id = roomId
+        self._game_rule = gRule
         self._seated_players = []
         # self._lookon_players = []
         self._all_players = []

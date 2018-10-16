@@ -70,179 +70,9 @@ timer_clear_dead_connection = None
 
 MAX_PLAYER_NUM_IN_ROOM = 8
 
-# dou di zu
-def init_poker_rule_doudizu():
-    rule_id = "1212"
-    rule = GameRule_Poker(rule_id)
-    rule.set_player_min_number(3)
-    rule.set_player_max_number(3)
-    rule.set_cards_number_not_deal(3)
-    cards = CardsMaster.Pokers
-    rule.set_cards(cards)
-
-    stage = GroupPlayers(rule)
-    rule.add_game_stage(stage)
-
-    stage = DealCards(rule)
-    rule.add_game_stage(stage)
-
-    stage = CallBanker(rule)
-    rule.add_game_stage(stage)
-    set_call_banker_action_options(stage)
-
-    stage = TeamPlayers(rule)
-    rule.add_game_stage(stage)
-
-    stage = PlayCards(rule)
-    rule.add_game_stage(stage)
-
-    stage = TellWinner(rule)
-    rule.add_game_stage(stage)
-
-    stage = CalScores(rule)
-    rule.add_game_stage(stage)
-
-    stage = PublishScores(rule)
-    rule.add_game_stage(stage)
-
-    #__PlayRules[rule_id] = rule
-    GameRules[rule_id] = rule
-
-
-# da tong guai san jiao
-def init_majiang_rule_guaisanjiao():
-    rule_id = 111
-    rule = GameRule_Majiang(rule_id)
-    rule.set_player_min_number(3)
-    rule.set_player_max_number(4)
-    rule.set_cards(CardsMaster.majiang_wans + CardsMaster.majiang_suos + CardsMaster.majiang_tons)
-
-    stage = RandomBanker(rule)
-    rule.add_game_stage(stage)
-    stage = DealMaJiangs(rule)
-    rule.add_game_stage(stage)
-    stage = PlayMajiang(rule)
-    rule.add_game_stage(stage)
-    stage = TellWinner_Majiang(rule)
-    rule.add_game_stage(stage)
-    stage = PublishScores(rule)
-    rule.add_game_stage(stage)
-
-    rule.ScoreRule.set_base_score(3)
-    rule.ScoreRule.set_zimo_score(2)
-    rule.ScoreRule.set_ting_kou_count_score(1, 2)
-    rule.ScoreRule.set_ting_kou_count_score(2, 1)
-    rule.ScoreRule.set_ting_kou_count_score(3, 1)
-    rule.ScoreRule.set_ting_kou_count_score(4, 1)
-    rule.ScoreRule.set_ting_kou_count_score(5, 1)
-    rule.ScoreRule.set_ting_kou_count_score(6, 1)
-    rule.ScoreRule.set_ting_kou_count_score(7, 1)
-    rule.ScoreRule.set_score_formular("(B + N) * P * W")
-
-    load_majiang_patterns(rule)
-
-    GameRules[rule_id] = rule
-
-
-def load_majiang_patterns(majiang_rule):
-
-    wan_s = CardsMaster.def_wans["wan-1"]
-    suo_s = CardsMaster.def_suos["suo-1"]
-    ton_s = CardsMaster.def_tons["ton-1"]
-
-    pat = PatternModes("qing-long", 10)
-    pat.add_mode(Mode_Seq(wan_s, 3))
-    pat.add_mode(Mode_Seq(wan_s + 3, 3))
-    pat.add_mode(Mode_Seq(wan_s + 6, 3))
-    pat.add_mode(Mode_AllInRange(wan_s, wan_s + 8))
-    majiang_rule.add_win_pattern(pat)
-
-    pat = PatternModes("qing-long", 10)
-    pat.add_mode(Mode_Seq(suo_s, 3))
-    pat.add_mode(Mode_Seq(suo_s + 3, 3))
-    pat.add_mode(Mode_Seq(suo_s + 6, 3))
-    pat.add_mode(Mode_AllInRange(suo_s, suo_s + 8))
-    majiang_rule.add_win_pattern(pat)
-
-    pat = PatternModes("qing-long", 10)
-    pat.add_mode(Mode_Seq(ton_s, 3))
-    pat.add_mode(Mode_Seq(ton_s + 3, 3))
-    pat.add_mode(Mode_Seq(ton_s + 6, 3))
-    pat.add_mode(Mode_AllInRange(ton_s, ton_s + 8))
-    majiang_rule.add_win_pattern(pat)
-    majiang_rule.ScoreRule.set_pattern_score("qing-long", 10)
-
-    pat = PatternModes("qing-pairs", 10)
-    pat.add_mode(Mode_AllPairs())
-    pat.add_mode(Mode_AllInRange(wan_s, wan_s + 8))
-    majiang_rule.add_win_pattern(pat)
-
-    pat = PatternModes("qing-pairs", 10)
-    pat.add_mode(Mode_AllPairs())
-    pat.add_mode(Mode_AllInRange(suo_s, suo_s + 8))
-    majiang_rule.add_win_pattern(pat)
-
-    pat = PatternModes("qing-pairs", 10)
-    pat.add_mode(Mode_AllPairs())
-    pat.add_mode(Mode_AllInRange(ton_s, ton_s + 8))
-    majiang_rule.add_win_pattern(pat)
-    majiang_rule.ScoreRule.set_pattern_score("qing-pairs", 10)
-
-    pat = PatternModes("qing", 5)
-    pat.add_mode(Mode_AllInRange(wan_s, wan_s + 8))
-    majiang_rule.add_win_pattern(pat)
-
-    pat = PatternModes("qing", 5)
-    pat.add_mode(Mode_AllInRange(suo_s, suo_s + 8))
-    majiang_rule.add_win_pattern(pat)
-
-    pat = PatternModes("qing", 5)
-    pat.add_mode(Mode_AllInRange(ton_s, ton_s + 8))
-    majiang_rule.add_win_pattern(pat)
-    majiang_rule.ScoreRule.set_pattern_score("qing", 5)
-
-    pat = PatternModes("long", 5)
-    pat.add_mode(Mode_Seq(wan_s, 3))
-    pat.add_mode(Mode_Seq(wan_s + 3, 3))
-    pat.add_mode(Mode_Seq(wan_s + 6, 3))
-    pat.add_mode(Mode_AnyOutRange(wan_s, wan_s + 8))
-
-    pat = PatternModes("long", 5)
-    pat.add_mode(Mode_Seq(suo_s, 3))
-    pat.add_mode(Mode_Seq(suo_s + 3, 3))
-    pat.add_mode(Mode_Seq(suo_s + 6, 3))
-    pat.add_mode(Mode_AnyOutRange(suo_s, suo_s + 8))
-    majiang_rule.add_win_pattern(pat)
-
-    pat = PatternModes("long", 5)
-    pat.add_mode(Mode_Seq(ton_s, 3))
-    pat.add_mode(Mode_Seq(ton_s + 3, 3))
-    pat.add_mode(Mode_Seq(ton_s + 6, 3))
-    pat.add_mode(Mode_AnyOutRange(ton_s, suo_s + 8))
-    majiang_rule.add_win_pattern(pat)
-    majiang_rule.ScoreRule.set_pattern_score("long", 5)
-
-    pat = PatternModes("pairs", 5)
-    pat.add_mode(Mode_AllPairs())
-    pat.add_mode(Mode_AnyInRange(wan_s, wan_s + 8))
-    pat.add_mode(Mode_AnyInRange(ton_s, ton_s + 8))
-    majiang_rule.add_win_pattern(pat)
-
-    pat = PatternModes("pairs", 5)
-    pat.add_mode(Mode_AllPairs())
-    pat.add_mode(Mode_AnyInRange(wan_s, wan_s + 8))
-    pat.add_mode(Mode_AnyInRange(suo_s, suo_s + 8))
-    majiang_rule.add_win_pattern(pat)
-
-    pat = PatternModes("pairs", 5)
-    pat.add_mode(Mode_AllPairs())
-    pat.add_mode(Mode_AnyInRange(suo_s, suo_s + 8))
-    pat.add_mode(Mode_AnyInRange(ton_s, ton_s + 8))
-    majiang_rule.add_win_pattern(pat)
-    majiang_rule.ScoreRule.set_pattern_score("pairs", 5)
 
 def initialize():
-    init_play_rules()
+    load_games()
 
     start_timer_to_clear_dead_connection()
 
@@ -251,13 +81,6 @@ def start_timer_to_clear_dead_connection():
     timer_clear_dead_connection = Timer(timeout * 60, remove_dead_connection)
     timer_clear_dead_connection.start()
 
-def init_play_rules():
-    # init_poker_rule_doudizu()
-    try:
-        # init_majiang_rule_guaisanjiao()
-        load_games()
-    except Exception as ex:
-        print(ex)
 
 def load_games():
     try:
@@ -274,44 +97,6 @@ def load_games():
 
     except Exception as ex:
         Log.write_exception(ex)
-
-# def load_game(gameConfig):
-#     try:
-#
-#         DOMTree = xml.dom.minidom.parse(gameConfig)
-#         game = DOMTree.documentElement
-#         for c in game.childNodes:
-#             if type(c) is xml.dom.minidom.Element:
-#                 print(c.tagName) #cards, players trick
-#
-#
-#     except Exception as ex:
-#         Log.write_exception(ex)
-
-def set_call_banker_action_options(call_banker_stage):
-    call_bank = CallBank("Call", "1")
-
-    call_banker_stage.add_player_action(call_bank)
-
-    c11 = call_bank.add_follow_up_action(CallBank("Rob", "1-1"))
-    c111 = c11.add_follow_up_action(CallBank("Rob", "1-1-1"))
-    c112 = c11.add_follow_up_action(PassCall("Not Rob", "1-1-2"), True)
-
-    c12 = call_bank.add_follow_up_action(PassCall("Not Rob", "1-2"), True)
-    c121 = c12.add_follow_up_action(CallBank("Rob", "1-2-1"))
-    c122 = c12.add_follow_up_action(PassCall("Not Rob", "1-2-2"), True)
-
-    not_call = PassCall("Not Call", "2")
-    call_banker_stage.add_player_action(not_call, True)
-
-    c21 = not_call.add_follow_up_action(CallBank("Call", "2-1"))
-    c211 = c21.add_follow_up_action(CallBank("Rob", "2-1-1"))
-    c212 = c21.add_follow_up_action(PassCall("Not Rob", "2-1-2"), True)
-
-    c22 = not_call.add_follow_up_action(PassCall("Not Call", "2-2"), True)
-    c221 = c22.add_follow_up_action(CallBank("Call", "2-2-1"))
-    c222 = c22.add_follow_up_action(PassCall("Not Call", "2-2-2"), True)
-
 
 def validate_player(j_obj):
     if InterProtocol.user_id not in j_obj \
@@ -341,7 +126,6 @@ def dispatch_player_commands(conn, comm_text):
             process_client_request(conn, j_obj)
     except Exception as ex:
         Log.write_exception(ex)
-        print(ex)
 
 
 def send_msg_to_client(conn, msg):
