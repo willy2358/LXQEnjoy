@@ -12,6 +12,7 @@ from GCore.LeftOperand import LeftOperand
 
 
 from Patterns.Pattern import Pattern
+from GCore.Runtime import Runtime
 
 class Pattern_Single(Pattern):
     ELEMENT_NAME = "single"
@@ -43,9 +44,9 @@ class Pattern_Single(Pattern):
                 if s is None:
                     continue
                 targetProp = s.get_target_property()
-                if targetProp == LeftOperand.CARDS_POWER.value :
+                if targetProp == Runtime.CARDS_POWER :
                     self.add_power_statement(s)
-                elif targetProp == LeftOperand.CARDS_POWER.value:
+                elif targetProp == Runtime.CARDS_LEADING:
                     self.add_leading_statement(s)
 
         except Exception as ex:

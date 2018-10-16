@@ -18,11 +18,11 @@ class Pattern:
     def set_power(self, power):
         self.__power = power
 
-    def add_power_statement(self, clause):
-        self.__power_statements.append(clause)
+    def add_power_statement(self, statement):
+        self.__power_statements.append(statement)
 
-    def add_leading_statement(self, clause):
-        self.__leading_statements.append(clause)
+    def add_leading_statement(self, statement):
+        self.__leading_statements.append(statement)
 
     def get_leading(self):
         return self.__leading
