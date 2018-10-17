@@ -3,5 +3,5 @@ enjoy lxlx
 
 dependencies:
 watchdog
-install: 
-pip install watchdog
+### install: 
+pip3 install watchdog
