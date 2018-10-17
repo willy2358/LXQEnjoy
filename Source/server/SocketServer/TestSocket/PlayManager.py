@@ -45,7 +45,7 @@ from CardsPattern.Mode_Seq import Mode_Seq
 from CardsPattern.Mode_Triple import Mode_Triple
 
 from GRules.GRule import GRule
-
+import Accessors
 
 Conn_Players = {} #{connection, player}
 # __Players = []
@@ -57,6 +57,8 @@ __Waiting_Players = {}
 __PlayRules = {}
 
 __game_rounds = []
+
+__accessors = {}
 
 
 SERVER_CMD_DEAL_BEGIN = "deal_begin"  # 开始发牌
@@ -72,8 +74,8 @@ MAX_PLAYER_NUM_IN_ROOM = 8
 
 
 def initialize():
+    load_accessors()
     load_games()
-
     start_timer_to_clear_dead_connection()
 
 def start_timer_to_clear_dead_connection():
@@ -81,10 +83,19 @@ def start_timer_to_clear_dead_connection():
     timer_clear_dead_connection = Timer(timeout * 60, remove_dead_connection)
     timer_clear_dead_connection.start()
 
+def load_accessors():
+    try:
+        configDir = os.path.join(os.getcwd(), "accessors")
+        Accessors.set_config_dir(configDir)
+        if os.path.exists(configDir):
+            Accessors.reload()
+        Accessors.start_watcher()
+    except Exception as ex:
+        Log.write_exception(ex)
 
 def load_games():
     try:
-        prefile = os.path.join(os.getcwd(), "games")
+        prefile = os.path.join(os.getcwd(), "gconfigs")
         for (root, _, files) in os.walk(prefile):
             for f in files:
                 if f.endswith(".xml"):
@@ -144,39 +155,53 @@ def send_welcome_to_new_connection(conn):
     welcome_msg = "welcome,just enjoy!"
     send_msg_to_client(conn, welcome_msg)
 
+def process_register_player(conn, req_json):
+    pass
+
+def process_create_room(conn, req_json):
+    pass
+
+def process_player_request(conn, req_json):
+    cmd = req_json[InterProtocol.sock_req_cmd]
+    user_id = req_json[InterProtocol.user_id]
+    if user_id not in Players:
+        player = PlayerClient(conn, user_id)
+        Players[user_id] = player
+        Log.write_info("new player:" + str(user_id))
+        Conn_Players[conn] = player
+        Log.write_info("client number:" + str(len(Conn_Players)))
+    else:
+        player = Players[user_id]
+        if player.get_socket_conn() != conn:
+            if player.get_is_online():
+                send_err_pack_to_client(conn, cmd, Errors.player_already_in_game)
+                return
+            else:
+                player.update_connection(conn)
+                return
+    if player:
+        player.update_last_alive()
+
+    roomid = str(req_json[InterProtocol.room_id])
+    if not roomid or roomid == "-1" or roomid == "0" or roomid.lower() == "null" or roomid.lower() == "none":
+        Lobby.process_player_request(player, req_json)
+    else:
+        room, err = get_room(cmd, roomid, req_json[InterProtocol.game_id])
+        if not room:
+            send_err_pack_to_client(conn, cmd, err)
+        else:
+            room.process_player_cmd_request(player, req_json)
 
 def process_client_request(conn, req_json):
     try:
         player = None
         cmd = req_json[InterProtocol.sock_req_cmd]
-        user_id = req_json[InterProtocol.user_id]
-        if user_id not in Players:
-            player = PlayerClient(conn, user_id)
-            Players[user_id] = player
-            Log.write_info("new player:" + str(user_id))
-            Conn_Players[conn] = player
-            Log.write_info("client number:" + str(len(Conn_Players)))
+        if cmd == InterProtocol.client_req_cmd_reg_player:
+            process_register_player(conn, req_json)
+        elif cmd == InterProtocol.client_req_cmd_new_room:
+            process_create_room(conn, req_json)
         else:
-            player = Players[user_id]
-            if player.get_socket_conn() != conn:
-                if player.get_is_online():
-                    send_err_pack_to_client(conn, cmd, Errors.player_already_in_game)
-                    return
-                else:
-                    player.update_connection(conn)
-                    return
-        if player:
-            player.update_last_alive()
-
-        roomid = str(req_json[InterProtocol.room_id])
-        if not roomid or roomid == "-1" or roomid == "0" or roomid.lower() == "null" or roomid.lower() == "none":
-            Lobby.process_player_request(player, req_json)
-        else:
-            room,err = get_room(cmd, roomid, req_json[InterProtocol.game_id])
-            if not room:
-                send_err_pack_to_client(conn, cmd, err)
-            else:
-                room.process_player_cmd_request(player, req_json)
+            process_player_request(conn, req_json)
 
     except Exception as ex:
         Log.write_exception(ex)
@@ -187,7 +212,7 @@ def is_room_for_inner_test(room_id):
 
 def get_room(cmd, room_id, game_id):
     if room_id in Rooms:
-        return Rooms[room_id],0
+        return Rooms[room_id],Errors.ok
 
     if cmd.lower() == InterProtocol.client_req_cmd_enter_room.lower():
         if is_room_for_inner_test(room_id):

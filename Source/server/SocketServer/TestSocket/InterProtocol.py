@@ -16,12 +16,15 @@ resp_seated_players = "seated-players"
 resp_room = "room"
 resp_seats_ids = "seats"
 
-
+client_req_cmd_reg_player = "reg-player"  # register player
+client_req_cmd_new_room = "new-room"      # create a new room
 client_req_cmd_join_game = "join-game"   # 加入游戏
 client_req_cmd_leave_game = "leave-game" #离开游戏
 client_req_select_action = "sel-act"
 client_req_type_reconnect = "reconnect"   # 断线重连
 client_req_type_exe_cmd = "exe-cmd"
+
+
 client_req_exe_cmd = "cmd"
 client_req_cmd_param = "cmd-param"
 client_req_robot_play = "robot-play"
