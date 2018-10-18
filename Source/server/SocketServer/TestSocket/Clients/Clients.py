@@ -35,6 +35,13 @@ def start_watcher():
     observer.start()
     observer.join()
 
+def get_client(clientid):
+    for c in __clients:
+        if c.get_clientid() == clientid:
+            return c
+
+    return None
+
 
 def is_client_valid(client, token):
     ret = False

@@ -5,6 +5,8 @@ class PlayScene:
         self.__history_rounds = []
         self.__players = []
 
+    def is_player_in(self, player):
+        return player in self.__players
 
     def get_players(self):
         return self.__players
@@ -16,3 +18,7 @@ class PlayScene:
     def remove_player(self, player):
         if player in self.__players:
             self.__players.remove(player)
+
+
+
+

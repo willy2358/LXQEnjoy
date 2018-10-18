@@ -35,7 +35,8 @@ class PlayerClient:
         self.__session_token = ""
         self.__last_alive_time = datetime.now()
         self.__last_sent_cmd_str = ""
-        self.__entity_id = 0
+        self.__client_id = 0       # clientid + userid 标识唯一的player
+        self.__my_closet = None
 
 
     def is_banker(self):
@@ -60,7 +61,7 @@ class PlayerClient:
         return self.__user_id
 
     def get_entity_id(self):
-        return self.__entity_id
+        return self.__client_id
 
     def get_seat_id(self):
         return self.__seat_id
@@ -79,6 +80,9 @@ class PlayerClient:
 
     def get_my_room(self):
         return self.__my_room
+
+    def get_my_closet(self):
+        return self.__my_closet
 
     def update_connection(self, conn):
         self.__socket__conn = conn
@@ -118,11 +122,14 @@ class PlayerClient:
     def set_my_room(self, room):
         self.__my_room = room
 
+    def set_my_closet(self, closet):
+        self.__my_closet = closet
+
     def set_seat_id(self, seatid):
         self.__seat_id = seatid
 
     def set_entity_id(self, entid):
-        self.__entity_id = entid
+        self.__client_id = entid
 
     def reset_for_next_round(self):
         self.__cards_in_hand = []
