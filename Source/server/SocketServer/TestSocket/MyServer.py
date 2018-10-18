@@ -38,13 +38,14 @@ HOST, PORT = "127.0.0.1", 9229
     # HOST, PORT = "117.78.40.54", 9229
 server = socketserver.ThreadingTCPServer((HOST, PORT), MyTCPHandler)
 
-# thread = None
+thread = None
 
 def run_background_server():
-
+    global thread
     thread = threading.Thread(group=None, target=server.serve_forever)
     thread.setDaemon(True)
     thread.start()
+    # thread.join()
 
 
 
@@ -59,6 +60,7 @@ if __name__ == "__main__":
         if line == "qz":
             server.server_close()
             server.shutdown()
+
             print("socket server closed")
             break
 

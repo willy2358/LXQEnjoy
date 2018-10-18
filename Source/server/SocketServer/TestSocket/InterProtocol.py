@@ -67,6 +67,7 @@ room_id = "roomid"
 user_id = "userid"
 game_id = "gameid"
 seat_id = "seatid"
+client_id = "clientid"  #机构id
 
 
 player_state = "player-state"

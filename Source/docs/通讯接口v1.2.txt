@@ -368,7 +368,7 @@ user-info，用户信息，具体待定
 	cmdtype:"sockreq",
 	sockreq:"reg-player",
 	userid: 1111,            //玩家的id
-	entityid:2345,           //购买API服务的机构id 
+	clientid:2345,           //购买API服务的机构id 
 	token:"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN"  //机构的凭证
  }
 
@@ -390,7 +390,7 @@ user-info，用户信息，具体待定
 	sockreq:"new-room",
 	userid: 1111,     //玩家id
 	gameid:111,       
-	entityid: 111,    //机构id
+	clientid: 111,    //机构id
 	token:"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN"   //玩家的凭证
 	"auto-enter":1,                          //房间创建完成后是否自动进入房间，1: 进入； 0：不进入
 	"max-players": 8,                        //房间可容纳的玩家数，此数字应该 > 游戏的最小玩家数
@@ -422,7 +422,7 @@ user-info，用户信息，具体待定
 	"cmdtype":"sockreq",
 	"sockreq":"enter-room",
 	"userid",123456,
-	"entityid":111,
+	"clientid":111,
 	"token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN",
 	“gameid":12,
 	"roomid",122424，//roomid为0，-1，或空时，为进入游戏大厅

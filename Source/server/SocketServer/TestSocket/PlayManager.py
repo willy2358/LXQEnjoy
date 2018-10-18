@@ -78,7 +78,7 @@ MAX_PLAYER_NUM_IN_ROOM = 8
 
 def initialize():
     load_clients()
-    load_games()
+    load_rules()
     start_timer_to_clear_dead_connection()
 
 def start_timer_to_clear_dead_connection():
@@ -96,7 +96,7 @@ def load_clients():
     except Exception as ex:
         Log.write_exception(ex)
 
-def load_games():
+def load_rules():
     try:
         prefile = os.path.join(os.getcwd(), config_dir_rules)
         for (root, _, files) in os.walk(prefile):
