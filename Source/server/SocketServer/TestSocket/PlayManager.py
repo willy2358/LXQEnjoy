@@ -43,9 +43,9 @@ from CardsPattern.Mode_AnyOutRange import Mode_AnyOutRange
 from CardsPattern.Mode_Pair import Mode_Pair
 from CardsPattern.Mode_Seq import Mode_Seq
 from CardsPattern.Mode_Triple import Mode_Triple
+from Clients import Clients
 
 from GRules.GRule import GRule
-import Accessors
 
 Conn_Players = {} #{connection, player}
 # __Players = []
@@ -60,9 +60,12 @@ __game_rounds = []
 
 __accessors = {}
 
+config_dir_clients = "clients"
+config_dir_rules = "rules"
 
-SERVER_CMD_DEAL_BEGIN = "deal_begin"  # 开始发牌
-SERVER_CMD_DEAL_FINISH = "deal_finish"   # 结束发牌
+
+SERVER_CMD_DEAL_BEGIN = "deal_begin"
+SERVER_CMD_DEAL_FINISH = "deal_finish"
 
 CLIENT_REQ_SELECT_ACTION = "sel-act"
 
@@ -74,7 +77,7 @@ MAX_PLAYER_NUM_IN_ROOM = 8
 
 
 def initialize():
-    load_accessors()
+    load_clients()
     load_games()
     start_timer_to_clear_dead_connection()
 
@@ -83,19 +86,19 @@ def start_timer_to_clear_dead_connection():
     timer_clear_dead_connection = Timer(timeout * 60, remove_dead_connection)
     timer_clear_dead_connection.start()
 
-def load_accessors():
+def load_clients():
     try:
-        configDir = os.path.join(os.getcwd(), "accessors")
-        Accessors.set_config_dir(configDir)
+        configDir = os.path.join(os.getcwd(), config_dir_clients)
+        Clients.set_config_dir(configDir)
         if os.path.exists(configDir):
-            Accessors.reload()
-        Accessors.start_watcher()
+            Clients.reload()
+        Clients.start_watcher()
     except Exception as ex:
         Log.write_exception(ex)
 
 def load_games():
     try:
-        prefile = os.path.join(os.getcwd(), "gconfigs")
+        prefile = os.path.join(os.getcwd(), config_dir_rules)
         for (root, _, files) in os.walk(prefile):
             for f in files:
                 if f.endswith(".xml"):
