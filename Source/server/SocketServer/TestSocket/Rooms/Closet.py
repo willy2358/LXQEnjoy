@@ -5,7 +5,7 @@ class Closet:
         self.__gRule = gRule
         self.__roomId = roomId
         self.__playScene = PlayScene()
-        self.__seated_players = []
+        self._players = []
 
     def get_rule(self):
         return self.__gRule
@@ -16,22 +16,24 @@ class Closet:
     def get_scene(self):
         return self.__playScene
 
-    def get_seated_players(self):
-        return self.__seated_players
+    def get_scene_players(self):
+        return self.__playScene.get_players()
 
-    def get_seated_players_count(self):
-        return len(self.__seated_players)
+    def get_players_count(self):
+        return len(self._players)
 
     def is_player_in(self, player):
-        return player in self.__seated_players
+        return player in self._players
 
-    def add_seated_player(self, player):
-        if player not in self.__seated_players:
-            self.__seated_players.append(player)
+    def add_player(self, player):
+        if player not in self._players:
+            self._players.append(player)
 
-    def remove_seated_player(self, player):
-        if player in self.__seated_players:
-            self.__seated_players.remove(player)
+    def remove_player(self, player):
+        if player in self._players:
+            self._players.remove(player)
+
+        self.__playScene.remove_player(player)
 
 
 

@@ -40,7 +40,7 @@ class Room(Closet):
     def get_room_id(self):
         return self._room_id
 
-    def get_seated_players(self):
+    def get_scene_players(self):
         return self._seated_players
 
     def get_last_winners(self):

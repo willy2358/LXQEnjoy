@@ -35,6 +35,8 @@ class PlayerClient:
         self.__session_token = ""
         self.__last_alive_time = datetime.now()
         self.__last_sent_cmd_str = ""
+        self.__entity_id = 0
+
 
     def is_banker(self):
         return self.__is_banker
@@ -56,6 +58,9 @@ class PlayerClient:
 
     def get_user_id(self):
         return self.__user_id
+
+    def get_entity_id(self):
+        return self.__entity_id
 
     def get_seat_id(self):
         return self.__seat_id
@@ -115,6 +120,9 @@ class PlayerClient:
 
     def set_seat_id(self, seatid):
         self.__seat_id = seatid
+
+    def set_entity_id(self, entid):
+        self.__entity_id = entid
 
     def reset_for_next_round(self):
         self.__cards_in_hand = []

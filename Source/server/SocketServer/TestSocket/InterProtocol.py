@@ -263,7 +263,7 @@ def create_request_error_packet(player_req_cmd):
 
 def create_players_total_score_in_room(room):
     scores = []
-    for p in room.get_seated_players():
+    for p in room.get_scene_players():
         scores.append({user_id: p.get_user_id(), server_push_score: room.get_player_total_score(p)})
 
     packet = {
