@@ -112,9 +112,9 @@ def load_rules():
     except Exception as ex:
         Log.write_exception(ex)
 
-def validate_player(j_obj):
+def validate_req_packet(j_obj):
     if InterProtocol.user_id not in j_obj \
-            or InterProtocol.room_id not in j_obj \
+            or InterProtocol.client_id not in j_obj \
             or InterProtocol.sock_req_cmd not in j_obj:
         return False
     else:
@@ -131,7 +131,7 @@ def dispatch_player_commands(conn, comm_text):
         send_err_pack_to_client(conn, 'unknown', Errors.invalid_packet_format)
         return
 
-    if not validate_player(j_obj):
+    if not validate_req_packet(j_obj):
         send_err_pack_to_client(conn, "invalid", Errors.invalid_request_parameter)
         return
 
@@ -141,123 +141,133 @@ def dispatch_player_commands(conn, comm_text):
     except Exception as ex:
         Log.write_exception(ex)
 
+def send_pack_to_client(conn, pack):
+    j_str = json.dumps(pack)
+    msg = "LXQ<(:" + j_str + ":)>QXL"
+    send_msg_to_client(msg)
+
+def send_err_pack_to_client(clientConn, cmd, errCode):
+    err_pack = InterProtocol.create_error_pack(cmd, errCode);
+    err_str = json.dumps(err_pack)
+    msg = "LXQ<(:" + err_str + ":)>QXL"
+    send_msg_to_client(clientConn, msg)
 
 def send_msg_to_client(conn, msg):
-
     try:
         conn.sendall(msg.encode(encoding="utf-8"))
     except Exception as ex:
         Log.write_exception(ex)
 
-def send_err_pack_to_client(clientConn, cmd, errCode):
-    err_pack = InterProtocol.create_error_pack(cmd, errCode);
-    err_str = json.dumps(err_pack)
-    send_msg_to_client(clientConn, err_str)
-
 def send_welcome_to_new_connection(conn):
     welcome_msg = "welcome,just enjoy!"
     send_msg_to_client(conn, welcome_msg)
 
-def process_register_player(conn, req_json):
-    pass
+def process_register_player(conn, cmd, req_json):
+    clientid = req_json[InterProtocol.client_id]
+    token = req_json[InterProtocol.authed_token]
+    if not Clients.is_client_valid(clientid, token):
+        send_err_pack_to_client(conn, cmd, Errors.invalid_client_token)
+        return
+    client = Clients.get_client(clientid)
+    userid = req_json[InterProtocol.user_id]
+    err, token = client.register_player(userid)
+    if err == Errors.ok:
+        obj = {InterProtocol.user_id: userid, InterProtocol.authed_token:token}
+        resp_pack = InterProtocol.create_success_resp_data_pack(cmd, InterProtocol.resp_player, obj)
+        send_pack_to_client(conn, resp_pack)
+    else:
+        send_err_pack_to_client(cmd, err)
 
-def process_create_room(conn, req_json):
-    pass
+def validate_client_player(conn, cmd, req_json):
+    # validate client
+    clientid = req_json[InterProtocol.client_id]
+    client = Clients.get_client(clientid)
+    if not client:
+        send_err_pack_to_client(conn, cmd, Errors.invalid_player_clientid)
+        return False, None, None
+    # validate user
+    userid = req_json[InterProtocol.user_id]
+    token = req_json[InterProtocol.authed_token]
+    ret = client.is_player_registered(userid, token)
+    if not ret:
+        send_err_pack_to_client(conn, cmd, Errors.player_not_registered)
+        return False, None, None
 
-def process_player_request(conn, req_json):
-    cmd = req_json[InterProtocol.sock_req_cmd]
-    user_id = req_json[InterProtocol.user_id]
-    if user_id not in Players:
-        player = PlayerClient(conn, user_id)
-        Players[user_id] = player
-        Log.write_info("new player:" + str(user_id))
+    return True, client, client.get_player_by_id(userid)
+
+def process_player_request(conn, cmd, req_json):
+    ret, client, player = validate_client_player(cmd, req_json)
+    if not ret:
+        return
+
+    if conn not in Conn_Players:
         Conn_Players[conn] = player
+        player.set_sock_conn(conn)
         Log.write_info("client number:" + str(len(Conn_Players)))
-    else:
-        player = Players[user_id]
-        if player.get_socket_conn() != conn:
-            if player.get_is_online():
-                send_err_pack_to_client(conn, cmd, Errors.player_already_in_game)
-                return
-            else:
-                player.update_connection(conn)
-                return
-    if player:
-        player.update_last_alive()
 
-    roomid = str(req_json[InterProtocol.room_id])
-    if not roomid or roomid == "-1" or roomid == "0" or roomid.lower() == "null" or roomid.lower() == "none":
-        Lobby.process_player_request(player, req_json)
-    else:
-        room, err = get_room(cmd, roomid, req_json[InterProtocol.game_id])
-        if not room:
-            send_err_pack_to_client(conn, cmd, err)
-        else:
-            room.process_player_cmd_request(player, req_json)
+    if client and player:
+        client.process_player_request(player, cmd, req_json)
 
 def process_client_request(conn, req_json):
     try:
-        player = None
         cmd = req_json[InterProtocol.sock_req_cmd]
         if cmd == InterProtocol.client_req_cmd_reg_player:
-            process_register_player(conn, req_json)
-        elif cmd == InterProtocol.client_req_cmd_new_room:
-            process_create_room(conn, req_json)
+            process_register_player(conn, cmd, req_json)
         else:
-            process_player_request(conn, req_json)
+            process_player_request(conn, cmd, req_json)
 
     except Exception as ex:
         Log.write_exception(ex)
 
-def is_room_for_inner_test(room_id):
-    sr_id = str(room_id)
-    return sr_id.startswith("LX")
-
-def get_room(cmd, room_id, game_id):
-    if room_id in Rooms:
-        return Rooms[room_id],Errors.ok
-
-    if cmd.lower() == InterProtocol.client_req_cmd_enter_room.lower():
-        if is_room_for_inner_test(room_id):
-            return create_room(room_id, game_id), Errors.ok
-        else:
-            if check_is_valid_room_no(room_id, game_id):
-                return create_room(room_id, game_id), Errors.ok
-            else:
-                return None, Errors.wrong_room_number
-    else:
-        return None, Errors.did_not_call_enter_room
-
-def create_inner_test_room(roomid, gameid):
-    game_rule = GameRules[gameid]
-    room = None
-    if isinstance(game_rule, GameRule_Majiang):
-        room = Room_Majiang(roomid, game_rule)
-
-    room.set_min_seated_player_num(game_rule.get_player_min_number())
-    room.set_max_seated_player_num(game_rule.get_player_max_number())
-    room.set_max_player_number(MAX_PLAYER_NUM_IN_ROOM)
-    Rooms[roomid] = room
-    return room
-
-def check_is_valid_room_no(roomid, gameid):
-
-    try:
-        dbConn = db.get_connection()
-        with dbConn.cursor() as cursor:
-            sql = " SELECT count(room_no) as rcount" \
-                  " FROM `room` " \
-                  " WHERE room_no=%s and gameid=%s"
-            cursor.execute(sql, (roomid, gameid))
-            result = cursor.fetchone()
-            if result["rcount"] < 1:
-                return False
-            else:
-                return True
-
-    except Exception as ex:
-        Log.write_exception(ex)
-        return False
+# def is_room_for_inner_test(room_id):
+#     sr_id = str(room_id)
+#     return sr_id.startswith("LX")
+#
+# def get_room(cmd, room_id, game_id):
+#     if room_id in Rooms:
+#         return Rooms[room_id],Errors.ok
+#
+#     if cmd.lower() == InterProtocol.client_req_cmd_enter_room.lower():
+#         if is_room_for_inner_test(room_id):
+#             return create_room(room_id, game_id), Errors.ok
+#         else:
+#             if check_is_valid_room_no(room_id, game_id):
+#                 return create_room(room_id, game_id), Errors.ok
+#             else:
+#                 return None, Errors.wrong_room_number
+#     else:
+#         return None, Errors.did_not_call_enter_room
+#
+# def create_inner_test_room(roomid, gameid):
+#     game_rule = GameRules[gameid]
+#     room = None
+#     if isinstance(game_rule, GameRule_Majiang):
+#         room = Room_Majiang(roomid, game_rule)
+#
+#     room.set_min_seated_player_num(game_rule.get_player_min_number())
+#     room.set_max_seated_player_num(game_rule.get_player_max_number())
+#     room.set_max_player_number(MAX_PLAYER_NUM_IN_ROOM)
+#     Rooms[roomid] = room
+#     return room
+#
+# def check_is_valid_room_no(roomid, gameid):
+#
+#     try:
+#         dbConn = db.get_connection()
+#         with dbConn.cursor() as cursor:
+#             sql = " SELECT count(room_no) as rcount" \
+#                   " FROM `room` " \
+#                   " WHERE room_no=%s and gameid=%s"
+#             cursor.execute(sql, (roomid, gameid))
+#             result = cursor.fetchone()
+#             if result["rcount"] < 1:
+#                 return False
+#             else:
+#                 return True
+#
+#     except Exception as ex:
+#         Log.write_exception(ex)
+#         return False
 
 
 def get_player_client_from_conn(conn):
@@ -304,46 +314,46 @@ def process_player_select_action(conn, j_obj):
     round.process_player_select_action(player, j_obj["act-id"], act_param)
 
 # TODO create Room from database
-def create_room(room_id, rule_id):
-    game_rule = GameRules[rule_id]
+# def create_room(room_id, rule_id):
+#     game_rule = GameRules[rule_id]
+#
+#     room = None
+#     if isinstance(game_rule, GameRule_Majiang):
+#         room = Room_Majiang(room_id, game_rule)
+#         room.set_min_seated_player_num(game_rule.get_player_min_number())
+#         room.set_max_seated_player_num(game_rule.get_player_max_number())
+#         room.set_max_player_number(MAX_PLAYER_NUM_IN_ROOM)
+#     ret = True
+#     if not is_room_for_inner_test(room_id):
+#         ret = load_room_settings_from_db(room)
+#
+#     if ret:
+#         Rooms[room_id] = room
+#         return room
+#     else:
+#         return None
 
-    room = None
-    if isinstance(game_rule, GameRule_Majiang):
-        room = Room_Majiang(room_id, game_rule)
-        room.set_min_seated_player_num(game_rule.get_player_min_number())
-        room.set_max_seated_player_num(game_rule.get_player_max_number())
-        room.set_max_player_number(MAX_PLAYER_NUM_IN_ROOM)
-    ret = True
-    if not is_room_for_inner_test(room_id):
-        ret = load_room_settings_from_db(room)
 
-    if ret:
-        Rooms[room_id] = room
-        return room
-    else:
-        return None
-
-
-def load_room_settings_from_db(room):
-    try:
-        dbConn = db.get_connection()
-        with dbConn.cursor() as cursor:
-            # Read a single record
-            sql = "SELECT `userid`, `room_no`,`gameid`,`round_num`,`ex_ip_cheat`,`ex_gps_cheat`,`fee_stuff_id`, " \
-                  " s1.`stuffname` as `fee_stuff_name`," \
-                  "`fee_amount_per_player`,`fee_creator_pay_all`,`stake_stuff_id`," \
-                  "s2.`stuffname` as `stake_stuff_name`,`stake_base_score`" \
-                  " FROM `room` as r, stuff as s1, stuff as s2 " \
-                  " WHERE room_no=%s and r.fee_stuff_id = s1.stuffid and r.stake_stuff_id = s2.stuffid"
-            cursor.execute(sql, (room.get_room_id()))
-            result = cursor.fetchone()
-            print(result)
-            room.set_round_number(result["round_num"])
-            room.set_fee_stuff(result["fee_stuff_id"], result["fee_stuff_name"])
-            room.set_stake_stuff(result["stake_stuff_id"], result["stake_stuff_name"])
-            return True
-    except Exception as ex:
-        return False
+# def load_room_settings_from_db(room):
+#     try:
+#         dbConn = db.get_connection()
+#         with dbConn.cursor() as cursor:
+#             # Read a single record
+#             sql = "SELECT `userid`, `room_no`,`gameid`,`round_num`,`ex_ip_cheat`,`ex_gps_cheat`,`fee_stuff_id`, " \
+#                   " s1.`stuffname` as `fee_stuff_name`," \
+#                   "`fee_amount_per_player`,`fee_creator_pay_all`,`stake_stuff_id`," \
+#                   "s2.`stuffname` as `stake_stuff_name`,`stake_base_score`" \
+#                   " FROM `room` as r, stuff as s1, stuff as s2 " \
+#                   " WHERE room_no=%s and r.fee_stuff_id = s1.stuffid and r.stake_stuff_id = s2.stuffid"
+#             cursor.execute(sql, (room.get_room_id()))
+#             result = cursor.fetchone()
+#             print(result)
+#             room.set_round_number(result["round_num"])
+#             room.set_fee_stuff(result["fee_stuff_id"], result["fee_stuff_name"])
+#             room.set_stake_stuff(result["stake_stuff_id"], result["stake_stuff_name"])
+#             return True
+#     except Exception as ex:
+#         return False
 
 def process_client_disconnected(conn):
     player = get_player_client_from_conn(conn)

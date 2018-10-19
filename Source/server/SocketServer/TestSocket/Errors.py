@@ -1,6 +1,8 @@
 
 ok = 0
 unknown_error = 1
+invalid_client_token = 10
+client_reach_players_limit = 11
 wrong_room_number = 111
 invalid_packet_format = 112
 invalid_request_parameter = 113
@@ -13,6 +15,9 @@ player_not_in_room = 119
 player_not_in_game = 120
 invalid_seat_id = 121
 seat_id_occupied = 122
+invalid_player_clientid = 123
+player_not_registered = 124
+
 
 
 
@@ -21,6 +26,8 @@ Errors = {
     ok: "OK",
     unknown_error:"unknown error",
     wrong_room_number : "wrong room number",
+    invalid_client_token:"invalid clientid or token",
+    client_reach_players_limit: "reached the limits of players",
     invalid_packet_format: "invalid json format request packet",
     invalid_request_parameter: "invalid request parameters",
     player_already_in_game: "player is already in game",
@@ -31,6 +38,7 @@ Errors = {
     player_not_in_game: "player is not in game",
     player_not_in_room: "player is not in room",
     invalid_seat_id: "invalid seat id",
-    seat_id_occupied : "seat has been occupied by other player"
-
+    seat_id_occupied : "seat has been occupied by other player",
+    invalid_player_clientid: "Invalid clientid, please purchase service",
+    player_not_registered:"Not registered player, should be registered by authorized organization"
 }

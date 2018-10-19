@@ -15,6 +15,7 @@ resp_players = "players"
 resp_seated_players = "seated-players"
 resp_room = "room"
 resp_seats_ids = "seats"
+resp_player = "player"
 
 client_req_cmd_reg_player = "reg-player"  # register player
 client_req_cmd_new_room = "new-room"      # create a new room
@@ -59,16 +60,14 @@ server_push_shown_card_groups = "shown-cards-groups"
 server_push_private_cards_count = "private-cards-count"
 server_push_pending_player = "pending-player"
 
-
 cmd_data_cards = "cards"
-
 
 room_id = "roomid"
 user_id = "userid"
 game_id = "gameid"
 seat_id = "seatid"
 client_id = "clientid"  #机构id
-
+authed_token = "token"
 
 player_state = "player-state"
 player_state_normal = "normal"
