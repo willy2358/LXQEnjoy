@@ -6,6 +6,14 @@ import Log
 
 from Rooms.Closet import Closet
 
+def process_player_request(player, cmd, req_json):
+    room = player.get_closet()
+    if room:
+        room.process_player_request(player, cmd, req_json)
+    else:
+        player.response_err_pack(cmd, Errors.did_not_call_enter_room)
+
+
 class Room(Closet):
     def __init__(self, gRule, roomId):
         super(Room, self).__init__(gRule, roomId)
@@ -137,6 +145,9 @@ class Room(Closet):
 
     def set_last_winners(self, winners):
         self._last_winners = winners
+
+    def process_player_request(self, player, cmd, req_json):
+        pass
 
     def process_player_cmd_request(self, player, req_json):
         req_cmd = req_json[InterProtocol.sock_req_cmd].lower()

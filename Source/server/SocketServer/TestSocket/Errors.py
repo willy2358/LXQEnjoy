@@ -17,6 +17,7 @@ invalid_seat_id = 121
 seat_id_occupied = 122
 invalid_player_clientid = 123
 player_not_registered = 124
+player_not_join_game = 125
 
 
 
@@ -31,7 +32,7 @@ Errors = {
     invalid_packet_format: "invalid json format request packet",
     invalid_request_parameter: "invalid request parameters",
     player_already_in_game: "player is already in game",
-    did_not_call_enter_room: "should call enter-room to enter room firstly",
+    did_not_call_enter_room: "Player is not in room, should call enter-room to enter room firstly",
     player_already_in_room: "already in room",
     room_is_full: "room is full, no more play can be accepted",
     room_no_empty_seat:"no more empty seat",
@@ -40,5 +41,6 @@ Errors = {
     invalid_seat_id: "invalid seat id",
     seat_id_occupied : "seat has been occupied by other player",
     invalid_player_clientid: "Invalid clientid, please purchase service",
-    player_not_registered:"Not registered player, should be registered by authorized organization"
+    player_not_registered:"Not registered player, should be registered by authorized organization",
+    player_not_join_game: "Not in game, should join game at first"
 }

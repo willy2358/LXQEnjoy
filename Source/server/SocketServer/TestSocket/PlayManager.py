@@ -205,6 +205,22 @@ def process_player_request(conn, cmd, req_json):
         player.set_sock_conn(conn)
         Log.write_info("client number:" + str(len(Conn_Players)))
 
+    #     if player.get_socket_conn() != conn:
+    #         if player.get_is_online():
+    #             send_err_pack_to_client(conn, cmd, Errors.player_already_in_game)
+    #             return
+    #         else:
+    #             player.update_connection(conn)
+    #             return
+    if player:
+        if player.get_socket_conn() != conn:
+            if player.get_is_online():
+                send_err_pack_to_client(conn, cmd, Errors.player_already_in_game)
+            else:
+                player.update_connection(conn)
+        player.update_last_alive()
+
+
     if client and player:
         client.process_player_request(player, cmd, req_json)
 

@@ -8,6 +8,7 @@ lock = threading.Lock()
 
 
 def set_config_dir(dir):
+    global __configDir
     __configDir = dir
 
 

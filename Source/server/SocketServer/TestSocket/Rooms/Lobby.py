@@ -5,6 +5,7 @@ import InterProtocol
 
 from Rooms.Closet import Closet
 from Clients import Clients
+from Errors import *
 
 
 # __game_rounds = []
@@ -22,9 +23,15 @@ def process_player_join_game(player, req_json):
         player.send_success_messsage(InterProtocol.client_req_cmd_join_game)
         closet.start_game()
 
-def process_player_request(player, req_json):
-    if req_json[InterProtocol.sock_req_cmd].lower() == InterProtocol.client_req_cmd_join_game:
+def process_player_request(player, cmd, req_json):
+    if cmd == InterProtocol.client_req_cmd_join_game:
         process_player_join_game(player, req_json)
+    else:
+        closet = player.get_closet()
+        if closet:
+            closet.process_player_request(player, cmd, req_json)
+        else:
+            player.response_err_pack(cmd, Errors.player_not_join_game)
 
 
 # def get_available_game_round(rule_id):

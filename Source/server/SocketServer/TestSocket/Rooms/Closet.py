@@ -31,6 +31,8 @@ class Closet:
     def remove_player(self, player):
         self.__playScene.remove_player(player)
 
+    def process_player_request(self, cmd, req_json):
+        pass
 
 
     def start_game(self):

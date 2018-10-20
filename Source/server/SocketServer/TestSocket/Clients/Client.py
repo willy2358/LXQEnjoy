@@ -3,6 +3,8 @@ import Errors
 import secrets
 import InterProtocol
 import Rooms.Lobby
+from Rooms.Lobby import *
+import Rooms.Room
 
 from Player import Player
 
@@ -74,14 +76,29 @@ class Client:
                                                                InterProtocol.resp_room, roomObj)
             player.response_success_pack(pack)
 
+    def get_closet(self, gameid, roomid):
+        pass
+
     def process_player_request(self, player, cmd, req_json):
 
         if cmd == InterProtocol.client_req_cmd_new_room:
             self.process_create_room(player, req_json)
 
-        roomid = str(req_json[InterProtocol.room_id])
+        roomid = req_json[InterProtocol.room_id]
         if not roomid or roomid == "-1" or roomid == "0" or roomid.lower() == "null" or roomid.lower() == "none":
-            Rooms.Lobby.process_player_request(player, req_json)
+            Rooms.Lobby.process_player_request(player, cmd, req_json)
+        else:
+            Rooms.Room.process_player_request(player, cmd, req_json)
+        # room = self.get_closet(gameid, roomid)
+        # if room:
+        #     room.process_player_request(player, req_json)
+
+        # if room:
+        #     room.process_player_cmd_request(player, req_json)
+        # else:
+        #     roomid = str(req_json[InterProtocol.room_id])
+        #     if not roomid or roomid == "-1" or roomid == "0" or roomid.lower() == "null" or roomid.lower() == "none":
+        #         Rooms.Lobby.process_player_request(player, req_json)
         # # cmd = req_json[InterProtocol.sock_req_cmd]
         # user_id = req_json[InterProtocol.user_id]
         # if user_id not in Players:
