@@ -29,6 +29,9 @@ class Closet:
     def add_player(self, player):
         if self.__playScene.add_player(player):
             self.publish_players_status()
+        # reached the min players,  start game.
+        if len(self.__playScene.get_players()) >= self.__gRule.get_min_players_capacity():
+            self.__playScene.start_game()
 
     def remove_player(self, player):
         if self.__playScene.remove_player(player):

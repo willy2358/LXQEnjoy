@@ -28,6 +28,10 @@ class PlayScene:
     def has_vacancy(self):
         return len(self.__players) < self.__rule.get_max_players_capacity()
 
+    def start_game(self):
+        pass
+
+
 
 
 

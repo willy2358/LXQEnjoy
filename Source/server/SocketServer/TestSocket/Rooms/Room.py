@@ -344,3 +344,6 @@ class Room(Closet):
     def set_stake_stuff(self, stuffid, stuffname):
         self._stake_stuff_id = stuffid
         self._stake_stuff_name = stuffname
+
+    #################new design
+
