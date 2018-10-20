@@ -14,7 +14,7 @@ import Utils
 
 
 class RulePart_Cards(RulePart):
-    __part_name = "cards"
+    PART_NAME = "cards"
     __attr_name_sets = "sets"
     __tag_name_excludes = "excludes"
     tag_name_card = "card"
@@ -29,6 +29,9 @@ class RulePart_Cards(RulePart):
         self.__kitty = None
         self.__score_cards = []
         self.__patterns = []
+
+    def get_part_name(self):
+        return self.PART_NAME
 
     def parse(self):
 

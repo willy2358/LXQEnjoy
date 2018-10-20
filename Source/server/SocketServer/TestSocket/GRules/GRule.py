@@ -6,6 +6,7 @@ import Log
 from Cards.GType import GType
 
 from GRules import RulePartFactory
+from GRules.RulePart_Running import RulePart_Running
 
 class GRule:
     def __init__(self, xmlConfig):
@@ -71,4 +72,20 @@ class GRule:
 
     def get_gtype(self):
         return self.__game_type
+
+    # def get_running_part(self):
+    #     for p in self.__parts:
+    #         if type(p) is RulePart_Running:
+    #             return p
+    #
+    #     return None
+
+    def get_part_of_name(self, partName):
+        for p in self.__parts:
+            if p.get_part_name() == partName:
+                return p
+
+        return None
+
+
 

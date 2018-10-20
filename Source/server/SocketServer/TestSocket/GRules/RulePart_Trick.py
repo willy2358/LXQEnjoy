@@ -2,7 +2,7 @@
 from GRules.RulePart import RulePart
 
 class RulePart_Trick(RulePart):
-    __part_name = "trick"
+    PART_NAME = "trick"
 
     def __init__(self, xmlNode, gRule):
         super(RulePart_Trick, self).__init__(xmlNode, gRule)
@@ -10,3 +10,5 @@ class RulePart_Trick(RulePart):
     def parse(self):
         return True
 
+    def get_part_name(self):
+        return self.PART_NAME

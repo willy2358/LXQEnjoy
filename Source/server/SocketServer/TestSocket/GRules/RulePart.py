@@ -8,6 +8,7 @@ class RulePart:
     def __init__(self, xmlNode, gRule):
         self.__xml_node = xmlNode
         self.__gRule = gRule
+        self.__code_blocks = []
 
     def parse(self):
         pass
@@ -17,6 +18,12 @@ class RulePart:
 
     def getGRule(self):
         return self.__gRule
+
+    def get_part_name(self):
+        pass
+
+    def get_code_blocks(self):
+        return self.__code_blocks
 
     @staticmethod
     def is_contain_valid_child_node(tagName, parentNode):
