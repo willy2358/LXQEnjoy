@@ -15,10 +15,15 @@ class PlayScene:
     def add_player(self, player):
         if player not in self.__players:
             self.__players.append(player)
+            return True
+        else:
+            return False
 
     def remove_player(self, player):
         if player in self.__players:
             self.__players.remove(player)
+            return True
+        return False
 
     def has_vacancy(self):
         return len(self.__players) < self.__rule.get_max_players_capacity()

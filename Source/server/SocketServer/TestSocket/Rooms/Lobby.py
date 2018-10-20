@@ -20,8 +20,8 @@ def process_player_join_game(player, req_json):
 
         closet = get_available_closet(req_json[InterProtocol.client_id], req_json[InterProtocol.game_id])
         closet.add_player(player)
-        player.send_success_messsage(InterProtocol.client_req_cmd_join_game)
-        closet.start_game()
+        # player.send_success_messsage(InterProtocol.client_req_cmd_join_game)
+        # closet.start_game()
 
 def process_player_request(player, cmd, req_json):
     if cmd == InterProtocol.client_req_cmd_join_game:

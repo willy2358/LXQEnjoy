@@ -9,6 +9,7 @@ class Player:
         self.__sock_conn = None
         self.__closet = None
         self.__last_alive_time = datetime.now()
+        self.__seatid = 0
 
     def get_userid(self):
         return self.__userid
@@ -22,6 +23,9 @@ class Player:
     def get_closet(self):
         return self.__closet
 
+    def get_seatid(self):
+        return self.__seatid
+
     def set_sock_conn(self, conn):
         self.__sock_conn = conn
 
@@ -30,6 +34,9 @@ class Player:
 
     def set_closet(self, closet):
         return self.__closet
+
+    def set_seatid(self, seatid):
+        self.__seatid = seatid
 
     def update_last_alive(self):
         self.__last_alive_time = datetime.now()

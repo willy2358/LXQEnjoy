@@ -1,4 +1,5 @@
 from PlayScene import PlayScene
+import InterProtocol
 
 class Closet:
     def __init__(self, gRule, gameid, roomId = None):
@@ -26,17 +27,29 @@ class Closet:
         return self.__playScene.has_vacancy()
 
     def add_player(self, player):
-        self.__playScene.add_player(player)
+        if self.__playScene.add_player(player):
+            self.publish_players_status()
 
     def remove_player(self, player):
-        self.__playScene.remove_player(player)
+        if self.__playScene.remove_player(player):
+            self.publish_players_status()
 
     def process_player_request(self, cmd, req_json):
         pass
 
+    def get_players_status(self):
+        players = []
+        for p in self.__playScene.get_players():
+            players.append({'userid': p.get_userid(), 'seated': p.get_seatid()})
 
-    def start_game(self):
-        pass
+        return players
+
+    def publish_players_status(self):
+        players = self.get_players_status()
+
+        pack = InterProtocol.create_game_players_packet(players)
+        for p in self._all_players:
+            p.send_server_cmd_packet(pack)
 
 
 

@@ -39,6 +39,8 @@ class Room(Closet):
         self._lock_seated_players = threading.Lock()
         self._lock_all_players = threading.Lock()
 
+        self.__lookon_players = []
+
     def is_player_in(self, player):
         return player in self._seated_players
 
@@ -282,22 +284,18 @@ class Room(Closet):
         return seatid in self._game_rule.get_seats_ids()
 
     def get_players_status(self):
-        players = []
-        for i in range(0, len(self._all_players)):
-            player = self._all_players[i]
-            # seated = 1 if player in self._seated_players else 0
-            seated = player.get_seat_id()
-
-            players.append({'userid': player.get_user_id(), 'seated': seated})
+        players = Closet.get_players_status(self)
+        for p in self.__lookon_players:
+            players.append({'userid': p.get_userid(), 'seated': p.get_seatid()})
 
         return players
 
-    def publish_players_status(self):
-        players = self.get_players_status()
-
-        pack = InterProtocol.create_game_players_packet(players)
-        for p in self._all_players:
-            p.send_server_cmd_packet(pack)
+    # def publish_players_status(self):
+    #     players = self.get_players_status()
+    #
+    #     pack = InterProtocol.create_game_players_packet(players)
+    #     for p in self._all_players:
+    #         p.send_server_cmd_packet(pack)
 
     def test_continue_next_round(self):
         if self._current_round_order < self._round_num:

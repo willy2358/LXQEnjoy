@@ -5,6 +5,7 @@ import InterProtocol
 import Rooms.Lobby
 from Rooms.Lobby import *
 import Rooms.Room
+import threading
 
 from Player import Player
 
@@ -19,20 +20,28 @@ class Client:
         self.__player_limits = 0   #all products share a same player limits
         self.__expire_date = None
         self.__players = {}  #{userid:player}
+        self.__closet_lock = threading.Lock()
 
     def get_clientid(self):
         return self.__clientid
 
     def get_available_closet(self, gameid):
-        if gameid not in self.__closets:
-            self.__closets[gameid] = []
+        try:
+            if self.__closet_lock.acquire(10):
+                if gameid not in self.__closets:
+                    self.__closets[gameid] = []
 
-        for c in self.__closets[gameid]:
-            if c.is_accept_new_player():
-                return c
+                for c in self.__closets[gameid]:
+                    if c.is_accept_new_player():
+                        return c
 
-        rule = self.get_rule_by_gameid(gameid)
-        self.__closets[gameid].append(Closet(rule, gameid))
+                rule = self.get_rule_by_gameid(gameid)
+                self.__closets[gameid].append(Closet(rule, gameid))
+                return self.__closets[gameid]
+        except Exception as ex:
+            return None
+        finally:
+            self.__closet_lock.release()
 
     def get_player_by_id(self, userid):
         return self.__players[userid]
