@@ -84,53 +84,11 @@ class Client:
         if cmd == InterProtocol.client_req_cmd_new_room:
             self.process_create_room(player, req_json)
 
-        roomid = req_json[InterProtocol.room_id]
-        if not roomid or roomid == "-1" or roomid == "0" or roomid.lower() == "null" or roomid.lower() == "none":
+        room_id = InterProtocol.room_id
+        if room_id not in req_json or str(req_json[room_id]) == "-1" \
+                or str(req_json[room_id]) == "0" \
+                or str(req_json[room_id].lower()) == "null" \
+                or str(req_json[room_id].lower()) == "none":
             Rooms.Lobby.process_player_request(player, cmd, req_json)
         else:
             Rooms.Room.process_player_request(player, cmd, req_json)
-        # room = self.get_closet(gameid, roomid)
-        # if room:
-        #     room.process_player_request(player, req_json)
-
-        # if room:
-        #     room.process_player_cmd_request(player, req_json)
-        # else:
-        #     roomid = str(req_json[InterProtocol.room_id])
-        #     if not roomid or roomid == "-1" or roomid == "0" or roomid.lower() == "null" or roomid.lower() == "none":
-        #         Rooms.Lobby.process_player_request(player, req_json)
-        # # cmd = req_json[InterProtocol.sock_req_cmd]
-        # user_id = req_json[InterProtocol.user_id]
-        # if user_id not in Players:
-        #     player = PlayerClient(conn, user_id)
-        #     Players[user_id] = player
-        #     Log.write_info("new player:" + str(user_id))
-        #     Conn_Players[conn] = player
-        #     Log.write_info("client number:" + str(len(Conn_Players)))
-        # else:
-        #     player = Players[user_id]
-        #     if player.get_socket_conn() != conn:
-        #         if player.get_is_online():
-        #             send_err_pack_to_client(conn, cmd, Errors.player_already_in_game)
-        #             return
-        #         else:
-        #             player.update_connection(conn)
-        #             return
-        # if player:
-        #     player.update_last_alive()
-        #
-        # roomid = str(req_json[InterProtocol.room_id])
-        # if not roomid or roomid == "-1" or roomid == "0" or roomid.lower() == "null" or roomid.lower() == "none":
-        #     Lobby.process_player_request(player, req_json)
-        # else:
-        #     room, err = get_room(cmd, roomid, req_json[InterProtocol.game_id])
-        #     if not room:
-        #         send_err_pack_to_client(conn, cmd, err)
-        #     else:
-        #         room.process_player_cmd_request(player, req_json)
-        #
-        # pass
-
-
-
-

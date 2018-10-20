@@ -5,7 +5,7 @@ class Closet:
         self.__gRule = gRule
         self.__roomId = roomId
         self.__gameid = gameid
-        self.__playScene = PlayScene()
+        self.__playScene = PlayScene(gRule)
 
     def get_rule(self):
         return self.__gRule
@@ -23,7 +23,7 @@ class Closet:
         return self.__playScene.is_player_in(player)
 
     def is_accept_new_player(self):
-        return True
+        return self.__playScene.has_vacancy()
 
     def add_player(self, player):
         self.__playScene.add_player(player)

@@ -14,6 +14,14 @@ class GRule:
         self.__game_id = "0"
         self.__game_text = "game"
         self.__game_type = GType.Poker
+        self.__max_players_capacity = 0
+        self.__min_players_capacity = 0
+
+    def get_max_players_capacity(self):
+        return self.__max_players_capacity
+
+    def get_min_players_capacity(self):
+        return self.__min_players_capacity
 
     def load(self):
         try:
