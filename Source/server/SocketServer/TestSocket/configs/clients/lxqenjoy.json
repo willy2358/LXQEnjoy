@@ -1,0 +1,17 @@
+{
+    "clientid": "00001",
+    "token":"prs35tqjMI3VUn6M6lyyPLcj84Q",
+    "player-limits":1000,
+    "games" : [
+        {
+            "ruleid": "shengji001",
+            "gameid": "shengji001",
+            "coin-base": 500
+        },
+        {
+            "ruleid": "ddz001",
+            "gameid": "ddz001",
+            "coin-base": 1000
+        },
+    ]
+}
