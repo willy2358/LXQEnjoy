@@ -60,6 +60,7 @@ __game_rounds = []
 
 __accessors = {}
 
+config_dir = "configs"
 config_dir_clients = "clients"
 config_dir_rules = "rules"
 
@@ -88,7 +89,7 @@ def start_timer_to_clear_dead_connection():
 
 def load_clients():
     try:
-        configDir = os.path.join(os.getcwd(), config_dir_clients)
+        configDir = os.path.join(os.getcwd(), config_dir,  config_dir_clients)
         Clients.set_config_dir(configDir)
         if os.path.exists(configDir):
             Clients.reload()
@@ -98,7 +99,7 @@ def load_clients():
 
 def load_rules():
     try:
-        prefile = os.path.join(os.getcwd(), config_dir_rules)
+        prefile = os.path.join(os.getcwd(), config_dir, config_dir_rules)
         for (root, _, files) in os.walk(prefile):
             for f in files:
                 if f.endswith(".xml"):
