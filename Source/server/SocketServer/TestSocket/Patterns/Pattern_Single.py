@@ -30,7 +30,7 @@ class Pattern_Single(Pattern):
             if xmlElement.hasAttribute(GCore.Engine.attr_name_cfigure):
                 self.__cfigure = parse_cfigure(xmlElement.getAttribute(GCore.Engine.attr_name_cfigure))
             if xmlElement.hasAttribute(GCore.Engine.attr_name_ctype):
-                self.__ctype = parse_ctype(xmlElement.getAttribute(GCore.Engine.attr_name_ctype), self.getGRule())
+                self.__ctype = parse_ctype(xmlElement.getAttribute(GCore.Engine.attr_name_ctype), self.getGRule().get_gtype())
             if xmlElement.hasAttribute(Pattern.ATTR_NAME_POWER):
                 powerAttrVal = xmlElement.getAttribute(Pattern.ATTR_NAME_POWER)
                 if powerAttrVal.isnumeric():
