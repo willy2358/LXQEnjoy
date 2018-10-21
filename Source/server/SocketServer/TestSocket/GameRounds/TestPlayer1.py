@@ -1,4 +1,4 @@
-import SocketClient
+from Test import SocketClient
 from Mains import InterProtocol
 import json
 

@@ -11,10 +11,11 @@ class Client:
     field_client_name = "name"
     field_client_id = "clientid"
     field_auth_token = "token"
+    field_player_limits = "player-limits"
     field_games = "games"
     field_game_rule_id = "ruleid"
     field_game_game_id = "gameid"
-    field_game_coid_base = "coid-base"
+    field_game_coin_base = "coin-base"
 
     def __init__(self, name, clientid, token):
         self.__name = name
@@ -68,6 +69,9 @@ class Client:
 
     def add_product(self, p):
         self.__products.append(p)
+
+    def set_player_limits(self, limits):
+        self.__player_limits = limits
 
     def register_player(self, userid):
         if userid in self.__players:
