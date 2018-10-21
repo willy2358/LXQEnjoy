@@ -4,6 +4,7 @@ import secrets
 import Rooms.Lobby
 from Rooms.Lobby import *
 import Rooms.Room
+from Rooms.Closet import Closet
 import threading
 
 from Mains.Player import Player
@@ -47,8 +48,9 @@ class Client:
                         return c
 
                 rule = self.get_rule_by_gameid(gameid)
-                self.__closets[gameid].append(Closet(rule, gameid))
-                return self.__closets[gameid]
+                newCloset = Closet(rule, gameid)
+                self.__closets[gameid].append(newCloset)
+                return newCloset
         except Exception as ex:
             return None
         finally:
@@ -59,7 +61,7 @@ class Client:
 
     def get_rule_by_gameid(self, gameid):
         for p in self.__products:
-            if p.get_ruleid() == gameid:
+            if p.get_gameid() == gameid:
                 return p.get_rule()
         return None
 
@@ -109,6 +111,7 @@ class Client:
 
         if cmd == InterProtocol.client_req_cmd_new_room:
             self.process_create_room(player, req_json)
+            return
 
         room_id = InterProtocol.room_id
         if room_id not in req_json or str(req_json[room_id]) == "-1" \

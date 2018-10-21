@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rule name="ddz" ruleid="ddz001" gtype="P">
+<rule name="ddz" ruleid="ddz001" gtype="P" text="ddz001">
 
 
   <cards sets="1">

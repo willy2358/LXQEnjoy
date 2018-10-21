@@ -25,6 +25,7 @@ class GRule:
         return self.__min_players_capacity
 
     def load(self):
+
         try:
             DOMTree = xml.dom.minidom.parse(self._config_file)
             game = DOMTree.documentElement
@@ -46,9 +47,9 @@ class GRule:
         if not gameElem:
             return False
 
-        if not gameElem.hasAttribute("gameid"):
+        if not gameElem.hasAttribute("ruleid"):
             return False
-        self.__rule_id = gameElem.getAttribute("gameid")
+        self.__rule_id = gameElem.getAttribute("ruleid")
 
         if not gameElem.hasAttribute("text"):
             return False

@@ -2,9 +2,10 @@ from Test import SocketClient
 from Mains import InterProtocol
 import json
 
-roomid = "LX888"
+# roomid = "LX888"
+roomid = "0"
 userid = 111
-gameid = 111
+gameid = "ddz001"
 # roomid = 888
 # client = SocketClient.SocketClient("117.78.40.54", 9229)
 client = SocketClient.SocketClient("127.0.0.1", 9229)
@@ -20,19 +21,21 @@ cmd = {
 
 cmd_str = json.dumps(cmd)
 client.send_message(cmd_str)
-line = input("press any key to register next player\r\n")
+# line = input("press any key to enter room\r\n")
 
 # cmd = '{"cmdtype":"sockreq","sockreq":"enter-room","userid":111,"roomid":' +'"' + roomid +'","gameid":"m1"}'
 # cmd = '{"cmdtype":"sockreq","sockreq":"enter-room","userid":111,"roomid":' + roomid +',"gameid":"m1"}'
-cmd = {
-    "cmdtype":"sockreq",
-    "sockreq":"enter-room",
-    "userid":userid,
-    "roomid":roomid,
-    "gameid":gameid
-}
-cmd_str = json.dumps(cmd)
-client.send_message(cmd_str)
+# cmd = {
+#     "cmdtype":"sockreq",
+#     "sockreq":"enter-room",
+#     "userid":userid,
+#     "clientid":"00001",
+#     "token":client.get_token(),
+#     "roomid":roomid,
+#     "gameid":gameid
+# }
+# cmd_str = json.dumps(cmd)
+# client.send_message(cmd_str)
 
 
 line = input("press any key to join game\r\n")
@@ -44,11 +47,15 @@ cmd = {
     "userid":userid,
     "roomid":roomid,
     "gameid":gameid,
+    "clientid": "00001",
+    "token": client.get_token(),
     "seatid":3
 }
 cmd_str = json.dumps(cmd)
 client.send_message(cmd_str)
 print('sent: ' + cmd_str)
+
+
 cmds = {
     "0": InterProtocol.majiang_player_act_zimo,
     "1": InterProtocol.majiang_player_act_hu,

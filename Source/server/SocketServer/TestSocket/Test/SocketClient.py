@@ -1,6 +1,9 @@
 import socket
 import sys
 import threading
+import json
+
+import Mains.InterProtocol as InterProtocol
 
 
 def wait_sock_receive(sock_client):
@@ -26,6 +29,7 @@ class SocketClient:
         self.__isRun = False
         self.__mySock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.__receiveThread = None
+        self.__token = ""
 
     def run(self):
         try:
@@ -53,10 +57,19 @@ class SocketClient:
                     print("client closed")
                     break
                 data = buf.decode('utf-8')
-                parts = data.split(":)>QXL");
+                parts = data.split("LXQ<(:");
                 for p in parts:
-                    if len(p) > 5:
-                        print('Received:' + p)
+                    if len(p) < 5:
+                        continue
+                    p = p.strip(":)>QXL")
+                    print('Received:' + p)
+                    if not p.startswith('{'):
+                        continue
+                    j_obj = json.loads(p)
+                    if j_obj[InterProtocol.sock_resp] == InterProtocol.client_req_cmd_reg_player:
+                        if InterProtocol.resp_player in j_obj:
+                            self.__token = j_obj[InterProtocol.resp_player][InterProtocol.authed_token]
+
                         # print("\r\n")
 
             except Exception as ex:
@@ -73,6 +86,9 @@ class SocketClient:
 
     def socket(self):
         return self.__mySock
+
+    def get_token(self):
+        return self.__token
 
     def stop(self):
 

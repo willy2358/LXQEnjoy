@@ -60,6 +60,9 @@ class Room(Closet):
         else:
             return 0
 
+    def get_all_players(self):
+        return self.__lookon_players + self.get_scene_players()
+
     def can_new_player_seated(self):
         return len(self._seated_players) < self._max_seated_players
 

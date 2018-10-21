@@ -170,7 +170,7 @@ def validate_client_player(conn, cmd, req_json):
     return True, client, client.get_player_by_id(userid)
 
 def process_player_request(conn, cmd, req_json):
-    ret, client, player = validate_client_player(cmd, req_json)
+    ret, client, player = validate_client_player(conn, cmd, req_json)
     if not ret:
         return
 
@@ -187,7 +187,7 @@ def process_player_request(conn, cmd, req_json):
     #             player.update_connection(conn)
     #             return
     if player:
-        if player.get_socket_conn() != conn:
+        if player.get_sock_conn() != conn:
             if player.get_is_online():
                 send_err_pack_to_client(conn, cmd, Errors.player_already_in_game)
             else:
@@ -290,8 +290,9 @@ def remove_dead_connection():
     start_timer_to_clear_dead_connection()
 
 def get_rule_by_id(rule_id):
-    if rule_id in __PlayRules:
-        return __PlayRules[rule_id]
+
+    if rule_id in GameRules:
+        return GameRules[rule_id]
     else:
         return None
 

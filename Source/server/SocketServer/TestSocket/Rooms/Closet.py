@@ -21,6 +21,9 @@ class Closet:
     def get_scene_players(self):
         return self.__playScene.get_players()
 
+    def get_all_players(self):
+        return self.__playScene.get_players()
+
     def is_player_in(self, player):
         return self.__playScene.is_player_in(player)
 
@@ -48,11 +51,12 @@ class Closet:
 
         return players
 
+
     def publish_players_status(self):
         players = self.get_players_status()
 
         pack = InterProtocol.create_game_players_packet(players)
-        for p in self._all_players:
+        for p in self.get_all_players():
             p.send_server_cmd_packet(pack)
 
 

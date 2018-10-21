@@ -12,7 +12,7 @@ from Mains.Errors import *
 def process_player_join_game(player, req_json):
     user_id = req_json[InterProtocol.user_id]
 
-    if player.get_my_closet():
+    if player.get_closet():
         player.send_error_message("Already in a game")
     else:
 
