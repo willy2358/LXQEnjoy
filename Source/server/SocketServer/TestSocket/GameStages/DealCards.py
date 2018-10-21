@@ -1,6 +1,5 @@
 import random
 
-import PlayManager
 import Utils
 from GameStages.GameStage import GameStage
 

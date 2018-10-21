@@ -1,7 +1,6 @@
 import threading
 
-import InterProtocol
-from GameRounds.GameRound_Majiang import GameRound_Majiang
+from Mains import InterProtocol
 
 
 class Room:

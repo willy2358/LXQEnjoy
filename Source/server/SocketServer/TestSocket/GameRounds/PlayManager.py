@@ -1,13 +1,11 @@
 import json
 
 import CardsMaster
-import InterProtocol
-import Log
+from Mains import Log, InterProtocol
 from Actions.CallBank import CallBank
 from Actions.PassCall import PassCall
 from GameRules.GameRule_Majiang import GameRule_Majiang
 from GameRules.GameRule_Poker import GameRule_Poker
-from GameStages.CalScores_Majiang import CalScores_Majiang
 from GameStages.CallBanker import CallBanker
 from GameStages.DealCards import DealCards
 from GameStages.DealMaJiangs import DealMaJiangs
@@ -23,7 +21,7 @@ from Rooms.Room_Majiang import Room_Majiang
 from GameStages.TellWinner_Majiang import TellWinner_Majiang
 
 from threading import Timer
-from datetime import datetime,timedelta
+from datetime import datetime
 
 from GameStages.CalScores import CalScores
 
@@ -34,9 +32,7 @@ from CardsPattern.Mode_AllInRange import Mode_AllInRange
 from CardsPattern.Mode_AllPairs import Mode_AllPairs
 from CardsPattern.Mode_AnyInRange import Mode_AnyInRange
 from CardsPattern.Mode_AnyOutRange import Mode_AnyOutRange
-from CardsPattern.Mode_Pair import Mode_Pair
 from CardsPattern.Mode_Seq import Mode_Seq
-from CardsPattern.Mode_Triple import Mode_Triple
 
 Conn_Players = {} #{connection, player}
 # __Players = []
@@ -298,14 +294,14 @@ def dispatch_player_commands(conn, comm_text):
         if j_obj[InterProtocol.cmd_type].lower() == InterProtocol.sock_req_cmd.lower():
             process_client_request(conn, j_obj)
     except Exception as ex:
-        Log.write_exception(ex)
+        Log.exception(ex)
         print(ex)
 
 def send_msg_to_client_connection(conn, msg):
     try:
         conn.sendall(msg.encode(encoding="utf-8"))
     except Exception as ex:
-        Log.write_exception(ex)
+        Log.exception(ex)
 
 
 def send_welcome_to_new_connection(conn):
@@ -320,9 +316,9 @@ def process_client_request(conn, req_json):
         if user_id not in Players:
             player = PlayerClient(conn, user_id)
             Players[user_id] = player
-            Log.write_info("new player:" + str(user_id))
+            Log.info("new player:" + str(user_id))
             Conn_Players[conn] = player
-            Log.write_info("client number:" + str(len(Conn_Players)))
+            Log.info("client number:" + str(len(Conn_Players)))
         else:
             player = Players[user_id]
             if player.get_socket_conn() != conn:
@@ -354,7 +350,7 @@ def process_client_request(conn, req_json):
             Lobby.process_player_request(player, req_json)
 
     except Exception as ex:
-        Log.write_exception(ex)
+        Log.exception(ex)
 
 # def update_round_stage(client_conn):
 #     player = get_player_client_from_conn(client_conn)
@@ -388,7 +384,7 @@ def remove_dead_connection():
         Conn_Players.pop(item[1])
         conn.close()
 
-    Log.write_info("client number:" + str(len(Conn_Players)))
+    Log.info("client number:" + str(len(Conn_Players)))
     start_timer_to_clear_dead_connection()
 
 def get_rule_by_id(rule_id):

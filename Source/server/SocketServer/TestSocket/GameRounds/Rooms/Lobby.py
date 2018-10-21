@@ -1,6 +1,4 @@
-
-import InterProtocol
-import PlayManager
+from Mains import PlayManager, InterProtocol
 from GameRounds import GameRound
 
 __game_rounds = []

@@ -1,15 +1,21 @@
-from Rooms.Closet import Closet
-import Errors
+from Mains import Errors
 import secrets
-import InterProtocol
 import Rooms.Lobby
 from Rooms.Lobby import *
 import Rooms.Room
 import threading
 
-from Player import Player
+from Mains.Player import Player
 
 class Client:
+    field_client_name = "name"
+    field_client_id = "clientid"
+    field_auth_token = "token"
+    field_games = "games"
+    field_game_rule_id = "ruleid"
+    field_game_game_id = "gameid"
+    field_game_coid_base = "coid-base"
+
     def __init__(self, name, clientid, token):
         self.__name = name
         self.__clientid = clientid
@@ -48,7 +54,7 @@ class Client:
 
     def get_rule_by_gameid(self, gameid):
         for p in self.__products:
-            if p.get_gameid() == gameid:
+            if p.get_ruleid() == gameid:
                 return p.get_rule()
         return None
 
@@ -60,9 +66,12 @@ class Client:
         else:
             return False
 
+    def add_product(self, p):
+        self.__products.append(p)
+
     def register_player(self, userid):
         if userid in self.__players:
-            return  Errors.ok, self.__players[userid]
+            return Errors.ok, self.__players[userid]
         if len(self.__players) >= self.__player_limits:
             return Errors.client_reach_players_limit, "not a token"
         player = Player(userid)

@@ -1,11 +1,9 @@
-
-import InterProtocol
+from Mains import InterProtocol
 # import PlayManager
 # from GameRounds import GameRound
 
-from Rooms.Closet import Closet
 from Clients import Clients
-from Errors import *
+from Mains.Errors import *
 
 
 # __game_rounds = []

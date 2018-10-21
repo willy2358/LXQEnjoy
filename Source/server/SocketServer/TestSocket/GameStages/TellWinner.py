@@ -1,6 +1,6 @@
 from GameStages.GameStage import GameStage
 
-import InterProtocol
+from Mains import InterProtocol
 
 
 class TellWinner(GameStage):

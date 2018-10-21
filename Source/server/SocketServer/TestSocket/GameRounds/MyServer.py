@@ -1,8 +1,6 @@
 import socketserver
 
-import PlayManager
-import PlayerClient
-import Log
+from Mains import PlayManager, Log
 
 
 class MyTCPHandler(socketserver.StreamRequestHandler):
@@ -13,7 +11,7 @@ class MyTCPHandler(socketserver.StreamRequestHandler):
         try:
             conn.sendall("Welcome!Just enjoy!".encode(encoding="utf-8"))
         except Exception as ex:
-            Log.write_exception(ex)
+            Log.exception(ex)
 
         while True:
             try:

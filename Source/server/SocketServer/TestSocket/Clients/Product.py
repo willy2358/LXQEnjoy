@@ -1,13 +1,9 @@
-import Errors
-import secrets
-
 class Product:
-    def __init__(self, rule, name, times):
+    def __init__(self, rule, gameid, times):
         self.__rule = rule
-        self.__gameid = -1
+        self.__gameid = gameid
         self.__coin_times = times   # the stake = self.__coin_times * coin base of game
-        self.__name = name
-       
+
 
     def get_rule(self):
         return self.__rule

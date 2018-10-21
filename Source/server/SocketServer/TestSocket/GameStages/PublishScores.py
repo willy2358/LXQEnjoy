@@ -1,6 +1,7 @@
 from GameStages.GameStage import GameStage
 
-import InterProtocol
+from Mains import InterProtocol
+
 
 class PublishScores(GameStage):
     def __init__(self, rule):

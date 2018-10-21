@@ -2,17 +2,17 @@
 from xml.dom.minidom import parse
 import xml.dom.minidom
 
-import Log
+from Mains import Log
 from Cards.GType import GType
 
 from GRules import RulePartFactory
-from GRules.RulePart_Running import RulePart_Running
+
 
 class GRule:
     def __init__(self, xmlConfig):
         self._config_file = xmlConfig
         self.__parts = []
-        self.__game_id = "0"
+        self.__rule_id = "0"
         self.__game_text = "game"
         self.__game_type = GType.Poker
         self.__max_players_capacity = 0
@@ -39,7 +39,7 @@ class GRule:
 
             return True
         except Exception as ex:
-            Log.write_exception(ex)
+            Log.exception(ex)
             return False
 
     def parse_game_attrs(self, gameElem):
@@ -48,7 +48,7 @@ class GRule:
 
         if not gameElem.hasAttribute("gameid"):
             return False
-        self.__game_id = gameElem.getAttribute("gameid")
+        self.__rule_id = gameElem.getAttribute("gameid")
 
         if not gameElem.hasAttribute("text"):
             return False
@@ -64,8 +64,8 @@ class GRule:
         return True
 
 
-    def get_gameid(self):
-        return self.__game_id
+    def get_ruleid(self):
+        return self.__rule_id
 
     def get_game_text(self):
         return self.__game_text

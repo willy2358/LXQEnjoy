@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<game name="ddz" gtype="P">
+<rule name="ddz" ruleid="ddz001" gtype="P">
 
 
   <cards sets="1">
@@ -277,4 +277,4 @@
 
   </actions>
 
-</game>
+</rule>

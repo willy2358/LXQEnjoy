@@ -1,6 +1,7 @@
-import PlayManager
+from Mains import PlayManager
 
-from datetime import datetime,timedelta
+from datetime import datetime
+
 
 class Player:
     def __init__(self, userid):

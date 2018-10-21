@@ -1,6 +1,6 @@
 from GameStages.PlayInTurn import PlayInTurn
-from PlayCmd import PlayCmd
-import InterProtocol
+from Mains.PlayCmd import PlayCmd
+from Mains import InterProtocol
 from GameRules.GameRule_Majiang import WinType
 
 

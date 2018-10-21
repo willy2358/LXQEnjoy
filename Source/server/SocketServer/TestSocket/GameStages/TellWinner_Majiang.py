@@ -1,6 +1,6 @@
 from GameStages.TellWinner import TellWinner
 
-import InterProtocol
+from Mains import InterProtocol
 import CardsMaster
 from GameRules.WinTester_Majiang import WinTester_Majiang
 

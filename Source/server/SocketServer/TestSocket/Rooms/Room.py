@@ -1,8 +1,6 @@
 import threading
 
-import InterProtocol
-import Errors
-import Log
+from Mains import Log, InterProtocol, Errors
 
 from Rooms.Closet import Closet
 
@@ -82,7 +80,7 @@ class Room(Closet):
                 else:
                     return False, Errors.room_no_empty_seat
         except Exception as ex:
-            Log.write_exception(ex)
+            Log.exception(ex)
             return False, Errors.unknown_error
         finally:
             self._lock_seated_players.release()
@@ -97,7 +95,7 @@ class Room(Closet):
                     return False, Errors.player_not_in_game
 
         except Exception as ex:
-            Log.write_exception(ex)
+            Log.exception(ex)
             return False, Errors.unknown_error
         finally:
             self._lock_seated_players.release()
@@ -125,7 +123,7 @@ class Room(Closet):
                 else:
                     return False, Errors.room_is_full
         except Exception as ex:
-            Log.write_exception(ex)
+            Log.exception(ex)
             return False, Errors.unknown_error
         finally:
             self._lock_all_players.release()
@@ -140,7 +138,7 @@ class Room(Closet):
                 else:
                     return False, Errors.player_not_in_room
         except Exception as ex:
-            Log.write_exception(ex)
+            Log.exception(ex)
             return False, Errors.unknown_error
         finally:
             self._lock_all_players.release()

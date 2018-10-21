@@ -1,48 +1,11 @@
 import json
-import Errors
-import db
 import os
 
-
-import CardsMaster
-import InterProtocol
-import Log
-
-
-from Actions.CallBank import CallBank
-from Actions.PassCall import PassCall
-from GameRules.GameRule_Majiang import GameRule_Majiang
-from GameRules.GameRule_Poker import GameRule_Poker
-from GameStages.CalScores_Majiang import CalScores_Majiang
-from GameStages.CallBanker import CallBanker
-from GameStages.DealCards import DealCards
-from GameStages.DealMaJiangs import DealMaJiangs
-from GameStages.GroupPlayers import GroupPlayers
-from GameStages.PlayCards import PlayCards
-from GameStages.PlayMajiang import PlayMajiang
-from GameStages.PublishScores import PublishScores
-from GameStages.RandomBanker import RandomBanker
-from GameStages.TeamPlayers import TeamPlayers
-from GameStages.TellWinner import TellWinner
-from Rooms import Lobby
-from Rooms.Room_Majiang import Room_Majiang
-from GameStages.TellWinner_Majiang import TellWinner_Majiang
+from Mains import Log, InterProtocol, Errors
 
 from threading import Timer
-from datetime import datetime,timedelta
+from datetime import datetime
 
-from GameStages.CalScores import CalScores
-
-from PlayerClient import PlayerClient
-
-from CardsPattern.PatternModes import PatternModes
-from CardsPattern.Mode_AllInRange import Mode_AllInRange
-from CardsPattern.Mode_AllPairs import Mode_AllPairs
-from CardsPattern.Mode_AnyInRange import Mode_AnyInRange
-from CardsPattern.Mode_AnyOutRange import Mode_AnyOutRange
-from CardsPattern.Mode_Pair import Mode_Pair
-from CardsPattern.Mode_Seq import Mode_Seq
-from CardsPattern.Mode_Triple import Mode_Triple
 from Clients import Clients
 
 from GRules.GRule import GRule
@@ -51,7 +14,7 @@ Conn_Players = {} #{connection, player}
 # __Players = []
 Players={}   #{userid:player}
 Rooms = {}   #{roomid:room}
-GameRules = {} #{gameid:rule}
+GameRules = {} #{ruleid:rule}
 
 __Waiting_Players = {}
 __PlayRules = {}
@@ -78,8 +41,10 @@ MAX_PLAYER_NUM_IN_ROOM = 8
 
 
 def initialize():
+    load_rules()   # must before load_clients
+
     load_clients()
-    load_rules()
+
     start_timer_to_clear_dead_connection()
 
 def start_timer_to_clear_dead_connection():
@@ -95,7 +60,7 @@ def load_clients():
             Clients.reload()
         Clients.start_watcher()
     except Exception as ex:
-        Log.write_exception(ex)
+        Log.exception(ex)
 
 def load_rules():
     try:
@@ -106,12 +71,18 @@ def load_rules():
                     gRuleXml = os.path.join(root, f)
                     gf = GRule(gRuleXml)
                     if gf.load():
-                        GameRules[gf.get_gameid()] = gf
+                        GameRules[gf.get_ruleid()] = gf
                     else:
-                        Log.write_error("game config error:" + gRuleXml)
+                        Log.error("game config error:" + gRuleXml)
 
     except Exception as ex:
-        Log.write_exception(ex)
+        Log.exception(ex)
+
+def get_rule_by_id(ruleid):
+    if ruleid in GameRules:
+        return GameRules[ruleid]
+    else:
+        return None
 
 def validate_req_packet(j_obj):
     if InterProtocol.user_id not in j_obj \
@@ -140,7 +111,7 @@ def dispatch_player_commands(conn, comm_text):
         if j_obj[InterProtocol.cmd_type].lower() == InterProtocol.sock_req_cmd.lower():
             process_client_request(conn, j_obj)
     except Exception as ex:
-        Log.write_exception(ex)
+        Log.exception(ex)
 
 def send_pack_to_client(conn, pack):
     j_str = json.dumps(pack)
@@ -157,7 +128,7 @@ def send_msg_to_client(conn, msg):
     try:
         conn.sendall(msg.encode(encoding="utf-8"))
     except Exception as ex:
-        Log.write_exception(ex)
+        Log.exception(ex)
 
 def send_welcome_to_new_connection(conn):
     welcome_msg = "welcome,just enjoy!"
@@ -204,7 +175,7 @@ def process_player_request(conn, cmd, req_json):
     if conn not in Conn_Players:
         Conn_Players[conn] = player
         player.set_sock_conn(conn)
-        Log.write_info("client number:" + str(len(Conn_Players)))
+        Log.info("client number:" + str(len(Conn_Players)))
 
     #     if player.get_socket_conn() != conn:
     #         if player.get_is_online():
@@ -234,7 +205,7 @@ def process_client_request(conn, req_json):
             process_player_request(conn, cmd, req_json)
 
     except Exception as ex:
-        Log.write_exception(ex)
+        Log.exception(ex)
 
 # def is_room_for_inner_test(room_id):
 #     sr_id = str(room_id)
@@ -313,7 +284,7 @@ def remove_dead_connection():
         Conn_Players.pop(item[1])
         conn.close()
 
-    Log.write_info("client number:" + str(len(Conn_Players)))
+    Log.info("client number:" + str(len(Conn_Players)))
     start_timer_to_clear_dead_connection()
 
 def get_rule_by_id(rule_id):

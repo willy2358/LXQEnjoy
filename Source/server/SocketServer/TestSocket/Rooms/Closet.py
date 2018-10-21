@@ -1,5 +1,6 @@
-from PlayScene import PlayScene
-import InterProtocol
+from Mains.PlayScene import PlayScene
+from Mains import InterProtocol
+
 
 class Closet:
     def __init__(self, gRule, gameid, roomId = None):

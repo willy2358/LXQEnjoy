@@ -1,7 +1,6 @@
 
 from GameRounds.GameRound import GameRound
-import InterProtocol
-import PlayCmd
+
 
 class GameRound_Majiang(GameRound):
     def __init__(self, rule):

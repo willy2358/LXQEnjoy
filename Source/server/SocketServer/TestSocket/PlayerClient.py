@@ -1,16 +1,12 @@
 #coding=utf-8
 import json
 
-import PlayManager
+from Mains import PlayManager, Log, InterProtocol
 
 import Utils
-import Log
-import InterProtocol
 
-import base64
-import os
+from datetime import datetime
 
-from datetime import datetime,timedelta
 
 class PlayerClient:
     def __init__(self, conn, user_id):
@@ -167,7 +163,7 @@ class PlayerClient:
             print(dataStr)
             self.__socket__conn.sendall(dataStr.encode(encoding="utf-8"))
         except Exception as ex:
-            Log.write_exception(ex)
+            Log.exception(ex)
 
     def begin_new_deal(self):
         self.send_api_pack_msg_str(PlayManager.SERVER_CMD_DEAL_BEGIN)

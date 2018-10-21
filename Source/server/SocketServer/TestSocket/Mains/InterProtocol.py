@@ -1,5 +1,4 @@
-
-import Errors
+from Mains import Errors
 
 cmd_type = "cmdtype"
 sock_req_cmd = "sockreq"
@@ -223,7 +222,7 @@ def create_error_pack(req_cmd, errCode):
         sock_resp:req_cmd,
         sock_result:sock_result_error,
         sock_error_code:errCode,
-        sock_error_message:Errors.Errors[errCode]
+        sock_error_message: Errors.Errors[errCode]
     }
 
     return pack

@@ -1,5 +1,5 @@
 import SocketClient
-import InterProtocol
+from Mains import InterProtocol
 import json
 
 # client = SocketClient.SocketClient("117.78.40.54", 9229)
@@ -9,14 +9,14 @@ cmd = '{"cmdtype":"sockreq","sockreq":"join-game","userid":111,	"roomid":123333,
 client.send_message(cmd)
 print('sent: ' + cmd)
 cmds = {
-    "0":InterProtocol.majiang_player_act_zimo,
-    "1":InterProtocol.majiang_player_act_hu,
-    "2":InterProtocol.majiang_player_act_gang,
-    "3":InterProtocol.majiang_player_act_peng,
-    "4":InterProtocol.majiang_player_act_chi,
-    "5":InterProtocol.majiang_player_act_pass,
-    "6":InterProtocol.majiang_player_act_play_card,
-    "7":InterProtocol.majiang_player_act_mopai,
+    "0": InterProtocol.majiang_player_act_zimo,
+    "1": InterProtocol.majiang_player_act_hu,
+    "2": InterProtocol.majiang_player_act_gang,
+    "3": InterProtocol.majiang_player_act_peng,
+    "4": InterProtocol.majiang_player_act_chi,
+    "5": InterProtocol.majiang_player_act_pass,
+    "6": InterProtocol.majiang_player_act_play_card,
+    "7": InterProtocol.majiang_player_act_mopai,
     "8":"exit"
 }
 
@@ -31,7 +31,7 @@ while True:
     if cmd in cmds:
         packet = {
             InterProtocol.cmd_type: InterProtocol.sock_req_cmd,
-            InterProtocol.sock_req_cmd:InterProtocol.client_req_type_exe_cmd,
+            InterProtocol.sock_req_cmd: InterProtocol.client_req_type_exe_cmd,
             InterProtocol.user_id:111,
             InterProtocol.room_id:123333,
             InterProtocol.client_req_exe_cmd:cmds[cmd],

@@ -2,10 +2,9 @@ import random
 import queue
 import Utils
 from Dealer import Dealer
-import InterProtocol
 from threading import Timer
 from GameStages.PlayInTurn import PlayInTurn
-import Log
+from Mains import Log, InterProtocol
 import os.path
 
 timeout_seconds_to_run_round = 5
@@ -190,7 +189,7 @@ class GameRound:
                 cards = eval(pre_cards)
                 f.close()
             except Exception as ex:
-                Log.write_exception(ex)
+                Log.exception(ex)
 
         left = card_number - len(cards)
         if left > 0:

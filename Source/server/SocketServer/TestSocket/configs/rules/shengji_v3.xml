@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--gtype:M, mahong; P: Poker
 -->
-<game name="shengji" gameid="shengji001" gtype="P" text="shengji001">
+<rule name="shengji" ruleid="shengji001" gtype="P" text="shengji001">
   
   <!--
     sets:牌副数：默认值：1
@@ -498,4 +498,4 @@
       <publish_players message="kou pai"/>
     </action>
   </actions>
-</game>
+</rule>

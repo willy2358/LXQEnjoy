@@ -1,7 +1,7 @@
 from GameRules.GameRule import GameRule
 
-import InterProtocol
-from PlayCmd import PlayCmd
+from Mains import InterProtocol
+from Mains.PlayCmd import PlayCmd
 
 from enum import Enum
 from GameRules.WinTester_Majiang import WinTester_Majiang
@@ -58,16 +58,16 @@ class GameRule_Majiang(GameRule):
         cards = player.get_active_cards() + new_cards
         if WinTester_Majiang.can_cards_win(cards):
             if is_cards_from_other_player:
-                cmd_opts.append(PlayCmd(player, InterProtocol.majiang_player_act_hu,new_cards))
+                cmd_opts.append(PlayCmd(player, InterProtocol.majiang_player_act_hu, new_cards))
             else:
-                cmd_opts.append(PlayCmd(player, InterProtocol.majiang_player_act_zimo,new_cards))
+                cmd_opts.append(PlayCmd(player, InterProtocol.majiang_player_act_zimo, new_cards))
         if new_cards and cards.count(new_cards[0]) == 3 and is_cards_from_other_player:
-            cmd_opts.append(PlayCmd(player, InterProtocol.majiang_player_act_peng,new_cards))
+            cmd_opts.append(PlayCmd(player, InterProtocol.majiang_player_act_peng, new_cards))
         # gang can be execute any time
         uniq_cards = set(cards)
         for c in uniq_cards:
             if cards.count(c) == 4:
-                gang = PlayCmd(player, InterProtocol.majiang_player_act_gang,new_cards)
+                gang = PlayCmd(player, InterProtocol.majiang_player_act_gang, new_cards)
                 gang.set_cmd_param([c])
                 cmd_opts.append(gang)
 
