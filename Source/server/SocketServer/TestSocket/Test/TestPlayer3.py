@@ -11,6 +11,18 @@ gameid = 111
 client = SocketClient.SocketClient("127.0.0.1", 9229)
 client.run()
 
+cmd = {
+        "cmdtype":"sockreq",
+        "sockreq":"reg-player",
+        "userid":userid,
+        "clientid":"00001",
+        "token":"prs35tqjMI3VUn6M6lyyPLcj84Q"
+    }
+
+cmd_str = json.dumps(cmd)
+client.send_message(cmd_str)
+line = input("press any key to register next player\r\n")
+
 # cmd = '{"cmdtype":"sockreq","sockreq":"enter-room","userid":111,"roomid":' +'"' + roomid +'","gameid":"m1"}'
 # cmd = '{"cmdtype":"sockreq","sockreq":"enter-room","userid":111,"roomid":' + roomid +',"gameid":"m1"}'
 cmd = {

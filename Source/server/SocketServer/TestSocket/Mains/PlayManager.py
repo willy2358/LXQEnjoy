@@ -9,6 +9,8 @@ from datetime import datetime
 from Clients import Clients
 
 from GRules.GRule import GRule
+import Mains.Errors as Err
+
 
 Conn_Players = {} #{connection, player}
 # __Players = []
@@ -58,7 +60,7 @@ def load_clients():
         Clients.set_config_dir(configDir)
         if os.path.exists(configDir):
             Clients.reload()
-        Clients.start_watcher()
+        # Clients.start_watcher()
     except Exception as ex:
         Log.exception(ex)
 
@@ -116,7 +118,7 @@ def dispatch_player_commands(conn, comm_text):
 def send_pack_to_client(conn, pack):
     j_str = json.dumps(pack)
     msg = "LXQ<(:" + j_str + ":)>QXL"
-    send_msg_to_client(msg)
+    send_msg_to_client(conn, msg)
 
 def send_err_pack_to_client(clientConn, cmd, errCode):
     err_pack = InterProtocol.create_error_pack(cmd, errCode);
@@ -142,9 +144,9 @@ def process_register_player(conn, cmd, req_json):
         return
     client = Clients.get_client(clientid)
     userid = req_json[InterProtocol.user_id]
-    err, token = client.register_player(userid)
-    if err == Errors.ok:
-        obj = {InterProtocol.user_id: userid, InterProtocol.authed_token:token}
+    err, player = client.register_player(userid)
+    if err == Err.ok:
+        obj = {InterProtocol.user_id: player.get_userid(), InterProtocol.authed_token:player.get_token()}
         resp_pack = InterProtocol.create_success_resp_data_pack(cmd, InterProtocol.resp_player, obj)
         send_pack_to_client(conn, resp_pack)
     else:

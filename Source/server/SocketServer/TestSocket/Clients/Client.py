@@ -1,4 +1,5 @@
-from Mains import Errors
+
+import Mains.Errors as Err
 import secrets
 import Rooms.Lobby
 from Rooms.Lobby import *
@@ -31,6 +32,9 @@ class Client:
 
     def get_clientid(self):
         return self.__clientid
+
+    def get_token(self):
+        return self.__token
 
     def get_available_closet(self, gameid):
         try:
@@ -75,13 +79,13 @@ class Client:
 
     def register_player(self, userid):
         if userid in self.__players:
-            return Errors.ok, self.__players[userid]
+            return Err.ok, self.__players[userid]
         if len(self.__players) >= self.__player_limits:
-            return Errors.client_reach_players_limit, "not a token"
+            return Err.client_reach_players_limit, "not a token"
         player = Player(userid)
         player.set_token(secrets.token_urlsafe(20))
         self.__players[userid] = player
-        return Errors.ok, self.__players[userid]
+        return Err.ok, self.__players[userid]
 
     def create_new_room(self, player, req_json):
         return None
@@ -89,7 +93,7 @@ class Client:
     def process_create_room(self, player, req_json):
         # create room
         err, room = self.create_new_room(player, req_json)
-        if err != Errors.ok:
+        if err != Err.ok:
             player.response_err_pack(InterProtocol.client_req_cmd_new_room, err)
 
         else:

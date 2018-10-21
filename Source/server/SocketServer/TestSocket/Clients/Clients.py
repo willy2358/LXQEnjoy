@@ -41,7 +41,7 @@ def reload():
                 times = g[Client.field_game_coin_base]
                 p = Product(rule, gameid, times)
                 client.add_product(p)
-            __clients[client.get_clientid()] = client
+            __clients.append(client)
 
 def start_watcher():
     reload()
@@ -63,10 +63,12 @@ def get_client(clientid):
 def is_client_valid(client, token):
     ret = False
     if lock.acquire():
-        if client not in __clients:
-            ret = False
-        else:
-            ret = (__clients[client] == token)
+        for c in __clients:
+            if c.get_clientid() == client:
+                if c.get_token() == token:
+                    ret = True
+                break
+
         lock.release()
     return ret
 

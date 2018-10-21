@@ -25,9 +25,9 @@ player_not_join_game = 125
 
 Errors = {
     ok: "OK",
-    unknown_error:"unknown error",
+    unknown_error: "unknown error",
     wrong_room_number : "wrong room number",
-    invalid_client_token:"invalid clientid or token",
+    invalid_client_token: "invalid clientid or token",
     client_reach_players_limit: "reached the limits of players",
     invalid_packet_format: "invalid json format request packet",
     invalid_request_parameter: "invalid request parameters",
