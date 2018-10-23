@@ -10,6 +10,7 @@ class Update(Statement):
         self.__targetProp = targetProp
         self.__op = op
         self.__opVal = opVal
+        self.__case = None
 
     def __init__(self, target, opVal, op = Operator.Update):
         if not GCore.Engine.is_var_ref(target):
@@ -27,3 +28,5 @@ class Update(Statement):
     def execute(self):
         pass
 
+    def set_exe_case(self, case):
+        self.__case = case

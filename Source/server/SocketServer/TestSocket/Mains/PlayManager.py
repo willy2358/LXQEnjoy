@@ -68,7 +68,7 @@ def load_clients():
 
 def load_rules():
     try:
-        prefile = os.path.join(os.getcwd(), '..', config_dir, config_dir_rules)
+        prefile = os.path.join(os.getcwd(), config_dir, config_dir_rules)
         if os.name.find('win') >= 0:
             prefile = os.path.join(os.getcwd(), '..', config_dir,  config_dir_clients)
         for (root, _, files) in os.walk(prefile):
