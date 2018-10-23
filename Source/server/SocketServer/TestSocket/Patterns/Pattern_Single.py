@@ -36,7 +36,7 @@ class Pattern_Single(Pattern):
                 if powerAttrVal.isnumeric():
                     self.set_power(int(powerAttrVal))
                 elif is_str_statement(powerAttrVal) or is_var_ref(powerAttrVal) :
-                    self.add_power_statement(parse_statement_str(powerAttrVal))
+                    self.add_power_statement(parse_statement_str(xmlElement, powerAttrVal))
             if not xmlElement.hasChildNodes():
                 return True
             for elem in xmlElement.childNodes:
