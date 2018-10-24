@@ -4,8 +4,8 @@ from Patterns.Pattern import Pattern
 #牌型组
 class Pattern_Comp(Pattern):
     ELEMENT_NAME = "comp"
-    def __init__(self):
-        super(Pattern_Comp, self).__init__()
+    def __init__(self, gRule):
+        super(Pattern_Comp, self).__init__(gRule)
         self.__child_patterns = []
 
     def append_child_pattern(self, pattern):

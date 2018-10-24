@@ -24,29 +24,29 @@ class Operator(Enum):
 
 
 def from_str(strOp):
-    if strOp == attr_name_ret_as or strOp == attr_name_ret_is:
+    if strOp == GCore.Engine.attr_name_ret_as or strOp == GCore.Engine.attr_name_ret_is:
         return Operator.Equal
-    elif strOp == attr_name_ret_not_is or strOp == attr_name_ret_not_as:
+    elif strOp == GCore.Engine.attr_name_ret_not_is or strOp == GCore.Engine.attr_name_ret_not_as:
         return Operator.NotEqual
-    elif strOp == attr_name_ret_lt or strOp == attr_name_ret_lt_as:
+    elif strOp == GCore.Engine.attr_name_ret_lt or strOp == GCore.Engine.attr_name_ret_lt_as:
         return Operator.LessThan
-    elif strOp == attr_name_ret_not_lt or strOp == attr_name_ret_not_lt_as:
+    elif strOp == GCore.Engine.attr_name_ret_not_lt or strOp == GCore.Engine.attr_name_ret_not_lt_as:
         return Operator.NotLessThan
-    elif strOp == attr_name_ret_gt or strOp == attr_name_ret_gt_as:
+    elif strOp == GCore.Engine.attr_name_ret_gt or strOp == GCore.Engine.attr_name_ret_gt_as:
         return Operator.GreaterThan
-    elif strOp == attr_name_ret_not_gt or strOp == attr_name_ret_not_gt_as:
+    elif strOp == GCore.Engine.attr_name_ret_not_gt or strOp == GCore.Engine.attr_name_ret_not_gt_as:
         return Operator.NotGreaterThan
-    elif strOp == attr_val_op_and :
+    elif strOp == GCore.Engine.attr_val_op_and :
         return Operator.And
-    elif strOp == attr_val_op_or:
+    elif strOp == GCore.Engine.attr_val_op_or:
         return Operator.Or
-    elif strOp == attr_val_op_not:
+    elif strOp == GCore.Engine.attr_val_op_not:
         return Operator.Not
-    elif strOp == attr_val_op_add:
+    elif strOp == GCore.Engine.attr_val_op_add:
         return Operator.Add
-    elif strOp == attr_val_op_subtract:
+    elif strOp == GCore.Engine.attr_val_op_subtract:
         return Operator.Subtract
-    elif strOp == attr_val_op_multiply:
+    elif strOp == GCore.Engine.attr_val_op_multiply:
         return Operator.Multiply
     else:
         return Operator.Unknown

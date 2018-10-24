@@ -7,10 +7,10 @@ class Pattern_SameCfigure(Pattern):
     ELEMENT_TRIPLE = "triple"
     ELEMENT_QUAD = "quad"
 
-    def __init__(self, multiply, cfigure):
-        super(Pattern_SameCfigure, self).__init__()
-        self.__multiply = multiply
-        self.__cfigure = cfigure
+    def __init__(self, gRule):
+        super(Pattern_SameCfigure, self).__init__(gRule)
+        self.__multiply = 0
+        self.__cfigure = None
 
     def load(self, xmlElement):
         if xmlElement.tagName != Pattern_SameCfigure.ELEMENT_NAME \

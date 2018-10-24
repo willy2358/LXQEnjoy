@@ -376,11 +376,9 @@
 
     <!--发牌（摸牌，起牌）-->
     <!--每次一张牌-->
-    <dealcard_loop start_player="@round.init_drawer" card_number_per_time="1">
-    <!--底牌6张-->
-      <ift  cards_count_not_deal="6">
-        <stoploop/>
-      </ift>
+    <var name="drawer" value="@round.init_drawer" value_type="player"/>
+    <loop start_player="@round.init_drawer" card_number_per_time="1">
+      <deal_card to="@drawer" card_count="1"/>
 
       <!--摸到将牌，可以叫主，前提是还没主-->
       <ift>
@@ -393,8 +391,14 @@
               <action act_ref="pass"/>
           </actions>
       </ift>
-      
-    </dealcard_loop>
+
+         <!--底牌6张-->
+      <ift  cards_count_not_deal="6">
+        <stoploop/>
+      </ift>
+
+      <update property="@drawer" value=":(next_player_of(@drawer))"/>
+    </loop>
 
     <!--发牌结束，必须有防守方，否则流局，此情况只发生刚开始的几局-->
     <ift value_of="@round.defenders" ret_is="none">

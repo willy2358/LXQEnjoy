@@ -15,18 +15,17 @@ def create_pattern(elemName, xmlElement, gRule):
             or elemName == Pattern_SameCfigure.ELEMENT_PAIR\
             or elemName == Pattern_SameCfigure.ELEMENT_TRIPLE\
             or elemName == Pattern_SameCfigure.ELEMENT_QUAD:
-        pat = Pattern_SameCfigure()
+        pat = Pattern_SameCfigure(gRule)
     elif elemName == Pattern_Seq.ELEMENT_NAME:
-        pat = Pattern_Seq()
+        pat = Pattern_Seq(gRule)
     elif elemName == Pattern_Seqm.ELEMENT_NAME:
-        pat = Pattern_Seqm()
+        pat = Pattern_Seqm(gRule)
     elif elemName == Pattern_Comp.ELEMENT_NAME:
-        pat = Pattern_Comp()
+        pat = Pattern_Comp(gRule)
     elif elemName == Pattern_QGroup.ELEMENT_NAME:
-        pat = Pattern_QGroup()
+        pat = Pattern_QGroup(gRule)
     elif elemName == Pattern_SameCtype.ELEMENT_NAME:
-        pat = Pattern_SameCtype()
+        pat = Pattern_SameCtype(gRule)
+    return pat
 
-    if pat is not None and pat.load(xmlElement):
-        return pat
 

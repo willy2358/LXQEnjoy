@@ -33,6 +33,9 @@ class RulePart_Cards(RulePart):
     def get_part_name(self):
         return self.PART_NAME
 
+    def get_patterns(self):
+        return self.__patterns
+
     def parse(self):
 
         try:
@@ -126,11 +129,11 @@ class RulePart_Cards(RulePart):
         if not RulePart.is_contain_valid_child_node(RulePart_Cards.TAG_NAME_PATTERNS, xmlNode):
             return
         patterns = Utils.getXmlFirstNamedChild(RulePart_Cards.TAG_NAME_PATTERNS, xmlNode)
-        for c in patterns.childNodes:
-            if type(c) is not xml.dom.minidom.Element:
-                continue
+        for c in Utils.getXmlChildElments(xmlNode):
+
             pat = create_pattern(c.tagName, c, self.getGRule())
-            if pat is not None:
+
+            if pat and pat.load(c):
                 self.__patterns.append(pat)
 
 

@@ -39,16 +39,16 @@ class Pattern_Single(Pattern):
                     self.add_power_statement(parse_statement_str(xmlElement, powerAttrVal))
             if not xmlElement.hasChildNodes():
                 return True
-            for elem in xmlElement.childNodes:
+            for elem in Utils.getXmlChildElments(xmlElement):
                 s = parse_statement_elem(elem)
                 if s is None:
-                    continue
+                    return False
                 targetProp = s.get_target_property()
                 if targetProp == Runtime.CARDS_POWER :
                     self.add_power_statement(s)
                 elif targetProp == Runtime.CARDS_LEADING:
                     self.add_leading_statement(s)
-
+            return True
         except Exception as ex:
             return False
 
