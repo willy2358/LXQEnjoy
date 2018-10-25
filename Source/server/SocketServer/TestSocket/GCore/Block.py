@@ -7,4 +7,7 @@ class Block(Operation):
 
 
     def add_operation(self, operation):
-        self.__operations.append(operation)
+        if operation:
+            self.__operations.append(operation)
+            operation.set_parent(self)
+

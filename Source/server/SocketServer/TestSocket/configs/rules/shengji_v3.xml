@@ -378,7 +378,7 @@
         <!--每次一张牌-->
         <var name="drawer" value="@round.init_drawer" value_type="player"/>
         <var name="drawn_card" value="None" value_type="card"></var>
-        <loop start_player="@round.init_drawer" card_number_per_time="1">
+        <loop>
             <draw_cards to_var="@drawn_card" count="1"></draw_cards>
             <send_cards player="@drawer" cards="@drawn_card" ></send_cards>
 
@@ -440,7 +440,7 @@
                 </ift>
             </loop_until>
 
-            <loop_for i_range="1,2,3">
+            <loop_for range="1,2,3">
                 <var name="valid_following_cards" value_type="bool" value="false"/>
                 <var name="follower" value_type="player" value=":(find_player(seatid==@trick_init_player.seatid + @i))"/>
                 <loop_until value_of="@valid_following_cards" ret_is="false">

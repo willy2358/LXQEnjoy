@@ -40,7 +40,7 @@ class Pattern_Single(Pattern):
             if not xmlElement.hasChildNodes():
                 return True
             for elem in Utils.getXmlChildElments(xmlElement):
-                s = parse_statement_elem(elem)
+                s = parse_elem(elem)
                 if s is None:
                     return False
                 targetProp = s.get_target_property()

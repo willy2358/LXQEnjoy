@@ -37,7 +37,6 @@ class RulePart_Cards(RulePart):
         return self.__patterns
 
     def parse(self):
-
         try:
             self.read_card_sets()
             self.read_excludes()
@@ -48,7 +47,6 @@ class RulePart_Cards(RulePart):
             return  True
         except Exception as ex:
             raise ex
-
 
     def read_card_sets(self):
 
