@@ -440,9 +440,10 @@
                 </ift>
             </loop_until>
 
-            <loop_for range="1,2,3">
+            <var name="sorder" value_type="int" value="1"/>
+            <loop_until value_of="@sorder" ret_is="3">
                 <var name="valid_following_cards" value_type="bool" value="false"/>
-                <var name="follower" value_type="player" value=":(find_player(seatid==@trick_init_player.seatid + @i))"/>
+                <var name="follower" value_type="player" value=":(find_player(seatid==@trick_init_player.seatid + @sorder))"/>
                 <loop_until value_of="@valid_following_cards" ret_is="false">
                     <find_player player="@follower">
                         <actions timeout_seconds="30" timeout_def_act="force_chupai">
@@ -455,7 +456,7 @@
                         <set property="@valid_following_cards" value="true"/>
                     </ift>
                 </loop_until>
-            </loop_for>
+            </loop_until>
 
             <set property="trick_init_player" value="@trick.winner"/>
             <exe ref="@trick.end"/>
