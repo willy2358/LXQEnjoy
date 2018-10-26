@@ -396,7 +396,7 @@
             </ift>
 
             <!--底牌6张-->
-            <ift  cards_count_not_deal="6">
+            <ift  value_of=":(cards_count_not_deal())" ret_is="6">
                 <exitloop/>
             </ift>
 
