@@ -490,6 +490,7 @@
 
         <action name="koupai" text="koupai">
             <send_cards_to_table cards="@selected_cards"/>
+            <delay seconds="2"/>
             <pub_msg players="@round.players" msg="kou pai"></pub_msg>
         </action>
 
@@ -503,6 +504,7 @@
 
         <action name="force_koupai" text="none" >
             <send_cards_to_table cards=":(select_random_cards(count=6))"/>
+            <delay seconds="3"></delay>
             <pub_msg players="@round.players" msg="kou pai" ></pub_msg>
         </action>
     </actions>
