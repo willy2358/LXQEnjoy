@@ -24,17 +24,18 @@ class RulePart_Players(RulePart):
         rule = self.getGRule()
         rule.set_players_capacity(self.__min_players, self.__max_players)
 
-        attrsRoot = Utils.getXmlFirstNamedChild(Engine.tag_name_attrs)
+        attrsRoot = Utils.getXmlFirstNamedChild(Engine.tag_name_attrs, xmlNode)
         if not attrsRoot:
             attrsRoot = xmlNode
 
         for elem in Utils.getXmlChildElments(attrsRoot):
-            if elem.tag == Engine.tag_name_attr:
+            if elem.tagName == Engine.tag_name_attr:
                 vName = elem.getAttribute(Engine.attr_name_name)
                 vType = elem.getAttribute(Engine.attr_name_value_type)
                 attr = Variable(vName)
                 attr.set_value_type(vType)
                 self.__custom_attrs.append(attr)
+        return True
 
     def get_part_name(self):
         return self.PART_NAME

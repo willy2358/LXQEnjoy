@@ -299,7 +299,7 @@
                 </loop_until>
             </loop_until>
 
-            <update property="trick_init_player" value="@trick.winner"/>
+            <update property="@trick_init_player" value="@trick.winner"/>
             <exeref ref="@trick.end"/>
 
         </loop_until>

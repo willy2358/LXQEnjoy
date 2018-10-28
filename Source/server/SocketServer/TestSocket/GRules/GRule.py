@@ -74,10 +74,9 @@ class GRule:
                 return False
 
             for c in Utils.getXmlChildElments(game):
-                if type(c) is xml.dom.minidom.Element:
-                    part = RulePartFactory.create_part(c.tagName, c, self)
-                    if part.parse():
-                        self.__parts.append(part)
+                part = RulePartFactory.create_part(c.tagName, c, self)
+                if part.parse():
+                    self.__parts.append(part)
 
             return True
         except Exception as ex:

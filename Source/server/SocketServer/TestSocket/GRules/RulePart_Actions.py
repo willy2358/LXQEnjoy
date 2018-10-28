@@ -15,7 +15,7 @@ class RulePart_Actions(RulePart):
         xmlNode = self.get_xml_node()
 
         for elem in Utils.getXmlChildElments(xmlNode):
-            if elem.tag == Engine.tag_name_action:
+            if elem.tagName == Engine.tag_name_action:
                 action = Engine.parse_elem_action(elem)
                 if action:
                     self.add_action(action)

@@ -16,9 +16,9 @@ class RulePart_Procs(RulePart):
 
         try:
             for elem in Utils.getXmlChildElments(xmlNode):
-                prooc = GCore.Engine.parse_elem_proc(elem)
-                if prooc:
-                    self.__statements.append(prooc)
+                proc = GCore.Engine.parse_elem_proc(elem)
+                if proc:
+                    self.__procs.append(proc)
 
             return True
         except Exception as ex:
