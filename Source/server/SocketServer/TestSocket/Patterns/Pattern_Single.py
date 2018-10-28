@@ -8,7 +8,6 @@ from Cards.CType import CType, parse_ctype
 from Cards.CType import TOKEN as CTYPE_TOKEN
 from GCore.Engine import *
 import GCore.Engine
-from GCore.LeftOperand import LeftOperand
 
 
 from Patterns.Pattern import Pattern

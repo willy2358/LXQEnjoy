@@ -1,6 +1,6 @@
 
 from GCore.Operator import Operator
-from GCore.Case import Case
+from GCore.ElemCase import Case
 
 
 class Cases(Case):
