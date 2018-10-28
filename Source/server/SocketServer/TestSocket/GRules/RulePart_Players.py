@@ -1,7 +1,7 @@
 
 import Utils
 from GRules.RulePart import RulePart
-from GCore.ElemVariable import Variable
+from GCore.Elements.Variable import Variable
 import GCore.Engine as Engine
 
 class RulePart_Players(RulePart):
