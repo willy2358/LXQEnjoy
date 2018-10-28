@@ -5,7 +5,7 @@ import json
 # roomid = "LX888"
 roomid = "0"
 userid = 111
-gameid = "ddz001"
+gameid = "shengji001"
 # roomid = 888
 # client = SocketClient.SocketClient("117.78.40.54", 9229)
 client = SocketClient.SocketClient("127.0.0.1", 9229)
@@ -49,7 +49,7 @@ cmd = {
     "gameid":gameid,
     "clientid": "00001",
     "token": client.get_token(),
-    "seatid":3
+    "seatid":1
 }
 cmd_str = json.dumps(cmd)
 client.send_message(cmd_str)

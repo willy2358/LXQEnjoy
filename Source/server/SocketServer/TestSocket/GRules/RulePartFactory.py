@@ -7,6 +7,7 @@ from GRules.RulePart_Round import RulePart_Round
 from GRules.RulePart_Running import RulePart_Running
 from GRules.RulePart_Trick import RulePart_Trick
 from GRules.RulePart_Procs import RulePart_Procs
+from GRules.RulePart_Scene import RulePart_Scene
 
 def create_part(partName, xmlNode, gRule):
     if partName == RulePart_Cards.PART_NAME:
@@ -19,6 +20,8 @@ def create_part(partName, xmlNode, gRule):
         return RulePart_Procs(xmlNode, gRule)
     elif partName == RulePart_Trick.PART_NAME:
         return RulePart_Trick(xmlNode, gRule)
+    elif partName == RulePart_Scene.PART_NAME:
+        return RulePart_Scene(xmlNode, gRule)
     elif partName == RulePart_Round.PART_NAME:
         return RulePart_Round(xmlNode, gRule)
     elif partName == RulePart_Running.PART_NAME:

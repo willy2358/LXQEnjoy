@@ -202,17 +202,25 @@
             <!--
               reset: 新局是否复位属性，false:不复位；true:复位, 默认值
             -->
-            <attr name="cur_level" reset="false" value_type="int" init_value="2"/>
-            <attr name="defenders" reset="false" value_type="list" init_value="none"/>
-            <attr name="attacters" reset="false" value_type="list" init_value="none"/>
+            <attr name="cur_level" reset="false" value_type="int" value="2"/>
+            <attr name="defenders" reset="false" value_type="list" value="none"/>
+            <attr name="attacters" reset="false" value_type="list" value="none"/>
             <!--庄牌点数-->
-            <attr name="bank_cfigure" reset="false" value_type="int" init_value="2"/>
+            <attr name="bank_cfigure" reset="false" value_type="int" value="2"/>
             <!--庄牌花色-->
-            <attr name="bank_ctype" reset="true" value_type="string" init_value="none"/>
+            <attr name="bank_ctype" reset="true" value_type="string" value="none"/>
             <!--起牌玩家，第一个摸牌的人-->
-            <attr name="init_drawer" reset="false" value_type="player" init_value="random"/>
+            <attr name="init_drawer" reset="false" value_type="player" value="random"/>
         </attrs>
     </round>
+
+    <scene>
+        <attrs>
+
+            <attr name="cur_level" value_type="int" value="2"/>
+
+        </attrs>
+    </scene>
 
     <running>
 
