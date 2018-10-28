@@ -231,8 +231,8 @@
                     <case value_of="@round.bank_ctype" ret_is="none"/>
                 </cases>
                 <act_opts timeout="30" timeout_act="pass" to_player="@drawer">
-                    <act_opt act_ref="jiaozhu"/>
-                    <act_opt act_ref="pass"/>
+                    <act_opt act="jiaozhu"/>
+                    <act_opt act="pass"/>
                 </act_opts>
 
             </ift>
@@ -260,8 +260,8 @@
         <!--等待主打扣牌-->
         <find_player property="IsMainPlayer" value="true">
             <act_opts timeout="30" timeout_act="force_koupai">
-                <act_opt act_ref="koupai"/>
-                <act_opt act_ref="force_koupai"/>
+                <act_ref act="koupai"/>
+                <act_ref act="force_koupai"/>
             </act_opts>
         </find_player>
 
@@ -272,8 +272,8 @@
             <loop_until value_of="@valid_leading_cards" ret_is="false">
                 <find_player player="@trick_init_player">
                     <act_opts timeout="30" timeout_act="force_chupai">
-                        <act_opt act_ref="playcard"/>
-                        <act_opt act_ref="force_chupai"/>
+                        <act_ref act="playcard"/>
+                        <act_ref act="force_chupai"/>
                     </act_opts>
                 </find_player>
                 <ift value_of=":(is_valid_leading_cards(@trick_init_player.played_cards))" ret_is="true">
@@ -288,8 +288,8 @@
                 <loop_until value_of="@valid_following_cards" ret_is="false">
                     <find_player player="@follower">
                         <act_opts timeout="30" timeout_act="force_chupai">
-                            <act_opt act_ref="playcard"/>
-                            <act_opt act_ref="force_chupai"/>
+                            <act_ref act="playcard"/>
+                            <act_ref act="force_chupai"/>
                         </act_opts>
                     </find_player>
 
