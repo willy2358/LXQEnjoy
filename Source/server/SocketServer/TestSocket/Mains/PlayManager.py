@@ -11,6 +11,7 @@ from Clients import Clients
 from GRules.GRule import GRule
 import Mains.Errors as Err
 
+ConfigRoot = ""
 
 Conn_Players = {} #{connection, player}
 # __Players = []
@@ -56,11 +57,9 @@ def start_timer_to_clear_dead_connection():
 
 def load_clients():
     try:
-        configDir = os.path.join(os.getcwd(), config_dir,  config_dir_clients)
-        if os.name.find('win') >= 0:
-            configDir = os.path.join(os.getcwd(), '..', config_dir,  config_dir_clients)
-        Clients.set_config_dir(configDir)
-        if os.path.exists(configDir):
+        clientsDir = os.path.join(ConfigRoot, config_dir,  config_dir_clients)
+        Clients.set_config_dir(clientsDir)
+        if os.path.exists(clientsDir):
             Clients.reload()
         # Clients.start_watcher()
     except Exception as ex:
@@ -68,10 +67,9 @@ def load_clients():
 
 def load_rules():
     try:
-        prefile = os.path.join(os.getcwd(), config_dir, config_dir_rules)
-        if os.name.find('win') >= 0:
-            prefile = os.path.join(os.getcwd(), '..', config_dir,  config_dir_clients)
-        for (root, _, files) in os.walk(prefile):
+        rulesDir = os.path.join(ConfigRoot, config_dir, config_dir_rules)
+
+        for (root, _, files) in os.walk(rulesDir):
             for f in files:
                 if f.endswith(".xml"):
                     gRuleXml = os.path.join(root, f)

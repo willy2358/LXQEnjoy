@@ -6,6 +6,7 @@ from Mains import Log
 from Cards.GType import GType
 
 from GRules import RulePartFactory
+import Utils
 
 
 class GRule:
@@ -39,6 +40,9 @@ class GRule:
                 return p
 
         return None
+    def set_players_capacity(self, minPlayers, maxPlayers):
+        self.__min_players_capacity = minPlayers
+        self.__max_players_capacity = maxPlayers
 
     def parse_game_attrs(self, gameElem):
         if not gameElem:
@@ -69,7 +73,7 @@ class GRule:
             if not self.parse_game_attrs(game):
                 return False
 
-            for c in game.childNodes:
+            for c in Utils.getXmlChildElments(game):
                 if type(c) is xml.dom.minidom.Element:
                     part = RulePartFactory.create_part(c.tagName, c, self)
                     if part.parse():

@@ -3,6 +3,7 @@ import socketserver
 from Mains import PlayManager, Log
 import threading
 import sys
+import os
 
 
 class MyTCPHandler(socketserver.StreamRequestHandler):
@@ -45,6 +46,10 @@ def run_background_server():
     thread.start()
 
 if __name__ == "__main__":
+
+    configDir = os.path.join(os.getcwd(), '..')
+
+    PlayManager.ConfigRoot = configDir
 
     PlayManager.initialize()
 
