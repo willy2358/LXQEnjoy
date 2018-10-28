@@ -300,12 +300,12 @@
             </loop_until>
 
             <update property="@trick_init_player" value="@trick.winner"/>
-            <exeref ref="@trick.end"/>
+            <proc_ref proc="@trick.end"/>
 
         </loop_until>
 
         <!--出牌结束，确定一局输赢玩家-->
-        <exeref ref="@round.end"/>
+        <proc_ref proc="@round.end"/>
 
         <!--广播一局胜负-->
         <!--<publish_round_winners_losers/>-->
