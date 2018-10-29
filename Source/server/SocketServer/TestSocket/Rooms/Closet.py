@@ -1,5 +1,6 @@
 from Mains.PlayScene import PlayScene
 from Mains import InterProtocol
+import Mains.Errors as Errors
 
 
 class Closet:
@@ -32,7 +33,12 @@ class Closet:
 
     def add_player(self, player):
         if self.__playScene.add_player(player):
+            pack = InterProtocol.create_success_resp_pack(InterProtocol.client_req_cmd_join_game)
+            player.response_success_pack(pack)
             self.publish_players_status()
+        else:
+            player.response_err_pack(InterProtocol.client_req_cmd_join_game, Errors.player_already_in_game)
+
         # reached the min players,  start game.
         if len(self.__playScene.get_players()) >= self.__gRule.get_min_players_capacity():
             self.__playScene.start_game()

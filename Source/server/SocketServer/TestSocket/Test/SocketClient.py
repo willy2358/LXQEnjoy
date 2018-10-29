@@ -66,7 +66,8 @@ class SocketClient:
                     if not p.startswith('{'):
                         continue
                     j_obj = json.loads(p)
-                    if j_obj[InterProtocol.sock_resp] == InterProtocol.client_req_cmd_reg_player:
+                    if InterProtocol.sock_resp in j_obj and\
+                            j_obj[InterProtocol.sock_resp] == InterProtocol.client_req_cmd_reg_player:
                         if InterProtocol.resp_player in j_obj:
                             self.__token = j_obj[InterProtocol.resp_player][InterProtocol.authed_token]
 

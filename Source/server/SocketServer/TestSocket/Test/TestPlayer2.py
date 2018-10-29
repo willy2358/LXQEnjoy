@@ -20,7 +20,7 @@ cmd = {
 
 cmd_str = json.dumps(cmd)
 client.send_message(cmd_str)
-line = input("press any key to join game\r\n")
+# line = input("press any key to join game\r\n")
 
 # cmd = '{"cmdtype":"sockreq","sockreq":"enter-room","userid":111,"roomid":' +'"' + roomid +'","gameid":"m1"}'
 # cmd = '{"cmdtype":"sockreq","sockreq":"enter-room","userid":111,"roomid":' + roomid +',"gameid":"m1"}'
