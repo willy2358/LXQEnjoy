@@ -13,13 +13,17 @@ def process_player_join_game(player, req_json):
     user_id = req_json[InterProtocol.user_id]
 
     if player.get_closet():
-        player.send_error_message("Already in a game")
+        player.response_err_pack(InterProtocol.client_req_cmd_join_game, Errors.player_already_in_game)
     else:
 
         closet = get_available_closet(req_json[InterProtocol.client_id], req_json[InterProtocol.game_id])
-        closet.add_player(player)
-        # player.send_success_messsage(InterProtocol.client_req_cmd_join_game)
-        # closet.start_game()
+        if closet and closet.add_player(player):
+            pack = InterProtocol.create_success_resp_pack(InterProtocol.client_req_cmd_join_game)
+            player.response_success_pack(pack)
+            closet.publish_players_status()
+
+            closet.test_to_start_game()
+
 
 def process_player_request(player, cmd, req_json):
     if cmd == InterProtocol.client_req_cmd_join_game:
