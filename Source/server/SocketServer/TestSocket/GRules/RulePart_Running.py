@@ -28,3 +28,6 @@ class RulePart_Running(RulePart):
 
     def get_part_name(self):
         return self.PART_NAME
+
+    def get_statements(self):
+        return self.__statements

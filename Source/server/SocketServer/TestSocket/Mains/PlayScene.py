@@ -5,6 +5,23 @@ from GRules.RulePart_Following import RulePart_Following
 from GRules.RulePart_Players import RulePart_Players
 from GRules.RulePart_Round import RulePart_Round
 from GRules.RulePart_Running import RulePart_Running
+from GRules.RulePart_Scene import RulePart_Scene
+from GRules.RulePart_Procs import RulePart_Procs
+
+from GCore.Elements.Variable import Variable
+from GCore.Elements.Loop import Loop
+from GCore.Elements.ActRefs import ActRefs
+from GCore.Elements.ActRef import ActRef
+from GCore.Elements.ProcRef import ProcRef
+from GCore.Elements.Action import Action
+from GCore.Elements.Delay import Delay
+from GCore.Elements.PubMsg import PubMsg
+from GCore.Elements.FindPlayer import FindPlayer
+from GCore.Elements.FindPlayers import FindPlayers
+from GCore.Elements.Clause import Clause
+from GCore.Elements.ActOpts import ActOpts
+from GCore.Elements.Case import Case
+from GCore.Elements.Cases import Cases
 
 class PlayScene:
     def __init__(self, rule):
@@ -13,6 +30,9 @@ class PlayScene:
         self.__players = []
         self.__rule = rule
         self.__cus_attrs = {}
+        self.__vars = {} # name:['val_type', 'value']
+        self.parse_rule(self.__rule)
+        self.__runtimes = []
 
     def is_player_in(self, player):
         return player in self.__players
@@ -36,6 +56,16 @@ class PlayScene:
         else:
             return False
 
+    def add_variable(self, name, vtype, value):
+        if name not in self.__vars:
+            self.__vars[name] = [vtype, value]
+
+    def update_variable(self, name, value):
+        if name not in self.__vars:
+            self.__vars[name] = ['undef', value]
+        else:
+            self.__vars[name][1] = value
+
     def remove_player(self, player):
         if player in self.__players:
             self.__players.remove(player)
@@ -44,6 +74,55 @@ class PlayScene:
 
     def has_vacancy(self):
         return len(self.__players) < self.__rule.get_max_players_capacity()
+
+    def parse_rule(self, rule):
+        partRun = rule.get_part_by_name(RulePart_Running.PART_NAME)
+        assert partRun
+        rt = None
+        for stm in partRun.get_statements():
+            rt = None
+            if isinstance(stm, Variable):
+                self.parse_variable(stm)
+            elif isinstance(stm, Loop):
+                rt = self.parse_loop(stm)
+            elif isinstance(stm, FindPlayer):
+                rt = self.parse_find_player(stm)
+
+
+            if rt:
+                self.__runtimes.append(rt)
+
+    def parse_find_player(self, stm):
+        pass
+
+    def parse_variable(self, stm):
+        name = stm.get_name()
+        vtype = stm.get_value_type()
+        val = stm.get_value()
+        self.add_variable(name, vtype, val)
+
+    def parse_if_test(self, stm):
+        def test():
+            return True
+
+        return test
+
+    def parse_statements(self, stms):
+        return []
+
+    def parse_loop(self, loop):
+
+        exit_test = self.parse_if_test(loop.get_exit_condition())
+        stms = self.parse_statements(loop.get_clauses())
+        def sub_proc():
+            while True:
+                if exit_test():
+                    break
+                for func in stms:
+                    func()
+
+        return sub_proc
+
 
     def prepare_start(self):
         player_part = self.__rule.get_part_by_name(RulePart_Players.PART_NAME)

@@ -7,6 +7,15 @@ class Variable(Operand):
         self.__value_type = ValueType.integer
         self.__value = None
 
+    def get_name(self):
+        return self.__name
+
+    def get_value_type(self):
+        return self.__value_type
+
+    def get_value(self):
+        return self.__value
+
     def get_value(self):
         return self.__value
 

@@ -34,7 +34,7 @@ class GRule:
     def get_gtype(self):
         return self.__game_type
 
-    def get_part_of_name(self, partName):
+    def get_part_by_name(self, partName):
         for p in self.__parts:
             if p.get_part_name() == partName:
                 return p
