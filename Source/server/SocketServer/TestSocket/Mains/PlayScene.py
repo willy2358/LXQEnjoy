@@ -12,12 +12,22 @@ class PlayScene:
         self.__history_rounds = []
         self.__players = []
         self.__rule = rule
+        self.__cus_attrs = {}
 
     def is_player_in(self, player):
         return player in self.__players
 
     def get_players(self):
         return self.__players
+
+    def get_attr_value(self, attrName):
+        if attrName in self.__cus_attrs:
+            return self.__cus_attrs[attrName]
+        else:
+            return None
+
+    def add_cus_attr(self, attrName, attrVal=None):
+        self.__cus_attrs[attrName] = attrVal
 
     def add_player(self, player):
         if player not in self.__players:
