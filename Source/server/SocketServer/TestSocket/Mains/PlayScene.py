@@ -56,6 +56,9 @@ class PlayScene:
         else:
             return False
 
+    def __append_rt_obj(self, obj):
+        self.__runtimes.append(obj)
+
     def add_variable(self, name, vtype, value):
         if name not in self.__vars:
             self.__vars[name] = [vtype, value]
@@ -80,49 +83,9 @@ class PlayScene:
         assert partRun
         rt = None
         for stm in partRun.get_statements():
-            rt = None
-            if isinstance(stm, Variable):
-                self.parse_variable(stm)
-            elif isinstance(stm, Loop):
-                rt = self.parse_loop(stm)
-            elif isinstance(stm, FindPlayer):
-                rt = self.parse_find_player(stm)
-
-
-            if rt:
-                self.__runtimes.append(rt)
-
-    def parse_find_player(self, stm):
-        pass
-
-    def parse_variable(self, stm):
-        name = stm.get_name()
-        vtype = stm.get_value_type()
-        val = stm.get_value()
-        self.add_variable(name, vtype, val)
-
-    def parse_if_test(self, stm):
-        def test():
-            return True
-
-        return test
-
-    def parse_statements(self, stms):
-        return []
-
-    def parse_loop(self, loop):
-
-        exit_test = self.parse_if_test(loop.get_exit_condition())
-        stms = self.parse_statements(loop.get_clauses())
-        def sub_proc():
-            while True:
-                if exit_test():
-                    break
-                for func in stms:
-                    func()
-
-        return sub_proc
-
+            obj = stm.gen_runtime_obj(self)
+            if obj:
+                self.__append_rt_obj(obj)
 
     def prepare_start(self):
         player_part = self.__rule.get_part_by_name(RulePart_Players.PART_NAME)

@@ -22,4 +22,7 @@ class Case:
         elif self.__op == Operator.NotGreaterThan:
             return not value_of(self.__expr1) > value_of(self.__expr2)
 
+    def gen_runtime_obj(self, scene):
+        pass
+
 

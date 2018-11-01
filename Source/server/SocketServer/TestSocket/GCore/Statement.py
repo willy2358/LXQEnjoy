@@ -11,3 +11,6 @@ class Statement:
 
     def get_parent(self):
         return self.__parent
+
+    def gen_runtime_obj(self, scene):
+        return None

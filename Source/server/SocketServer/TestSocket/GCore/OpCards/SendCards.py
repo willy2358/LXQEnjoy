@@ -8,3 +8,5 @@ class SendCards(Statement):
         self.__cards = cards
         self.__recv_player = recv_player
 
+    def gen_runtime_obj(self, scene):
+        pass

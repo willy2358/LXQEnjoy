@@ -25,4 +25,10 @@ class Variable(Operand):
     def set_value(self, val):
         self.__value = val
 
+    def gen_runtime_obj(self, scene):
+        name = self.get_name()
+        vtype = self.get_value_type()
+        val = self.get_value()
+        scene.add_variable(name, vtype, val)
+
 

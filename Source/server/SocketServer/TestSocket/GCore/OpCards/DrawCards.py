@@ -8,4 +8,9 @@ class DrawCards(Statement):
         self.__var = var
         self.__count = count
 
+    def gen_runtime_obj(self, scene):
+        pass
+
+
+
     
