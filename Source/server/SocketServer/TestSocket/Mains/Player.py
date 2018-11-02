@@ -17,6 +17,7 @@ class Player:
         self.__is_online = True
         self.__is_robot_play = False
         self.__cus_attrs = {}
+        self.__cards_in_hand = []
 
     def get_attr_value(self, attrName):
         if attrName in self.__cus_attrs:
@@ -62,6 +63,16 @@ class Player:
     def set_is_robot_play(self, robot_play = False):
         self.__is_robot_play = robot_play
 
+    def send_cards(self, cards):
+        self.__cards_in_hand += cards
+        packet = InterProtocol.create_deal_cards_json_packet(self, cards)
+        self.send_server_cmd_packet(packet)
+
+    def set_is_online(self, online=True):
+        self.__is_online = online
+        if not online:
+            self.set_is_robot_play(True)
+
     def update_connection(self, conn):
         self.__sock_conn = conn
         self.set_is_online(True)
@@ -73,11 +84,6 @@ class Player:
 
         if cmd_str_bak:
             self.send_raw_network_data(cmd_str_bak)
-
-    def set_is_online(self, online=True):
-        self.__is_online = online
-        if not online:
-            self.set_is_robot_play(True)
 
     def update_last_alive(self):
         self.__last_alive_time = datetime.now()

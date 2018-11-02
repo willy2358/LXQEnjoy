@@ -1,3 +1,4 @@
+import random
 
 from GRules.RulePart_Cards import RulePart_Cards
 from GRules.RulePart_Actions import RulePart_Actions
@@ -23,6 +24,8 @@ from GCore.Elements.ActOpts import ActOpts
 from GCore.Elements.Case import Case
 from GCore.Elements.Cases import Cases
 
+import Utils
+
 class PlayScene:
     def __init__(self, rule):
         self.__cur_round = None
@@ -33,6 +36,7 @@ class PlayScene:
         self.__vars = {} # name:['val_type', 'value']
         self.parse_rule(self.__rule)
         self.__runtimes = []
+        self.__undealing_cards = []
 
     def is_player_in(self, player):
         return player in self.__players
@@ -45,6 +49,18 @@ class PlayScene:
             return self.__cus_attrs[attrName]
         else:
             return None
+
+    def find_player(self, cond):
+        return None
+
+    def find_players(self, cond):
+        return None
+
+    def draw_cards(self, count):
+        cards = random.sample(self.__undealing_cards, count)
+        Utils.list_remove_parts(self.__undealing_cards, cards)
+        return cards
+
 
     def add_cus_attr(self, attrName, attrVal=None):
         self.__cus_attrs[attrName] = attrVal

@@ -9,4 +9,9 @@ class SendCards(Statement):
         self.__recv_player = recv_player
 
     def gen_runtime_obj(self, scene):
-        pass
+        def send_cards_rtobj():
+            player = scene.find_player(self.__recv_player)
+            if player:
+                player.send_cards(self.__cards)
+
+        return send_cards_rtobj

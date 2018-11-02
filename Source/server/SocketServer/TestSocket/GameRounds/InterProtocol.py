@@ -8,7 +8,6 @@ sock_result_ok = "OK"
 sock_error_message = "errmsg"
 
 
-
 client_req_type_join_game = "join-game"   # 开始游戏
 client_req_select_action = "sel-act"
 client_req_type_reconnect = "reconnect"   # 断线重连
