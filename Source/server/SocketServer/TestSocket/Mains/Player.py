@@ -4,7 +4,10 @@ from datetime import datetime
 
 import Mains.InterProtocol as InterProtocol
 
-class Player:
+from Mains.GVar import GVar
+from Mains.ExtAttrs import ExtAttrs
+
+class Player(ExtAttrs):
     def __init__(self, userid):
         self.__userid = userid
         self.__token = None
@@ -16,14 +19,9 @@ class Player:
 
         self.__is_online = True
         self.__is_robot_play = False
-        self.__cus_attrs = {}
         self.__cards_in_hand = []
 
-    def get_attr_value(self, attrName):
-        if attrName in self.__cus_attrs:
-            return self.__cus_attrs[attrName]
-        else:
-            return None
+
     def get_userid(self):
         return self.__userid
 
@@ -44,9 +42,6 @@ class Player:
 
     def get_is_robot_play(self):
         return self.__is_robot_play
-
-    def add_cus_attr(self, attrName, attrVal = None):
-        self.__cus_attrs[attrName] = attrVal
 
     def set_sock_conn(self, conn):
         self.__sock_conn = conn

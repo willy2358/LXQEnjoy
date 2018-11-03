@@ -13,6 +13,9 @@ class RulePart_Players(RulePart):
         self.__max_players = 0
         self.__custom_attrs = []
 
+    def get_custom_attrs(self):
+        return self.__custom_attrs
+
     def parse(self):
         xmlNode = self.get_xml_node()
         if xmlNode.hasAttribute(Engine.attr_name_max):

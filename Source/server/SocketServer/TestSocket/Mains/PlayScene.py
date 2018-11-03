@@ -24,16 +24,18 @@ from GCore.Elements.ActOpts import ActOpts
 from GCore.Elements.Case import Case
 from GCore.Elements.Cases import Cases
 
+from Mains.GVar import GVar
+from GCore.ValueType import ValueType
+from Mains.ExtAttrs import ExtAttrs
+
 import Utils
 
-class PlayScene:
+class PlayScene(ExtAttrs):
     def __init__(self, rule):
         self.__cur_round = None
         self.__history_rounds = []
         self.__players = []
         self.__rule = rule
-        self.__cus_attrs = {}
-        self.__vars = {} # name:['val_type', 'value']
         self.parse_rule(self.__rule)
         self.__runtimes = []
         self.__undealing_cards = []
@@ -61,29 +63,28 @@ class PlayScene:
         Utils.list_remove_parts(self.__undealing_cards, cards)
         return cards
 
-
-    def add_cus_attr(self, attrName, attrVal=None):
-        self.__cus_attrs[attrName] = attrVal
-
     def add_player(self, player):
         if player not in self.__players:
             self.__players.append(player)
+            self.init_player_attrs(player)
             return True
         else:
             return False
 
+    def init_player_attrs(self, player):
+        playerPart = self.__rule.get_part_by_name(RulePart_Players.PART_NAME)
+        if not playerPart:
+            return
+
+        for attr in playerPart.get_custom_attrs():
+            name = attr.get_name()
+            vtype = attr.get_value_type()
+            val = attr.get_value()
+            self.add_cus_attr(name, vtype, val)
+
     def __append_rt_obj(self, obj):
         self.__runtimes.append(obj)
 
-    def add_variable(self, name, vtype, value):
-        if name not in self.__vars:
-            self.__vars[name] = [vtype, value]
-
-    def update_variable(self, name, value):
-        if name not in self.__vars:
-            self.__vars[name] = ['undef', value]
-        else:
-            self.__vars[name][1] = value
 
     def remove_player(self, player):
         if player in self.__players:

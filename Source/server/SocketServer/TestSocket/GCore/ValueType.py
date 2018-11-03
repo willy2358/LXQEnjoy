@@ -2,10 +2,11 @@ from enum import Enum
 
 
 class ValueType(Enum):
-    integer = 0
-    string = 1
-    bool = 2
-    card = 3
-    cards = 4  # list of cards
-    player = 5
-    players = 6 # list of players
+    undef = 0
+    integer = 1
+    string = 2
+    bool = 3
+    card = 4
+    cards = 5  # list of cards
+    player = 6
+    players = 7 # list of players
