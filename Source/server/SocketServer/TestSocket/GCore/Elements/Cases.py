@@ -24,3 +24,26 @@ class Cases(Case):
             return False
         else:
             return False
+
+    def gen_runtime_obj(self, scene):
+        rt_funcs = []
+        for c in self.__cases:
+            func = c.gen_runtime_obj()
+            if func:
+                rt_funcs.append(func)
+
+        def test():
+            if self.__op == Operator.And:
+                for f in rt_funcs:
+                    if not f():
+                        return False  # 短路法
+                return True
+            elif self.__op == Operator.Or:
+                for f in rt_funcs:
+                    if f():
+                        return True  # 短路法
+                return False
+            else:
+                return False
+
+        return test

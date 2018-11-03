@@ -36,4 +36,43 @@ class Clause(Statement):
             for u in self.__true_statements:
                 u.execute()
 
+    def gen_true_runtime_objs(self, scene):
+        if not self.__true_statements:
+            return None
+        objs = []
+        for stm in self.__true_statements:
+            rtObj = stm.gen_runtime_obj()
+            if rtObj:
+                objs.append(rtObj)
+        return objs
+
+    def gen_false_runtime_objs(self, scene):
+        if not self.__false_statements:
+            return None
+        objs = []
+        for stm in self.__false_statements:
+            rtObj = stm.gen_runtime_obj()
+            if rtObj:
+                objs.append(rtObj)
+        return objs
+
+    def gen_runtime_obj(self, scene):
+        assert self.__case
+        cond = self.__case.gen_runtime_obj
+        if not cond:
+            return None
+        t_rt_objs = self.get_true_statements()
+        f_rt_objs = self.get_false_statements()
+
+        def if_test():
+            if cond():
+                if t_rt_objs:
+                    for func in t_rt_objs:
+                        func()
+            else:
+                if f_rt_objs:
+                    for func in f_rt_objs:
+                        func()
+
+        return if_test
 

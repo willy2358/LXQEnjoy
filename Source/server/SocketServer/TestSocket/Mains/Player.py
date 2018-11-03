@@ -44,6 +44,9 @@ class Player(ExtAttrs):
     def get_is_robot_play(self):
         return self.__is_robot_play
 
+    def is_attr_meet(self, attrName, testVal):
+        return True
+
     def set_sock_conn(self, conn):
         self.__sock_conn = conn
 

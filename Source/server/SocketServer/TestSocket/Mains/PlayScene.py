@@ -56,6 +56,9 @@ class PlayScene(ExtAttrs):
         else:
             return None
 
+    def get_current_round(self):
+        return self.__cur_round
+
     def find_player(self, cond):
         return None
 
@@ -102,8 +105,6 @@ class PlayScene(ExtAttrs):
     def parse_rule(self, rule):
         self.load_cards_space(rule)
         self.load_scene_attrs(rule)
-
-
 
         partRun = rule.get_part_by_name(RulePart_Running.PART_NAME)
         assert partRun

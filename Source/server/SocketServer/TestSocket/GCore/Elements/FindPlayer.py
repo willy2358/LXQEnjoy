@@ -17,4 +17,12 @@ class FindPlayer(Statement):
     def add_statement(self, statement):
         self.__statements.append(statement)
 
+    def gen_runtime_obj(self, scene):
+        def find_player():
+            players = scene.get_players()
+            for p in players:
+                if p.is_attr_meet(self.__test_prop, self.__test_value):
+                    return p
+        return find_player
+
 
