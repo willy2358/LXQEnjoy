@@ -27,18 +27,22 @@ from GCore.Elements.Cases import Cases
 from Mains.GVar import GVar
 from GCore.ValueType import ValueType
 from Mains.ExtAttrs import ExtAttrs
+from Mains.Round import Round
+from Cards import Card
 
 import Utils
 
 class PlayScene(ExtAttrs):
     def __init__(self, rule):
+        super(PlayScene, self).__init__()
         self.__cur_round = None
         self.__history_rounds = []
         self.__players = []
         self.__rule = rule
-        self.parse_rule(self.__rule)
         self.__runtimes = []
         self.__undealing_cards = []
+        self.__cards_space = []
+        self.parse_rule(self.__rule)
 
     def is_player_in(self, player):
         return player in self.__players
@@ -80,9 +84,9 @@ class PlayScene(ExtAttrs):
             name = attr.get_name()
             vtype = attr.get_value_type()
             val = attr.get_value()
-            self.add_cus_attr(name, vtype, val)
+            player.add_cus_attr(name, vtype, val)
 
-    def __append_rt_obj(self, obj):
+    def _append_rt_obj(self, obj):
         self.__runtimes.append(obj)
 
 
@@ -96,28 +100,73 @@ class PlayScene(ExtAttrs):
         return len(self.__players) < self.__rule.get_max_players_capacity()
 
     def parse_rule(self, rule):
+        self.load_cards_space(rule)
+        self.load_scene_attrs(rule)
+
+
+
         partRun = rule.get_part_by_name(RulePart_Running.PART_NAME)
         assert partRun
         rt = None
         for stm in partRun.get_statements():
             obj = stm.gen_runtime_obj(self)
             if obj:
-                self.__append_rt_obj(obj)
+                self._append_rt_obj(obj)
 
-    def prepare_start(self):
-        player_part = self.__rule.get_part_by_name(RulePart_Players.PART_NAME)
+    def load_cards_space(self, rule):
+        cards_set= Card.get_cards(rule.get_gtype())
+        cardsPart = rule.get_part_by_name(RulePart_Cards.PART_NAME)
+        if not cardsPart:
+            self.__cards_space = cards_set
+            return
+        excludes = cardsPart.get_excluded_cards()
+        for ex in excludes:
+            while cards_set.index(ex) >= 0:
+                cards_set.remove(ex)
+
+        sets = 1
+        c = cardsPart.get_card_sets()
+        if c > 1:
+            sets = c
+        self.__cards_space = cards_set * sets
+
+    def load_scene_attrs(self, rule):
+        scenePart = rule.get_part_by_name(RulePart_Scene.PART_NAME)
+        if scenePart:
+            for attr in scenePart.get_custom_attrs():
+                name = attr.get_name()
+                vtype = attr.get_value_type()
+                val = attr.get_value()
+                self.add_cus_attr(name, vtype, val)
 
     def start_game(self):
-        self.prepare_start()
 
-        run_part = self.__rule.get_part_by_name(RulePart_Running.PART_NAME)
+        self.create_new_round()
+        for rtObj in self.__runtimes:
+            rtObj()
 
-        codeBlocks = run_part.get_code_blocks()
-        for i in range(len(codeBlocks)):
-            self.exe_block(codeBlocks[i])
+        #
+        # run_part = self.__rule.get_part_by_name(RulePart_Running.PART_NAME)
+        #
+        # codeBlocks = run_part.get_code_blocks()
+        # for i in range(len(codeBlocks)):
+        #     self.exe_block(codeBlocks[i])
 
     def exe_block(self, code_block):
         pass
+
+    def create_new_round(self):
+        newRound = Round()
+        roundPart = self.__rule.get_part_by_name(RulePart_Round.PART_NAME)
+        if roundPart:
+            for attr in roundPart.get_custom_attrs():
+                name = attr.get_name()
+                vtype = attr.get_value_type()
+                val = attr.get_value()
+                newRound.add_cus_attr(name, vtype, val)
+        self.__history_rounds.append(newRound)
+        self.__cur_round = newRound
+
 
 
 

@@ -9,6 +9,7 @@ from Mains.ExtAttrs import ExtAttrs
 
 class Player(ExtAttrs):
     def __init__(self, userid):
+        super(Player, self).__init__()
         self.__userid = userid
         self.__token = None
         self.__sock_conn = None

@@ -33,7 +33,8 @@ class Loop(Statement):
                 if exit_test():
                     break
                 for func in rtObjs:
-                    func()
+                    if func:
+                        func()
 
         return sub_proc
 

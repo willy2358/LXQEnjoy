@@ -1,7 +1,9 @@
 
+import sys
+sys.path.append('..')
+
 from GCore.Statement import Statement
-import random
-import GCore.Engine as Engine
+from GCore import Engine
 
 #draw some cards from the card stack, but without dealing them to a player, assign these cards to a varialble
 # <draw_cards to_var="@drawn_card" count="1"></draw_cards>

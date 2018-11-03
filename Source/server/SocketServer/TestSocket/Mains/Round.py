@@ -5,5 +5,5 @@ from Mains.ExtAttrs import ExtAttrs
 
 class Round(ExtAttrs):
     def __init__(self):
-        self.__custom_attrs = {}
+        super(Round, self).__init__()
         self.__player_wins = {}

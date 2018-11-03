@@ -33,8 +33,14 @@ class RulePart_Cards(RulePart):
     def get_part_name(self):
         return self.PART_NAME
 
+    def get_excluded_cards(self):
+        return self.__excluded_cards
+
     def get_patterns(self):
         return self.__patterns
+
+    def get_card_sets(self):
+        return self.__card_sets
 
     def parse(self):
         try:

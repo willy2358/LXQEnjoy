@@ -11,6 +11,9 @@ class RulePart_Scene(RulePart):
         super(RulePart_Scene, self).__init__(xmlNode, gRule)
         self.__custom_attrs = []
 
+    def get_custom_attrs(self):
+        return self.__custom_attrs
+
     def parse(self):
         xmlNode = self.get_xml_node()
         attrsRoot = Utils.getXmlFirstNamedChild(Engine.tag_name_attrs, xmlNode)

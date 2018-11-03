@@ -1,6 +1,38 @@
 
 from Cards.GType import GType
 
+_Poker_Cards = ["c1","d1", "h1", "s1",
+            "c2", "d2", "h2", "s2",
+            "c3", "d3", "h3", "s3",
+            "c4", "d4", "h4", "s4",
+            "c5", "d5", "h5", "s5",
+            "c6", "d6", "h6", "s6",
+            "c7", "d7", "h7", "s7",
+            "c8", "d8", "h8", "s8",
+            "c9", "d9", "h9", "s9",
+            "c10", "d10", "h10", "s10",
+            "c11", "d11", "h11", "s11",
+            "c12", "d12", "h12", "s12",
+            "c13", "d13", "h13", "s13",
+             "j21", "j22"]
+
+Mahong_ws = ["w1","w2","w3","w4","w5","w6","w7","w8","w9"] * 4
+Mahong_ss = ["s1","s2","s3","s4","s5","s6","s7","s8","s9"] * 4
+Mahong_ts = ["t1","t2","t3","t4","t5","t6","t7","t8","t9"] * 4
+Mahong_fs = ["f1","f3","f5","f7"] * 4
+Mahong_zs = ["z1","z3","z5"] * 4
+Mahong_hs = ["h1","h2","h3","h4","h5","h6","h7","h8"]
+
+_Mahong_Cards = Mahong_ws + Mahong_ss + Mahong_ts + Mahong_fs + Mahong_zs + Mahong_hs
+
+def get_cards(gType):
+    if gType == GType.Poker:
+        return _Poker_Cards[:]
+    elif gType == GType.Mahong:
+        return _Mahong_Cards[:]
+    else:
+        return None
+
 class Card:
     CTYPE = "ctype"
     CFIGURE = "cfigure"
@@ -13,6 +45,8 @@ class Card:
 
     def set_score(self, score):
         self.__score = score
+
+
 
     @staticmethod
     def create_cards(gtype, ctype, cfigure):
@@ -41,7 +75,7 @@ class Card:
         if gtype == GType.Poker:
             return ["c", "h", "d", "s", "j"] # club, heart, diamond, spade, joker
         if gtype == GType.Mahong:
-            return ["w", "s","t", "f", "a", "h"] #wan, suo, tiao, feng, zhong, hua
+            return ["w", "s","t", "f", "z", "h"] #wan, suo, tiao, feng, zhong, hua
 
     @staticmethod
     def get_card_figures(gtype, ctype):

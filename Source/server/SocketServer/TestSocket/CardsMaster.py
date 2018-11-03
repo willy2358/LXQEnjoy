@@ -1,18 +1,18 @@
 
-Pokers = ["poker_1_c","poker_1_d", "poker_1_h", "poker_1_s",
-             "poker_2_c", "poker_2_d", "poker_2_h", "poker_2_s",
-             "poker_3_c", "poker_3_d", "poker_3_h", "poker_3_s",
-             "poker_4_c", "poker_4_d", "poker_4_h", "poker_4_s",
-             "poker_5_c", "poker_5_d", "poker_5_h", "poker_5_s",
-             "poker_6_c", "poker_6_d", "poker_6_h", "poker_6_s",
-             "poker_7_c", "poker_7_d", "poker_7_h", "poker_7_s",
-             "poker_8_c", "poker_8_d", "poker_8_h", "poker_8_s",
-             "poker_9_c", "poker_9_d", "poker_9_h", "poker_9_s",
-             "poker_10_c", "poker_10_d", "poker_10_h", "poker_10_s",
-             "poker_11_c", "poker_11_d", "poker_11_h", "poker_11_s",
-             "poker_12_c", "poker_12_d", "poker_12_h", "poker_12_s",
-             "poker_13_c", "poker_13_d", "poker_13_h", "poker_13_s",
-             "poker_joker_moon", "poker_joker_sun"]
+Pokers = ["c1","d1", "h1", "s1",
+            "c2", "d2", "h2", "s2",
+            "c3", "d3", "h3", "s3",
+            "c4", "d4", "h4", "s4",
+            "c5", "d5", "h5", "s5",
+            "c6", "d6", "h6", "s6",
+            "c7", "d7", "h7", "s7",
+            "c8", "d8", "h8", "s8",
+            "c9", "d9", "h9", "s9",
+            "c10", "d10", "h10", "s10",
+            "c11", "d11", "h11", "s11",
+            "c12", "d12", "h12", "s12",
+            "c13", "d13", "h13", "s13",
+             "j21", "j22"]
 
 # MaJiang_Wan = [('wan_1',11),('wan_2',12),('wan_3',13),('wan_4',14),('wan_5',15),('wan_6',16),('wan_7',17),('wan_8',18),('wan_9',19)] * 4
 # MaJiang_Suo = [('suo_1',21),('suo_2',22),('suo_3',23),('suo_4',24),('suo_5',25),('suo_6',26),('suo_7',27),('suo_8',28),('suo_9',29)] * 4
