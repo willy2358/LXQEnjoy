@@ -247,10 +247,19 @@
             <update property="@drawer" value=":(next_player_of(@drawer))"/>
         </loop>
 
-        <!--发牌结束，必须有防守方，否则流局，此情况只发生刚开始的几局-->
-        <ift value_of="@scene.defenders" ret_is="none">
-            <pub_msg message="liuju" players="@scene.players"></pub_msg>
-            <exitround/>
+        <!--发牌结束,还没有选主-->
+        <ift value_of="@round.bank_ctype", ret_is="none">
+            <!--开始局，流局-->
+            <ift value_of="@scene.defenders" ret_is="none">
+               <then>
+                    <pub_msg message="liuju" players="@scene.players"></pub_msg>
+                    <exitround/>
+               </then>
+               <else>
+                    <!--从底牌中选主-->
+                    <proc_ref proc="sel_bank_type_from_kitty"/>
+               </else>
+            </ift>
         </ift>
 
         <!--底牌归于主打-->
@@ -312,17 +321,38 @@
 
     <!--玩家操作命令列表-->
     <procs>
+        <!--没有选主，从底牌中选出-->
+        <proc name="sel_bank_type_from_kitty">
+            <ift value_of=":(is_cards_contain_ctype(@round.kitty,'j'))" ret_is="true">
+            <!--有王牌，主牌为王和四个级牌-->
+                <then>
+                    <update property="@round.bank_ctype" value="j"/>
+                </then>
+                <else>
+                    <ift value_of=":(is_cards_contain_cfigure(@round.kitty, @round.bank_cfigure))", ret_is="true">
+                        <then>
+                            <!--有级数牌，从级数牌里选-->
+                            <update property="@round.bank_ctype" value=":(var c; var t; c=card_of_cfigure(@round.kitty, @round.bank_cfigure); t=ctype_of(@c); return @t)" />
+                        </then>
+                        <else>
+                            <!--无王牌，无级牌，选点数最大牌-->
+                            <update property="@round.bank_ctype" value=":(var c; var t; c=max_cfigure_of(@round.kitty); t=ctype_of(@c); return @t)" />
+                        </else>
+                    </ift>
+                </else>
+            </ift>
+        </proc>
         <proc name="round_end">
             <lets>
                 <!--进攻方分数<40，防守方赢 -->
-                <let property="@round.winners" value=":(find_players(IsDefender=true))"/>
-                <let property="@round.losers" value=":(find_players(IsDefender=false))"/>
-                <when value_of="@round.attacters[0].Score" ret_lt="40"/>
+                <let property="@round.winners" value=":(find_players(IsDefender==true))"/>
+                <let property="@round.losers" value=":(find_players(IsDefender==false))"/>
+                <when value_of="@scene.attacters[0].Score" ret_lt="40"/>
             </lets>
             <lets>
                 <!--进攻方分数>=40，进攻方赢 -->
-                <let property="@round.winners" value=":(find_players(IsAttacter=true))"/>
-                <let property="@round.losers" value=":(find_players(IsAttacter=false))"/>
+                <let property="@round.winners" value=":(find_players(IsAttacter==true))"/>
+                <let property="@round.losers" value=":(find_players(IsAttacter==false))"/>
                 <when value_of="@round.attacters[0].Score" ret_not_lt="40"/>
             </lets>
 
