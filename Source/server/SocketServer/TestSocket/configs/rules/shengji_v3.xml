@@ -8,9 +8,10 @@
     -->
     <scene>
         <attrs>
-            <attr name="cur_level" value_type="int" value="2"/>
             <attr name="defenders" value_type="list" value="none"/>
             <attr name="attacters" value_type="list" value="none"/>
+             <!--庄牌点数-->
+            <attr name="bank_cfigure" value_type="int" value="2"/>
         </attrs>
     </scene>
 
@@ -186,7 +187,7 @@
 
     <!--玩家-->
     <players min="4" max="4">
-        <attr name="level" value_type="int"/>
+        <attr name="bank_cfigure" value_type="int" value="2">
         <attr name="IsMainPlayer" value_type="bool"/>
         <attr name="IsAttacter" value_type="bool"/>
         <attr name="IsDefender" value_type="bool"/>
@@ -206,11 +207,12 @@
     <!--一局-->
     <round>
         <attrs>
-            <attr name="cur_level" value_type="int" value="2"/>
              <!--庄牌点数-->
             <attr name="bank_cfigure" value_type="int" value="2"/>
             <!--庄牌花色-->
             <attr name="bank_ctype" value_type="string" value="none"/>
+            <attr name="defenders" value_type="list" value="none"/>
+            <attr name="attacters" value_type="list" value="none"/>
             <!--起牌玩家，第一个摸牌的人-->
             <attr name="init_drawer" value_type="player" value="random"/>
         </attrs>
@@ -218,8 +220,12 @@
 
     <running>
 
+        <update property="@round.defenders" value="@scene.defenders"/>
+        <update property="@round.attacters" value="@scene.attacters"/>
+        <update property="@round.bank_cfigure", value="@scene.bank_cfigure">
         <!--发牌（摸牌，起牌）-->
         <!--每次一张牌-->
+        
         <var name="drawer" value="@round.init_drawer" value_type="player"/>
         <var name="drawn_card" value="None" value_type="card"></var>
         <loop>
@@ -229,7 +235,7 @@
             <!--摸到将牌，可以叫主，前提是还没主-->
             <ift>
                 <cases>
-                    <case value_of=":(cfigure_of(@drawn_card))" ret_as="@scene.cur_level"/>
+                    <case value_of=":(cfigure_of(@drawn_card))" ret_as="@round.bank_cfigure"/>
                     <case value_of="@round.bank_ctype" ret_is="none"/>
                 </cases>
                 <act_opts timeout="30" timeout_act="pass" to_player="@drawer">
@@ -347,7 +353,7 @@
                 <!--进攻方分数<40，防守方赢 -->
                 <let property="@round.winners" value=":(find_players(IsDefender==true))"/>
                 <let property="@round.losers" value=":(find_players(IsDefender==false))"/>
-                <when value_of="@scene.attacters[0].Score" ret_lt="40"/>
+                <when value_of="@round.attacters[0].Score" ret_lt="40"/>
             </lets>
             <lets>
                 <!--进攻方分数>=40，进攻方赢 -->
@@ -377,20 +383,20 @@
                         <then>
                             <!--进攻方分数为0，防守方升2级-->
                             <find_players players="@round.winners">
-                                <update property="level" op="inc" value="2"/>
+                                <update property="@bank_figure" op="inc" value="2"/>
                             </find_players>
                         </then>
                         <else>
                             <!--进攻方分数>0，防守方升1级-->
                             <then>
                                 <find_players players="@round.winners">
-                                    <update property="level" op="inc" value="1"/>
+                                    <update property="@bank_figure" op="inc" value="1"/>
                                 </find_players>
                             </then>
                         </else>
                     </ift>
 
-                    <update property="@round.cur_level" value="@round.winners[0].level"/>
+                    <update property="@scene.bank_cfigure" value="@round.winners[0].bank_cfigure"/>
                     <update property="@round.init_drawer" value="@p2"/>
 
                 </then>
@@ -415,20 +421,23 @@
                         <then>
                             <!--进攻方分数>=80，进攻方升2级-->
                             <find_players players="@round.winners">
-                                <update property="level" op="inc" value="2"/>
+                                <update property="@bank_cfigure" op="inc" value="2"/>
                             </find_players>
                         </then>
                         <else>
                             <!--进攻方分数<80，进攻方升1级-->
                             <then>
                                 <find_players players="@round.winners">
-                                    <update property="level" op="inc" value="1"/>
+                                    <update property="@bank_cfigure" op="inc" value="1"/>
                                 </find_players>
                             </then>
                         </else>
                     </case>
                 </else>
             </ift>
+
+            <update property="@scene.defenders" value="@round.winners"/>
+            <update property="@scene.attacters" value="@round.losers"/>
         </proc>
         <proc name="trick_end">
             <!--进攻方赢，得到分数牌, cards，一圈打出的牌-->

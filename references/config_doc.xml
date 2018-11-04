@@ -290,6 +290,12 @@
 
       //取指定花色牌
       cards_of_ctype(cards, ctype) return cards 
+
+      //取出一张指定点数牌
+      card_of_cfigure(cards, cfigure) return one card
+
+      //取出所有的指定点数牌
+      cards_of_cfigure(cards, cfigure) return cards
       
       //玩家是否有某牌色
       is_player_has_ctype(player, ctype) return true/false
