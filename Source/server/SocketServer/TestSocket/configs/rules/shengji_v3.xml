@@ -6,6 +6,14 @@
     <!--
       sets:牌副数：默认值：1
     -->
+    <scene>
+        <attrs>
+            <attr name="cur_level" value_type="int" value="2"/>
+            <attr name="defenders" value_type="list" value="none"/>
+            <attr name="attacters" value_type="list" value="none"/>
+        </attrs>
+    </scene>
+
     <cards sets="1">
         <!--去牌
         valid: 节点是否生效，true：生效, 默认值；false: 无效-->
@@ -195,32 +203,18 @@
           </find_player>
         </winner> -->
     </trick>
-
     <!--一局-->
     <round>
         <attrs>
-            <!--
-              reset: 新局是否复位属性，false:不复位；true:复位, 默认值
-            -->
-            <attr name="cur_level" reset="false" value_type="int" value="2"/>
-            <attr name="defenders" reset="false" value_type="list" value="none"/>
-            <attr name="attacters" reset="false" value_type="list" value="none"/>
-            <!--庄牌点数-->
-            <attr name="bank_cfigure" reset="false" value_type="int" value="2"/>
+            <attr name="cur_level" value_type="int" value="2"/>
+             <!--庄牌点数-->
+            <attr name="bank_cfigure" value_type="int" value="2"/>
             <!--庄牌花色-->
-            <attr name="bank_ctype" reset="true" value_type="string" value="none"/>
+            <attr name="bank_ctype" value_type="string" value="none"/>
             <!--起牌玩家，第一个摸牌的人-->
-            <attr name="init_drawer" reset="false" value_type="player" value="random"/>
+            <attr name="init_drawer" value_type="player" value="random"/>
         </attrs>
     </round>
-
-    <scene>
-        <attrs>
-
-            <attr name="cur_level" value_type="int" value="2"/>
-
-        </attrs>
-    </scene>
 
     <running>
 
@@ -235,7 +229,7 @@
             <!--摸到将牌，可以叫主，前提是还没主-->
             <ift>
                 <cases>
-                    <case value_of=":(cfigure_of(@drawn_card))" ret_as="@round.cur_level"/>
+                    <case value_of=":(cfigure_of(@drawn_card))" ret_as="@scene.cur_level"/>
                     <case value_of="@round.bank_ctype" ret_is="none"/>
                 </cases>
                 <act_opts timeout="30" timeout_act="pass" to_player="@drawer">
@@ -254,36 +248,30 @@
         </loop>
 
         <!--发牌结束，必须有防守方，否则流局，此情况只发生刚开始的几局-->
-        <ift value_of="@round.defenders" ret_is="none">
-            <pub_msg message="liuju" players="@round.players"></pub_msg>
+        <ift value_of="@scene.defenders" ret_is="none">
+            <pub_msg message="liuju" players="@scene.players"></pub_msg>
             <exitround/>
         </ift>
 
         <!--底牌归于主打-->
-        <find_player property="IsMainPlayer" value="true">
-            <deal_cards count="6"></deal_cards>
-        </find_player>
-
+        <deal_cards count="6" player=":(find_player(IsMainPlayer==true))"></deal_cards>
 
         <!--等待主打扣牌-->
-        <find_player property="IsMainPlayer" value="true">
-            <act_opts timeout="30" timeout_act="force_koupai">
+        <act_opts timeout="30" timeout_act="force_koupai" to_player=":(find_player(IsMainPlayer==true))">
                 <act_ref act="koupai"/>
                 <act_ref act="force_koupai"/>
-            </act_opts>
-        </find_player>
+        </act_opts>
 
         <var name="trick_init_player" value_type="player" value=":(find_player(IsMainPlayer==true))"/>
         <var name="valid_leading_cards" value_type="bool" value="false"/>
         <!--进入打牌，从主打开始, 一局结束，主打手里没牌-->
         <loop_until value_of=":(cards_count_in_player_hand(@trick_init_player))" ret_gt="0">
             <loop_until value_of="@valid_leading_cards" ret_is="false">
-                <find_player player="@trick_init_player">
-                    <act_opts timeout="30" timeout_act="force_chupai">
+                <act_opts timeout="30" timeout_act="force_chupai" to_player="@trick_init_player">
                         <act_ref act="playcard"/>
                         <act_ref act="force_chupai"/>
-                    </act_opts>
-                </find_player>
+                </act_opts>
+                
                 <ift value_of=":(is_valid_leading_cards(@trick_init_player.played_cards))" ret_is="true">
                     <update property="@valid_leading_cards" value="true"/>
                 </ift>
@@ -292,7 +280,7 @@
             <var name="sorder" value_type="int" value="1"/>
             <loop_until value_of="@sorder" ret_is="3">
                 <var name="valid_following_cards" value_type="bool" value="false"/>
-                <var name="follower" value_type="player" value=":(find_player(seatid==@trick_init_player.seatid + @sorder))"/>
+                <var name="follower" value_type="player" value=":(find_player(seatid==(@trick_init_player.seatid + @sorder)))"/>
                 <loop_until value_of="@valid_following_cards" ret_is="false">
                     <find_player player="@follower">
                         <act_opts timeout="30" timeout_act="force_chupai">
