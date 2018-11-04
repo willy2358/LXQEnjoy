@@ -31,3 +31,18 @@ class Update(Statement):
 
     def set_exe_case(self, case):
         self.__case = case
+
+    def get_result(self, originVal):
+        if self.__op == Operator.Update:
+            return self.__opVal
+        elif self.__op == Operator.Add:
+            return originVal + self.__opVal
+        elif self.__operator == Operator.Subtract:
+            return originVal - self.__opVal
+        elif self.__operator == Operator.Multiply:
+            return originVal * self.__opVal
+        else:
+            return originVal
+
+    def gen_runtime_obj(self, scene):
+        pass

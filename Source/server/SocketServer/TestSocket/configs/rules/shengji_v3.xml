@@ -297,12 +297,11 @@
                 <var name="valid_following_cards" value_type="bool" value="false"/>
                 <var name="follower" value_type="player" value=":(find_player(seatid==(@trick_init_player.seatid + @sorder)))"/>
                 <loop_until value_of="@valid_following_cards" ret_is="false">
-                    <find_player player="@follower">
-                        <act_opts timeout="30" timeout_act="force_chupai">
+
+                    <act_opts timeout="30" timeout_act="force_chupai" to_player="@follower">
                             <act_ref act="playcard"/>
                             <act_ref act="force_chupai"/>
-                        </act_opts>
-                    </find_player>
+                    </act_opts>
 
                     <ift value_of=":(is_valid_following_cards(@follower.played_cards))" ret_is="true">
                         <update property="@valid_following_cards" value="true"/>
