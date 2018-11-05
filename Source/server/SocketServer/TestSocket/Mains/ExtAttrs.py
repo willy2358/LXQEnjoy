@@ -19,12 +19,25 @@ class ExtAttrs:
         else:
             return None
 
+    def get_var(self, varName):
+        if varName in self.__vars:
+            return self.__vars[varName]
+        else:
+            return None
+
+    def get_attr(self, attrName):
+        if attrName in self.__cus_attrs:
+            return self.__cus_attrs[attrName]
+        else:
+            return None
+
     def add_cus_attr(self, attrName, attrType = 'integer', attrVal=None):
         self.__cus_attrs[attrName] = GVar(attrName, attrType, attrVal)
 
     def update_attr(self, attrName, value):
         if attrName in self.__cus_attrs:
             self.__cus_attrs[attrName].set_value(value)
+
 
     def add_variable(self, name, vtype, value):
         if name not in self.__vars:

@@ -371,26 +371,18 @@
                 <!--防守方赢 -->
                 <then>
                     <!--交换主打人-->
-                    <find_player player="@p1">
-                        <update property="IsMainPlayer" value="false"/>
-                    </find_player>
-                    <find_player player="@p2">
-                        <update property="IsMainPlayer" value="true"/>
-                    </find_player>
+                    <update targets="@p1" property="IsMainPlayer" value="false"/>
+                    <update targets="@p2" property="IsMainPlayer" value="true"/>
 
                     <ift value_of="@round.losers[0].Score" ret_is="0">
                         <then>
                             <!--进攻方分数为0，防守方升2级-->
-                            <find_players players="@round.winners">
-                                <update property="@bank_figure" op="inc" value="2"/>
-                            </find_players>
+                            <update targets="@round.winners" property="@bank_figure" op="add" value="2"/>
                         </then>
                         <else>
                             <!--进攻方分数>0，防守方升1级-->
                             <then>
-                                <find_players players="@round.winners">
-                                    <update property="@bank_figure" op="inc" value="1"/>
-                                </find_players>
+                                <update targets="@round.winners" property="@bank_figure" op="add" value="1"/>
                             </then>
                         </else>
                     </ift>
@@ -403,32 +395,25 @@
                 <else>
                     <!--攻守角色互换-->
                     <then>
-                        <find_players players="@round.winners">
-                            <update property="IsDefender" value="true"/>
-                            <update property="IsAttacter" value="false"/>
-                        </find_players>
-                        <find_players players="@round.losers">
-                            <update property="IsDefender" value="false"/>
-                            <update property="IsAttacter" value="true"/>
-                            <update property="IsMainPlayer" value="false"/>
-                        </find_players>
-                        <find_player property="seatid" value="@seatid + 1">
-                            <update property="IsMainPlayer" value="true"/>
-                        </find_player>
+                        <update property="IsDefender" targets="@round.winners" value="true"/>
+                        <update property="IsAttacter" targets="@round.winners" value="false"/>
+                       
+                        
+                        <update property="IsDefender" targets="@round.losers" value="false"/>
+                        <update property="IsAttacter" targets="@round.losers" value="true"/>
+                        <update property="IsMainPlayer" targets="@round.losers" value="false"/>
+                        
+                        <update property="IsMainPlayer" targets=":(find_player(seatid == @seatid + 1))" value="true"/>
                     </then>
                     <case value_of="@round.winners[0].Score" ret_not_lt="80">
                         <then>
                             <!--进攻方分数>=80，进攻方升2级-->
-                            <find_players players="@round.winners">
-                                <update property="@bank_cfigure" op="inc" value="2"/>
-                            </find_players>
+                            <update targets="@round.winners" property="@bank_cfigure" op="add" value="2"/>
                         </then>
                         <else>
                             <!--进攻方分数<80，进攻方升1级-->
                             <then>
-                                <find_players players="@round.winners">
-                                    <update property="@bank_cfigure" op="inc" value="1"/>
-                                </find_players>
+                                <update targets="@round.winners" property="@bank_cfigure" op="add" value="1"/>
                             </then>
                         </else>
                     </case>
@@ -446,9 +431,7 @@
                     <case value_of="@trick_winner.IsAttacter" ret_is="true"/>
                 </cases>
                 <then>
-                    <find_players property="IsAttacter" ret_is="true">
-                        <update property="score" op="add" value="card_score"/>
-                    </find_players>
+                    <update targets=":(find_players(IsAttacter == true))" property="score" op="add" value="card_score"/>
                 </then>
             </ift>
 
@@ -460,9 +443,7 @@
                     <case value_of="@trick_winner.IsAttacter" ret_is="true"/>
                 </cases>
                 <then>
-                    <find_players property="IsAttacter" ret_is="true">
-                        <update property="score" op="add" value=":(sum_score(@kitty_cards))"/>
-                    </find_players>
+                    <update targets=":(find_players(IsAttacter == true))" property="score" op="add" value=":(sum_score(@kitty_cards))"/>
                 </then>
             </ift>
         </proc>
