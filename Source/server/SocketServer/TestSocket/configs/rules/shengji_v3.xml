@@ -187,7 +187,7 @@
 
     <!--玩家-->
     <players min="4" max="4">
-        <attr name="bank_cfigure" value_type="int" value="2">
+        <attr name="bank_cfigure" value_type="int" value="2"/>
         <attr name="IsMainPlayer" value_type="bool"/>
         <attr name="IsAttacter" value_type="bool"/>
         <attr name="IsDefender" value_type="bool"/>
@@ -222,7 +222,7 @@
 
         <update property="@round.defenders" value="@scene.defenders"/>
         <update property="@round.attacters" value="@scene.attacters"/>
-        <update property="@round.bank_cfigure", value="@scene.bank_cfigure">
+        <update property="@round.bank_cfigure" value="@scene.bank_cfigure"/>
         <!--发牌（摸牌，起牌）-->
         <!--每次一张牌-->
         
@@ -254,7 +254,7 @@
         </loop>
 
         <!--发牌结束,还没有选主-->
-        <ift value_of="@round.bank_ctype", ret_is="none">
+        <ift value_of="@round.bank_ctype" ret_is="none">
             <!--开始局，流局-->
             <ift value_of="@scene.defenders" ret_is="none">
                <then>
@@ -269,15 +269,15 @@
         </ift>
 
         <!--底牌归于主打-->
-        <deal_cards count="6" player=":(find_player(IsMainPlayer==true))"></deal_cards>
+        <deal_cards count="6" player=":(find_player(IsMainPlayer:true))"></deal_cards>
 
         <!--等待主打扣牌-->
-        <act_opts timeout="30" timeout_act="force_koupai" to_player=":(find_player(IsMainPlayer==true))">
+        <act_opts timeout="30" timeout_act="force_koupai" to_player=":(find_player(IsMainPlayer:true))">
                 <act_ref act="koupai"/>
                 <act_ref act="force_koupai"/>
         </act_opts>
 
-        <var name="trick_init_player" value_type="player" value=":(find_player(IsMainPlayer==true))"/>
+        <var name="trick_init_player" value_type="player" value=":(find_player(IsMainPlayer:true))"/>
         <var name="valid_leading_cards" value_type="bool" value="false"/>
         <!--进入打牌，从主打开始, 一局结束，主打手里没牌-->
         <loop_until value_of=":(cards_count_in_player_hand(@trick_init_player))" ret_gt="0">
@@ -295,7 +295,7 @@
             <var name="sorder" value_type="int" value="1"/>
             <loop_until value_of="@sorder" ret_is="3">
                 <var name="valid_following_cards" value_type="bool" value="false"/>
-                <var name="follower" value_type="player" value=":(find_player(seatid==(@trick_init_player.seatid + @sorder)))"/>
+                <var name="follower" value_type="player" value=":(find_player(seatid:(@trick_init_player.seatid + @sorder)))"/>
                 <loop_until value_of="@valid_following_cards" ret_is="false">
 
                     <act_opts timeout="30" timeout_act="force_chupai" to_player="@follower">
@@ -334,7 +334,7 @@
                     <update property="@round.bank_ctype" value="j"/>
                 </then>
                 <else>
-                    <ift value_of=":(is_cards_contain_cfigure(@round.kitty, @round.bank_cfigure))", ret_is="true">
+                    <ift value_of=":(is_cards_contain_cfigure(@round.kitty, @round.bank_cfigure))" ret_is="true">
                         <then>
                             <!--有级数牌，从级数牌里选-->
                             <update property="@round.bank_ctype" value=":(var c; var t; c=card_of_cfigure(@round.kitty, @round.bank_cfigure); t=ctype_of(@c); return @t)" />
@@ -350,22 +350,22 @@
         <proc name="round_end">
             <lets>
                 <!--进攻方分数<40，防守方赢 -->
-                <let property="@round.winners" value=":(find_players(IsDefender==true))"/>
-                <let property="@round.losers" value=":(find_players(IsDefender==false))"/>
+                <let property="@round.winners" value=":(find_players(IsDefender:true))"/>
+                <let property="@round.losers" value=":(find_players(IsDefender:false))"/>
                 <when value_of="@round.attacters[0].Score" ret_lt="40"/>
             </lets>
             <lets>
                 <!--进攻方分数>=40，进攻方赢 -->
-                <let property="@round.winners" value=":(find_players(IsAttacter==true))"/>
-                <let property="@round.losers" value=":(find_players(IsAttacter==false))"/>
+                <let property="@round.winners" value=":(find_players(IsAttacter:true))"/>
+                <let property="@round.losers" value=":(find_players(IsAttacter:false))"/>
                 <when value_of="@round.attacters[0].Score" ret_not_lt="40"/>
             </lets>
 
             <ift value_of="@round.winners[0].IsDefender" ret_is="true">
                 <vars>
-                    <var name="p1" value=":(find_player(IsDefender==true ## IsMainPlayer==true))"/>
-                    <var name="p2" value=":(find_player(IsDefender==true ## IsMainPlayer==false))"/>
-                    <var name="seatid" value=":(find_player(IsDefender==true ## IsMainPlayer==true)|seatid_of_player)"/>
+                    <var name="p1" value=":(find_player(IsDefender:true ## IsMainPlayer:true))"/>
+                    <var name="p2" value=":(find_player(IsDefender:true ## IsMainPlayer:false))"/>
+                    <var name="seatid" value=":(var p; p = find_player(IsDefender:true ## IsMainPlayer:true); return seatid_of_player(@p))"/>
                 </vars>
 
                 <!--防守方赢 -->
@@ -403,7 +403,8 @@
                         <update property="IsAttacter" targets="@round.losers" value="true"/>
                         <update property="IsMainPlayer" targets="@round.losers" value="false"/>
                         
-                        <update property="IsMainPlayer" targets=":(find_player(seatid == @seatid + 1))" value="true"/>
+                        <update property="IsMainPlayer" targets=":(find_player(seatid:(@seatid + 1)))" value="true"/>
+                        
                     </then>
                     <case value_of="@round.winners[0].Score" ret_not_lt="80">
                         <then>
@@ -431,7 +432,7 @@
                     <case value_of="@trick_winner.IsAttacter" ret_is="true"/>
                 </cases>
                 <then>
-                    <update targets=":(find_players(IsAttacter == true))" property="score" op="add" value="card_score"/>
+                    <update targets=":(find_players(IsAttacter:true))" property="score" op="add" value="card_score"/>
                 </then>
             </ift>
 
@@ -443,7 +444,7 @@
                     <case value_of="@trick_winner.IsAttacter" ret_is="true"/>
                 </cases>
                 <then>
-                    <update targets=":(find_players(IsAttacter == true))" property="score" op="add" value=":(sum_score(@kitty_cards))"/>
+                    <update targets=":(find_players(IsAttacter:true))" property="score" op="add" value=":(sum_score(@kitty_cards))"/>
                 </then>
             </ift>
         </proc>
@@ -483,7 +484,7 @@
             </ift>
 
             <ift>
-                <case cpattern_name_of="@leading" ret_is="shuai"/>
+                <case value_of=":(cpattern_name_of(@leading))" ret_is="shuai"/>
                 <cards cards=":(get_cards_of_ctype(@cards[0], count_of(@cards), @any_ctype))"/>
             </ift>
         </proc>
@@ -492,7 +493,7 @@
     <actions>
         <!--叫主-->
         <action name="jiaozhu">
-            <update property="@round.bank_ctype" value_of=":(ctype_of(@token_card))"/>
+            <update property="@round.bank_ctype" value=":(ctype_of(@token_card))"/>
         </action>
 
         <action name="liuju">

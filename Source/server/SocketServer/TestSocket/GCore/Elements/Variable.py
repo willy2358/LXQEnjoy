@@ -4,7 +4,7 @@ from GCore.ValueType import ValueType
 class Variable(Operand):
     def __init__(self, varName):
         self.__name = varName
-        self.__value_type = ValueType.integer
+        self.__value_type = ValueType.undef
         self.__value = None
 
     def get_name(self):
