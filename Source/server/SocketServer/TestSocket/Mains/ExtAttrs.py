@@ -31,6 +31,14 @@ class ExtAttrs:
         else:
             return None
 
+    def get_prop(self, propName):
+        if propName in self.__cus_attrs:
+            return self.__cus_attrs[propName]
+        elif propName in self.__vars:
+            return self.__vars[propName]
+        else:
+            return None
+
     def add_cus_attr(self, attrName, attrType = 'integer', attrVal=None):
         self.__cus_attrs[attrName] = GVar(attrName, attrType, attrVal)
 

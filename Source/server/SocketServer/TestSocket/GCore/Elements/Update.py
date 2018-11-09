@@ -60,8 +60,38 @@ class Update(Statement):
 
         return objs
 
+    def get_rt_target_objs(self, scene):
+        objs = []
+        if self.__prop.startswith("@round."):
+            r = scene.get_current_round()
+            attr = r.get_attr(self.__prop.lstrip("@round"))
+            objs.append(attr)
+        elif self.__prop.startswith("@scene."):
+                objs.append( scene.get_attr(self.__prop.lstrip("@scene")))
+        elif self.__prop.startswith("@"):
+                objs.append(scene.get_var(self.__prop.lstrip("@")))
+        elif len(self.__prop) > 0 and self.__targets:
+            insts = self.__targets.gen_runtime_obj(scene)
+            if insts:
+                for inst in insts:
+                    obj = inst.get_prop(self.__prop)
+                    if obj:
+                        objs.append(obj)
+
+        return objs
+
+    def get_rt_value(self, scene):
+        return 0
+
 
     def gen_runtime_obj(self, scene):
-        if not self.__targets:
-            pass
+        def updates():
+            target_objs = self.get_rt_target_objs(scene)
+            val_obj = self.get_rt_value(scene)
+            if not target_objs:
+                return
+            for obj in target_objs:
+                obj.set_value(val_obj)
+        return updates
+
 
