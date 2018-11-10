@@ -50,20 +50,26 @@ class PlayScene(ExtAttrs):
     def get_players(self):
         return self.__players
 
+    def get_rule(self):
+        return self.__rule
+
     def get_attr_value(self, attrName):
         if attrName in self.__cus_attrs:
             return self.__cus_attrs[attrName]
         else:
             return None
 
+    def get_runtime_objs(self, varStr):
+        if varStr.startswith("@round."):
+            r = self.get_current_round()
+            return r.get_attr(self.__prop.lstrip("@round"))
+        elif varStr.startswith("@scene."):
+            return self.get_attr(self.__prop.lstrip("@scene"))
+        elif varStr.startswith("@"):
+            return self.get_var(self.__prop.lstrip("@"))
+
     def get_current_round(self):
         return self.__cur_round
-
-    def find_player(self, cond):
-        return None
-
-    def find_players(self, cond):
-        return None
 
     def draw_cards(self, count):
         cards = random.sample(self.__undealing_cards, count)

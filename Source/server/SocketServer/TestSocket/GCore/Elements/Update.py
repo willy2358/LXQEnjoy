@@ -40,25 +40,25 @@ class Update(Statement):
         else:
             return originVal
 
-    def parse_attr_statement(self, attrValue):
-        pass
+    # def parse_attr_statement(self, attrValue):
+    #     pass
 
-    def get_final_target_objects(self, scene):
-        objs = []
-        if not self.__targets:
-            if self.__prop.startswith("@round."):
-                r = scene.get_current_round()
-                attr = r.get_attr(self.__prop)
-                objs.append(attr)
-            elif self.__prop.startswith("@scene."):
-                objs.append( scene.get_attr(self.__prop))
-            elif self.__prop.startswith("@"):
-                objs.append(scene.get_var(self.__prop))
-
-        else:
-            pass
-
-        return objs
+    # def get_final_target_objects(self, scene):
+    #     objs = []
+    #     if not self.__targets:
+    #         if self.__prop.startswith("@round."):
+    #             r = scene.get_current_round()
+    #             attr = r.get_attr(self.__prop)
+    #             objs.append(attr)
+    #         elif self.__prop.startswith("@scene."):
+    #             objs.append( scene.get_attr(self.__prop))
+    #         elif self.__prop.startswith("@"):
+    #             objs.append(scene.get_var(self.__prop))
+    #
+    #     else:
+    #         pass
+    #
+    #     return objs
 
     def get_rt_target_objs(self, scene):
         objs = []
@@ -74,24 +74,26 @@ class Update(Statement):
             insts = self.__targets.gen_runtime_obj(scene)
             if insts:
                 for inst in insts:
-                    obj = inst.get_prop(self.__prop)
+                    obj = inst.get_prop_value(self.__prop)
                     if obj:
                         objs.append(obj)
 
         return objs
 
     def get_rt_value(self, scene):
-        return 0
+        return self.__opVal.get_runtime_obj(scene)
 
 
     def gen_runtime_obj(self, scene):
         def updates():
             target_objs = self.get_rt_target_objs(scene)
-            val_obj = self.get_rt_value(scene)
             if not target_objs:
                 return
+            val_func = self.get_rt_value(scene)
+            val = val_func()
+            fininal_val = self.get_result(val)
             for obj in target_objs:
-                obj.set_value(val_obj)
+                obj.set_value(fininal_val)
         return updates
 
 

@@ -1,6 +1,7 @@
 
 from Mains.GVar import GVar
 from GCore.ValueType import ValueType
+from GCore.Operator import Operator
 
 class ExtAttrs:
     def __init__(self):
@@ -31,13 +32,30 @@ class ExtAttrs:
         else:
             return None
 
-    def get_prop(self, propName):
+    def get_prop_value(self, propName):
         if propName in self.__cus_attrs:
             return self.__cus_attrs[propName]
         elif propName in self.__vars:
             return self.__vars[propName]
         else:
             return None
+
+    def is_meet_conditions(self, named_attrs, op):
+        # no requirements, return false
+        if not named_attrs:
+            return False
+
+        if op == Operator.Or:
+            for k, v in named_attrs:
+                if v == self.get_prop_value(k):
+                    return True
+            return False
+        if op == Operator.And:
+            for k, v in named_attrs:
+                if v != self.get_prop_value(k):
+                    return False
+            return True
+        return False
 
     def add_cus_attr(self, attrName, attrType = 'integer', attrVal=None):
         self.__cus_attrs[attrName] = GVar(attrName, attrType, attrVal)

@@ -1,7 +1,9 @@
 
 from GCore.Operator import Operator
 from GCore.Engine import *
+from GCore.Funcs import *
 
+# <case value_of=":(cfigure_of(@drawn_card))" ret_as="@round.bank_cfigure"/>
 class Case:
     def __init__(self, expr1, expr2, op = Operator.Equal):
         self.__expr1 = expr1
@@ -9,19 +11,24 @@ class Case:
         self.__op = op
 
     def gen_runtime_obj(self, scene):
+        func1 = self.__expr1.gen_runtime_obj(scene)
+        func2 = self.__expr2.gen_runtime_obj(scene)
+        if not func1 or not func2:
+            return None
+
         def test():
             if self.__op == Operator.Equal:
-                return value_of(self.__expr1) == value_of(self.__expr2)
+                return func1() == func2()
             elif self.__op == Operator.NotEqual:
-                return not value_of(self.__expr1) == value_of(self.__expr2)
+                return not func1() == func2()
             elif self.__op == Operator.LessThan:
-                return value_of(self.__expr1) < value_of(self.__expr2)
+                return func1() < func2()
             elif self.__op == Operator.NotLessThan:
-                return not value_of(self.__expr1) < value_of(self.__expr2)
+                return not func1() < func2()
             elif self.__op == Operator.GreaterThan:
-                return value_of(self.__expr1) > value_of(self.__expr2)
+                return func1() > func2()
             elif self.__op == Operator.NotGreaterThan:
-                return not value_of(self.__expr1) > value_of(self.__expr2)
+                return not func1() > func2()
         return test
 
 
