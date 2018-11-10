@@ -17,8 +17,6 @@ from GCore.Elements.ProcRef import ProcRef
 from GCore.Elements.Action import Action
 from GCore.Elements.Delay import Delay
 from GCore.Elements.PubMsg import PubMsg
-from GCore.Elements.UpdatePlayer import UpdatePlayer
-from GCore.Elements.UpdatePlayers import UpdatePlayers
 from GCore.Elements.Clause import Clause
 from GCore.Elements.ActOpts import ActOpts
 from GCore.Elements.Case import Case
