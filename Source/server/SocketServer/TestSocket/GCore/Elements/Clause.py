@@ -14,6 +14,9 @@ class Clause(Statement):
     def get_false_statements(self):
         return self.__false_statements
 
+    def get_case(self):
+        return self.__case
+
     def set_case(self, case):
         if case:
             self.__case = case
@@ -58,7 +61,7 @@ class Clause(Statement):
 
     def gen_runtime_obj(self, scene):
         assert self.__case
-        cond = self.__case.gen_runtime_obj
+        cond = self.__case.gen_runtime_obj(scene)
         if not cond:
             return None
         t_rt_objs = self.get_true_statements()

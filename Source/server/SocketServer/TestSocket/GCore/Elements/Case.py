@@ -4,6 +4,7 @@ from GCore.Engine import *
 from GCore.Funcs import *
 
 # <case value_of=":(cfigure_of(@drawn_card))" ret_as="@round.bank_cfigure"/>
+# <ift  value_of=":(cards_count_not_deal())" ret_is="6">
 class Case:
     def __init__(self, expr1, expr2, op = Operator.Equal):
         self.__expr1 = expr1

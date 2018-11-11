@@ -36,9 +36,9 @@ def from_str(strOp):
         return Operator.GreaterThan
     elif strOp == GCore.Engine.attr_name_ret_not_gt or strOp == GCore.Engine.attr_name_ret_not_gt_as:
         return Operator.NotGreaterThan
-    elif strOp == GCore.Engine.attr_val_op_and :
+    elif strOp == GCore.Engine.attr_val_op_and or strOp == "##":
         return Operator.And
-    elif strOp == GCore.Engine.attr_val_op_or:
+    elif strOp == GCore.Engine.attr_val_op_or or strOp == "||":
         return Operator.Or
     elif strOp == GCore.Engine.attr_val_op_not:
         return Operator.Not

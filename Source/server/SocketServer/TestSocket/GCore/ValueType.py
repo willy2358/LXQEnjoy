@@ -10,6 +10,7 @@ class ValueType(Enum):
     cards = 5  # list of cards
     player = 6
     players = 7 # list of players
+    void = 8
 
 
 def parse_from_str(sType):
