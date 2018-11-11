@@ -28,7 +28,7 @@ class Cases(Case):
     def gen_runtime_obj(self, scene):
         rt_funcs = []
         for c in self.__cases:
-            func = c.gen_runtime_obj()
+            func = c.gen_runtime_obj(scene)
             if func:
                 rt_funcs.append(func)
 

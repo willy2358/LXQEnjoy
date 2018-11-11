@@ -3,6 +3,7 @@ from GCore.Operator import Operator
 from GCore.Statement import Statement
 from GCore.Engine import *
 import GCore.Engine
+from GCore.VarRef import VarRef
 
 # <update property="@round.defenders" value="@scene.defenders"/>
 # <update property="@drawer" value=":(next_player_of(@drawer))"/>
@@ -24,76 +25,49 @@ class Update(Statement):
         if not self.__targets:
             assert self.__prop.startswith('@')
 
-
     def get_target_property(self):
         return self.__target
 
-    def get_result(self, originVal):
+    def get_result(self, originVal, opVal):
         if self.__op == Operator.Update:
-            return self.__opVal
+            return opVal
         elif self.__op == Operator.Add:
-            return originVal + self.__opVal
+            return originVal + opVal
         elif self.__operator == Operator.Subtract:
-            return originVal - self.__opVal
+            return originVal - opVal
         elif self.__operator == Operator.Multiply:
-            return originVal * self.__opVal
+            return originVal * opVal
         else:
             return originVal
 
-    # def parse_attr_statement(self, attrValue):
-    #     pass
-
-    # def get_final_target_objects(self, scene):
-    #     objs = []
-    #     if not self.__targets:
-    #         if self.__prop.startswith("@round."):
-    #             r = scene.get_current_round()
-    #             attr = r.get_attr(self.__prop)
-    #             objs.append(attr)
-    #         elif self.__prop.startswith("@scene."):
-    #             objs.append( scene.get_attr(self.__prop))
-    #         elif self.__prop.startswith("@"):
-    #             objs.append(scene.get_var(self.__prop))
-    #
-    #     else:
-    #         pass
-    #
-    #     return objs
-
-    def get_rt_target_objs(self, scene):
-        objs = []
-        if self.__prop.startswith("@round."):
-            r = scene.get_current_round()
-            attr = r.get_attr(self.__prop.lstrip("@round"))
-            objs.append(attr)
-        elif self.__prop.startswith("@scene."):
-                objs.append( scene.get_attr(self.__prop.lstrip("@scene")))
-        elif self.__prop.startswith("@"):
-                objs.append(scene.get_var(self.__prop.lstrip("@")))
-        elif len(self.__prop) > 0 and self.__targets:
-            insts = self.__targets.gen_runtime_obj(scene)
-            if insts:
-                for inst in insts:
-                    obj = inst.get_prop_value(self.__prop)
-                    if obj:
-                        objs.append(obj)
-
-        return objs
-
     def get_rt_value(self, scene):
-        return self.__opVal.get_runtime_obj(scene)
+        return self.__opVal.gen_runtime_obj(scene)
 
 
     def gen_runtime_obj(self, scene):
+
         def updates():
-            target_objs = self.get_rt_target_objs(scene)
-            if not target_objs:
-                return
             val_func = self.get_rt_value(scene)
+            if not val_func:
+                return None
             val = val_func()
-            fininal_val = self.get_result(val)
-            for obj in target_objs:
-                obj.set_value(fininal_val)
+
+            if type(self.__prop) is VarRef:
+                var = self.__prop.gen_runtime_obj(scene)()
+                if var:
+                    fininal_val = self.get_result(var.get_value(), val.get_value())
+                    var.set_value(fininal_val)
+            elif type(self.__prop) is AttrName and self.__targets:
+                targets = []
+                func1 = self.__targets.gen_runtime_obj(scene)
+                if func1:
+                    targets = func1()
+                for t in targets:
+                    o_val = t.get_prop_value(self.__prop.get_name())
+                    if o_val :
+                        f_val = self.get_result(o_val, val)
+                        t.upate_prop(self.__prop.get_name(), f_val)
+
         return updates
 
 

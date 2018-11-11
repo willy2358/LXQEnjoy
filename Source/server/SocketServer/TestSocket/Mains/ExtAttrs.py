@@ -74,3 +74,10 @@ class ExtAttrs:
             self.__vars[name] = GVar(name, ValueType.undef, value)
         else:
             self.__vars[name].set_value(value)
+
+    def upate_prop(self, propName, value):
+        if propName in self.__cus_attrs:
+            self.__cus_attrs[propName] = value
+        elif propName in self.__vars:
+            self.__vars[propName] = value
+

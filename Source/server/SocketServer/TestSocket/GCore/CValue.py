@@ -8,3 +8,8 @@ class CValue(Operand):
 
     def get_result(self):
         return self.__val
+
+    def gen_runtime_obj(self, scene):
+        def ret_val():
+            return self.__val
+        return ret_val

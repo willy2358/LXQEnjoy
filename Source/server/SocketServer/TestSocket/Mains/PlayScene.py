@@ -60,11 +60,11 @@ class PlayScene(ExtAttrs):
     def get_runtime_objs(self, varStr):
         if varStr.startswith("@round."):
             r = self.get_current_round()
-            return r.get_attr(self.__prop.lstrip("@round"))
+            return r.get_attr(varStr[len("@round."):])
         elif varStr.startswith("@scene."):
-            return self.get_attr(self.__prop.lstrip("@scene"))
+            return self.get_attr(varStr[len("@scene."):])
         elif varStr.startswith("@"):
-            return self.get_var(self.__prop.lstrip("@"))
+            return self.get_var(varStr.lstrip("@"))
 
     def get_current_round(self):
         return self.__cur_round
