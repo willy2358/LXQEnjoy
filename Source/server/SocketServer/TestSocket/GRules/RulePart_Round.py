@@ -23,11 +23,9 @@ class RulePart_Round(RulePart):
 
         for elem in Utils.getXmlChildElments(attrsRoot):
             if elem.tagName == Engine.tag_name_attr:
-                vName = elem.getAttribute(Engine.attr_name_name)
-                vType = elem.getAttribute(Engine.attr_name_value_type)
-                attr = Variable(vName)
-                attr.set_value_type(vType)
-                self.__custom_attrs.append(attr)
+                attrVar = Engine.parse_elem_var(elem)
+                if attrVar:
+                    self.__custom_attrs.append(attrVar)
         return True
 
     def get_part_name(self):

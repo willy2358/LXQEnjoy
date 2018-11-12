@@ -63,7 +63,7 @@ class Update(Statement):
                 if func1:
                     targets = func1()
                 for t in targets:
-                    o_val = t.get_prop_value(self.__prop.get_name())
+                    o_val = t.get_prop(self.__prop.get_name())
                     if o_val :
                         f_val = self.get_result(o_val, val)
                         t.upate_prop(self.__prop.get_name(), f_val)

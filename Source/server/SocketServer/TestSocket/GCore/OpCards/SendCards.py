@@ -13,8 +13,10 @@ class SendCards(Statement):
         player_func = self.__recv_player.gen_runtime_obj(scene)
         cards_func = self.__cards.gen_runtime_obj(scene)
         def send_cards_rtobj():
-            player = player_func()
-            cards = cards_func()
+            playerRef = player_func()
+            cardsRef = cards_func()
+            player = scene.get_prop_value(playerRef.get_name())
+            cards = scene.get_prop_value(cardsRef.get_name())
             if player and cards:
                 player.send_cards(cards)
 

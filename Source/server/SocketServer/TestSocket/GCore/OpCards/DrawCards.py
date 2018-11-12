@@ -15,7 +15,8 @@ class DrawCards(Statement):
     def gen_runtime_obj(self, scene):
         def draw_cards():
             cards = scene.draw_cards(self.__count)
-            scene.update_variable(Engine.get_variable_name(self.__hold_var), cards)
+            var = self.__hold_var.gen_runtime_obj(scene)()
+            scene.update_variable(var.get_name(), cards)
 
         return draw_cards
 

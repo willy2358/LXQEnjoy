@@ -12,6 +12,9 @@ class GVar:
     def get_value(self):
         return self.__value
 
+    def get_value_type(self):
+        return self.__vType
+
     def set_value(self, val):
         self.__value = val
 

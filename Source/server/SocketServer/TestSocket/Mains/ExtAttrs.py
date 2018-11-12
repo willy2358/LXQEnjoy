@@ -2,6 +2,7 @@
 from Mains.GVar import GVar
 from GCore.ValueType import ValueType
 from GCore.Operator import Operator
+from GCore.VarRef import VarRef
 
 class ExtAttrs:
     def __init__(self):
@@ -10,15 +11,38 @@ class ExtAttrs:
 
     def get_attr_value(self, attrName):
         if attrName in self.__cus_attrs:
-            return self.__cus_attrs[attrName].get_value()
+            val = self.__cus_attrs[attrName].get_value()
+            if type(val) is VarRef :
+                obj = val.gen_runtime_obj(self)()
+                if type(obj) is GVar:
+                    return obj.get_value()
+                else:
+                    return obj
+            return val
         else:
             return None
 
     def get_var_value(self, varName):
         if varName in self.__vars:
-            return self.__vars[varName].get_value()
+            val = self.__vars[varName].get_value()
+            if type(val) is VarRef:
+                obj = val.gen_runtime_obj(self)()
+                if type(obj) is GVar:
+                    return obj.get_value()
+                else:
+                    return obj
+            return val
         else:
             return None
+
+    def get_prop_value(self, propName):
+        if propName in self.__cus_attrs:
+            return self.get_attr_value(propName)
+        elif propName in self.__vars:
+            return self.get_var_value(propName)
+        else:
+            return None
+
 
     def get_var(self, varName):
         if varName in self.__vars:
@@ -32,13 +56,19 @@ class ExtAttrs:
         else:
             return None
 
-    def get_prop_value(self, propName):
+    def get_prop(self, propName):
         if propName in self.__cus_attrs:
             return self.__cus_attrs[propName]
         elif propName in self.__vars:
             return self.__vars[propName]
         else:
             return None
+
+    def get_attrs(self):
+        return self.__cus_attrs
+
+    def get_vars(self):
+        return self.__vars
 
     def is_meet_conditions(self, named_attrs, op):
         # no requirements, return false
@@ -47,12 +77,12 @@ class ExtAttrs:
 
         if op == Operator.Or:
             for k, v in named_attrs:
-                if v == self.get_prop_value(k):
+                if v == self.get_prop(k):
                     return True
             return False
         if op == Operator.And:
             for k, v in named_attrs:
-                if v != self.get_prop_value(k):
+                if v != self.get_prop(k):
                     return False
             return True
         return False

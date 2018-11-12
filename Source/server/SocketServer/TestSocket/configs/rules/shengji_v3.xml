@@ -12,6 +12,7 @@
             <attr name="attacters" value_type="players" value="none"/>
              <!--庄牌点数-->
             <attr name="bank_cfigure" value_type="int" value="2"/>
+            <attr name="init_drawer" value_type="player" value="random"/>
         </attrs>
     </scene>
 
@@ -188,12 +189,12 @@
     <!--玩家-->
     <players min="4" max="4">
         <attr name="bank_cfigure" value_type="int" value="2"/>
-        <attr name="IsMainPlayer" value_type="bool"/>
-        <attr name="IsAttacter" value_type="bool"/>
-        <attr name="IsDefender" value_type="bool"/>
-        <attr name="sum_score" value_type="int"/>
-        <attr name="Score" value_type="int"/>
-        <attr name="IsTrickWinner" value_type="bool"/>
+        <attr name="IsMainPlayer" value_type="bool" value="false" />
+        <attr name="IsAttacter" value_type="bool" value="false"/>
+        <attr name="IsDefender" value_type="bool" value="false"/>
+        <attr name="sum_score" value_type="int" value="0"/>
+        <attr name="Score" value_type="int" value="0"/>
+        <attr name="IsTrickWinner" value_type="bool" value="false"/>
     </players>
 
     <!--一圈-->
@@ -226,7 +227,7 @@
         <!--发牌（摸牌，起牌）-->
         <!--每次一张牌-->
         
-        <var name="drawer" value="@round.init_drawer" value_type="player"/>
+        <var name="drawer" value="@scene.init_drawer" value_type="player"/>
         <var name="drawn_card" value="None" value_type="card"></var>
         <loop>
             <draw_cards to_var="@drawn_card" count="1"></draw_cards>
@@ -239,8 +240,8 @@
                     <case value_of="@round.bank_ctype" ret_is="none"/>
                 </cases>
                 <act_opts timeout="30" timeout_act="pass" to_player="@drawer">
-                    <act_opt act="jiaozhu"/>
-                    <act_opt act="pass"/>
+                    <act_ref act="jiaozhu"/>
+                    <act_ref act="pass"/>
                 </act_opts>
 
             </ift>

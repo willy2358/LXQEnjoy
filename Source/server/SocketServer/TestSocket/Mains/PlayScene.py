@@ -27,6 +27,7 @@ from GCore.ValueType import ValueType
 from Mains.ExtAttrs import ExtAttrs
 from Mains.Round import Round
 from Cards import Card
+from GCore.CValue import CValue
 
 import Utils
 
@@ -38,7 +39,6 @@ class PlayScene(ExtAttrs):
         self.__players = []
         self.__rule = rule
         self.__runtimes = []
-        self.__undealing_cards = []
         self.__cards_space = []
         self.parse_rule(self.__rule)
 
@@ -50,12 +50,6 @@ class PlayScene(ExtAttrs):
 
     def get_rule(self):
         return self.__rule
-
-    def get_attr_value(self, attrName):
-        if attrName in self.__cus_attrs:
-            return self.__cus_attrs[attrName]
-        else:
-            return None
 
     def get_runtime_objs(self, varStr):
         if varStr.startswith("@round."):
@@ -70,9 +64,7 @@ class PlayScene(ExtAttrs):
         return self.__cur_round
 
     def draw_cards(self, count):
-        cards = random.sample(self.__undealing_cards, count)
-        Utils.list_remove_parts(self.__undealing_cards, cards)
-        return cards
+        return  self.__cur_round.draw_cards(count)
 
     def add_player(self, player):
         if player not in self.__players:
@@ -145,7 +137,7 @@ class PlayScene(ExtAttrs):
                 self.add_cus_attr(name, vtype, val)
 
     def start_game(self):
-
+        self.init_player_type_attrs()
         self.create_new_round()
         for rtObj in self.__runtimes:
             rtObj()
@@ -156,6 +148,19 @@ class PlayScene(ExtAttrs):
         # codeBlocks = run_part.get_code_blocks()
         # for i in range(len(codeBlocks)):
         #     self.exe_block(codeBlocks[i])
+    def init_player_type_attrs(self):
+        if not self.__players:
+            return
+        attrs = self.get_attrs()
+        for attr in attrs:
+            # attr is a GVar
+            if attrs[attr].get_value_type() == ValueType.player:
+                val = attrs[attr].get_value()
+                if type(val) is CValue:
+                    if val.get_value() == "random":
+                        attrs[attr].set_value(self.__players[0])
+
+
 
     def exe_block(self, code_block):
         pass
@@ -169,6 +174,8 @@ class PlayScene(ExtAttrs):
                 vtype = attr.get_value_type()
                 val = attr.get_value()
                 newRound.add_cus_attr(name, vtype, val)
+
+        newRound.init_cards_pack(self.__cards_space)
         self.__history_rounds.append(newRound)
         self.__cur_round = newRound
 
