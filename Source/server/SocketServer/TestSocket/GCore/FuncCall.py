@@ -27,7 +27,7 @@ class FuncCall(Operand):
     def gen_runtime_obj(self, scene):
         def func():
             if self.__ordered_args:
-                return Funcs.invoke(self.__func_name, self.__ordered_args)
+                return Funcs.invoke(self.__func_name, scene, self.__ordered_args)
             elif self.__named_args:
                 if self.__func_name == "find_player" or self.__func_name == "find_players":
                     return self.filter_insts(scene, "@round.players")

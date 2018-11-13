@@ -19,3 +19,6 @@ class Round(ExtAttrs):
         cards = random.sample(self.__undealing_cards, count)
         Utils.list_remove_parts(self.__undealing_cards, cards)
         return cards
+
+    def undealing_cards_count(self):
+        return len(self.__undealing_cards)

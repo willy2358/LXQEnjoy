@@ -216,6 +216,7 @@
             <attr name="attacters" value_type="players" value="none"/>
             <!--起牌玩家，第一个摸牌的人-->
             <attr name="init_drawer" value_type="player" value="random"/>
+            <attr name="kitty" value_type="cards" value="none"/>
         </attrs>
     </round>
 
@@ -224,12 +225,16 @@
         <update property="@round.defenders" value="@scene.defenders"/>
         <update property="@round.attacters" value="@scene.attacters"/>
         <update property="@round.bank_cfigure" value="@scene.bank_cfigure"/>
-        <!--发牌（摸牌，起牌）-->
-        <!--每次一张牌-->
+   
         
         <var name="drawer" value="@scene.init_drawer" value_type="player"/>
         <var name="drawn_card" value="None" value_type="card"></var>
-        <loop>
+
+        <!--底牌6张-->
+        <draw_cards to_var="@round.kitty" count="6"></draw_cards>
+        <loop_until value_of=":(cards_count_not_deal())" ret_gt="0">
+            <!--发牌（摸牌，起牌）-->
+            <!--每次一张牌-->
             <draw_cards to_var="@drawn_card" count="1"></draw_cards>
             <send_cards player="@drawer" cards="@drawn_card" ></send_cards>
 
@@ -246,13 +251,8 @@
 
             </ift>
 
-            <!--底牌6张-->
-            <ift  value_of=":(cards_count_not_deal())" ret_is="6">
-                <exitloop/>
-            </ift>
-
             <update property="@drawer" value=":(next_player_of(@drawer))"/>
-        </loop>
+        </loop_until>
 
         <!--发牌结束,还没有选主-->
         <ift value_of="@round.bank_ctype" ret_is="none">

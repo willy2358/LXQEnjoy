@@ -4,6 +4,9 @@ from GCore.Statement import Statement
 from GCore.Engine import *
 import GCore.Engine
 from GCore.VarRef import VarRef
+from Mains.GVar import GVar
+from GCore.CValue import CValue
+import Mains.Log as Log
 
 # <update property="@round.defenders" value="@scene.defenders"/>
 # <update property="@drawer" value=":(next_player_of(@drawer))"/>
@@ -28,10 +31,19 @@ class Update(Statement):
     def get_target_property(self):
         return self.__target
 
-    def get_result(self, originVal, opVal):
+    def get_result(self, scene, originVal, opVal):
+        rawVal = originVal
+        if type(originVal) is GVar:
+            rawVal = scene.get_prop_value(originVal.get_name())
+        if type(rawVal) is CValue:
+            rawVal = rawVal.get_value()
+
         if self.__op == Operator.Update:
-            return opVal
-        elif self.__op == Operator.Add:
+            return rawVal
+        if not str(rawVal).isnumeric():
+            return rawVal
+
+        if self.__op == Operator.Add:
             return originVal + opVal
         elif self.__operator == Operator.Subtract:
             return originVal - opVal
@@ -45,28 +57,30 @@ class Update(Statement):
 
 
     def gen_runtime_obj(self, scene):
-
         def updates():
-            val_func = self.get_rt_value(scene)
-            if not val_func:
-                return None
-            val = val_func()
+            try:
+                val_func = self.get_rt_value(scene)
+                if not val_func:
+                    return None
+                val = val_func()
 
-            if type(self.__prop) is VarRef:
-                var = self.__prop.gen_runtime_obj(scene)()
-                if var:
-                    fininal_val = self.get_result(var.get_value(), val.get_value())
-                    var.set_value(fininal_val)
-            elif type(self.__prop) is AttrName and self.__targets:
-                targets = []
-                func1 = self.__targets.gen_runtime_obj(scene)
-                if func1:
-                    targets = func1()
-                for t in targets:
-                    o_val = t.get_prop(self.__prop.get_name())
-                    if o_val :
-                        f_val = self.get_result(o_val, val)
-                        t.upate_prop(self.__prop.get_name(), f_val)
+                if type(self.__prop) is VarRef:
+                    var = self.__prop.gen_runtime_obj(scene)()
+                    if var:
+                        fininal_val = self.get_result(scene, var.get_value(), val.get_value())
+                        var.set_value(fininal_val)
+                elif type(self.__prop) is AttrName and self.__targets:
+                    targets = []
+                    func1 = self.__targets.gen_runtime_obj(scene)
+                    if func1:
+                        targets = func1()
+                    for t in targets:
+                        o_val = t.get_prop(self.__prop.get_name())
+                        if o_val :
+                            f_val = self.get_result(o_val, val)
+                            t.upate_prop(self.__prop.get_name(), f_val)
+            except Exception as ex:
+                Log.exception(ex)
 
         return updates
 

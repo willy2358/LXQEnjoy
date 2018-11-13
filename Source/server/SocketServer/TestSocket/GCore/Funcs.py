@@ -13,10 +13,14 @@ def cfigure_of(scene, *args):
     card = args[0]
     return CFigure.parse_cfigure(card[1:])
 
+def cards_count_not_deal(scene, *args):
+    rund = scene.get_current_round()
+    return rund.undealing_cards_count()
+
 
 __maps = {'ctype_of' : ctype_of,
           'cfigure_of': cfigure_of,
-
+        'cards_count_not_deal': cards_count_not_deal,
           }
 
 
