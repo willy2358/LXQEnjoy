@@ -21,6 +21,7 @@ from GCore.Elements.Clause import Clause
 from GCore.Elements.ActOpts import ActOpts
 from GCore.Elements.Case import Case
 from GCore.Elements.Cases import Cases
+from GCore.VarRef import VarRef
 
 from Mains.GVar import GVar
 from GCore.ValueType import ValueType
@@ -59,6 +60,18 @@ class PlayScene(ExtAttrs):
             return self.get_attr(varStr[len("@scene."):])
         elif varStr.startswith("@"):
             return self.get_var(varStr.lstrip("@"))
+
+    def get_obj_value(self, obj):
+        if isinstance(obj, int) or isinstance(obj, bool) or isinstance(obj, str):
+            return obj
+        elif type(obj) is GVar:
+            return self.get_obj_value(obj.get_value())
+        elif type(obj) is VarRef:
+            return self.get_obj_value(obj.gen_runtime_obj(self)())
+        elif callable(obj):
+            return self.get_obj_value(obj())
+        else:
+            return None
 
     def get_current_round(self):
         return self.__cur_round

@@ -13,28 +13,27 @@ class Case:
         self.__op = op
 
     def gen_runtime_obj(self, scene):
-        func1 = self.__expr1.gen_runtime_obj(scene)
-        func2 = self.__expr2.gen_runtime_obj(scene)
-        if not func1 or not func2:
-            return None
-
         def test():
+            func1 = self.__expr1.gen_runtime_obj(scene)
+            func2 = self.__expr2.gen_runtime_obj(scene)
+            if not func1 or not func2:
+                return False
             try:
-                f1 = func1()
-                f2 = func2()
+                f1 = scene.get_obj_val(func1)
+                f2 = scene.get_obj_val(func2)
                 ret = False
                 if self.__op == Operator.Equal:
-                    ret = (func1() == func2())
+                    ret = (str(func1()).lower() == str(func2()).lower())
                 elif self.__op == Operator.NotEqual:
-                    ret = (not (func1() == func2()))
+                    ret = (not (str(func1()).lower() == str(func2()).lower()))
                 elif self.__op == Operator.LessThan:
                     ret = (int(f1) < int(f2))
                 elif self.__op == Operator.NotLessThan:
-                    ret = (not int(f1) < int(f2))
+                    ret = (not (int(f1) < int(f2)))
                 elif self.__op == Operator.GreaterThan:
                     ret = (int(f1) > int(f2))
                 elif self.__op == Operator.NotGreaterThan:
-                    ret = (not int(f1) > int(f2))
+                    ret = (not (int(f1) > int(f2)))
                 return ret
             except Exception as ex:
                 Log.exception(ex)

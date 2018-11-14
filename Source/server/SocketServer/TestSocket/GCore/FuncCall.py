@@ -2,6 +2,7 @@
 from GCore.Operand import Operand
 from GCore.Operator import Operator
 import GCore.Funcs as Funcs
+from GCore.VarRef import VarRef
 
 # find_player(IsDefender:true ## IsMainPlayer:true)  ## <==> &&
 # find_player(IsDefender:true || IsMainPlayer:true)  || <==> ||
@@ -27,7 +28,11 @@ class FuncCall(Operand):
     def gen_runtime_obj(self, scene):
         def func():
             if self.__ordered_args:
-                return Funcs.invoke(self.__func_name, scene, self.__ordered_args)
+                args = []
+                for arg in self.__ordered_args:
+                    val = scene.get_obj_value(arg)
+                    args.append(val)
+                return Funcs.invoke(self.__func_name, scene, args)
             elif self.__named_args:
                 if self.__func_name == "find_player" or self.__func_name == "find_players":
                     return self.filter_insts(scene, "@round.players")
