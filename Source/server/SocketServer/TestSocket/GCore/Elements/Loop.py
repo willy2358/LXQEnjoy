@@ -22,7 +22,7 @@ class Loop(Statement):
     def gen_runtime_obj(self, scene):
         assert self.__exit_cond
 
-        can_loop = self.__exit_cond.gen_runtime_obj(scene)
+        loop_test = self.__exit_cond.gen_runtime_obj(scene)
         rtObjs = []
         for c in self.__clauses:
             obj = c.gen_runtime_obj(scene)
@@ -30,15 +30,12 @@ class Loop(Statement):
                 rtObjs.append(obj)
 
         def sub_proc():
-            while True:
-                try:
-                    if not can_loop():
-                        break
+            try:
+                while loop_test():
                     for func in rtObjs:
-                        if func:
+                        if callable(func):
                             func()
-                except Exception as ex:
-                    Log.exception(ex)
-
+            except Exception as ex:
+                Log.exception(ex)
         return sub_proc
 

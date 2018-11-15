@@ -1,5 +1,6 @@
 
 import sys
+import Mains.Log as Log
 sys.path.append('..')
 
 from GCore.Statement import Statement
@@ -14,9 +15,13 @@ class DrawCards(Statement):
 
     def gen_runtime_obj(self, scene):
         def draw_cards():
-            cards = scene.draw_cards(self.__count)
-            var = self.__hold_var.gen_runtime_obj(scene)()
-            scene.update_variable(var.get_name(), cards)
+            try:
+                cards = scene.draw_cards(self.__count)
+                var = scene.get_rt_var(self.__hold_var) #self.__hold_var.gen_runtime_obj(scene)()
+                var.set_value(cards)
+            except Exception as ex:
+               Log.exception(ex)
+            # scene.update_variable(var.get_name(), cards)
 
         return draw_cards
 

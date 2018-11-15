@@ -59,26 +59,31 @@ class Update(Statement):
     def gen_runtime_obj(self, scene):
         def updates():
             try:
-                val_func = self.get_rt_value(scene)
-                if not val_func:
-                    return None
-                val = val_func()
+                # valObj = self.get_rt_value(scene)
+                opVal = scene.get_obj_value(self.__opVal)
 
-                if type(self.__prop) is VarRef:
-                    var = self.__prop.gen_runtime_obj(scene)()
-                    if var:
-                        fininal_val = self.get_result(scene, var.get_value(), val.get_value())
-                        var.set_value(fininal_val)
+                # val = scene.get_obj_value(valObj)
+
+                if isinstance(self.__prop, VarRef):
+                    rtVar = scene.get_rt_var(self.__prop)
+                    if rtVar:
+                        oriVal = scene.get_obj_value(rtVar)
+
+                        # var = scene.get_obj_value(self.__prop)
+                        fininal_val = self.get_result(scene, oriVal, opVal)
+                        rtVar.set_value(fininal_val)
+                    # scene.set_obj_value(self.__prop, fininal_val)
                 elif type(self.__prop) is AttrName and self.__targets:
-                    targets = []
-                    func1 = self.__targets.gen_runtime_obj(scene)
-                    if func1:
-                        targets = func1()
+                    targets = scene.get_obj_value(self.__targets)
+                    # func1 = self.__targets.gen_runtime_obj(scene)
+                    # if func1:
+                    #     targets = func1()
                     for t in targets:
                         o_val = t.get_prop(self.__prop.get_name())
                         if o_val :
-                            f_val = self.get_result(o_val, val)
-                            t.upate_prop(self.__prop.get_name(), f_val)
+                            f_val = self.get_result(o_val.get_value(), opVal)
+                            # o_val is a GVar
+                            o_val.set_value(f_val)
             except Exception as ex:
                 Log.exception(ex)
 

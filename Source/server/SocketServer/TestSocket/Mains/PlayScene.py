@@ -22,6 +22,8 @@ from GCore.Elements.ActOpts import ActOpts
 from GCore.Elements.Case import Case
 from GCore.Elements.Cases import Cases
 from GCore.VarRef import VarRef
+from Mains.Player import Player
+from GCore.FuncCall import FuncCall
 
 from Mains.GVar import GVar
 from GCore.ValueType import ValueType
@@ -29,6 +31,7 @@ from Mains.ExtAttrs import ExtAttrs
 from Mains.Round import Round
 from Cards import Card
 from GCore.CValue import CValue
+from Cards.CFigure import CFigure
 
 import Utils
 
@@ -62,16 +65,43 @@ class PlayScene(ExtAttrs):
             return self.get_var(varStr.lstrip("@"))
 
     def get_obj_value(self, obj):
-        if isinstance(obj, int) or isinstance(obj, bool) or isinstance(obj, str):
+        if isinstance(obj, CFigure):
+            return int(obj)
+        elif isinstance(obj, int) or isinstance(obj, bool) or isinstance(obj, str):
+            return obj
+        elif isinstance(obj, Player):
+            return obj
+        elif isinstance(obj, list):
             return obj
         elif type(obj) is GVar:
             return self.get_obj_value(obj.get_value())
+        elif isinstance(obj, CValue):
+            return obj.get_value()
         elif type(obj) is VarRef:
+            return self.get_obj_value(obj.gen_runtime_obj(self)())
+        elif isinstance(obj, FuncCall):
             return self.get_obj_value(obj.gen_runtime_obj(self)())
         elif callable(obj):
             return self.get_obj_value(obj())
         else:
             return None
+
+    def get_rt_var(self, obj):
+        if isinstance(obj, GVar):
+            return obj
+        elif isinstance(obj, VarRef):
+            return self.get_rt_var(obj.gen_runtime_obj(self)())
+        elif callable(obj):
+            return self.get_rt_var(obj())
+        else:
+            return None
+
+    def set_obj_value(self, obj, value):
+        if isinstance(obj, VarRef):
+            var = obj.gen_runtime_obj(self)()
+            if isinstance(var, GVar):
+                var.set_value(value)
+
 
     def get_current_round(self):
         return self.__cur_round

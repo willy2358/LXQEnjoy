@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import IntEnum
 
 TOKEN = "cfigure"
 
@@ -12,7 +12,7 @@ def parse_cfigure(strFig):
     else:
         return CFigure.Undefined
 
-class CFigure(Enum):
+class CFigure(IntEnum):
     Any = 100
     Undefined = -1
     Fig_1 = 1

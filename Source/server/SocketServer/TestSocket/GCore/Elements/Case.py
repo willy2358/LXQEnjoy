@@ -14,18 +14,18 @@ class Case:
 
     def gen_runtime_obj(self, scene):
         def test():
-            func1 = self.__expr1.gen_runtime_obj(scene)
-            func2 = self.__expr2.gen_runtime_obj(scene)
-            if not func1 or not func2:
-                return False
+            # func1 = self.__expr1.gen_runtime_obj(scene)
+            # func2 = self.__expr2.gen_runtime_obj(scene)
+            # if not func1 or not func2:
+            #     return False
             try:
-                f1 = scene.get_obj_val(func1)
-                f2 = scene.get_obj_val(func2)
+                f1 = scene.get_obj_value(self.__expr1)
+                f2 = scene.get_obj_value(self.__expr2)
                 ret = False
                 if self.__op == Operator.Equal:
-                    ret = (str(func1()).lower() == str(func2()).lower())
+                    ret = (str(f1).lower() == str(f2).lower())
                 elif self.__op == Operator.NotEqual:
-                    ret = (not (str(func1()).lower() == str(func2()).lower()))
+                    ret = (not (str(f1).lower() == str(f2).lower()))
                 elif self.__op == Operator.LessThan:
                     ret = (int(f1) < int(f2))
                 elif self.__op == Operator.NotLessThan:
