@@ -245,8 +245,8 @@
                     <case value_of="@round.bank_ctype" ret_is="none"/>
                 </cases>
                 <act_opts timeout="30" timeout_act="pass" to_player="@drawer">
-                    <act_ref act="jiaozhu"/>
-                    <act_ref act="pass"/>
+                    <act_ref act="jiaozhu" params="@drawn_card"/>
+                    <act_ref act="pass" params="none"/>
                 </act_opts>
 
             </ift>

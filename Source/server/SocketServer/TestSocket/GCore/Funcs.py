@@ -25,10 +25,16 @@ def cards_count_not_deal(scene, *args):
     rund = scene.get_current_round()
     return rund.undealing_cards_count()
 
+def next_player_of(scene, args):
+    player = args[0]
+    return scene.get_next_player(player)
+
+
 
 __maps = {'ctype_of' : ctype_of,
           'cfigure_of': cfigure_of,
         'cards_count_not_deal': cards_count_not_deal,
+          'next_player_of':next_player_of,
           }
 
 

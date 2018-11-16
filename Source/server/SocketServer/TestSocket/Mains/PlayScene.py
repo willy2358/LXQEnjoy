@@ -55,6 +55,14 @@ class PlayScene(ExtAttrs):
     def get_rule(self):
         return self.__rule
 
+    def get_next_player(self, ref_player):
+        idx = self.__players.index(ref_player)
+        idx += 1
+        if idx >= len(self.__players):
+            idx = 0
+
+        return self.__players[idx]
+
     def get_runtime_objs(self, varStr):
         if varStr.startswith("@round."):
             r = self.get_current_round()

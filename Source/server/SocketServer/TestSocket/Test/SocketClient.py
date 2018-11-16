@@ -23,13 +23,14 @@ def wait_sock_receive(sock_client):
 
 
 class SocketClient:
-    def __init__(self, address, port):
+    def __init__(self, address, port, msgCallback = None):
         self._address = address
         self._port = port
         self.__isRun = False
         self.__mySock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.__receiveThread = None
         self.__token = ""
+        self.__msgCallback = msgCallback
 
     def run(self):
         try:
@@ -66,12 +67,15 @@ class SocketClient:
                     if not p.startswith('{'):
                         continue
                     j_obj = json.loads(p)
+
                     if InterProtocol.sock_resp in j_obj and\
                             j_obj[InterProtocol.sock_resp] == InterProtocol.client_req_cmd_reg_player:
                         if InterProtocol.resp_player in j_obj:
                             self.__token = j_obj[InterProtocol.resp_player][InterProtocol.authed_token]
 
                         # print("\r\n")
+                    if self.__msgCallback:
+                        self.__msgCallback(j_obj)
 
             except Exception as ex:
                 print(ex)

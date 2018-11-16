@@ -1,6 +1,7 @@
 from Test import SocketClient
 from Mains import InterProtocol
 import json
+import time
 
 # roomid = "LX888"
 roomid = "0"
@@ -8,7 +9,13 @@ userid = 111
 gameid = "shengji001"
 # roomid = 888
 # client = SocketClient.SocketClient("117.78.40.54", 9229)
-client = SocketClient.SocketClient("127.0.0.1", 9229)
+
+def msg_callback(jsonObj):
+    if jsonObj["sockresp"] == "reg-player" and jsonObj["result"] == "OK":
+        time.sleep(0.5)
+        join_game()
+
+client = SocketClient.SocketClient("127.0.0.1", 9229, msg_callback)
 client.run()
 
 cmd = {
@@ -38,22 +45,24 @@ client.send_message(cmd_str)
 # client.send_message(cmd_str)
 
 
-line = input("press any key to join game\r\n")
+# line = input("press any key to join game\r\n")
 
 # cmd = '{"cmdtype":"sockreq","sockreq":"join-game","userid":111,	"roomid":' + roomid +',"gameid":"m1"}'
-cmd = {
-    "cmdtype":"sockreq",
-    "sockreq":"join-game",
-    "userid":userid,
-    "roomid":roomid,
-    "gameid":gameid,
-    "clientid": "00001",
-    "token": client.get_token(),
-    "seatid":1
-}
-cmd_str = json.dumps(cmd)
-client.send_message(cmd_str)
-print('sent: ' + cmd_str)
+
+def join_game():
+    cmd = {
+        "cmdtype":"sockreq",
+        "sockreq":"join-game",
+        "userid":userid,
+        "roomid":roomid,
+        "gameid":gameid,
+        "clientid": "00001",
+        "token": client.get_token(),
+        "seatid":1
+    }
+    cmd_str = json.dumps(cmd)
+    client.send_message(cmd_str)
+    print('sent: ' + cmd_str)
 
 
 cmds = {
