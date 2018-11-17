@@ -29,6 +29,9 @@ class Variable(Operand):
         name = self.get_name()
         vtype = self.get_value_type()
         val = self.get_value()
-        scene.add_variable(name, vtype, val)
+        if name.startswith("#"):
+            scene.add_proc_local_var(name, vtype, val)
+        else:
+            scene.add_variable(name, vtype, val)
 
 

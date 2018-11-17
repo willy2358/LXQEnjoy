@@ -20,6 +20,9 @@ class PlayCmd:
     def get_cmd_player(self):
         return self.__player
 
+    def set_cmd_player(self, player):
+        self.__player = player
+
     def is_silent(self):
         return self.__is_silent
 

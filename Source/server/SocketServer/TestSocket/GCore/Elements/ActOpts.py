@@ -3,7 +3,7 @@ from GCore.Statement import Statement
 from Mains.Player import Player
 
 import Mains.InterProtocol as InterProtocol
-from Mains.PlayCmd import PlayCmd
+from Mains.PlayScene import PlayScene
 
 # <act_opts timeout="30" timeout_act="pass" to_player="@drawer">
 #                     <act_opt act="jiaozhu"/>
@@ -22,13 +22,16 @@ class ActOpts(Statement):
 
     def gen_runtime_obj(self, scene):
         def send_act_opts():
-            # func = self.__to_player.gen_runtime_obj(scene)
-            # playerRef = func()
-            # player = scene.get_prop_value(playerRef.get_name())
-            # if type(player) is Player:
-            #     cmd_opts = []
-            #     cmd_opts.append(PlayCmd(player, InterProtocol.majiang_player_act_hu, new_cards))
-            #     packet = InterProtocol.create_cmd_options_json_packet(player, cmd_opts, self.__timeout_act, self.__timeout_seconds)
-            #     player.send_server_cmd_packet(packet)
-            pass
+            recv_player = scene.get_obj_value(self.__to_player)
+            cmd_opts = []
+            def_act = None
+            for opt in self.__opts:
+                cmdObj = opt.gen_runtime_obj(scene)
+                cmdObj.set_cmd_player(recv_player)
+                cmd_opts.append(cmdObj)
+                if opt.get_act_name() == self.__timeout_act:
+                    def_act = cmdObj
+                pack = InterProtocol.create_cmd_options_json_packet(recv_player, cmd_opts, def_act, self.__timeout_seconds)
+                if recv_player.send_server_cmd_packet(pack):
+                    scene.set_waiting_cmd_opts(pack)
         return send_act_opts

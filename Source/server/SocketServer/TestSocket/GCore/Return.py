@@ -7,6 +7,6 @@ class Return(Operand):
 
     def gen_runtime_obj(self, scene):
         def var_ref():
-            return scene.get_runtime_objs(self.__var)
+            return scene.get_obj_value(self.__var)
 
         return var_ref

@@ -131,8 +131,10 @@ def send_err_pack_to_client(clientConn, cmd, errCode):
 def send_msg_to_client(conn, msg):
     try:
         conn.sendall(msg.encode(encoding="utf-8"))
+        return True
     except Exception as ex:
         Log.exception(ex)
+        return False
 
 def send_welcome_to_new_connection(conn):
     welcome_msg = "welcome,just enjoy!"

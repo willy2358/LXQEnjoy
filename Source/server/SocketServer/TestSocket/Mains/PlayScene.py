@@ -44,6 +44,8 @@ class PlayScene(ExtAttrs):
         self.__rule = rule
         self.__runtimes = []
         self.__cards_space = []
+        self.__waiting_cmds = None
+        self.__local_vars = {}
         self.parse_rule(self.__rule)
 
     def is_player_in(self, player):
@@ -63,14 +65,24 @@ class PlayScene(ExtAttrs):
 
         return self.__players[idx]
 
+    def get_proc_local_var(self, varName):
+        if varName in self.__local_vars:
+            return self.__local_vars[varName]
+        else:
+            return None
+
     def get_runtime_objs(self, varStr):
         if varStr.startswith("@round."):
             r = self.get_current_round()
             return r.get_attr(varStr[len("@round."):])
         elif varStr.startswith("@scene."):
             return self.get_attr(varStr[len("@scene."):])
+        elif varStr.startswith("@#"):
+            return self.get_proc_local_var(varStr.lstrip("@"))
         elif varStr.startswith("@"):
             return self.get_var(varStr.lstrip("@"))
+        else:
+            return None
 
     def get_obj_value(self, obj):
         if isinstance(obj, CFigure):
@@ -110,6 +122,8 @@ class PlayScene(ExtAttrs):
             if isinstance(var, GVar):
                 var.set_value(value)
 
+    def add_proc_local_var(self, varName, vType, value):
+        self.__local_vars[varName] = GVar(varName, vType, value)
 
     def get_current_round(self):
         return self.__cur_round
@@ -230,6 +244,8 @@ class PlayScene(ExtAttrs):
         self.__history_rounds.append(newRound)
         self.__cur_round = newRound
 
+    def set_waiting_cmd_opts(self, jsonObj):
+        self.__waiting_cmds = jsonObj
 
 
 

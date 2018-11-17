@@ -94,4 +94,4 @@ class Player(ExtAttrs):
         PlayManager.send_err_pack_to_client(self.__sock_conn, cmd, err_code)
 
     def send_server_cmd_packet(self, pack):
-        PlayManager.send_pack_to_client(self.__sock_conn, pack)
+        return PlayManager.send_pack_to_client(self.__sock_conn, pack)

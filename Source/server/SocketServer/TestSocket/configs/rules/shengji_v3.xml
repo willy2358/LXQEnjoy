@@ -245,8 +245,8 @@
                     <case value_of="@round.bank_ctype" ret_is="none"/>
                 </cases>
                 <act_opts timeout="30" timeout_act="pass" to_player="@drawer">
-                    <act_ref act="jiaozhu" params="@drawn_card"/>
-                    <act_ref act="pass" params="none"/>
+                    <act_ref act="jiaozhu" param="@drawn_card"/>
+                    <act_ref act="pass" param="none"/>
                 </act_opts>
 
             </ift>
@@ -487,6 +487,11 @@
             <ift>
                 <case value_of=":(cpattern_name_of(@leading))" ret_is="shuai"/>
                 <cards cards=":(get_cards_of_ctype(@cards[0], count_of(@cards), @any_ctype))"/>
+            </ift>
+        </proc>
+        <proc name="proc_example" params="#player,#cards">
+            <ift value_of="#cards[0]" ret_is="s1">
+
             </ift>
         </proc>
     </procs>
