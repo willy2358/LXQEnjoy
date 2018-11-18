@@ -6,6 +6,7 @@ from Rooms.Lobby import *
 import Rooms.Room
 from Rooms.Closet import Closet
 import threading
+import Mains.Log as Log
 
 from Mains.Player import Player
 
@@ -52,6 +53,7 @@ class Client:
                 self.__closets[gameid].append(newCloset)
                 return newCloset
         except Exception as ex:
+            Log.exception(ex)
             return None
         finally:
             self.__closet_lock.release()

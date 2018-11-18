@@ -67,6 +67,11 @@ class Player(ExtAttrs):
         packet = InterProtocol.create_deal_cards_json_packet(self, cards)
         self.send_server_cmd_packet(packet)
 
+    def publish_message(self, msgTxt):
+        if msgTxt:
+            packet = InterProtocol.create_msg_packet(msgTxt)
+            self.send_server_cmd_packet(packet)
+
     def set_is_online(self, online=True):
         self.__is_online = online
         if not online:

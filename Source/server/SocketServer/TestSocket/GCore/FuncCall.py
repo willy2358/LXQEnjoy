@@ -38,6 +38,7 @@ class FuncCall(Operand):
                 elif self.__named_args:
                     if self.__func_name == "find_player" or self.__func_name == "find_players":
                         return self.filter_insts(scene, "@round.players")
+
                 else:
                     return None
             except Exception as ex:

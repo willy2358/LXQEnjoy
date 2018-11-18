@@ -24,6 +24,9 @@ class RulePart_Procs(RulePart):
         except Exception as ex:
             raise ex
 
+    def get_procs(self):
+        return self.__procs
+
     def add_proc(self, procStm):
         self.__procs.append(procStm)
 

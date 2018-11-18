@@ -58,6 +58,9 @@ server_push_freezed_cards = "frozen-cards"
 server_push_shown_card_groups = "shown-cards-groups"
 server_push_private_cards_count = "private-cards-count"
 server_push_pending_player = "pending-player"
+server_push_pub_msg = "pub-msg"
+
+pack_field_msg = "msg"
 
 cmd_data_cards = "cards"
 
@@ -133,6 +136,14 @@ def create_pending_player_packet(player):
         user_id: player.get_user_id()
     }
 
+    return packet
+
+def create_msg_packet(msg):
+    packet = {
+        cmd_type: server_cmd_type_push,
+        server_cmd_type_push: server_push_pub_msg,
+        pack_field_msg: server_push_pub_msg
+    }
     return packet
 
 def create_play_cards_packet(player, cards):

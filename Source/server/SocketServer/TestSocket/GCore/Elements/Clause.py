@@ -1,6 +1,7 @@
 
 from GCore.Operator import Operator
 from GCore.Statement import Statement
+import Mains.Log as Log
 
 class Clause(Statement):
     def __init__(self, Op = Operator.And):
@@ -44,7 +45,9 @@ class Clause(Statement):
             return None
         objs = []
         for stm in self.__true_statements:
-            rtObj = stm.gen_runtime_obj()
+            if not stm:
+                continue
+            rtObj = stm.gen_runtime_obj(scene)
             if rtObj:
                 objs.append(rtObj)
         return objs
@@ -54,7 +57,7 @@ class Clause(Statement):
             return None
         objs = []
         for stm in self.__false_statements:
-            rtObj = stm.gen_runtime_obj()
+            rtObj = stm.gen_runtime_obj(scene)
             if rtObj:
                 objs.append(rtObj)
         return objs
@@ -64,18 +67,22 @@ class Clause(Statement):
         cond = self.__case.gen_runtime_obj(scene)
         if not cond:
             return None
-        t_rt_objs = self.get_true_statements()
-        f_rt_objs = self.get_false_statements()
+        t_rt_objs = self.gen_true_runtime_objs(scene)
+        f_rt_objs = self.gen_false_runtime_objs(scene)
 
         def if_test():
-            if cond():
-                if t_rt_objs:
-                    for func in t_rt_objs:
-                        func()
-            else:
-                if f_rt_objs:
-                    for func in f_rt_objs:
-                        func()
-
+            try:
+                if cond():
+                    if t_rt_objs:
+                        for func in t_rt_objs:
+                            if callable(func):
+                                func()
+                else:
+                    if f_rt_objs:
+                        for func in f_rt_objs:
+                            if callable(func):
+                                func()
+            except Exception as ex:
+                Log.exception(ex)
         return if_test
 

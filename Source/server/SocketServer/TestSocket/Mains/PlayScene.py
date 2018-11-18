@@ -11,7 +11,7 @@ from GRules.RulePart_Procs import RulePart_Procs
 
 from GCore.Elements.Variable import Variable
 from GCore.Elements.Loop import Loop
-from GCore.Elements.ActRefs import ActRefs
+
 from GCore.Elements.ActRef import ActRef
 from GCore.Elements.ProcRef import ProcRef
 from GCore.Elements.Action import Action
@@ -46,6 +46,7 @@ class PlayScene(ExtAttrs):
         self.__cards_space = []
         self.__waiting_cmds = None
         self.__local_vars = {}
+        self.__procs = {}
         self.parse_rule(self.__rule)
 
     def is_player_in(self, player):
@@ -166,6 +167,7 @@ class PlayScene(ExtAttrs):
     def parse_rule(self, rule):
         self.load_cards_space(rule)
         self.load_scene_attrs(rule)
+        self.load_procedures(rule)
 
         partRun = rule.get_part_by_name(RulePart_Running.PART_NAME)
         assert partRun
@@ -201,6 +203,13 @@ class PlayScene(ExtAttrs):
                 val = attr.get_value()
                 self.add_cus_attr(name, vtype, val)
 
+    def load_procedures(self, rule):
+        procsPart = rule.get_part_by_name(RulePart_Procs.PART_NAME)
+        for proc in procsPart.get_procs():
+            func = proc.gen_runtime_obj(self)
+            if callable(func):
+                self.__procs[proc.get_name()] = (proc.get_param_names(), func)
+
     def start_game(self):
         self.init_player_type_attrs()
         self.create_new_round()
@@ -225,7 +234,19 @@ class PlayScene(ExtAttrs):
                     if val.get_value() == "random":
                         attrs[attr].set_value(self.__players[0])
 
+    def call_proc(self, proc_name, args):
+        if proc_name in self.__procs:
+            params = self.__procs[proc_name][0]
+            if params:
+                for i in range(len(params)):
+                    if i < len(args):
+                        gVar = self.get_proc_local_var(params[i])
+                        if gVar:
+                            gVar.set_value(args[i])
 
+            return self.__procs[proc_name][1]()
+        else:
+            return None
 
     def exe_block(self, code_block):
         pass

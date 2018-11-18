@@ -1,7 +1,7 @@
 
 from Mains.PlayCmd import PlayCmd
 from GCore.Statement import Statement
-from Mains.PlayScene import PlayScene
+# from Mains.PlayScene import PlayScene
 
 #<act_ref act="jiaozhu" param="@drawn_card"/>
 class ActRef(Statement):

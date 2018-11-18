@@ -221,6 +221,11 @@
     </round>
 
     <running>
+        <!--for debugging, start-->
+        <var name="test_var" value_type="cards" value="list:s1,s2,s3"/>
+        <update property="@test_var" value="list:s4,s5,s6"/>
+        <update property="@round.bank_cfigure" value=":(#proc_example(none, @test_var))"/>
+        <!--for debugging, end-->
 
         <update property="@round.defenders" value="@scene.defenders"/>
         <update property="@round.attacters" value="@scene.attacters"/>
@@ -490,9 +495,11 @@
             </ift>
         </proc>
         <proc name="proc_example" params="#player,#cards">
-            <ift value_of="#cards[0]" ret_is="s1">
-
+            <var name="#f_val" value_type="int" value="0"/>
+            <ift value_of=":(element_at(@#cards, 0))" ret_not_is="str:s1">
+                <update property="@#f_val" value="4"/>
             </ift>
+            <ret value="@#f_val"></ret>
         </proc>
     </procs>
 

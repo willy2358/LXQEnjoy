@@ -10,7 +10,7 @@ gameid = "shengji001"
 # roomid = 888
 # client = SocketClient.SocketClient("117.78.40.54", 9229)
 def msg_callback(jsonObj):
-    if jsonObj["sockresp"] == "reg-player" and jsonObj["result"] == "OK":
+    if "sockresp" in jsonObj and jsonObj["sockresp"] == "reg-player" and jsonObj["result"] == "OK":
         time.sleep(0.5)
         join_game()
 client = SocketClient.SocketClient("127.0.0.1", 9229, msg_callback)

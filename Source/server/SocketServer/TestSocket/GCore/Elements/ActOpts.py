@@ -3,7 +3,7 @@ from GCore.Statement import Statement
 from Mains.Player import Player
 
 import Mains.InterProtocol as InterProtocol
-from Mains.PlayScene import PlayScene
+# from Mains.PlayScene import PlayScene
 
 # <act_opts timeout="30" timeout_act="pass" to_player="@drawer">
 #                     <act_opt act="jiaozhu"/>

@@ -39,7 +39,7 @@ class Update(Statement):
             rawVal = rawVal.get_value()
 
         if self.__op == Operator.Update:
-            return rawVal
+            return opVal
         if not str(rawVal).isnumeric():
             return rawVal
 
