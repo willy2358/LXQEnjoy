@@ -222,9 +222,17 @@
 
     <running>
         <!--for debugging, start-->
-        <var name="test_var" value_type="cards" value="list:s1,s2,s3"/>
+        <!--<var name="test_var" value_type="cards" value="list:s1,s2,s3"/>
         <update property="@test_var" value="list:s4,s5,s6"/>
-        <update property="@round.bank_cfigure" value=":(#proc_example(none, @test_var))"/>
+        <update property="@round.bank_cfigure" value=":(#proc_example(none, @test_var))"/>-->
+        <!--for debugging, end-->
+
+        <!--for debugging, start-->
+        <var name="drawer1" value="@scene.init_drawer" value_type="player"/>
+        <act_opts timeout="30" timeout_act="pass" to_player="@drawer1">
+                    <act_ref act="jiaozhu" param="list:s2"/>
+                    <act_ref act="pass" param="none"/>
+        </act_opts>
         <!--for debugging, end-->
 
         <update property="@round.defenders" value="@scene.defenders"/>
@@ -232,8 +240,9 @@
         <update property="@round.bank_cfigure" value="@scene.bank_cfigure"/>
    
         
-        <var name="drawer" value="@scene.init_drawer" value_type="player"/>
+
         <var name="drawn_card" value="None" value_type="card"></var>
+        <var name="drawer" value="@scene.init_drawer" value_type="player"/>
 
         <!--底牌6张-->
         <draw_cards to_var="@round.kitty" count="6"></draw_cards>

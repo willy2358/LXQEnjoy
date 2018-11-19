@@ -14,6 +14,7 @@ class ActRef(Statement):
 
     def gen_runtime_obj(self, scene):
         def ret_cmd():
+            param = scene.get_obj_value(self.__param)
             cmd = PlayCmd(None, self.__ref_act_name, scene.get_obj_value(self.__param))
             return cmd
         return ret_cmd

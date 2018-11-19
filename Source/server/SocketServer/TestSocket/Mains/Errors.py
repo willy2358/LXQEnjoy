@@ -18,6 +18,8 @@ seat_id_occupied = 122
 invalid_player_clientid = 123
 player_not_registered = 124
 player_not_join_game = 125
+player_not_pending_cmd = 126
+invalid_cmd_or_param = 127
 
 
 
@@ -42,5 +44,7 @@ Errors = {
     seat_id_occupied : "seat has been occupied by other player",
     invalid_player_clientid: "Invalid clientid, please purchase service",
     player_not_registered:"Not registered player, should be registered by authorized organization",
-    player_not_join_game: "Not in game, should join game at first"
+    player_not_join_game: "Not in game, should join game at first",
+    player_not_pending_cmd: "Illegal player, should not send cmd when not been asked for",
+    invalid_cmd_or_param:"Invalid cmd or cmd arguments"
 }

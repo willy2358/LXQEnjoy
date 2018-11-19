@@ -18,6 +18,8 @@ def process_player_join_game(player, req_json):
 def process_player_request(player, req_json):
     if req_json[InterProtocol.sock_req_cmd].lower() == InterProtocol.client_req_cmd_join_game:
         process_player_join_game(player, req_json)
+    # elif req_json[InterProtocol.sock_req_cmd].lower() == InterProtocol.client_req_type_exe_cmd:
+    #     rnd = player.get_game_round
 
 
 def get_available_game_round(rule_id):

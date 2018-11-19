@@ -24,6 +24,7 @@ from GCore.Elements.Cases import Cases
 from GCore.VarRef import VarRef
 from Mains.Player import Player
 from GCore.FuncCall import FuncCall
+from GCore.GArray import GArray
 
 from Mains.GVar import GVar
 from GCore.ValueType import ValueType
@@ -32,6 +33,8 @@ from Mains.Round import Round
 from Cards import Card
 from GCore.CValue import CValue
 from Cards.CFigure import CFigure
+
+from Mains import Errors
 
 import Utils
 
@@ -44,7 +47,10 @@ class PlayScene(ExtAttrs):
         self.__rule = rule
         self.__runtimes = []
         self.__cards_space = []
-        self.__waiting_cmds = None
+        self.__pending_player = None
+        self.__pending_cmds = None
+        self.__pending_seconds = 0
+        self.__timeout_cmd = None
         self.__local_vars = {}
         self.__procs = {}
         self.parse_rule(self.__rule)
@@ -94,6 +100,8 @@ class PlayScene(ExtAttrs):
             return obj
         elif isinstance(obj, list):
             return obj
+        elif isinstance(obj, GArray):
+            return obj.gen_runtime_obj(self)()
         elif type(obj) is GVar:
             return self.get_obj_value(obj.get_value())
         elif isinstance(obj, CValue):
@@ -168,6 +176,7 @@ class PlayScene(ExtAttrs):
         self.load_cards_space(rule)
         self.load_scene_attrs(rule)
         self.load_procedures(rule)
+        self.load_actions(rule)
 
         partRun = rule.get_part_by_name(RulePart_Running.PART_NAME)
         assert partRun
@@ -209,6 +218,9 @@ class PlayScene(ExtAttrs):
             func = proc.gen_runtime_obj(self)
             if callable(func):
                 self.__procs[proc.get_name()] = (proc.get_param_names(), func)
+
+    def load_actions(self, rule):
+        pass
 
     def start_game(self):
         self.init_player_type_attrs()
@@ -265,8 +277,29 @@ class PlayScene(ExtAttrs):
         self.__history_rounds.append(newRound)
         self.__cur_round = newRound
 
-    def set_waiting_cmd_opts(self, jsonObj):
-        self.__waiting_cmds = jsonObj
+
+    def set_pending_player_and_cmds(self, player, cmds, timeout_seconds, timeout_act):
+        self.__pending_player = player
+        self.__pending_cmds = cmds
+        self.__pending_seconds = timeout_seconds
+        self.__timeout_cmd = timeout_act
+
+
+    def process_player_exed_cmd(self, player, cmd, cmd_args):
+        if player != self.__pending_player:
+            player.response_err_pack(Errors.player_not_pending_cmd)
+        else:
+            validCmd = False
+            for c in self.__pending_cmds:
+                if c.get_cmd() == cmd and cmd_args == c.get_cmd_param():
+                   validCmd = True
+
+            if not validCmd:
+                player.response_err_pack(Errors.invalid_cmd_or_param)
+            else:
+                pass
+
+
 
 
 

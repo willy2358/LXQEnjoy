@@ -38,8 +38,11 @@ class Closet:
         if self.__playScene.remove_player(player):
             self.publish_players_status()
 
-    def process_player_request(self, cmd, req_json):
-        pass
+    def process_player_request(self, player, cmd, req_json):
+        if cmd == InterProtocol.client_req_type_exe_cmd:
+            cmdTxt = req_json[InterProtocol.client_req_exe_cmd]
+            cmdArgs = req_json[InterProtocol.client_req_cmd_param]
+            self.__playScene.process_player_exed_cmd(player, cmdTxt, cmdTxt)
 
     def get_players_status(self):
         players = []
