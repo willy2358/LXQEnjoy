@@ -120,7 +120,7 @@ def create_cards_state_packet(player, isForOwn = True):
     packet = {
         cmd_type: server_cmd_type_push,
         server_cmd_type_push: server_push_cards_state,
-        user_id: player.get_user_id(),
+        user_id: player.get_userid(),
         server_push_private_cards_count:player.get_private_cards_count(),
         server_push_active_cards: player.get_active_cards() if isForOwn else [],
         server_push_freezed_cards: player.get_frozen_cards() if isForOwn else [],
@@ -133,7 +133,7 @@ def create_pending_player_packet(player):
     packet = {
         cmd_type: server_cmd_type_push,
         server_cmd_type_push: server_push_pending_player,
-        user_id: player.get_user_id()
+        user_id: player.get_userid()
     }
 
     return packet
@@ -160,7 +160,7 @@ def create_play_cards_packet(player, cards):
     packet = {
         cmd_type: server_cmd_type_push,
         server_cmd_type_push: server_push_play_cards,
-        user_id: player.get_user_id(),
+        user_id: player.get_userid(),
         cmd_data_cards: l_cards,
         player_state:state
     }
@@ -202,7 +202,7 @@ def create_player_exed_cmd_json_packet(player, cmd, cmd_data):
             server_cmd_type_push: server_push_player_exed_cmd,
             server_push_player_exed_cmd: cmd,
             server_push_cmd_param:cmd_data,
-            user_id:player.get_user_id()
+            user_id:player.get_userid()
         }
         return packet
 
@@ -242,7 +242,7 @@ def create_error_pack(req_cmd, errCode):
 def create_publish_bank_player_json_packet(bank_player):
     packet = {cmd_type: server_cmd_type_push,
            server_cmd_type_push: server_push_new_banker,
-           user_id: bank_player.get_user_id()
+           user_id: bank_player.get_userid()
            }
     return packet
 
@@ -250,10 +250,10 @@ def create_publish_bank_player_json_packet(bank_player):
 def create_winners_losers_json_packet(winners, losers):
     ws = []
     for p in winners:
-        ws.append({user_id:p.get_user_id(), server_push_score:p.get_won_score()})
+        ws.append({user_id:p.get_userid(), server_push_score:p.get_won_score()})
     ls = []
     for p in losers:
-        ls.append({user_id:p.get_user_id(),server_push_score:p.get_won_score()})
+        ls.append({user_id:p.get_userid(), server_push_score:p.get_won_score()})
     packet = {
         cmd_type: server_cmd_type_push,
         server_cmd_type_push: server_push_game_end,
@@ -274,7 +274,7 @@ def create_request_error_packet(player_req_cmd):
 def create_players_total_score_in_room(room):
     scores = []
     for p in room.get_scene_players():
-        scores.append({user_id: p.get_user_id(), server_push_score: room.get_player_total_score(p)})
+        scores.append({user_id: p.get_userid(), server_push_score: room.get_player_total_score(p)})
 
     packet = {
         cmd_type: server_cmd_type_push,
@@ -287,7 +287,7 @@ def create_players_total_score_in_room(room):
 def create_players_total_score_in_round(game_round):
     scores = []
     for p in game_round.get_players():
-        scores.append({user_id: p.get_user_id(), server_push_score: p.get_won_score()})
+        scores.append({user_id: p.get_userid(), server_push_score: p.get_won_score()})
 
     packet = {
         cmd_type: server_cmd_type_push,

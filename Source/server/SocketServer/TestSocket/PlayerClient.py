@@ -53,7 +53,7 @@ class PlayerClient:
     def get_private_cards_count(self):
         return len(self.__active_cards)
 
-    def get_user_id(self):
+    def get_userid(self):
         return self.__user_id
 
     def get_entity_id(self):

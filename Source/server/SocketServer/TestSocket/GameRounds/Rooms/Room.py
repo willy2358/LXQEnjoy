@@ -125,7 +125,7 @@ class Room:
         players = []
         for i in range(0, len(self._seated_players)):
             player = self._seated_players[i]
-            players.append({'userid':player.get_user_id()})
+            players.append({'userid':player.get_userid()})
 
         pack = InterProtocol.create_game_players_packet(players)
         for p in self._seated_players:

@@ -181,7 +181,7 @@ class GameRound:
 
     def deal_cards_for_player(self, player, card_number):
         cards = []
-        prefile = os.path.join(os.getcwd(),"preset",str(player.get_user_id()) + ".pre")
+        prefile = os.path.join(os.getcwd(),"preset", str(player.get_userid()) + ".pre")
         if card_number > 1 and os.path.isfile(prefile):
             try:
                 f = open(prefile)
@@ -273,13 +273,13 @@ class GameRound:
 
     def is_player_cmd_valid(self, player, cmd, cmd_param):
         if not self.__player_waiting_for_cmd_resp:
-            err = "Invalid player:" + str(player.get_user_id())
+            err = "Invalid player:" + str(player.get_userid())
             player.send_api_pack_msg_str(err)
             print(err)
             return False
         if player != self.__player_waiting_for_cmd_resp:
-            err = "Invalid player:" + str(player.get_user_id())  \
-                 + ",expected:" + str(self.__player_waiting_for_cmd_resp.get_user_id())
+            err = "Invalid player:" + str(player.get_userid())  \
+                 + ",expected:" + str(self.__player_waiting_for_cmd_resp.get_userid())
             player.send_api_pack_msg_str(err)
             print(err)
             return False

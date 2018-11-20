@@ -1,20 +1,37 @@
 from GCore.Statement import Statement
-
+import Mains.Log as Log
 # <action name="koupai" text="koupai">
 #             <send_cards_to_table cards="@selected_cards"/>
 #             <delay seconds="2"/>
 #             <pub_msg players="@round.players" msg="kou pai"></pub_msg>
-#         </action>
+# </action>
+# < !--对于action，其内部可访问两个隐含的参数：
+# @cmd_player: 执行此action的player
+#
+# @cmd_param :执行action传入的参数
+# -->
 class Action(Statement):
     def __init__(self, name):
         self.__name = name
         self.__statements = []
 
+    def get_name(self):
+        return self.__name
+
     def add_statement(self, stm):
         self.__statements.append(stm)
 
     def gen_runtime_obj(self, scene):
-        pass
+        def act_func():
+            try:
+                rtObjs = []
+                for c in self.__statements:
+                    func = c.gen_runtime_obj(scene)
+                    if callable(func):
+                        func()
+            except Exception as ex:
+                Log.exception(ex)
+        return act_func
 
 
 

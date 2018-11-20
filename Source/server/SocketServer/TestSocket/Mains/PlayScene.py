@@ -35,6 +35,7 @@ from GCore.CValue import CValue
 from Cards.CFigure import CFigure
 
 from Mains import Errors
+import Mains.InterProtocol as InterProtocol
 
 import Utils
 
@@ -51,8 +52,14 @@ class PlayScene(ExtAttrs):
         self.__pending_cmds = None
         self.__pending_seconds = 0
         self.__timeout_cmd = None
+
+        # for exec action
+        self.__cmd_player = None
+        self.__cmd_param = None
+
         self.__local_vars = {}
         self.__procs = {}
+        self.__actions = {} # {act_name: func}
         self.parse_rule(self.__rule)
 
     def is_player_in(self, player):
@@ -220,12 +227,20 @@ class PlayScene(ExtAttrs):
                 self.__procs[proc.get_name()] = (proc.get_param_names(), func)
 
     def load_actions(self, rule):
-        pass
+        actsPart = rule.get_part_by_name(RulePart_Actions.PART_NAME)
+        if not actsPart:
+            return
+
+        for act in actsPart.get_actions():
+            funcObj = act.gen_runtime_obj(self)
+            if callable(funcObj):
+                self.__actions[act.get_name()] = funcObj
 
     def start_game(self):
         self.init_player_type_attrs()
         self.create_new_round()
         for rtObj in self.__runtimes:
+
             rtObj()
 
         #
@@ -297,8 +312,18 @@ class PlayScene(ExtAttrs):
             if not validCmd:
                 player.response_err_pack(Errors.invalid_cmd_or_param)
             else:
-                pass
+                pack = InterProtocol.create_player_exed_cmd_json_packet(cmd, cmd_args)
+                for p in self.get_players():
+                    p.send_server_cmd_packet(pack)
 
+                # 准备参数
+                self.__cmd_player = player
+                self.__cmd_param = cmd_args
+
+                #执行内部逻辑
+                if cmd in self.__actions:
+                    if callable(self.__actions[cmd]):
+                        self.__actions[cmd]()
 
 
 
