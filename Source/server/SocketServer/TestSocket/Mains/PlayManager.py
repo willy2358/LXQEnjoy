@@ -120,7 +120,7 @@ def dispatch_player_commands(conn, comm_text):
 def send_pack_to_client(conn, pack):
     j_str = json.dumps(pack)
     msg = "LXQ<(:" + j_str + ":)>QXL"
-    send_msg_to_client(conn, msg)
+    return send_msg_to_client(conn, msg)
 
 def send_err_pack_to_client(clientConn, cmd, errCode):
     err_pack = InterProtocol.create_error_pack(cmd, errCode);

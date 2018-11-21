@@ -1,4 +1,5 @@
 import random
+import time
 
 from GRules.RulePart_Cards import RulePart_Cards
 from GRules.RulePart_Actions import RulePart_Actions
@@ -52,6 +53,7 @@ class PlayScene(ExtAttrs):
         self.__pending_cmds = None
         self.__pending_seconds = 0
         self.__timeout_cmd = None
+        self.__pending_start_tm = time.time() #seconds
 
         # for exec action
         self.__cmd_player = None
@@ -240,15 +242,24 @@ class PlayScene(ExtAttrs):
         self.init_player_type_attrs()
         self.create_new_round()
         for rtObj in self.__runtimes:
-
             rtObj()
+            self.waiting_for_player_exe_cmd()
 
-        #
-        # run_part = self.__rule.get_part_by_name(RulePart_Running.PART_NAME)
-        #
-        # codeBlocks = run_part.get_code_blocks()
-        # for i in range(len(codeBlocks)):
-        #     self.exe_block(codeBlocks[i])
+    def waiting_for_player_exe_cmd(self):
+        while self.__pending_player and self.__pending_cmds:
+            time.sleep(0.2)  # sleep 0.2 seconds
+
+            # 超时, 执行默认命令
+            if 0 < self.__pending_seconds < time.time() - self.__pending_start_tm:
+                if self.__timeout_cmd:
+                    defcmd = self.__timeout_cmd
+                else:
+                    defcmd = self.__pending_cmds[0]
+
+                cmd, cmd_param = defcmd.get_cmd(), defcmd.get_cmd_param()
+                self.process_player_exed_cmd(self.__pending_player, cmd, cmd_param)
+
+
     def init_player_type_attrs(self):
         if not self.__players:
             return
@@ -293,11 +304,15 @@ class PlayScene(ExtAttrs):
         self.__cur_round = newRound
 
 
-    def set_pending_player_and_cmds(self, player, cmds, timeout_seconds, timeout_act):
-        self.__pending_player = player
-        self.__pending_cmds = cmds
-        self.__pending_seconds = timeout_seconds
-        self.__timeout_cmd = timeout_act
+    def send_player_cmd_opts(self, player, cmds, timeout_seconds, timeout_act):
+        pack = InterProtocol.create_cmd_options_json_packet(player, cmds, timeout_act, timeout_seconds)
+        if player and player.send_server_cmd_packet(pack):
+            self.__pending_player = player
+            self.__pending_cmds = cmds
+            self.__pending_seconds = int(timeout_seconds)
+            self.__timeout_cmd = timeout_act
+            self.__pending_start_tm = time.time()
+
 
 
     def process_player_exed_cmd(self, player, cmd, cmd_args):
@@ -312,7 +327,7 @@ class PlayScene(ExtAttrs):
             if not validCmd:
                 player.response_err_pack(Errors.invalid_cmd_or_param)
             else:
-                pack = InterProtocol.create_player_exed_cmd_json_packet(cmd, cmd_args)
+                pack = InterProtocol.create_player_exed_cmd_json_packet(player, cmd, cmd_args)
                 for p in self.get_players():
                     p.send_server_cmd_packet(pack)
 
@@ -325,6 +340,9 @@ class PlayScene(ExtAttrs):
                     if callable(self.__actions[cmd]):
                         self.__actions[cmd]()
 
+                #重置，允许继续执行后面的命令
+                self.__pending_player = None
+                self.__pending_cmds = None
 
 
 
