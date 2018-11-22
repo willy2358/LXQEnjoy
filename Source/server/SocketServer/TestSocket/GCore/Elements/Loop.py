@@ -35,6 +35,7 @@ class Loop(Statement):
                     for func in rtObjs:
                         if callable(func):
                             func()
+                        scene.waiting_for_player_exe_cmd()
             except Exception as ex:
                 Log.exception(ex)
         return sub_proc

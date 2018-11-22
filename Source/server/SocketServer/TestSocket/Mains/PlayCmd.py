@@ -4,7 +4,7 @@ class PlayCmd:
         self.__player = player
         self.__cmd = cmd
         self.__cmd_param = []
-        if isinstance(cmd_param, type([])):
+        if isinstance(cmd_param, list):
             self.__cmd_param = cmd_param
         elif cmd_param:
             self.__cmd_param = [cmd_param]

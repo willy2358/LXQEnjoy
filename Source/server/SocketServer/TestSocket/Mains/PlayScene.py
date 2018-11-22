@@ -37,6 +37,7 @@ from Cards.CFigure import CFigure
 
 from Mains import Errors
 import Mains.InterProtocol as InterProtocol
+import Mains.Log as Log
 
 import Utils
 
@@ -248,7 +249,8 @@ class PlayScene(ExtAttrs):
     def waiting_for_player_exe_cmd(self):
         while self.__pending_player and self.__pending_cmds:
             time.sleep(0.2)  # sleep 0.2 seconds
-
+            if int(time.time()) % 2 == 0:
+                Log.debug("waiting for player {0} action ...".format(self.__pending_player.get_userid()))
             # 超时, 执行默认命令
             if 0 < self.__pending_seconds < time.time() - self.__pending_start_tm:
                 if self.__timeout_cmd:
@@ -340,9 +342,11 @@ class PlayScene(ExtAttrs):
                     if callable(self.__actions[cmd]):
                         self.__actions[cmd]()
 
+                Log.debug("player {0} exed action {1}".format(self.__pending_player.get_userid(), cmd))
                 #重置，允许继续执行后面的命令
                 self.__pending_player = None
                 self.__pending_cmds = None
+
 
 
 

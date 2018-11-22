@@ -63,9 +63,13 @@ while True:
             InterProtocol.user_id: userid,
             InterProtocol.room_id: roomid,
             InterProtocol.game_id: gameid,
-            InterProtocol.client_req_exe_cmd: cmd_opts[int(line)]["cmd"],
-            InterProtocol.client_req_cmd_param: cmd_opts[int(line)]["cmd-param"]
+            "clientid": "00001",
+            "token": client.get_token(),
+            InterProtocol.client_req_exe_cmd: cmd_opts[int(line)-1]["cmd"],
+            InterProtocol.client_req_cmd_param: cmd_opts[int(line)-1]["cmd-param"]
         }
+        str_obj = json.dumps(packet)
+        client.send_message(str_obj)
     elif ',' in line:
         cards = line.split(',')
         packet = {
@@ -74,6 +78,8 @@ while True:
             InterProtocol.user_id: userid,
             InterProtocol.room_id: roomid,
             InterProtocol.game_id: gameid,
+            "clientid": "00001",
+            "token": client.get_token(),
             InterProtocol.cmd_data_cards: cards,
         }
 
