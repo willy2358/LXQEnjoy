@@ -34,6 +34,7 @@ from Mains.Round import Round
 from Cards import Card
 from GCore.CValue import CValue
 from Cards.CFigure import CFigure
+from Cards.CType import CType
 
 from Mains import Errors
 import Mains.InterProtocol as InterProtocol
@@ -96,6 +97,10 @@ class PlayScene(ExtAttrs):
             return self.get_attr(varStr[len("@scene."):])
         elif varStr.startswith("@#"):
             return self.get_proc_local_var(varStr.lstrip("@"))
+        elif varStr.startswith("@cmd_param"):
+            return self.__cmd_param
+        elif varStr.startswith("@cmd_player"):
+            return self.__cmd_player
         elif varStr.startswith("@"):
             return self.get_var(varStr.lstrip("@"))
         else:
@@ -104,6 +109,8 @@ class PlayScene(ExtAttrs):
     def get_obj_value(self, obj):
         if isinstance(obj, CFigure):
             return int(obj)
+        if isinstance(obj, CType):
+            return obj
         elif isinstance(obj, int) or isinstance(obj, bool) or isinstance(obj, str):
             return obj
         elif isinstance(obj, Player):
@@ -249,7 +256,7 @@ class PlayScene(ExtAttrs):
     def waiting_for_player_exe_cmd(self):
         while self.__pending_player and self.__pending_cmds:
             time.sleep(0.2)  # sleep 0.2 seconds
-            if int(time.time()) % 2 == 0:
+            if int(time.time()) % 6 == 0:
                 Log.debug("waiting for player {0} action ...".format(self.__pending_player.get_userid()))
             # 超时, 执行默认命令
             if 0 < self.__pending_seconds < time.time() - self.__pending_start_tm:
@@ -288,9 +295,6 @@ class PlayScene(ExtAttrs):
         else:
             return None
 
-    def exe_block(self, code_block):
-        pass
-
     def create_new_round(self):
         newRound = Round()
         roundPart = self.__rule.get_part_by_name(RulePart_Round.PART_NAME)
@@ -324,7 +328,8 @@ class PlayScene(ExtAttrs):
             validCmd = False
             for c in self.__pending_cmds:
                 if c.get_cmd() == cmd and cmd_args == c.get_cmd_param():
-                   validCmd = True
+                    validCmd = True
+                    break
 
             if not validCmd:
                 player.response_err_pack(Errors.invalid_cmd_or_param)

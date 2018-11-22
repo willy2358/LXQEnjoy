@@ -54,7 +54,7 @@ class Player(ExtAttrs):
         self.__token = token
 
     def set_closet(self, closet):
-        return self.__closet
+        self.__closet = closet
 
     def set_seatid(self, seatid):
         self.__seatid = seatid

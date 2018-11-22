@@ -13,6 +13,8 @@ def parse_ctype(strCtype, gType = GType.Poker):
             return CType.P_Heart
         elif strCtype.startswith('j'):
             return CType.P_Joker
+        elif strCtype.startswith('s'):
+            return CType.P_Spade
         elif strCtype.startswith('*'):
             return CType.Any
         elif strCtype.startswith('-'):

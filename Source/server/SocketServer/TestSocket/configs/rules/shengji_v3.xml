@@ -229,7 +229,7 @@
 
         <!--for debugging, start-->
         <var name="drawer1" value="@scene.init_drawer" value_type="player"/>
-        <act_opts timeout="30" timeout_act="pass" to_player="@drawer1">
+        <act_opts timeout="500" timeout_act="pass" to_player="@drawer1">
                     <act_ref act="jiaozhu" param="list:s2"/>
                     <act_ref act="pass" param="none"/>
         </act_opts>
@@ -519,7 +519,8 @@
     <actions>
         <!--叫主-->
         <action name="jiaozhu">
-            <update property="@round.bank_ctype" value=":(ctype_of(@token_card))"/>
+            <var name="#jiaozhu_card" value_type="card" value=":(element_at(@cmd_param, 0))"/>
+            <update property="@round.bank_ctype" value=":(ctype_of(@#jiaozhu_card))"/>
         </action>
 
         <action name="liuju">

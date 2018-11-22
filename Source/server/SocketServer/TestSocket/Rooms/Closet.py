@@ -32,7 +32,12 @@ class Closet:
         return self.__playScene.has_vacancy()
 
     def add_player(self, player):
-        return self.__playScene.add_player(player)
+        if self.__playScene.add_player(player):
+            player.set_closet(self)
+            return True
+        else:
+            return False
+
 
     def remove_player(self, player):
         if self.__playScene.remove_player(player):
@@ -42,7 +47,7 @@ class Closet:
         if cmd == InterProtocol.client_req_type_exe_cmd:
             cmdTxt = req_json[InterProtocol.client_req_exe_cmd]
             cmdArgs = req_json[InterProtocol.client_req_cmd_param]
-            self.__playScene.process_player_exed_cmd(player, cmdTxt, cmdTxt)
+            self.__playScene.process_player_exed_cmd(player, cmdTxt, cmdArgs)
 
     def get_players_status(self):
         players = []
