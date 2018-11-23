@@ -519,8 +519,7 @@
     <actions>
         <!--叫主-->
         <action name="jiaozhu">
-            <var name="#jiaozhu_card" value_type="card" value=":(element_at(@cmd_param, 0))"/>
-            <update property="@round.bank_ctype" value=":(ctype_of(@#jiaozhu_card))"/>
+            <update property="@round.bank_ctype" value=":(ctype_of(element_at(@cmd_param, 0)))"/>
         </action>
 
         <action name="liuju">

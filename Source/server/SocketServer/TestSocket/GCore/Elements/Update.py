@@ -59,25 +59,16 @@ class Update(Statement):
     def gen_runtime_obj(self, scene):
         def updates():
             try:
-                # valObj = self.get_rt_value(scene)
                 opVal = scene.get_obj_value(self.__opVal)
-
-                # val = scene.get_obj_value(valObj)
 
                 if isinstance(self.__prop, VarRef):
                     rtVar = scene.get_rt_var(self.__prop)
                     if rtVar:
                         oriVal = scene.get_obj_value(rtVar)
-
-                        # var = scene.get_obj_value(self.__prop)
                         fininal_val = self.get_result(scene, oriVal, opVal)
                         rtVar.set_value(fininal_val)
-                    # scene.set_obj_value(self.__prop, fininal_val)
                 elif type(self.__prop) is AttrName and self.__targets:
                     targets = scene.get_obj_value(self.__targets)
-                    # func1 = self.__targets.gen_runtime_obj(scene)
-                    # if func1:
-                    #     targets = func1()
                     for t in targets:
                         o_val = t.get_prop(self.__prop.get_name())
                         if o_val :
