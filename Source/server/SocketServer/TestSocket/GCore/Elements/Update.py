@@ -62,11 +62,16 @@ class Update(Statement):
                 opVal = scene.get_obj_value(self.__opVal)
 
                 if isinstance(self.__prop, VarRef):
+                    objs = []
                     rtVar = scene.get_rt_var(self.__prop)
-                    if rtVar:
-                        oriVal = scene.get_obj_value(rtVar)
+                    if isinstance(rtVar, list):
+                        objs = rtVar[:]
+                    elif rtVar:
+                        objs.append(rtVar)
+                    for obj in objs:
+                        oriVal = scene.get_obj_value(obj)
                         fininal_val = self.get_result(scene, oriVal, opVal)
-                        rtVar.set_value(fininal_val)
+                        obj.set_value(fininal_val)
                 elif type(self.__prop) is AttrName and self.__targets:
                     targets = scene.get_obj_value(self.__targets)
                     for t in targets:

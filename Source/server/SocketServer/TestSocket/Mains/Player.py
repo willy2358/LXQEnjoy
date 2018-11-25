@@ -44,7 +44,10 @@ class Player(ExtAttrs):
     def get_is_robot_play(self):
         return self.__is_robot_play
 
-    def is_attr_meet(self, attrName, testVal):
+    def has_cards(self, cards):
+        for c in cards:
+            if c not in self.__cards_in_hand:
+                return False
         return True
 
     def set_sock_conn(self, conn):

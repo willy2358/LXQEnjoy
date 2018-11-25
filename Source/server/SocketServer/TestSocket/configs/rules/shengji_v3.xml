@@ -228,19 +228,20 @@
         <!--for debugging, end-->
 
         <!--for debugging, start-->
+        <!--
+        <update property="@players.[].Score" value="20"/>-->
         <var name="drawer1" value="@scene.init_drawer" value_type="player"/>
         <act_opts timeout="500" timeout_act="pass" to_player="@drawer1">
-                    <act_ref act="jiaozhu" param="list:s2"/>
+                    <act_ref act="koupai" param="list:s2"/>
                     <act_ref act="pass" param="none"/>
         </act_opts>
+
         <!--for debugging, end-->
 
         <update property="@round.defenders" value="@scene.defenders"/>
         <update property="@round.attacters" value="@scene.attacters"/>
         <update property="@round.bank_cfigure" value="@scene.bank_cfigure"/>
    
-        
-
         <var name="drawn_card" value="None" value_type="card"></var>
         <var name="drawer" value="@scene.init_drawer" value_type="player"/>
 
@@ -254,15 +255,14 @@
 
             <!--摸到将牌，可以叫主，前提是还没主-->
             <ift>
-                <cases>
+                <cases op="and">
                     <case value_of=":(cfigure_of(@drawn_card))" ret_as="@round.bank_cfigure"/>
                     <case value_of="@round.bank_ctype" ret_is="none"/>
                 </cases>
                 <act_opts timeout="30" timeout_act="pass" to_player="@drawer">
                     <act_ref act="jiaozhu" param="@drawn_card"/>
-                    <act_ref act="pass" param="none"/>
+                    <act_ref act="pass_jiaozhu" param="none"/>
                 </act_opts>
-
             </ift>
 
             <update property="@drawer" value=":(next_player_of(@drawer))"/>
@@ -283,11 +283,12 @@
             </ift>
         </ift>
 
+        <var name="main_defender" value_type="player" value=":(find_player(IsMainPlayer:true))"/>
         <!--底牌归于主打-->
-        <deal_cards count="6" player=":(find_player(IsMainPlayer:true))"></deal_cards>
+        <send_cards cards="@round.kitty" player="@main_defender"></send_cards>
 
         <!--等待主打扣牌-->
-        <act_opts timeout="30" timeout_act="force_koupai" to_player=":(find_player(IsMainPlayer:true))">
+        <act_opts timeout="30" timeout_act="force_koupai" to_player="@main_defender">
                 <act_ref act="koupai"/>
                 <act_ref act="force_koupai"/>
         </act_opts>
@@ -410,7 +411,7 @@
                 <else>
                     <!--攻守角色互换-->
                     <then>
-                        <update property="IsDefender" targets="@round.winners" value="true"/>
+                        <update property="@round.winners.[].IsDefender" value="true"/>
                         <update property="IsAttacter" targets="@round.winners" value="false"/>
                        
                         
@@ -520,17 +521,36 @@
         <!--叫主-->
         <action name="jiaozhu">
             <update property="@round.bank_ctype" value=":(ctype_of(element_at(@cmd_param, 0)))"/>
+            <ift value_of="@round.defenders" ret_is="none">
+                <!--第一局-->
+                <then>
+                    <!--设置防守方-->
+                    <update property="@round.defenders" op="add" value="@cmd_player"/>
+                    <update property="@round.defenders" op="add" value=":(next_player_of(@cmd_player,2))"/>
+                    <update property="@cmd_player.IsMainPlayer" value="true"/>
+                    
+                    <!--设置进攻方-->
+                    <update property="@round.attacters" op="add" value=":(next_player_of(@cmd_player,1))"/>
+                    <update property="@round.attacters" op="add" value=":(next_player_of(@cmd_player,1))"/>
+                </then>
+            </ift>
         </action>
 
         <action name="liuju">
             <pub_msg players="@round.players" message="liu ju"/>
         </action>
 
-        <action name="pass" text="pass">
+        <action name="pass_jiaozhu" text="pass">
 
         </action>>
 
         <action name="koupai" text="koupai">
+            <check_param>
+                <cases op="and">
+                    <case value_of=":(count_of(@cmd_param))" ret_is="6"></case>
+                    <case value_of=":(player_has_cards(@cmd_player, @cmd_param))" ret_is="true"/>
+                </cases>
+            </check_param>
             <send_cards_to_table cards="@selected_cards"/>
             <delay seconds="2"/>
             <pub_msg players="@round.players" msg="kou pai"></pub_msg>

@@ -63,7 +63,7 @@ class PlayScene(ExtAttrs):
 
         self.__local_vars = {}
         self.__procs = {}
-        self.__actions = {} # {act_name: func}
+        self.__actions = {} # {act_name: (check_param, func)}
         self.parse_rule(self.__rule)
 
     def is_player_in(self, player):
@@ -89,20 +89,39 @@ class PlayScene(ExtAttrs):
         else:
             return None
 
+    # scene has default attribute:players
     def get_runtime_objs(self, varStr):
+        varStr = varStr.strip()
         if varStr.startswith("@round."):
             r = self.get_current_round()
             return r.get_attr(varStr[len("@round."):])
         elif varStr.startswith("@scene."):
             return self.get_attr(varStr[len("@scene."):])
+        elif varStr == "@players":
+            return self.get_attr("players")
+        elif varStr == "@cmd_param":
+            return self.__cmd_param
+        elif varStr == "@cmd_player":
+            return self.__cmd_player
         elif varStr.startswith("@#"):
             return self.get_proc_local_var(varStr.lstrip("@"))
-        elif varStr.startswith("@cmd_param"):
-            return self.__cmd_param
-        elif varStr.startswith("@cmd_player"):
-            return self.__cmd_player
         elif varStr.startswith("@"):
-            return self.get_var(varStr.lstrip("@"))
+            if ".[]." in varStr:
+                # format  "@players.[].IsMainPlayer"
+                ps = varStr.split(".[].")
+                objsVar = self.get_runtime_objs(ps[0])
+                insts = self.get_obj_value(objsVar)
+                if isinstance(insts, list):
+                    attrObjs = []
+                    for inst in insts:
+                        # inst is a ExtAttrs, mostly a player
+                        attrObjs.append(inst.get_prop(ps[1].lstrip('@')))
+                    return attrObjs
+                else:
+                    return objsVar
+            else:
+                # format @player
+                return self.get_var(varStr.lstrip("@"))
         else:
             return None
 
@@ -135,6 +154,14 @@ class PlayScene(ExtAttrs):
     def get_rt_var(self, obj):
         if isinstance(obj, GVar):
             return obj
+        elif isinstance(obj, list):
+            varsList = []
+            for o in obj:
+                if isinstance(o, GVar):
+                    varsList.append(o)
+                else:
+                    varsList.append(self.get_rt_var(o))
+            return varsList
         elif isinstance(obj, VarRef):
             return self.get_rt_var(obj.gen_runtime_obj(self)())
         elif callable(obj):
@@ -244,7 +271,7 @@ class PlayScene(ExtAttrs):
         for act in actsPart.get_actions():
             funcObj = act.gen_runtime_obj(self)
             if callable(funcObj):
-                self.__actions[act.get_name()] = funcObj
+                self.__actions[act.get_name()] = (act.gen_param_check_func(self), funcObj)
 
     def start_game(self):
         self.init_player_type_attrs()
@@ -280,6 +307,7 @@ class PlayScene(ExtAttrs):
                 if type(val) is CValue:
                     if val.get_value() == "random":
                         attrs[attr].set_value(self.__players[0])
+        self.add_cus_attr("players", ValueType.players, self.__players)
 
     def call_proc(self, proc_name, args):
         if proc_name in self.__procs:
@@ -306,6 +334,7 @@ class PlayScene(ExtAttrs):
                 newRound.add_cus_attr(name, vtype, val)
 
         newRound.init_cards_pack(self.__cards_space)
+        newRound.add_cus_attr("players", ValueType.players, self.__players)
         self.__history_rounds.append(newRound)
         self.__cur_round = newRound
 
@@ -323,34 +352,52 @@ class PlayScene(ExtAttrs):
 
     def process_player_exed_cmd(self, player, cmd, cmd_args):
         if player != self.__pending_player:
-            player.response_err_pack(Errors.player_not_pending_cmd)
+            player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.player_not_pending_cmd)
         else:
-            validCmd = False
+            cmdObj = None
             for c in self.__pending_cmds:
-                if c.get_cmd() == cmd and cmd_args == c.get_cmd_param():
-                    validCmd = True
+                if c.get_cmd() == cmd:
+                    cmdObj = c
                     break
 
-            if not validCmd:
-                player.response_err_pack(Errors.invalid_cmd_or_param)
-            else:
-                pack = InterProtocol.create_player_exed_cmd_json_packet(player, cmd, cmd_args)
-                for p in self.get_players():
-                    p.send_server_cmd_packet(pack)
+            if not cmdObj:
+                player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_or_param)
 
-                # 准备参数
-                self.__cmd_player = player
-                self.__cmd_param = cmd_args
+            act_stms = None
+            if cmd in self.__actions:
+                act_stms = self.__actions[cmd]
 
-                #执行内部逻辑
-                if cmd in self.__actions:
-                    if callable(self.__actions[cmd]):
-                        self.__actions[cmd]()
+            if not act_stms:
+                Log.error("Lacking action configuration")
+                player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_or_param)
+                return
 
-                Log.debug("player {0} exed action {1}".format(self.__pending_player.get_userid(), cmd))
-                #重置，允许继续执行后面的命令
-                self.__pending_player = None
-                self.__pending_cmds = None
+            # 准备参数
+            self.__cmd_player = player
+            self.__cmd_param = cmd_args
+
+            if callable(act_stms[0]): # has param checker
+                # 优先使用param_check检查参数
+                ret = act_stms[0]()
+                if not ret:
+                    player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_or_param)
+                    return
+            elif cmdObj.get_cmd_param() != cmd_args:
+                player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_or_param)
+                return
+
+            pack = InterProtocol.create_player_exed_cmd_json_packet(player, cmd, cmd_args)
+            for p in self.get_players():
+                p.send_server_cmd_packet(pack)
+
+            #执行内部逻辑
+            if callable(act_stms[1]):
+                act_stms[1]()
+
+            Log.debug("player {0} exed action {1}".format(self.__pending_player.get_userid(), cmd))
+            #重置，允许继续执行后面的命令
+            self.__pending_player = None
+            self.__pending_cmds = None
 
 
 

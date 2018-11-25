@@ -14,12 +14,21 @@ class Action(Statement):
     def __init__(self, name):
         self.__name = name
         self.__statements = []
+        self.__check_param = None
 
     def get_name(self):
         return self.__name
 
     def add_statement(self, stm):
         self.__statements.append(stm)
+
+    def set_check_param_statement(self, stm):
+        self.__check_param = stm
+
+    def gen_param_check_func(self, scene):
+        if not self.__check_param:
+            return None
+        return self.__check_param.gen_runtime_obj(scene)
 
     def gen_runtime_obj(self, scene):
         def act_func():
