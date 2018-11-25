@@ -195,6 +195,8 @@
         <attr name="sum_score" value_type="int" value="0"/>
         <attr name="Score" value_type="int" value="0"/>
         <attr name="IsTrickWinner" value_type="bool" value="false"/>
+        <attr name="trick_cards" value_type="cards" value="none"/>
+        <attr name="trick_power" value_type="int" value="0"/>
     </players>
 
     <!--一圈-->
@@ -218,6 +220,7 @@
             <attr name="init_drawer" value_type="player" value="random"/>
             <attr name="kitty" value_type="cards" value="none"/>
             <attr name="koupai" value_type="cards" value="none"/>
+            <attr name="trick_leading_player" value_type="player" value="none"/>
         </attrs>
     </round>
 
@@ -230,13 +233,13 @@
 
         <!--for debugging, start-->
         <!--
-        <update property="@players.[].Score" value="20"/>-->
+        <update property="@players.[].Score" value="20"/>
         <var name="drawer1" value="@scene.init_drawer" value_type="player"/>
         <act_opts timeout="500" timeout_act="pass" to_player="@drawer1">
                     <act_ref act="koupai" param="list:s2"/>
                     <act_ref act="pass" param="none"/>
         </act_opts>
-
+        -->
         <!--for debugging, end-->
 
         <update property="@round.defenders" value="@scene.defenders"/>
@@ -294,37 +297,34 @@
                 <act_ref act="force_koupai" hidden="true"/>
         </act_opts>
 
+        <update property="@round.trick_leading_player" value="@main_defender"/>
         <var name="trick_init_player" value_type="player" value="@main_defender"/>
-        <var name="valid_leading_cards" value_type="bool" value="false"/>
+        <var name="is_valid_leading_cards" value_type="bool" value="false"/>
         <!--进入打牌，从主打开始, 一局结束，主打手里没牌-->
-        <loop_until value_of=":(count_of(player_cards_of_free(@trick_init_player)))" ret_gt="0">
-            <loop_until value_of="@valid_leading_cards" ret_is="false">
+        <loop_until value_of=":(count_of(player_cards_of_free(@round.trick_leading_player)))" ret_gt="0">
+            <loop_until value_of="@is_valid_leading_cards" ret_is="false">
                 <act_opts timeout="30" timeout_act="force_chupai" to_player="@trick_init_player">
                         <act_ref act="playcard"/>
                         <act_ref act="force_chupai" hidden="true"/>
                 </act_opts>
-
-                <update property="@valid_leading_cards" value=":(#is_valid_leading_cards(@trick_init_player.played_cards))"/>
             </loop_until>
 
             <var name="sorder" value_type="int" value="1"/>
-            <loop_until value_of="@sorder" ret_is="3">
+            <loop_until value_of="@sorder" ret_lt="4">
                 <var name="valid_following_cards" value_type="bool" value="false"/>
                 <var name="follower" value_type="player" value=":(next_player_of(@trick_init_player, @sorder))"/>
                 <loop_until value_of="@valid_following_cards" ret_is="false">
-
                     <act_opts timeout="30" timeout_act="force_chupai" to_player="@follower">
                             <act_ref act="playcard"/>
-                            <act_ref act="force_chupai"/>
+                            <act_ref act="force_chupai" hidden="true"/>
                     </act_opts>
-
-                    <update property="@valid_following_cards" value=":(#is_valid_following_cards(@follower.played_cards)"/>
                 </loop_until>
+                <update property="@sorder" op="add" value="1"/>
             </loop_until>
 
             <proc_ref proc="@trick.end"/>
             <update property="@trick_init_player" value="@trick.winner"/>
-
+            <update property="@round.trick_leading_player" value="@trick_init_player"/>
         </loop_until>
 
         <!--出牌结束，确定一局输赢玩家-->
@@ -360,12 +360,55 @@
                 </else>
             </ift>
         </proc>
-        <proc name="is_valid_leading_cards">
+        <proc name="is_valid_leading_cards" params="#player, #cards">
+            <var name="#p2_valid_leading" value_type="bool" value="false"/>
+            <ift value_of=":(count_of(@#cards))" ret_is="1">
+                <update property="@#p2_valid_leading" value="true"></update>
+            </ift>
 
+            <ift>
+                <!--4色同点-->
+                <cases op="and">
+                    <!--前提，任需探测-->
+                    <case value_of="@#p2_valid_leading" ret_is="false"/>
+                    <case value_of=":(count_of(@#cards))" ret_is="4"></case>
+                    <case value_of=":(is_cards_same_cfigure(@#cards))" ret_is="true"/>
+                    <case value_of=":(ctype_count_of_cards(@#cards))" ret_is="4"/>
+                </cases>
+                <update property="@#p2_valid_leading" value="true"></update>
+            </ift>
+
+            <ift value_of="@#p2_valid_leading" ret_is="false">
+                <var name="#p2_ctype" value_type="int" value=":(ctype_of(element_at(@#cards,0)))"/>
+                <var name="#p2_other_cards" value_type="cards" value="none"/>
+                <var name="#p2_sorder" value_type="int" value="1"/>
+                <var name="#p2_next_player" value="none" value_type="player"/>
+                <loop_until value_of="@#p2_sorder" ret_lt="4">
+                    <update property="@#p2_next_player" value=":(next_player_of(@#player, @#p2_sorder))"/>
+                    <update property="@#p2_other_cards" op="add" value=":(player_cards_of_ctype(@#p2_next_player, @#p2_ctype))"/>
+                </loop_until>
+            </ift>
+            <ift>
+                <!--甩牌-->
+                <cases op="and">
+                    <!--前提，任需探测-->
+                    <case value_of="@#p2_valid_leading" ret_is="false"/>
+                    <!--同色-->
+                    <case value_of=":(is_cards_same_ctype(@#cards))" ret_is="true" />
+                    <!--不能是主-->
+                    <case value_of=":(ctype_of(element_at(@#cards,0)))" ret_not_as="@round.bank_ctype"/>
+                    <!--其他玩家没有大过的牌-->
+                    <case value_of=":(min_cfigure_of_cards(@#cards))" ret_gt_as=":(max_cfigure_of_cards(@#p2_other_cards))" />
+                </cases>
+                <update property="@#p2_valid_leading" value="true"></update>
+            </ift>
+
+            <ret value="@#p2_valid_leading"></ret>
         </proc>
 
-        <proc name="is_valid_following_cards">
-
+        <proc name="is_valid_following_cards" params="#player,#cards">
+            <var name="#ivfc_valid_following" value_type="bool" value="false"/>
+            <ret value="@#ivfc_valid_following"/>
         </proc>
 
         <proc name="round_end">
@@ -560,8 +603,23 @@
             <playcards player="@cmd_player" cards="@cmd_param" alias="kuopai" faces_up="false"/>
         </action>
 
-        <action name="chupai" text="chupai">
-            <playcards cards="@selected_cards"/>
+        <action name="playcard" text="chupai">
+            <ift value_of="@cmd_player" ret_as="@round.trick_leading_player">
+                <then>
+                    <update property="@is_valid_leading_cards" value=":(#is_valid_leading_cards(@cmd_player, @cmd_param))"/>
+                    <ift value_of="@is_valid_leading_cards" ret_is="true">
+                        <playcards player="@cmd_player" cards="@cmd_param" alias="chupai" faces_up="true"/>
+                        <update property="@round.trick_leading_cards" value="@cmd_param"/>
+                    </ift>
+                </then>
+                <else>
+                    <update property="@valid_following_cards" value=":(#is_valid_following_cards(@cmd_player, @cmd_param))"/>
+                    <ift value_of="@valid_following_cards" ret_is="true">
+                        <playcards player="@cmd_player" cards="@cmd_param" alias="chupai" faces_up="true"/>
+                    </ift>
+                </else>
+            </ift>
+
         </action>
 
         <action name="force_chupai">

@@ -704,7 +704,7 @@ score > 0 赢的分数，score < 0 输的分数
 	"roomid":123,
 	"gameid":123,
 	"token":"YMQV7AJWINUMJCM4AIOQ5HTW2PDGHJQN"
-	"cards": [11],
+	"cards": ['s1'],
 }
 
 5.2玩家响应
