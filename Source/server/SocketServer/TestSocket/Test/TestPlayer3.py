@@ -70,18 +70,34 @@ while True:
         }
         str_obj = json.dumps(packet)
         client.send_message(str_obj)
-    elif ',' in line:
-        cards = line.split(',')
-        packet = {
-            InterProtocol.cmd_type: InterProtocol.sock_req_cmd,
-            InterProtocol.sock_req_cmd: InterProtocol.client_req_play_cards,
-            InterProtocol.user_id: userid,
-            InterProtocol.room_id: roomid,
-            InterProtocol.game_id: gameid,
-            "clientid": "00001",
-            "token": client.get_token(),
-            InterProtocol.cmd_data_cards: cards,
-        }
-
-        str_obj = json.dumps(packet)
-        client.send_message(str_obj)
+    elif ':' in line:
+        parts = line.split(':')
+        cmd = parts[0]
+        cmd_param = parts[1].split(',')
+        if cmd == "play-cards":
+            packet = {
+                InterProtocol.cmd_type: InterProtocol.sock_req_cmd,
+                InterProtocol.sock_req_cmd: InterProtocol.client_req_play_cards,
+                InterProtocol.user_id: userid,
+                InterProtocol.room_id: roomid,
+                InterProtocol.game_id: gameid,
+                "clientid": "00001",
+                "token": client.get_token(),
+                InterProtocol.cmd_data_cards: cmd_param,
+            }
+            str_obj = json.dumps(packet)
+            client.send_message(str_obj)
+        else:
+            packet = {
+                InterProtocol.cmd_type: InterProtocol.sock_req_cmd,
+                InterProtocol.sock_req_cmd: InterProtocol.client_req_type_exe_cmd,
+                InterProtocol.user_id: userid,
+                InterProtocol.room_id: roomid,
+                InterProtocol.game_id: gameid,
+                "clientid": "00001",
+                "token": client.get_token(),
+                InterProtocol.client_req_exe_cmd: cmd,
+                InterProtocol.client_req_cmd_param: cmd_param
+            }
+            str_obj = json.dumps(packet)
+            client.send_message(str_obj)

@@ -3,8 +3,6 @@ import Cards.CType as CType
 import Cards.CFigure as CFigure
 import Mains.Log as Log
 
-
-
 # args <= card
 def ctype_of(scene, args):
     card = args[0]
@@ -64,6 +62,17 @@ def player_has_cards(scene, args):
     except Exception as ex:
         Log.exception(ex)
         return False
+
+def player_cards_of_free(scene, args):
+    pass
+
+def player_cards_of_shown(scene, args):
+    pass
+
+def player_cards_of_frozen(scene, args):
+    pass
+
+
 
 def to_list(scene, args):
     return args

@@ -217,6 +217,7 @@
             <!--起牌玩家，第一个摸牌的人-->
             <attr name="init_drawer" value_type="player" value="random"/>
             <attr name="kitty" value_type="cards" value="none"/>
+            <attr name="koupai" value_type="cards" value="none"/>
         </attrs>
     </round>
 
@@ -290,28 +291,26 @@
         <!--等待主打扣牌-->
         <act_opts timeout="30" timeout_act="force_koupai" to_player="@main_defender">
                 <act_ref act="koupai"/>
-                <act_ref act="force_koupai"/>
+                <act_ref act="force_koupai" hidden="true"/>
         </act_opts>
 
-        <var name="trick_init_player" value_type="player" value=":(find_player(IsMainPlayer:true))"/>
+        <var name="trick_init_player" value_type="player" value="@main_defender"/>
         <var name="valid_leading_cards" value_type="bool" value="false"/>
         <!--进入打牌，从主打开始, 一局结束，主打手里没牌-->
-        <loop_until value_of=":(cards_count_in_player_hand(@trick_init_player))" ret_gt="0">
+        <loop_until value_of=":(count_of(player_cards_of_free(@trick_init_player)))" ret_gt="0">
             <loop_until value_of="@valid_leading_cards" ret_is="false">
                 <act_opts timeout="30" timeout_act="force_chupai" to_player="@trick_init_player">
                         <act_ref act="playcard"/>
-                        <act_ref act="force_chupai"/>
+                        <act_ref act="force_chupai" hidden="true"/>
                 </act_opts>
-                
-                <ift value_of=":(is_valid_leading_cards(@trick_init_player.played_cards))" ret_is="true">
-                    <update property="@valid_leading_cards" value="true"/>
-                </ift>
+
+                <update property="@valid_leading_cards" value=":(#is_valid_leading_cards(@trick_init_player.played_cards))"/>
             </loop_until>
 
             <var name="sorder" value_type="int" value="1"/>
             <loop_until value_of="@sorder" ret_is="3">
                 <var name="valid_following_cards" value_type="bool" value="false"/>
-                <var name="follower" value_type="player" value=":(find_player(seatid:(@trick_init_player.seatid + @sorder)))"/>
+                <var name="follower" value_type="player" value=":(next_player_of(@trick_init_player, @sorder))"/>
                 <loop_until value_of="@valid_following_cards" ret_is="false">
 
                     <act_opts timeout="30" timeout_act="force_chupai" to_player="@follower">
@@ -319,14 +318,12 @@
                             <act_ref act="force_chupai"/>
                     </act_opts>
 
-                    <ift value_of=":(is_valid_following_cards(@follower.played_cards))" ret_is="true">
-                        <update property="@valid_following_cards" value="true"/>
-                    </ift>
+                    <update property="@valid_following_cards" value=":(#is_valid_following_cards(@follower.played_cards)"/>
                 </loop_until>
             </loop_until>
 
-            <update property="@trick_init_player" value="@trick.winner"/>
             <proc_ref proc="@trick.end"/>
+            <update property="@trick_init_player" value="@trick.winner"/>
 
         </loop_until>
 
@@ -363,6 +360,14 @@
                 </else>
             </ift>
         </proc>
+        <proc name="is_valid_leading_cards">
+
+        </proc>
+
+        <proc name="is_valid_following_cards">
+
+        </proc>
+
         <proc name="round_end">
             <lets>
                 <!--进攻方分数<40，防守方赢 -->
@@ -551,9 +556,8 @@
                     <case value_of=":(player_has_cards(@cmd_player, @cmd_param))" ret_is="true"/>
                 </cases>
             </check_param>
-            <send_cards_to_table cards="@selected_cards"/>
-            <delay seconds="2"/>
-            <pub_msg players="@round.players" msg="kou pai"></pub_msg>
+            <update property="@round.koupai" value="@cmd_param"/>
+            <playcards player="@cmd_player" cards="@cmd_param" alias="kuopai" faces_up="false"/>
         </action>
 
         <action name="chupai" text="chupai">
@@ -564,10 +568,9 @@
             <playcards cards=":(select_random_cards(count=1))"/>
         </action>
 
-        <action name="force_koupai" text="none" >
-            <send_cards_to_table cards=":(select_random_cards(count=6))"/>
-            <delay seconds="3"></delay>
-            <pub_msg players="@round.players" msg="kou pai" ></pub_msg>
+        <action name="force_koupai" text="none">
+            <pick_cards from_player="@cmd_player" count="6" to_var="@round.koupai"/>
+            <playcards player="@cmd_player" cards="@round.koupai" alias="kuopai" cards_face_up="false"/>
         </action>
     </actions>
 </rule>

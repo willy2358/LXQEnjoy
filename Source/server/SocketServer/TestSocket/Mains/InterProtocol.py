@@ -61,6 +61,7 @@ server_push_pending_player = "pending-player"
 server_push_pub_msg = "pub-msg"
 
 pack_field_msg = "msg"
+pack_field_silent="silent"
 
 cmd_data_cards = "cards"
 
@@ -209,7 +210,7 @@ def create_player_exed_cmd_json_packet(player, cmd, cmd_data):
 def create_cmd_options_json_packet(player, cmd_options, def_cmd=None, resp_timeout=-1):
     opts = []
     for v in cmd_options:
-        opts.append({client_req_exe_cmd:v.get_cmd(),server_push_cmd_param:v.get_cmd_param()})
+        opts.append({client_req_exe_cmd:v.get_cmd(),server_push_cmd_param:v.get_cmd_param(), pack_field_silent:v.is_silent()})
 
     packet = {
         cmd_type: server_cmd_type_push,
