@@ -45,9 +45,13 @@ class Player(ExtAttrs):
         return self.__is_robot_play
 
     def has_cards(self, cards):
-        for c in cards:
-            if c not in self.__cards_in_hand:
+        #考虑到cards中有多张相同牌的可能
+        tmpCards = self.__cards_in_hand[:]
+        for c in tmpCards:
+            if c not in self.tmpCards:
                 return False
+            else:
+                tmpCards.remove(c)
         return True
 
     def set_sock_conn(self, conn):
