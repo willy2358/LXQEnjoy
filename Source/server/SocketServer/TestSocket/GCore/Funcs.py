@@ -62,6 +62,23 @@ def is_cards_same_ctype(scene, args):
 def is_cards_same_cfigure(scene, args):
     pass
 
+# args: cards, ctype
+def is_cards_contain_ctype(scene, args):
+    pass
+
+# args: cards, cfigure
+def is_cards_contain_cfigure(scene, args):
+
+
+# args: player, ctype
+def is_player_has_cards_of_ctype(scene, args):
+    pass
+
+# args: player, cfigure
+def is_player_has_cards_of_cfigure(scene, args):
+    pass
+
+
 # args: cards
 def max_cfigure_of_cards(scene, args):
     pass
@@ -103,6 +120,8 @@ def player_cards_of_frozen(scene, args):
 def player_cards_of_ctype(scene, args):
     pass
 
+
+
 def to_list(scene, args):
     return args
 
@@ -117,8 +136,13 @@ __maps = {
             'ctype_count_of_cards':ctype_count_of_cards,
 
             'element_at':element_at,
+            'is_cards_contain_ctype':is_cards_contain_ctype,
+            'is_cards_contain_cfigure':is_cards_contain_cfigure,
             'is_cards_same_ctype':is_cards_same_ctype,
             'is_cards_same_cfigure':is_cards_same_cfigure,
+
+            'is_player_has_cards_of_ctype':is_player_has_cards_of_ctype,
+            'is_player_has_cards_of_cfigure':is_player_has_cards_of_cfigure,
             'next_player_of':next_player_of,
             'player_has_cards':player_has_cards,
             'to_list':to_list,
