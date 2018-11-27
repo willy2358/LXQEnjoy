@@ -68,7 +68,7 @@ def is_cards_contain_ctype(scene, args):
 
 # args: cards, cfigure
 def is_cards_contain_cfigure(scene, args):
-
+    pass
 
 # args: player, ctype
 def is_player_has_cards_of_ctype(scene, args):
@@ -95,6 +95,21 @@ def next_player_of(scene, args):
         dis = int(args[1])
     return scene.get_next_player(player)
 
+# args: cards, cfigure
+def parts_of_cards_of_cfigure(scene, args):
+    pass
+
+# args: cards, cfigure
+def parts_of_cards_ex_cfigure(scene, args):
+    pass
+
+# args: cards, ctype
+def parts_of_cards_of_ctype(scene, args):
+    pass
+
+# args: cards, ctype
+def parts_of_cards_ex_ctype(scene, args):
+    pass
 
 #player_has_cards(scene, player, cards)
 def player_has_cards(scene, args):
@@ -114,6 +129,10 @@ def player_cards_of_shown(scene, args):
     pass
 
 def player_cards_of_frozen(scene, args):
+    pass
+
+# args: player, cfigure
+def player_cards_of_cfigure(scene, args):
     pass
 
 # args: player, ctype
@@ -144,6 +163,14 @@ __maps = {
             'is_player_has_cards_of_ctype':is_player_has_cards_of_ctype,
             'is_player_has_cards_of_cfigure':is_player_has_cards_of_cfigure,
             'next_player_of':next_player_of,
+            'parts_of_cards_of_cfigure':parts_of_cards_of_cfigure,
+            'parts_of_cards_ex_cfigure':parts_of_cards_ex_cfigure,
+            'parts_of_cards_of_ctype':parts_of_cards_of_ctype,
+            'parts_of_cards_ex_ctype': parts_of_cards_ex_ctype,
+            'player_cards_of_free':player_cards_of_free,
+            'player_cards_of_shown':player_cards_of_shown,
+            'player_cards_of_frozen':player_cards_of_frozen,
+            'player_cards_of_ctype':player_cards_of_ctype,
             'player_has_cards':player_has_cards,
             'to_list':to_list,
           }

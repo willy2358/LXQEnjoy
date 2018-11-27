@@ -410,7 +410,11 @@
         <proc name="is_valid_following_cards" params="#player,#cards">
             <var name="#ivfc_valid_following" value_type="bool" value="false"/>
             <ift>
-                <case value_of=":(count_of(#cards))" ret_not_as=":(count_of(@round.trick_leading_cards))"/>
+                <cases op="or">
+                    <case value_of=":(count_of(#cards))" ret_not_as=":(count_of(@round.trick_leading_cards))"/>
+                    <case value_of=":(player_has_cards(@#cards))" ret_is="false"/>
+                </cases>
+
                 <then>
                     <update property="@#ivfc_valid_following" value="false"></update>
                 </then>
@@ -506,17 +510,30 @@
                         <cases>
                             <case value_of="@#ivfc_valid_following" value="false"/>
                             <case value_of=":(is_cards_same_ctype(@round.trick_leading_cards))" ret_is="true"/>
-                            <cases op="or">
-                                <cases>
-
-                                </cases>
-                            </cases>
-                            <case value_of=":(is_cards_contain_ctype(@#cards, c))" ret_is="true"/>
-                            <case value_of=":(is_cards_contain_ctype(@#cards, d))" ret_is="true"/>
-                            <case value_of=":(is_cards_contain_ctype(@#cards, h))" ret_is="true"/>
-                            <case value_of=":(is_cards_contain_ctype(@#cards, s))" ret_is="true"/>
                         </cases>
-                        <update property="@#ivfc_valid_following" value="true"></update>
+                        <then>
+                            <var name="#ivfc_tmp_cards2" value_type="cards" value=":(parts_of_cards_ex_cfigure(@#cards, @round.bank_cfigure))"></var>
+                            <ift >
+                                <cases op="and">
+                                    <case value_of=":(count_of(@#ivfc_tmp_cards2))" ret_as=":(count_of(@round.trick_leading_cards))"></case>
+                                    <case value_of=":(ctype_of(element_at(@#ivfc_tmp_cards2,0)))" ret_as=":(ctype_of(element_at(@round.trick_leading_cards,0)))"></case>
+                                </cases>
+                                <then>
+                                    <!--跟牌同色-->
+                                    <update property="@#ivfc_valid_following" value="true"></update>
+                                </then>
+                                <else>
+                                    <!---玩家手里没有同色牌-->
+                                    <var name="#ivfc_tmp_cards1" value_type="cards" value=":(player_cards_of_free(@#player))"/>
+                                    <update property="@#ivfc_tmp_cards1" value=":(parts_of_cards_ex_cfigure(@#ivfc_tmp_cards1, @round.bank_cfigure))"/>
+                                    <ift value_of=":(count_of(@#ivfc_tmp_cards2))" ret_as=":(count_of(@ivfc_tmp_cards1))">
+                                        <update property="@#ivfc_valid_following" value="true"></update>
+                                    </ift>
+                                </else>
+                            </ift>
+
+                        </then>
+
                     </ift>
                 </else>
             </ift>
