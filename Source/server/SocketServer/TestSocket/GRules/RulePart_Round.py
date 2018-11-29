@@ -11,9 +11,13 @@ class RulePart_Round(RulePart):
     def __init__(self, xmlNode, gRule):
         super(RulePart_Round, self).__init__(xmlNode, gRule)
         self.__custom_attrs = []
+        self.__debug_cards = None
 
     def get_custom_attrs(self):
         return self.__custom_attrs
+
+    def get_debug_cards(self):
+        return self.__debug_cards
 
     def parse(self):
         xmlNode = self.get_xml_node()
@@ -26,6 +30,14 @@ class RulePart_Round(RulePart):
                 attrVar = Engine.parse_elem_var(elem)
                 if attrVar:
                     self.__custom_attrs.append(attrVar)
+        debug = Utils.getXmlFirstNamedChild("debug", xmlNode)
+        if debug:
+            if debug.hasAttribute("ordered_cards"):
+                cards = debug.getAttribute("ordered_cards")
+                cards = cards.split(',')
+                self.__debug_cards = [c.strip() for c in cards]
+
+
         return True
 
     def get_part_name(self):

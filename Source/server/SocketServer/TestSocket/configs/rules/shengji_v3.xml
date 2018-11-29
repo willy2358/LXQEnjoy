@@ -223,6 +223,8 @@
             <attr name="trick_leading_player" value_type="player" value="none"/>
             <attr name="trick_leading_cards" value_type="cards" value="none"/>
         </attrs>
+        <!---for debug-->
+        <debug ordered_cards="s3 , d3 ,c3, h3"></debug>
     </round>
 
     <running>
@@ -432,7 +434,7 @@
                     <ift>
                         <!--单牌，无同色牌,起牌为非主-->
                         <cases>
-                            <case value_of="@#ivfc_valid_following" value="false"/>
+                            <case value_of="@#ivfc_valid_following" ret_is="false"/>
                             <case value_of=":(ctype_of(element_at(@round.trick_leading_cards, 0)))" ret_not_as="@round.bank_ctype"/>
                             <case value_of=":(count_of(@#cards))" ret_is="1"></case>
                             <case value_of=":(ctype_of(element_at(@#cards,0)))" ret_not_as=":(ctype_of(element_at(@round.trick_leading_cards, 0)))"></case>
@@ -444,7 +446,7 @@
                     <ift>
                         <!--单牌，无同色牌,起牌为主牌-->
                         <cases>
-                            <case value_of="@#ivfc_valid_following" value="false"/>
+                            <case value_of="@#ivfc_valid_following" ret_is="false"/>
                             <case value_of=":(ctype_of(element_at(@round.trick_leading_cards, 0)))" ret_as="@round.bank_ctype"/>
                             <case value_of=":(count_of(@#cards))" ret_is="1"></case>
                             <case value_of=":(ctype_of(element_at(@#cards,0)))" ret_not_as=":(ctype_of(element_at(@round.trick_leading_cards,0)))"></case>
@@ -458,7 +460,7 @@
                     <ift>
                         <!--四张，同点, 跟牌，各色都有-->
                         <cases>
-                            <case value_of="@#ivfc_valid_following" value="false"/>
+                            <case value_of="@#ivfc_valid_following" ret_is="false"/>
                             <case value_of=":(is_cards_same_cfigure(@round.trick_leading_cards))" ret_is="true"/>
                             <case value_of=":(is_cards_contain_ctype(@#cards, c))" ret_is="true"/>
                             <case value_of=":(is_cards_contain_ctype(@#cards, d))" ret_is="true"/>
@@ -471,7 +473,7 @@
                     <ift>
                         <!--四张，同点，缺色-->
                         <cases>
-                            <case value_of="@#ivfc_valid_following" value="false"/>
+                            <case value_of="@#ivfc_valid_following" ret_is="false"/>
                             <case value_of=":(is_cards_same_cfigure(@round.trick_leading_cards))" ret_is="true"/>
                             <cases op="or">
                                 <cases op="and">
@@ -508,7 +510,7 @@
                     <ift>
                         <!--甩牌-->
                         <cases>
-                            <case value_of="@#ivfc_valid_following" value="false"/>
+                            <case value_of="@#ivfc_valid_following" ret_is="false"/>
                             <case value_of=":(is_cards_same_ctype(@round.trick_leading_cards))" ret_is="true"/>
                         </cases>
                         <then>

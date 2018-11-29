@@ -332,6 +332,7 @@ class PlayScene(ExtAttrs):
                 vtype = attr.get_value_type()
                 val = attr.get_value()
                 newRound.add_cus_attr(name, vtype, val)
+            newRound.set_debug_cards(roundPart.get_debug_cards())
 
         newRound.init_cards_pack(self.__cards_space)
         newRound.add_cus_attr("players", ValueType.players, self.__players)
