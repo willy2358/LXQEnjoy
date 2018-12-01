@@ -16,7 +16,7 @@ class RulePart_Procs(RulePart):
 
         try:
             for elem in Utils.getXmlChildElments(xmlNode):
-                proc = GCore.Engine.parse_elem_proc(elem)
+                proc = GCore.Engine.parse_elem_proc(elem, self.getGRule())
                 if proc:
                     self.__procs.append(proc)
 

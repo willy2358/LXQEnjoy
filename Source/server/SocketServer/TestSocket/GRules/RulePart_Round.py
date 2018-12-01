@@ -27,7 +27,7 @@ class RulePart_Round(RulePart):
 
         for elem in Utils.getXmlChildElments(attrsRoot):
             if elem.tagName == Engine.tag_name_attr:
-                attrVar = Engine.parse_elem_var(elem)
+                attrVar = Engine.parse_elem_attr(elem, self.getGRule(), "round.")
                 if attrVar:
                     self.__custom_attrs.append(attrVar)
         debug = Utils.getXmlFirstNamedChild("debug", xmlNode)

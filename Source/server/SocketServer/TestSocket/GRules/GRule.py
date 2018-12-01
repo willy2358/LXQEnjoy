@@ -19,6 +19,10 @@ class GRule:
         self.__max_players_capacity = 0
         self.__min_players_capacity = 0
 
+        self.__vars = []  #[Variable]
+        self.__acts = []
+        self.__procs = []
+
     def get_max_players_capacity(self):
         return self.__max_players_capacity
 
@@ -43,6 +47,58 @@ class GRule:
     def set_players_capacity(self, minPlayers, maxPlayers):
         self.__min_players_capacity = minPlayers
         self.__max_players_capacity = maxPlayers
+
+    def add_act(self, act, xmlNode):
+        if self.is_act_exists(act.get_name()):
+            Log.warn("Duplicated def of action, name:{0}, xmlNode:{1}".format(act.get_name(),xmlNode.toxml()))
+        else:
+            self.__acts.append(act)
+
+    def is_act_exists(self, actName):
+        for a in self.__acts:
+            if a.get_name() == actName:
+                return True
+
+        return False
+
+    def add_var(self, var, xmlNode):
+        if self.is_var_exists(var.get_name()):
+            Log.warn("Duplicated def of var, name:{0}, xmlnode:{1}".format(var.get_name(),xmlNode.toxml()))
+        else:
+            self.__vars.append(var)
+
+    def is_var_exists(self, varName):
+        if varName == "#arg_player" or varName == "#arg_cards" or varName == "cmd_player" or varName == "cmd_args":
+            return True
+
+        if varName.startswith("#arg_player."):
+            varName = varName[5:]
+        if varName.startswith("cmd_player."):
+            varName = varName[4:]
+
+        #sometimes, player is a variable.
+        ps = varName.split('.')
+        if ps == 2 and ps[0] != "round" and ps[0] != "scene" and ps[0] != "trick":
+            varName = "player." + ps[1]
+
+        for v in self.__vars:
+            if v.get_name() == varName:
+                return True
+
+        return False
+
+    def add_proc(self, proc, xmlNode):
+        if self.is_proc_exists(proc.get_name()):
+            Log.warn("Duplicated def of proc, name:{0}, xmlnode:{1}".format(proc.get_name(), xmlNode.toxml()))
+        else:
+            self.__procs.append(proc)
+
+    def is_proc_exists(self, procName):
+        for p in self.__procs:
+            if p.get_name() == procName:
+                return True
+
+        return False
 
     def parse_game_attrs(self, gameElem):
         if not gameElem:
@@ -82,5 +138,8 @@ class GRule:
         except Exception as ex:
             Log.exception(ex)
             return False
+
+
+
 
 

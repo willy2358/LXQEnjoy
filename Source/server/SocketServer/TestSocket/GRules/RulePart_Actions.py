@@ -17,7 +17,7 @@ class RulePart_Actions(RulePart):
         try:
             for elem in Utils.getXmlChildElments(xmlNode):
                 if elem.tagName == Engine.tag_name_action:
-                    action = Engine.parse_elem_action(elem)
+                    action = Engine.parse_elem_action(elem, self.getGRule())
                     if action:
                         self.add_action(action)
             return True

@@ -22,7 +22,7 @@ class RulePart_Scene(RulePart):
 
         for elem in Utils.getXmlChildElments(attrsRoot):
             if elem.tagName == Engine.tag_name_attr:
-                attrVar = Engine.parse_elem_var(elem)
+                attrVar = Engine.parse_elem_attr(elem, self.getGRule(),"scene.")
                 if attrVar :
                     self.__custom_attrs.append(attrVar)
         return True

@@ -8,7 +8,7 @@ import Mains.Log as Log
 # < !--对于action，其内部可访问两个隐含的参数：
 # @cmd_player: 执行此action的player
 #
-# @cmd_param :执行action传入的参数
+# @cmd_args :执行action传入的参数
 # -->
 class Action(Statement):
     def __init__(self, name):

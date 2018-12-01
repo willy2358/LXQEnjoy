@@ -18,7 +18,7 @@ class RulePart_Running(RulePart):
 
         try:
             for elem in Utils.getXmlChildElments(xmlNode):
-                st = GCore.Engine.parse_elem(elem)
+                st = GCore.Engine.parse_elem(elem, self.getGRule())
                 if st:
                     self.__statements.append(st)
 

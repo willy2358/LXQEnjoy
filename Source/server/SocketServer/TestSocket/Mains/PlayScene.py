@@ -60,7 +60,7 @@ class PlayScene(ExtAttrs):
 
         # for exec action
         self.__cmd_player = None
-        self.__cmd_param = None
+        self.__cmd_args = None
 
         self.__local_vars = {}
         self.__procs = {}
@@ -100,8 +100,8 @@ class PlayScene(ExtAttrs):
             return self.get_attr(varStr[len("@scene."):])
         elif varStr == "@players":
             return self.get_attr("players")
-        elif varStr == "@cmd_param":
-            return self.__cmd_param
+        elif varStr == "@cmd_args":
+            return self.__cmd_args
         elif varStr == "@cmd_player":
             return self.__cmd_player
         elif varStr.startswith("@#"):
@@ -294,8 +294,8 @@ class PlayScene(ExtAttrs):
                 else:
                     defcmd = self.__pending_cmds[0]
 
-                cmd, cmd_param = defcmd.get_cmd(), defcmd.get_cmd_param()
-                self.process_player_exed_cmd(self.__pending_player, cmd, cmd_param)
+                cmd, cmd_args = defcmd.get_cmd(), defcmd.get_cmd_param()
+                self.process_player_exed_cmd(self.__pending_player, cmd, cmd_args)
 
 
     def init_player_type_attrs(self):
@@ -377,7 +377,7 @@ class PlayScene(ExtAttrs):
 
             # 准备参数
             self.__cmd_player = player
-            self.__cmd_param = cmd_args
+            self.__cmd_args = cmd_args
 
             if callable(act_stms[0]): # has param checker
                 # 优先使用param_check检查参数
