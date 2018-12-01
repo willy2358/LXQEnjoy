@@ -1,5 +1,6 @@
 import random
 import time
+import threading
 
 from GRules.RulePart_Cards import RulePart_Cards
 from GRules.RulePart_Actions import RulePart_Actions
@@ -284,6 +285,7 @@ class PlayScene(ExtAttrs):
         while self.__pending_player and self.__pending_cmds:
             time.sleep(0.2)  # sleep 0.2 seconds
             if int(time.time()) % 6 == 0:
+                Log.debug("waiting_for_player_exe_cmd, thread:{0}".format(threading.get_ident()))
                 Log.debug("waiting for player {0} action ...".format(self.__pending_player.get_userid()))
             # 超时, 执行默认命令
             if 0 < self.__pending_seconds < time.time() - self.__pending_start_tm:

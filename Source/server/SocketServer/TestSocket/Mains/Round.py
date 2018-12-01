@@ -1,6 +1,9 @@
 
+import threading
 import random
 from Mains.GVar import GVar
+
+
 
 import Utils
 
@@ -17,6 +20,7 @@ class Round(ExtAttrs):
         self.__undealing_cards = cards[:]
 
     def draw_cards(self, count):
+        print("draw_cards,thread:{0}".format(threading.get_ident()))
         cards = []
         if self.__debug_cards:
             if len(self.__debug_cards) >= count:
