@@ -90,6 +90,10 @@ def is_player_has_cards_of_cfigure(scene, args):
 def max_cfigure_of_cards(scene, args):
     pass
 
+# args: attrName
+def max_attr_of_player(scene, args):
+    pass
+
 # args: cards
 def min_cfigure_of_cards(scene, args):
     pass
@@ -146,7 +150,8 @@ def player_cards_of_cfigure(scene, args):
 def player_cards_of_ctype(scene, args):
     pass
 
-
+def sum_cards_cfigure(scene, args):
+    pass
 
 def to_list(scene, args):
     return args

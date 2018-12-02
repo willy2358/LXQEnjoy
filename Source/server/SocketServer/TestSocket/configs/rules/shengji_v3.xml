@@ -228,6 +228,9 @@
             <attr name="is_player_valid_cards" value_type="bool" value="false"/>
             <attr name="trick_init_player" value="none" value_type="player"/>
             <attr name="trick_winner" value_type="player" value="none"/>
+            <attr name="trick_cards" value_type="cards" value="none"/>
+            <attr name="trick_score" value_type="int" value="0"/>
+            <attr name="kitty_score" value_type="int" value="0"/>
         </attrs>
         <!---for debug-->
         <debug ordered_cards="s3 , d3 ,c3, h3,h4,h5,c7,d6,s6,s8,s1 ,h2"></debug>
@@ -482,6 +485,29 @@
             <update property="@scene.attacters" value="@round.losers"/>
         </proc>
 
+        <proc name="trick_end">
+
+            <update property="@round.trick_winner" value=":(max_attr_of_player(trick_power))"/>
+            <var name="#te_trick_winner" value_type="player" value="@round.trick_winner"/>
+            <ift >
+                <!--进攻方赢，得到分数牌-->
+                <cases op="and">
+                    <case value_of="@#te_trick_winner.IsAttacter" ret_is="true"></case>
+                    <case value_of="@round.trick_score" ret_gt="0"></case>
+                </cases>
+                <update property="@round.attacters.[].Score" op="add" value="@round.trick_score"></update>
+            </ift>
+
+
+            <!-- 最后圈输赢测试 如果attacter win, attacter将获得底牌的分数 -->
+            <ift>
+                <cases>
+                    <case value_of=":(count_of(player_cards_of_free(@round.trick_winner)))" ret_is="0"/>
+                    <case value_of="@round.kitty_score" ret_gt="0"/>
+                </cases>
+                <update property="@round.attacters.[].Score" op="add" value="@round.trick_score"></update>
+            </ift>
+        </proc>
 
         <proc name="proc_example" params="#arg_player,#arg_cards">
             <var name="#f_val" value_type="int" value="0"/>
