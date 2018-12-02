@@ -1,8 +1,10 @@
 from GCore.Operand import Operand
 from GCore.ValueType import ValueType
+import Mains.Log as Log
 
 class Variable(Operand):
     def __init__(self, varName):
+        super(Variable, self).__init__(None)
         self.__name = varName
         self.__value_type = ValueType.undef
         self.__value = None
@@ -26,6 +28,7 @@ class Variable(Operand):
         self.__value = val
 
     def gen_runtime_obj(self, scene):
+        Log.debug("var {0} executing:{1} ....".format(self.get_name(), self.get_step()))
         name = self.get_name()
         vtype = self.get_value_type()
         val = self.get_value()

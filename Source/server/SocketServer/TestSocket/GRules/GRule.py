@@ -78,8 +78,13 @@ class GRule:
 
         #sometimes, player is a variable.
         ps = varName.split('.')
-        if ps == 2 and ps[0] != "round" and ps[0] != "scene" and ps[0] != "trick":
+        if len(ps) == 2 and ps[0] != "round" and ps[0] != "scene" and ps[0] != "trick":
             varName = "player." + ps[1]
+        elif '.[].' in varName:
+            ps = varName.split('.[].')
+            if len(ps) == 2 and ps[0].startswith('round.') or ps[0].startswith('scene.'):
+                varName = "player." + ps[1]
+
 
         for v in self.__vars:
             if v.get_name() == varName:

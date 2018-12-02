@@ -6,6 +6,7 @@ from GCore.VarsSpace import *
 
 class Operation(Statement):
     def __init__(self, operand1, operand2, operator = Operator.Add):
+        super(Operation, self).__init__()
         self.__result_name = None
         self.__operator = operator
         self.__operand1 = operand1

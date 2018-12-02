@@ -13,6 +13,7 @@ import Mains.InterProtocol as InterProtocol
 
 class ActOpts(Statement):
     def __init__(self, to_player, timeout_sec, timeout_act):
+        super(ActOpts, self).__init__()
         self.__to_player = to_player
         self.__timeout_seconds = timeout_sec
         self.__timeout_act = timeout_act
@@ -24,6 +25,7 @@ class ActOpts(Statement):
     def gen_runtime_obj(self, scene):
         def send_act_opts():
             try:
+                Log.debug("Executing:{0} ....".format(self.get_step()))
                 recv_player = scene.get_obj_value(self.__to_player)
                 cmd_opts = []
                 def_act = None

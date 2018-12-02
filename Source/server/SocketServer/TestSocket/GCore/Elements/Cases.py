@@ -1,10 +1,12 @@
 
 from GCore.Operator import Operator
 from GCore.Elements.Case import Case
+import Mains.Log as Log
 
 
 class Cases(Case):
     def __init__(self, op=Operator.And):
+        super(Cases, self).__init__(None, None)
         self.__op = op
         self.__cases = []
 
@@ -33,6 +35,7 @@ class Cases(Case):
                 rt_funcs.append(func)
 
         def test():
+            Log.debug("Executing:{0} ....".format(self.get_step()))
             if self.__op == Operator.And:
                 for f in rt_funcs:
                     if not f():

@@ -5,6 +5,7 @@ import Mains.Log as Log
 
 class Clause(Statement):
     def __init__(self, Op = Operator.And):
+        super(Clause, self).__init__()
         self.__case = None
         self.__true_statements = []
         self.__false_statements = []
@@ -71,6 +72,7 @@ class Clause(Statement):
         f_rt_objs = self.gen_false_runtime_objs(scene)
 
         def if_test():
+            Log.debug("Executing:{0} ....".format(self.get_step()))
             try:
                 if cond():
                     if t_rt_objs:

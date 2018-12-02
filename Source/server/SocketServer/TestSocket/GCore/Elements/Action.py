@@ -12,6 +12,7 @@ import Mains.Log as Log
 # -->
 class Action(Statement):
     def __init__(self, name):
+        super(Action, self).__init__()
         self.__name = name
         self.__statements = []
         self.__check_param = None
@@ -32,6 +33,7 @@ class Action(Statement):
 
     def gen_runtime_obj(self, scene):
         def act_func():
+            Log.debug("Executing:{0} ....".format(self.get_step()))
             try:
                 rtObjs = []
                 for c in self.__statements:

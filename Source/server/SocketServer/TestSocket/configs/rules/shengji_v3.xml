@@ -456,10 +456,10 @@
                     <update property="@round.losers.[].IsDefender" value="false"/>
                     <update property="@#pre_cur_main_player.IsMainPlayer" value="false"/>
                     <update property="@#pre_next_main_player.IsMainPlayer" value="true"/>
-                    <update property="@round.winners.[].bank_figure" op="add" value="1"/>
+                    <update property="@round.winners.[].bank_cfigure" op="add" value="1"/>
                     <ift value_of="@#pre_one_attacter.Score" ret_not_lt="int:80">
                         <!--进攻方分数>80, 升2级-->
-                        <update property="@round.winners.[].bank_figure" op="add" value="1"/>
+                        <update property="@round.winners.[].bank_cfigure" op="add" value="1"/>
                     </ift>
                     <update property="@round.init_drawer" value="@#pre_next_main_player"/>
                     <update property="@scene.bank_cfigure" value="@#pre_next_main_player.bank_cfigure"/>
@@ -471,10 +471,10 @@
                     <update property="@#pre_cur_main_player.IsMainPlayer" value="false"/>
                     <update property="@#pre_the_other_defender.IsMainPlayer" value="true"/>
 
-                    <update property="@round.winners.[].bank_figure" op="add" value="1"/>
+                    <update property="@round.winners.[].bank_cfigure" op="add" value="1"/>
                     <ift value_of="@#pre_one_attacter.Score" ret_is="int:0">
                         <!--进攻方分数=0，防守方升2级 -->
-                        <update property="@round.winners.[].bank_figure" op="add" value="1"/>
+                        <update property="@round.winners.[].bank_cfigure" op="add" value="1"/>
                     </ift>
                     <update property="@round.init_drawer" value="@#pre_the_other_defender"/>
                     <update property="@scene.bank_cfigure" value="@#pre_the_other_defender.bank_cfigure"/>
@@ -590,7 +590,7 @@
     </actions>
 
 
-     <running>
+    <running>
         <!--for debugging, start-->
         <!--<var name="test_var" value_type="cards" value="list:s1,s2,s3"/>
         <update property="@test_var" value="list:s4,s5,s6"/>
@@ -608,38 +608,38 @@
         -->
         <!--for debugging, end-->
 
-        <update property="@round.defenders" value="@scene.defenders"/>
-        <update property="@round.attacters" value="@scene.attacters"/>
-        <update property="@round.bank_cfigure" value="@scene.bank_cfigure"/>
+        <update step="1" property="@round.defenders" value="@scene.defenders"/>
+        <update step="2" property="@round.attacters" value="@scene.attacters"/>
+        <update step="3" property="@round.bank_cfigure" value="@scene.bank_cfigure"/>
 
-        <var name="drawn_card" value="None" value_type="card"></var>
-        <var name="drawer" value="@scene.init_drawer" value_type="player"/>
+        <var step="4" name="drawn_card" value="None" value_type="card"></var>
+        <var step="5" name="drawer" value="@scene.init_drawer" value_type="player"/>
 
         <!--底牌6张-->
-        <draw_cards to_var="@round.kitty" count="6"></draw_cards>
-        <loop_until value_of=":(cards_count_not_deal())" ret_gt="0">
+        <draw_cards step="6" to_var="@round.kitty" count="6"></draw_cards>
+        <loop_until step="7" value_of=":(cards_count_not_deal())" ret_gt="0">
             <!--发牌（摸牌，起牌）-->
             <!--每次一张牌-->
-            <draw_cards to_var="@drawn_card" count="1"></draw_cards>
-            <send_cards player="@drawer" cards="@drawn_card" ></send_cards>
+            <draw_cards step="7-1" to_var="@drawn_card" count="1"></draw_cards>
+            <send_cards step="7-2" player="@drawer" cards="@drawn_card" ></send_cards>
 
             <!--摸到将牌，可以叫主，前提是还没主-->
-            <ift>
+            <ift step="7-3" >
                 <cases op="and">
                     <case value_of=":(cfigure_of(@drawn_card))" ret_as="@round.bank_cfigure"/>
                     <case value_of="@round.bank_ctype" ret_is="none"/>
                 </cases>
-                <act_opts timeout="30" timeout_act="pass_jiaozhu" to_player="@drawer">
+                <act_opts timeout="600" timeout_act="pass_jiaozhu" to_player="@drawer">
                     <act_ref act="jiaozhu" param="@drawn_card"/>
                     <act_ref act="pass_jiaozhu" param="none"/>
                 </act_opts>
             </ift>
 
-            <update property="@drawer" value=":(next_player_of(@drawer))"/>
+            <update step="7-4" property="@drawer" value=":(next_player_of(@drawer))"/>
         </loop_until>
 
         <!--发牌结束,还没有选主-->
-        <ift value_of="@round.bank_ctype" ret_is="none">
+        <ift step="8" value_of="@round.bank_ctype" ret_is="none">
             <!--开始局，流局-->
             <ift value_of="@scene.defenders" ret_is="none">
                <then>
@@ -653,30 +653,30 @@
             </ift>
         </ift>
 
-        <var name="main_defender" value_type="player" value=":(find_player(IsMainPlayer:true))"/>
+        <var step="9" name="main_defender" value_type="player" value=":(find_player(IsMainPlayer:true))"/>
         <!--底牌归于主打-->
-        <send_cards cards="@round.kitty" player="@main_defender"></send_cards>
+        <send_cards step="10" cards="@round.kitty" player="@main_defender"></send_cards>
 
         <!--等待主打扣牌-->
-        <act_opts timeout="30" timeout_act="force_koupai" to_player="@main_defender">
+        <act_opts step="11" timeout="30" timeout_act="force_koupai" to_player="@main_defender">
                 <act_ref act="koupai"/>
                 <act_ref act="force_koupai" hidden="true"/>
         </act_opts>
 
-        <update property="@round.trick_leading_player" value="@main_defender"/>
-        <var name="trick_init_player" value_type="player" value="@main_defender"/>
+        <update step="12" property="@round.trick_leading_player" value="@main_defender"/>
+        <var step="13" name="trick_init_player" value_type="player" value="@main_defender"/>
 
         <!--进入打牌，从主打开始, 一局结束，主打手里没牌-->
-        <loop_until value_of=":(count_of(player_cards_of_free(@round.trick_leading_player)))" ret_gt="0">
-            <loop_until value_of="@round.is_trick_valid_leading_cards" ret_is="false">
+        <loop_until step="14" value_of=":(count_of(player_cards_of_free(@round.trick_leading_player)))" ret_gt="0">
+            <loop_until step="14-1" value_of="@round.is_trick_valid_leading_cards" ret_is="false">
                 <act_opts timeout="30" timeout_act="force_chupai" to_player="@round.trick_init_player">
                         <act_ref act="playcard"/>
                         <act_ref act="force_chupai" hidden="true"/>
                 </act_opts>
             </loop_until>
 
-            <var name="sorder" value_type="int" value="1"/>
-            <loop_until value_of="@sorder" ret_lt="4">
+            <var step="14-2" name="sorder" value_type="int" value="1"/>
+            <loop_until step="14-3" value_of="@sorder" ret_lt="4">
                 <var name="valid_following_cards" value_type="bool" value="false"/>
                 <var name="follower" value_type="player" value=":(next_player_of(@round.trick_init_player, @sorder))"/>
                 <loop_until value_of="@round.is_player_valid_cards" ret_is="false">
@@ -688,13 +688,13 @@
                 <update property="@sorder" op="add" value="1"/>
             </loop_until>
 
-            <proc_ref proc="@trick.end"/>
-            <update property="@round.trick_init_player" value="@round.trick_winner"/>
-            <update property="@round.trick_leading_player" value="@round.trick_init_player"/>
+            <proc_ref step="14-4" proc="trick_end"/>
+            <update step="14-5" property="@round.trick_init_player" value="@round.trick_winner"/>
+            <update step="14-6" property="@round.trick_leading_player" value="@round.trick_init_player"/>
         </loop_until>
 
         <!--出牌结束，确定一局输赢玩家-->
-        <proc_ref proc="@round.end"/>
+        <proc_ref step="15" proc="round_end"/>
 
         <!--广播一局胜负-->
         <!--<publish_round_winners_losers/>-->

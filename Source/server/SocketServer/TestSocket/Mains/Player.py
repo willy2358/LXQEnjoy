@@ -4,7 +4,7 @@ from datetime import datetime
 
 import Mains.InterProtocol as InterProtocol
 
-from Mains.GVar import GVar
+# from Mains.GVar import GVar
 from Mains.ExtAttrs import ExtAttrs
 
 class Player(ExtAttrs):

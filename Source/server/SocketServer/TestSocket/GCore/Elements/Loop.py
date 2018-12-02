@@ -4,6 +4,7 @@ import Mains.Log as Log
 
 class Loop(Statement):
     def __init__(self):
+        super(Loop, self).__init__()
         self.__exit_cond = None
         self.__clauses = []
 
@@ -31,6 +32,7 @@ class Loop(Statement):
 
         def sub_proc():
             try:
+                Log.debug("Executing:{0} ....".format(self.get_step()))
                 while loop_test():
                     for func in rtObjs:
                         if callable(func):

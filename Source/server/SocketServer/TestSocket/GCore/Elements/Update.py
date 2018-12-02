@@ -16,7 +16,7 @@ import Mains.Log as Log
 # <update targets=":(find_players(IsAttacter == true))" property="score" op="add" value="card_score"/>
 class Update(Statement):
     def __init__(self, prop, value, targets = None, op = Operator.Update):
-
+        super(Update, self).__init__()
         self.__targets = targets
         self.__prop = prop
         self.__op = op
@@ -40,6 +40,16 @@ class Update(Statement):
 
         if self.__op == Operator.Update:
             return opVal
+
+        if isinstance(originVal, list) and self.__op == Operator.Add:
+            if isinstance(opVal, list):
+                return originVal + opVal
+            else:
+                # todo : following can be optimized to  originVal.append(opVal)
+                newVal = originVal[:]
+                newVal.append(opVal)
+                return newVal
+
         if not str(rawVal).isnumeric():
             return rawVal
 
@@ -59,8 +69,8 @@ class Update(Statement):
     def gen_runtime_obj(self, scene):
         def updates():
             try:
+                Log.debug("Executing:{0} ....".format(self.get_step()))
                 opVal = scene.get_obj_value(self.__opVal)
-
                 if isinstance(self.__prop, VarRef):
                     objs = []
                     rtVar = scene.get_rt_var(self.__prop)
@@ -72,14 +82,7 @@ class Update(Statement):
                         oriVal = scene.get_obj_value(obj)
                         fininal_val = self.get_result(scene, oriVal, opVal)
                         obj.set_value(fininal_val)
-                elif type(self.__prop) is AttrName and self.__targets:
-                    targets = scene.get_obj_value(self.__targets)
-                    for t in targets:
-                        o_val = t.get_prop(self.__prop.get_name())
-                        if o_val :
-                            f_val = self.get_result(o_val.get_value(), opVal)
-                            # o_val is a GVar
-                            o_val.set_value(f_val)
+
             except Exception as ex:
                 Log.exception(ex)
 

@@ -7,6 +7,7 @@ import Mains.Log as Log
 # 因为变量都共享一个PlayScene.__local_var局部变量命名空间，尽量减小从命名上减小干扰。
 class Proc(Statement):
     def __init__(self, name, params):
+        super(Proc, self).__init__()
         self.__name = name
         self.__params = params
         self.__statements = []
@@ -36,6 +37,7 @@ class Proc(Statement):
 
         def proc_func():
             try:
+                Log.debug("Executing:{0} ....".format(self.get_step()))
                 rtObjs = []
                 for c in self.__statements:
                     if isinstance(c, Ret):
