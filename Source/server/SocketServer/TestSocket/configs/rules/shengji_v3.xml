@@ -258,7 +258,7 @@
                 </else>
             </ift>
         </proc>
-        <proc name="@round.is_trick_valid_leading_cards" params="#arg_player, #arg_cards">
+        <proc name="is_valid_leading_cards" params="#arg_player, #arg_cards">
             <var name="#p2_valid_leading" value_type="bool" value="false"/>
             <ift value_of=":(count_of(@#arg_cards))" ret_is="1">
                 <update property="@#p2_valid_leading" value="true"></update>
@@ -435,8 +435,51 @@
                 </else>
             </ift>
 
-
             <ret value="@#ivfc_valid_following"/>
+        </proc>
+
+        <proc name="round_end">
+            <var name="#pre_one_attacter" value_type="player" value=":(find_player(IsAttacter:true))"/>
+            <var name="#pre_cur_main_player" value_type="player" value=":(find_player(IsMainPlayer:true))"/>
+            <ift value_of="@#pre_one_attacter.Score" ret_not_lt="int:40">
+                <then>
+                    <var name="#pre_next_main_player" value=":(next_player_of(@#pre_cur_main_player, 1))" value_type="player"></var>
+                     <!--进攻方分数>40，进攻方赢, 防守方输, 攻守互换，进攻方升一级-->
+                    <update property="@round.winners" value=":(find_players(IsAttacter:true))"/>
+                    <update property="@round.losers" value=":(find_players(IsDefender:true))"/>
+                    <update property="@round.winners.[].IsDefender" value="true"/>
+                    <update property="@round.winners.[].IsAttacter" value="false"/>
+                    <update property="@round.losers.[].IsAttacter" value="true"/>
+                    <update property="@round.losers.[].IsDefender" value="false"/>
+                    <update property="@#pre_cur_main_player.IsMainPlayer" value="false"/>
+                    <update property="@#pre_next_main_player.IsMainPlayer" value="true"/>
+                    <update property="@round.winners.[].bank_figure" op="add" value="1"/>
+                    <ift value_of="@#pre_one_attacter.Score" ret_not_lt="int:80">
+                        <!--进攻方分数>80, 升2级-->
+                        <update property="@round.winners.[].bank_figure" op="add" value="1"/>
+                    </ift>
+                    <update property="@round.init_drawer" value="@#pre_next_main_player"/>
+                    <update property="@scene.bank_cfigure" value="@#pre_next_main_player.bank_cfigure"/>
+                </then>
+                <else>
+                    <!--进攻方分数<40，防守方赢, 防守方升1级 -->
+                    <var name="#pre_the_other_defender" value=":(next_player_of(@#pre_cur_main_player, 3))" value_type="player"></var>
+                    <!--交换主打-->
+                    <update property="@#pre_cur_main_player.IsMainPlayer" value="false"/>
+                    <update property="@#pre_the_other_defender.IsMainPlayer" value="true"/>
+
+                    <update property="@round.winners.[].bank_figure" op="add" value="1"/>
+                    <ift value_of="@#pre_one_attacter.Score" ret_is="int:0">
+                        <!--进攻方分数=0，防守方升2级 -->
+                        <update property="@round.winners.[].bank_figure" op="add" value="1"/>
+                    </ift>
+                    <update property="@round.init_drawer" value="@#pre_the_other_defender"/>
+                    <update property="@scene.bank_cfigure" value="@#pre_the_other_defender.bank_cfigure"/>
+                </else>
+            </ift>
+
+            <update property="@scene.defenders" value="@round.winners"/>
+            <update property="@scene.attacters" value="@round.losers"/>
         </proc>
 
 

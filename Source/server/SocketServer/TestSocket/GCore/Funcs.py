@@ -54,6 +54,13 @@ def element_at(scene, args):
         Log.exception(ex)
         return  None
 
+def find_player(scene, args):
+    pass
+
+def find_players(scene, args):
+    pass
+
+
 #args: cards, pattern(single,pair,triple,quad,same_type,
 #def is_cards_match_pattern(scene, args):
 def is_cards_same_ctype(scene, args):
