@@ -36,9 +36,12 @@ class FuncCall(Operand):
                         args.append(val)
                     return Funcs.invoke(self.__func_name, scene, args)
                 elif self.__named_args:
-                    if self.__func_name == "find_player" or self.__func_name == "find_players":
+                    if self.__func_name == "find_player":
+                        players = self.filter_insts(scene, "@round.players")
+                        if players:
+                            return players[0]
+                    elif self.__func_name == "find_players":
                         return self.filter_insts(scene, "@round.players")
-
                 else:
                     return None
             except Exception as ex:
@@ -47,11 +50,12 @@ class FuncCall(Operand):
 
     def filter_insts(self, scene, instsStr):
         insts = scene.get_runtime_objs(instsStr)
+        insts = scene.get_obj_value(insts)
         if not insts:
             return []
         objs = []
         for inst in insts:
-            if inst.is_meet_conditions(self.__named_args, self.__named_arg_op):
+            if scene.is_meet_conditions(inst, self.__named_args, self.__named_arg_op):
                 objs.append(inst)
         return objs
 

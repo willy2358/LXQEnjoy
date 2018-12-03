@@ -36,6 +36,7 @@ from Cards import Card
 from GCore.CValue import CValue
 from Cards.CFigure import CFigure
 from Cards.CType import CType
+from GCore.Operator import Operator
 
 from Mains import Errors
 import Mains.InterProtocol as InterProtocol
@@ -104,6 +105,12 @@ class PlayScene(ExtAttrs):
             return self.__cmd_args
         elif varStr == "@cmd_player":
             return self.__cmd_player
+        elif varStr.startswith("@cmd_player."):
+            if not self.__cmd_player:
+                Log.error("cmd_player should not none when used by:" + varStr)
+                return None
+            else:
+                return self.__cmd_player.get_attr(varStr[len("@cmd_player."):])
         elif varStr.startswith("@#"):
             return self.get_proc_local_var(varStr.lstrip("@"))
         elif varStr.startswith("@"):
@@ -181,6 +188,28 @@ class PlayScene(ExtAttrs):
 
     def get_current_round(self):
         return self.__cur_round
+
+    def is_meet_conditions(self, inst, named_attrs, op):
+        # no requirements, return false
+        if not named_attrs:
+            return False
+
+        if op == Operator.Or:
+            for k in named_attrs:
+                if self.get_obj_value(named_attrs[k]) == self.get_obj_value(inst.get_prop(k)):
+                    return True
+            return False
+        if op == Operator.And:
+
+            for k in named_attrs:
+                val1 = self.get_obj_value(named_attrs[k])
+                val2 = self.get_obj_value(inst.get_prop(k))
+                # if len(named_attrs) == 1 and val1 == val2:
+                #     return True
+                if val1 != val2:
+                    return False
+            return True
+        return False
 
     def draw_cards(self, count):
         return  self.__cur_round.draw_cards(count)

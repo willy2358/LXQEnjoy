@@ -28,13 +28,20 @@ class Variable(Operand):
         self.__value = val
 
     def gen_runtime_obj(self, scene):
-        Log.debug("var {0} executing:{1} ....".format(self.get_name(), self.get_step()))
-        name = self.get_name()
-        vtype = self.get_value_type()
-        val = self.get_value()
-        if name.startswith("#"):
-            scene.add_proc_local_var(name, vtype, val)
-        else:
-            scene.add_variable(name, vtype, val)
+        def new_var():
+            try:
+                Log.debug("var {0} executing:{1} ....".format(self.get_name(), self.get_step()))
+                name = self.get_name()
+                vtype = self.get_value_type()
+                val = self.get_value()
+                val = scene.get_obj_value(val)
+                if name.startswith("#"):
+                    scene.add_proc_local_var(name, vtype, val)
+                else:
+                    scene.add_variable(name, vtype, val)
+            except Exception as ex:
+                Log.exception(ex)
+        return new_var
+
 
 

@@ -8,6 +8,8 @@ class Statement:
         pass
 
     def get_step(self):
+        if self.__step == "9":
+            stop = 1
         return self.__step
 
     def set_step(self, step):

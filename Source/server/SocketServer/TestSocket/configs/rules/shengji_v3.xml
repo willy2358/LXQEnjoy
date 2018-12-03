@@ -524,9 +524,9 @@
     -->
     <actions>
         <!--叫主-->
-        <action name="jiaozhu">
-            <update property="@round.bank_ctype" value=":(ctype_of(element_at(@cmd_args, 0)))"/>
-            <ift value_of="@round.defenders" ret_is="none">
+        <action step="act1" name="jiaozhu">
+            <update step="act1-1" property="@round.bank_ctype" value=":(ctype_of(element_at(@cmd_args, 0)))"/>
+            <ift step="act1-2" value_of="@round.defenders" ret_is="none">
                 <!--第一局-->
                 <then>
                     <!--设置防守方-->
@@ -583,7 +583,7 @@
             <playcards player="@cmd_player" alias="chupai" cards=":(select_random_cards(count=1))" cards_face_up="true"/>
         </action>
 
-        <action name="force_koupai" text="none">
+        <action name="force_koupai" text="koupai">
             <pick_cards from_player="@cmd_player" count="6" to_var="@round.koupai"/>
             <playcards player="@cmd_player" cards="@round.koupai" alias="kuopai" cards_face_up="false"/>
         </action>
