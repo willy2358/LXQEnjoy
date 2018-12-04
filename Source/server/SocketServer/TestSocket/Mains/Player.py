@@ -1,6 +1,7 @@
 from Mains import PlayManager
 
 from datetime import datetime
+import Utils
 
 import Mains.InterProtocol as InterProtocol
 
@@ -21,6 +22,9 @@ class Player(ExtAttrs):
         self.__is_online = True
         self.__is_robot_play = False
         self.__cards_in_hand = []
+        self.__free_cards = []
+        self.__frozen_cards = []
+        self.__shown_cards = [] #[[],[]]
 
 
     def get_userid(self):
@@ -53,6 +57,11 @@ class Player(ExtAttrs):
             else:
                 tmpCards.remove(c)
         return True
+    def pick_cards(self, count):
+        return self.__free_cards[:count]
+
+    def play_cards(self, cards):
+        Utils.list_remove_parts(self.__free_cards, cards)
 
     def set_sock_conn(self, conn):
         self.__sock_conn = conn

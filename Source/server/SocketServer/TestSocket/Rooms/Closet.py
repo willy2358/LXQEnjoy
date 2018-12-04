@@ -47,7 +47,7 @@ class Closet:
         if cmd == InterProtocol.client_req_type_exe_cmd:
             cmdTxt = req_json[InterProtocol.client_req_exe_cmd]
             cmdArgs = req_json[InterProtocol.client_req_cmd_param]
-            self.__playScene.process_player_exed_cmd(player, cmdTxt, cmdArgs)
+            self.__playScene.process_player_exed_cmd(player, cmdTxt, cmdArgs, cmdTxt)
 
     def get_players_status(self):
         players = []

@@ -381,8 +381,14 @@ class PlayScene(ExtAttrs):
             self.__pending_start_tm = time.time()
 
 
+    def process_player_play_cards(self, player, cards):
+        pack = InterProtocol.create_play_cards_packet(player, cards)
+        for p in self.get_players():
+            p.send_server_cmd_packet(pack)
+        player.play_cards(cards)
 
-    def process_player_exed_cmd(self, player, cmd, cmd_args):
+
+    def process_player_exed_cmd(self, player, cmd, cmd_args, cmd_alias=""):
         if player != self.__pending_player:
             player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.player_not_pending_cmd)
         else:
@@ -418,7 +424,7 @@ class PlayScene(ExtAttrs):
                 player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_or_param)
                 return
 
-            pack = InterProtocol.create_player_exed_cmd_json_packet(player, cmd, cmd_args)
+            pack = InterProtocol.create_player_exed_cmd_json_packet(player, cmd_alias, cmd_args)
             for p in self.get_players():
                 p.send_server_cmd_packet(pack)
 

@@ -10,9 +10,6 @@ class SendCards(Statement):
         self.__recv_player = recv_player
 
     def gen_runtime_obj(self, scene):
-
-        # player_func = self.__recv_player.gen_runtime_obj(scene)
-        # cards_func = self.__cards.gen_runtime_obj(scene)
         def send_cards_rtobj():
             try:
                 player = scene.get_obj_value(self.__recv_player)
@@ -21,11 +18,5 @@ class SendCards(Statement):
                     player.send_cards(cards)
             except Exception as ex:
                 Log.exception(ex)
-
-            # playerRef = player_func()
-            # cardsRef = cards_func()
-            # player = scene.get_prop_value(playerRef.get_name())
-            # cards = scene.get_prop_value(cardsRef.get_name())
-
 
         return send_cards_rtobj

@@ -42,6 +42,8 @@ class FuncCall(Operand):
                             return players[0]
                     elif self.__func_name == "find_players":
                         return self.filter_insts(scene, "@round.players")
+                    else:
+                        Log.error("Un recognized function:" + self.__func_name)
                 else:
                     return None
             except Exception as ex:

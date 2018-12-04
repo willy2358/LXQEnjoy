@@ -149,7 +149,7 @@ def create_msg_packet(msg):
 
 def create_play_cards_packet(player, cards):
     l_cards = []
-    if isinstance(cards, type([])):
+    if isinstance(cards, list):
         l_cards = cards
     else:
         l_cards.append(cards)
