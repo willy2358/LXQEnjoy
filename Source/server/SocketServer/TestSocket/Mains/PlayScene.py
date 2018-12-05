@@ -324,7 +324,7 @@ class PlayScene(ExtAttrs):
                     defcmd = self.__pending_cmds[0]
 
                 cmd, cmd_args = defcmd.get_cmd(), defcmd.get_cmd_param()
-                self.process_player_exed_cmd(self.__pending_player, cmd, cmd_args)
+                self.process_player_exed_cmd(self.__pending_player, cmd, cmd_args, True)
 
 
     def init_player_type_attrs(self):
@@ -381,14 +381,24 @@ class PlayScene(ExtAttrs):
             self.__pending_start_tm = time.time()
 
 
-    def process_player_play_cards(self, player, cards):
+    def process_player_play_cards(self, player, cards, faces_up = True, quiet = False):
         pack = InterProtocol.create_play_cards_packet(player, cards)
-        for p in self.get_players():
-            p.send_server_cmd_packet(pack)
+        player.send_server_cmd_packet(pack)
+
+        if not quiet:
+            cmd_args = cards
+            if not faces_up:
+                cmd_args = ['*' for i in range(len(cards))]
+
+            pack = InterProtocol.create_play_cards_packet(player, cmd_args)
+            for p in self.get_players():
+                if p is not player:
+                    p.send_server_cmd_packet(pack)
+
         player.play_cards(cards)
 
 
-    def process_player_exed_cmd(self, player, cmd, cmd_args, cmd_alias=""):
+    def process_player_exed_cmd(self, player, cmd, cmd_args, auto_seled = False):
         if player != self.__pending_player:
             player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.player_not_pending_cmd)
         else:
@@ -420,13 +430,13 @@ class PlayScene(ExtAttrs):
                 if not ret:
                     player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_or_param)
                     return
-            elif cmdObj.get_cmd_param() != cmd_args:
+            elif not auto_seled and cmdObj.get_cmd_param() != cmd_args:
                 player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_or_param)
                 return
 
-            pack = InterProtocol.create_player_exed_cmd_json_packet(player, cmd_alias, cmd_args)
-            for p in self.get_players():
-                p.send_server_cmd_packet(pack)
+            # pack = InterProtocol.create_player_exed_cmd_json_packet(player, cmd_alias, cmd_args)
+            # for p in self.get_players():
+            #     p.send_server_cmd_packet(pack)
 
             #执行内部逻辑
             if callable(act_stms[1]):

@@ -20,6 +20,10 @@ class Operator(Enum):
     GreaterThan = 11
     NotGreaterThan = 12
 
+    #operation for list
+    Append = 13
+    Remove = 13
+
     Update = 100
 
 
@@ -48,5 +52,9 @@ def from_str(strOp):
         return Operator.Subtract
     elif strOp == GCore.Engine.attr_val_op_multiply:
         return Operator.Multiply
+    elif strOp == GCore.Engine.attr_val_op_append:
+        return Operator.Append
+    elif strOp == GCore.Engine.attr_val_op_remove:
+        return Operator.Remove
     else:
         return Operator.Unknown

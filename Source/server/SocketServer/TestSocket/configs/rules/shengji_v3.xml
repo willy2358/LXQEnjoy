@@ -539,6 +539,7 @@
                     <update property="@round.attacters" op="add" value=":(next_player_of(@cmd_player,3))"/>
                 </then>
             </ift>
+            <pub_act rec_players="@round.players" act="jiaozhu" args="@cmd_args"></pub_act>
         </action>
 
         <action name="liuju">
@@ -584,8 +585,13 @@
         </action>
 
         <action name="force_koupai" text="koupai">
+            <var name="#afk_other_players" value_type="players" value="@round.players"></var>
+            <update property="@#afk_other_players" op="remove" value="@cmd_player"></update>
+
             <pick_cards from_player="@cmd_player" count="6" to_var="@round.koupai"/>
             <playcards player="@cmd_player" cards="@round.koupai" alias="kuopai" cards_face_up="false"/>
+            <pub_act to_players="@cmd_player" act="koupai" args="@round.koupai"/>
+            <pub_act to_players="@#afk_other_players" act="koupai" args="none"/>
         </action>
     </actions>
 
