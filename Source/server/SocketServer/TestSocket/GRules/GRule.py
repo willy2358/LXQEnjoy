@@ -4,6 +4,8 @@ import xml.dom.minidom
 
 from Mains import Log
 from Cards.GType import GType
+from GCore.ValueType import ValueType
+from GCore.Operator import Operator
 
 from GRules import RulePartFactory
 import Utils
@@ -54,6 +56,27 @@ class GRule:
         else:
             self.__acts.append(act)
 
+    def check_op_var(self, varName, op, xmlElem):
+        if not self.is_var_exists(varName):
+            Log.warn("Not existing var {0} with {1},xml node:{2}".format(varName, op, xmlElem.toxml()))
+            return False
+
+        var = None
+        for v in self.__vars:
+            if v.get_name() == varName:
+                var = v
+                break
+
+        # if not var:
+        #     Log.warn("Not existing var {0} with {1},xml node:{2}".format(varName, op, xmlElem.toxml()))
+        #     return False
+
+        if var and (var.get_value_type() == ValueType.cards \
+                    or var.get_value_type() == ValueType.players):
+            if op != Operator.Remove and op != Operator.Append and op != Operator.Update:
+                Log.warn("Invalid op {0} on list {1}".format(op, varName))
+                return False
+
     def is_act_exists(self, actName):
         for a in self.__acts:
             if a.get_name() == actName:
@@ -68,7 +91,9 @@ class GRule:
             self.__vars.append(var)
 
     def is_var_exists(self, varName):
-        if varName == "#arg_player" or varName == "#arg_cards" or varName == "cmd_player" or varName == "cmd_args":
+        if varName == "#arg_player" or varName == "#arg_cards" \
+                or varName == "cmd_player" or varName == "cmd_args"\
+                or varName == "round.players" or varName == "scene.players":
             return True
 
         if varName.startswith("#arg_player."):

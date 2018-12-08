@@ -10,7 +10,7 @@ class PubMsg(Statement):
 
     def gen_runtime_obj(self, scene):
         def pub_msg_func():
-            Log.debug("Executing:{0} ....".format(self.get_step()))
+            Log.debug("Executing pub msg :{0} ....".format(self.get_step()))
             msgText = scene.get_obj_value(self.__msg)
             players = scene.get_obj_value(self.__recv_players)
             if players:

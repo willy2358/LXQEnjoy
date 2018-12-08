@@ -22,7 +22,7 @@ class Operator(Enum):
 
     #operation for list
     Append = 13
-    Remove = 13
+    Remove = 14
 
     Update = 100
 

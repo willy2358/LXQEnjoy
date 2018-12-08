@@ -15,21 +15,20 @@ import Mains.Log as Log
 # <update property="IsMainPlayer" targets=":(find_player(seatid == @seatid + 1))" value="true"/>
 # <update targets=":(find_players(IsAttacter == true))" property="score" op="add" value="card_score"/>
 class Update(Statement):
-    def __init__(self, prop, value, targets = None, op = Operator.Update):
+    def __init__(self, prop, value, op = Operator.Update):
         super(Update, self).__init__()
-        self.__targets = targets
         self.__prop = prop
         self.__op = op
         self.__opVal = value
-        self.__targetObj = None
-        self.__targetAttr = None
+        # self.__targetObj = None
+        # self.__targetAttr = None
 
-    def parse_target_attr(self):
-        if not self.__targets:
-            assert self.__prop.startswith('@')
+    # def parse_target_attr(self):
+    #     if not self.__targets:
+    #         assert self.__prop.startswith('@')
 
-    def get_target_property(self):
-        return self.__target
+    # def get_target_property(self):
+    #     return self.__target
 
     def get_result(self, scene, originVal, opVal):
         rawVal = originVal
@@ -41,14 +40,26 @@ class Update(Statement):
         if self.__op == Operator.Update:
             return opVal
 
-        if isinstance(originVal, list) and self.__op == Operator.Add:
-            if isinstance(opVal, list):
-                return originVal + opVal
+        if isinstance(originVal, list):
+            newObjs = originVal[:]
+            if self.__op == Operator.Append:
+                if isinstance(opVal, list):
+                    return newObjs + opVal
+                else:
+                    # todo : following can be optimized to  originVal.append(opVal)
+                    newObjs.append(opVal)
+                    return newObjs
+            elif self.__op == Operator.Remove:
+                if isinstance(opVal, list):
+                    Utils.list_remove_parts(newObjs, opVal)
+                    return newObjs
+                elif opVal in newObjs:
+                    newObjs.remove(opVal)
+                    return newObjs
             else:
-                # todo : following can be optimized to  originVal.append(opVal)
-                newVal = originVal[:]
-                newVal.append(opVal)
-                return newVal
+                Log.error("Invalid op for list:" + self.__op)
+                return newObjs
+
 
         if not str(rawVal).isnumeric():
             return rawVal

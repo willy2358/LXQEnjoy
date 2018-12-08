@@ -24,7 +24,7 @@ class PlayCards(Statement):
                 if player and cards:
                     face_up = scene.get_obj_value(self.__cards_face_up)
                     quiet = scene.get_obj_value(self.__quiet)
-                    scene.process_player_play_cards(player, cards, face_up, quiet)
+                    scene.process_player_play_cards(player, cards, self.__act_alias, face_up, quiet)
 
             except Exception as ex:
                 Log.exception(ex)

@@ -245,7 +245,7 @@
             <ift value_of=":(is_cards_contain_ctype(@round.kitty,j))" ret_is="true">
             <!--有王牌，主牌为王和四个级牌-->
                 <then>
-                    <update property="@round.bank_ctype" value="j"/>
+                    <update property="@round.bank_ctype" value=":(ctype_of(j21))"/>
                 </then>
                 <else>
                     <ift value_of=":(is_cards_contain_cfigure(@round.kitty, @round.bank_cfigure))" ret_is="true">
@@ -286,7 +286,7 @@
                 <var name="#p2_next_player" value="none" value_type="player"/>
                 <loop_until value_of="@#p2_sorder" ret_lt="4">
                     <update property="@#p2_next_player" value=":(next_player_of(@#arg_player, @#p2_sorder))"/>
-                    <update property="@#p2_other_cards" op="add" value=":(player_cards_of_ctype(@#p2_next_player, @#p2_ctype))"/>
+                    <update property="@#p2_other_cards" op="append" value=":(player_cards_of_ctype(@#p2_next_player, @#p2_ctype))"/>
                 </loop_until>
             </ift>
             <ift>
@@ -539,7 +539,7 @@
                     <update property="@round.attacters" op="add" value=":(next_player_of(@cmd_player,3))"/>
                 </then>
             </ift>
-            <pub_act rec_players="@round.players" act="jiaozhu" args="@cmd_args"></pub_act>
+            <pub_act exer="@cmd_player" to_players="@round.players" act="jiaozhu" args="@cmd_args"></pub_act>
         </action>
 
         <action name="liuju">
@@ -586,12 +586,14 @@
 
         <action name="force_koupai" text="koupai">
             <var name="#afk_other_players" value_type="players" value="@round.players"></var>
-            <update property="@#afk_other_players" op="remove" value="@cmd_player"></update>
+            <update step="fk_2" property="@#afk_other_players" op="remove" value="@cmd_player"></update>
 
             <pick_cards from_player="@cmd_player" count="6" to_var="@round.koupai"/>
             <playcards player="@cmd_player" cards="@round.koupai" alias="kuopai" cards_face_up="false"/>
-            <pub_act to_players="@cmd_player" act="koupai" args="@round.koupai"/>
-            <pub_act to_players="@#afk_other_players" act="koupai" args="none"/>
+            <!--
+            <pub_act exer="@cmd_player" to_players="@cmd_player" act="koupai" args="@round.koupai"/>
+            <pub_act exer="@cmd_player" to_players="@#afk_other_players" act="koupai" args="list:*,*,*,*,*,*"/>
+            -->
         </action>
     </actions>
 

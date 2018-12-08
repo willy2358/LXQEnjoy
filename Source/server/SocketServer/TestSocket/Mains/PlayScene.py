@@ -380,9 +380,10 @@ class PlayScene(ExtAttrs):
             self.__timeout_cmd = timeout_act
             self.__pending_start_tm = time.time()
 
-
-    def process_player_play_cards(self, player, cards, faces_up = True, quiet = False):
-        pack = InterProtocol.create_play_cards_packet(player, cards)
+    def process_player_play_cards(self, player, cards, cmd_alias = InterProtocol.server_push_play_cards,
+                                  faces_up = True, quiet = False):
+        cmd = cmd_alias if cmd_alias else InterProtocol.server_push_play_cards
+        pack = InterProtocol.create_play_cards_packet(player, cards, cmd)
         player.send_server_cmd_packet(pack)
 
         if not quiet:
@@ -390,7 +391,7 @@ class PlayScene(ExtAttrs):
             if not faces_up:
                 cmd_args = ['*' for i in range(len(cards))]
 
-            pack = InterProtocol.create_play_cards_packet(player, cmd_args)
+            pack = InterProtocol.create_play_cards_packet(player, cmd_args, cmd_alias)
             for p in self.get_players():
                 if p is not player:
                     p.send_server_cmd_packet(pack)

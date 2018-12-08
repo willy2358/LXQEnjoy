@@ -21,7 +21,7 @@ class Player(ExtAttrs):
 
         self.__is_online = True
         self.__is_robot_play = False
-        self.__cards_in_hand = []
+        # self.__cards_in_hand = []
         self.__free_cards = []
         self.__frozen_cards = []
         self.__shown_cards = [] #[[],[]]
@@ -50,13 +50,14 @@ class Player(ExtAttrs):
 
     def has_cards(self, cards):
         #考虑到cards中有多张相同牌的可能
-        tmpCards = self.__cards_in_hand[:]
+        tmpCards = self.__free_cards[:]
         for c in tmpCards:
             if c not in self.tmpCards:
                 return False
             else:
                 tmpCards.remove(c)
         return True
+
     def pick_cards(self, count):
         return self.__free_cards[:count]
 
@@ -79,7 +80,7 @@ class Player(ExtAttrs):
         self.__is_robot_play = robot_play
 
     def send_cards(self, cards):
-        self.__cards_in_hand += cards
+        self.__free_cards += cards
         packet = InterProtocol.create_deal_cards_json_packet(self, cards)
         self.send_server_cmd_packet(packet)
 
