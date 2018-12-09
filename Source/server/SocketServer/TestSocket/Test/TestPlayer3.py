@@ -74,7 +74,7 @@ while True:
         parts = line.split(':')
         cmd = parts[0]
         cmd_param = parts[1].split(',')
-        if cmd == "play-cards":
+        if cmd == "pcs":
             packet = {
                 InterProtocol.cmd_type: InterProtocol.sock_req_cmd,
                 InterProtocol.sock_req_cmd: InterProtocol.client_req_play_cards,

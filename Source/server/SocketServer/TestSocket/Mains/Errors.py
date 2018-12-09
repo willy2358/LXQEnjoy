@@ -19,7 +19,8 @@ invalid_player_clientid = 123
 player_not_registered = 124
 player_not_join_game = 125
 player_not_pending_cmd = 126
-invalid_cmd_or_param = 127
+invalid_cmd = 127
+invalid_cmd_param = 128
 
 
 
@@ -46,5 +47,6 @@ Errors = {
     player_not_registered:"Not registered player, should be registered by authorized organization",
     player_not_join_game: "Not in game, should join game at first",
     player_not_pending_cmd: "Illegal player, should not send cmd when not been asked for",
-    invalid_cmd_or_param:"Invalid cmd or cmd arguments"
+    invalid_cmd: "Invalid cmd",
+    invalid_cmd_param:"Invalid cmd arguments"
 }

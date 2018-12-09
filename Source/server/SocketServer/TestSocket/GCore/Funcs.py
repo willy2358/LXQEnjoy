@@ -134,7 +134,13 @@ def player_has_cards(scene, args):
 
 #args: player
 def player_cards_of_free(scene, args):
-    pass
+    try:
+        player = args[0]
+        return player.get_free_cards()
+
+    except Exception as ex:
+        Log.exception(ex)
+        return None
 
 def player_cards_of_shown(scene, args):
     pass

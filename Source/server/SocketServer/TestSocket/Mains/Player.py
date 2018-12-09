@@ -48,6 +48,9 @@ class Player(ExtAttrs):
     def get_is_robot_play(self):
         return self.__is_robot_play
 
+    def get_free_cards(self):
+        return self.__free_cards[:]
+
     def has_cards(self, cards):
         #考虑到cards中有多张相同牌的可能
         tmpCards = self.__free_cards[:]

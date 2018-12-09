@@ -62,6 +62,7 @@ server_push_pub_msg = "pub-msg"
 
 pack_field_msg = "msg"
 pack_field_silent="silent"
+pack_field_cmd_alias = "cmd_alias"
 
 cmd_data_cards = "cards"
 
@@ -160,7 +161,8 @@ def create_play_cards_packet(player, cards, cmd_alias = server_push_play_cards):
 
     packet = {
         cmd_type: server_cmd_type_push,
-        server_cmd_type_push: cmd_alias,
+        server_cmd_type_push: server_push_play_cards,
+        pack_field_cmd_alias: cmd_alias,
         user_id: player.get_userid(),
         cmd_data_cards: l_cards,
         player_state:state

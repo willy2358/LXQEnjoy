@@ -312,7 +312,7 @@ class PlayScene(ExtAttrs):
 
     def waiting_for_player_exe_cmd(self):
         while self.__pending_player and self.__pending_cmds:
-            time.sleep(0.2)  # sleep 0.2 seconds
+            time.sleep(0.5)  # sleep 0.2 seconds
             if int(time.time()) % 6 == 0:
                 Log.debug("waiting_for_player_exe_cmd, thread:{0}".format(threading.get_ident()))
                 Log.debug("waiting for player {0} action ...".format(self.__pending_player.get_userid()))
@@ -398,58 +398,69 @@ class PlayScene(ExtAttrs):
 
         player.play_cards(cards)
 
+    #当相同命令只有一个时，玩家可以不发送命令参数，只发送命令即可
+    #当相同命令有多个时，玩家需要发送命令参数，且参数需匹配
+    def check_player_cmd_param(self, player, cmd, cmd_args):
+        cmdObjs = []
+        for c in self.__pending_cmds:
+            if c.get_cmd() == cmd:
+                cmdObjs.append(c)
+
+        if not cmdObjs:
+            player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd)
+            return None, None
+
+            # 多个相同的命令，但参数不同，需要进一步检查实参，确定玩家选择
+        validCmd, validParam = cmd, cmd_args
+        if len(cmdObjs) > 1:
+            argMatch = False
+            for c in cmdObjs:
+                if c.get_cmd_param() == cmd_args:
+                    argMatch = True
+            if not argMatch:
+                player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_param)
+                return None, None
+        else:
+            validCmdParam = cmdObjs[0].get_cmd_param()
+
+        return validCmd, validCmdParam
 
     def process_player_exed_cmd(self, player, cmd, cmd_args, auto_seled = False):
         if player != self.__pending_player:
             player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.player_not_pending_cmd)
         else:
-            cmdObj = None
-            for c in self.__pending_cmds:
-                if c.get_cmd() == cmd:
-                    cmdObj = c
-                    break
-
-            if not cmdObj:
-                player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_or_param)
+            args = cmd_args
+            if not auto_seled:
+                c,args = self.check_player_cmd_param(player, cmd, cmd_args)
+                if not c:
+                    return
 
             act_stms = None
             if cmd in self.__actions:
                 act_stms = self.__actions[cmd]
 
             if not act_stms:
-                Log.error("Lacking action configuration")
-                player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_or_param)
+                Log.error("Action {0} lacking of configuration".format(cmd))
+                player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd)
                 return
 
             # 准备参数
             self.__cmd_player = player
-            self.__cmd_args = cmd_args
+            self.__cmd_args = args
 
-            if callable(act_stms[0]): # has param checker
+            if callable(act_stms[0]):  # has param checker
                 # 优先使用param_check检查参数
                 ret = act_stms[0]()
                 if not ret:
-                    player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_or_param)
+                    player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_param)
                     return
-            elif not auto_seled and cmdObj.get_cmd_param() != cmd_args:
-                player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_or_param)
-                return
 
-            # pack = InterProtocol.create_player_exed_cmd_json_packet(player, cmd_alias, cmd_args)
-            # for p in self.get_players():
-            #     p.send_server_cmd_packet(pack)
-
-            #执行内部逻辑
+            # 执行内部逻辑
             if callable(act_stms[1]):
                 act_stms[1]()
 
             Log.debug("player {0} exed action {1}".format(self.__pending_player.get_userid(), cmd))
-            #重置，允许继续执行后面的命令
+            # 重置，允许继续执行后面的命令
             self.__pending_player = None
             self.__pending_cmds = None
-
-
-
-
-
 

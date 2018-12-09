@@ -17,7 +17,7 @@ class ActRef(Statement):
 
     def gen_runtime_obj(self, scene):
         def ret_cmd():
-            Log.debug("Executing:{0} ....".format(self.get_step()))
+            Log.debug("Executing act ref:{0} ....".format(self.get_step()))
             param = scene.get_obj_value(self.__param)
             cmd = PlayCmd(None, self.__ref_act_name, scene.get_obj_value(self.__param))
             if self.__hidden:

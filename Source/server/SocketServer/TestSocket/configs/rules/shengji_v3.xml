@@ -166,26 +166,6 @@
         </patterns>
     </cards>
 
-    <!--跟牌规则：
-    是否跟牌：
-    1. 必须出牌
-      牌型要求
-        无相同牌型的处理
-        与起牌人的牌型相同
-        与上家的牌型相同
-      牌张要求
-    2. 大才出牌
-
-    pattern_ref_as="@round.trick_init_player"
-    pattern_ref_as="@prev_cards"
-    -->
-    <following must_follow="true"
-               pattern_ref_as="trick_init_cards">
-        <var name="leading" value="@trick_init_cards" value_type="cards"/>
-
-
-    </following>
-
     <!--玩家-->
     <players min="4" max="4">
         <attr name="bank_cfigure" value_type="int" value="2"/>
@@ -197,6 +177,7 @@
         <attr name="IsTrickWinner" value_type="bool" value="false"/>
         <attr name="trick_cards" value_type="cards" value="none"/>
         <attr name="trick_power" value_type="int" value="0"/>
+        <attr name="trick_score" value_type="int" value="0"/>
     </players>
 
     <!--一圈-->
@@ -516,6 +497,20 @@
             </ift>
             <ret value="@#f_val"></ret>
         </proc>
+
+        <proc name="set_player_trick_score" params="#arg_player, #arg_cards">
+            <var name="#spts_score" value="0" value_type="int"/>
+            <ift value_of=":(cfigure_of(element_at(@#arg_cards, 0)))" ret_is="5">
+                <update property="@#spts_score" value="5"/>
+            </ift>
+
+            <ift value_of=":(cfigure_of(element_at(@#arg_cards, 0)))" ret_is="10">
+                <update property="@#spts_score" value="10"/>
+            </ift>
+            <ift value_of=":(cfigure_of(element_at(@#arg_cards, 0)))" ret_is="13">
+                <update property="@#spts_score" value="10"/>
+            </ift>
+        </proc>
     </procs>
 
     <!--对于action，其内部可访问两个隐含的参数：
@@ -537,6 +532,8 @@
                     <!--设置进攻方-->
                     <update property="@round.attacters" op="add" value=":(next_player_of(@cmd_player,1))"/>
                     <update property="@round.attacters" op="add" value=":(next_player_of(@cmd_player,3))"/>
+
+                    <update property="@round.trick_init_player" value="@cmd_player"/>
                 </then>
             </ift>
             <pub_act exer="@cmd_player" to_players="@round.players" act="jiaozhu" args="@cmd_args"></pub_act>
@@ -577,12 +574,22 @@
                     </ift>
                 </else>
             </ift>
+             <update step="act-playcard-2" property="@cmd_player.trick_score" value=":(#set_player_trick_score(none, @cmd_args))"/>
 
         </action>
 
-        <action name="force_chupai">
-            <playcards player="@cmd_player" alias="chupai" cards=":(select_random_cards(count=1))" cards_face_up="true"/>
+        <action name="robot_lead_card">
+            <var name="#fc_tmp_card" value_type="card" value="none"></var>
+            <pick_cards from_player="@cmd_player" count="1" to_var="@#fc_tmp_card"/>
+            <playcards player="@cmd_player" cards="@#fc_tmp_card" alias="chu pai" cards_face_up="true"/>
+            <update step="robot_lead_card-3" property="@round.is_trick_valid_leading_cards" value="true"/>
+            <update step="robot_lead_card-4" property="@cmd_player.trick_score" value=":(#set_player_trick_score(none, @#fc_tmp_card))"/>
         </action>
+
+        <action name="robot_follow_cards">
+
+        </action>
+
 
         <action name="force_koupai" text="koupai">
             <var name="#afk_other_players" value_type="players" value="@round.players"></var>
@@ -672,14 +679,15 @@
         </act_opts>
 
         <update step="12" property="@round.trick_leading_player" value="@main_defender"/>
-        <var step="13" name="trick_init_player" value_type="player" value="@main_defender"/>
+        <update property="@round.trick_init_player" value="@main_defender"/>
+        <!--<var step="13" name="trick_init_player" value_type="player" value="@main_defender"/>-->
 
         <!--进入打牌，从主打开始, 一局结束，主打手里没牌-->
         <loop_until step="14" value_of=":(count_of(player_cards_of_free(@round.trick_leading_player)))" ret_gt="0">
             <loop_until step="14-1" value_of="@round.is_trick_valid_leading_cards" ret_is="false">
-                <act_opts timeout="30" timeout_act="force_chupai" to_player="@round.trick_init_player">
+                <act_opts step="14-1-1" timeout="30" timeout_act="robot_lead_card" to_player="@round.trick_init_player">
                         <act_ref act="playcard"/>
-                        <act_ref act="force_chupai" hidden="true"/>
+                        <act_ref act="robot_lead_card" hidden="true"/>
                 </act_opts>
             </loop_until>
 
@@ -688,9 +696,9 @@
                 <var name="valid_following_cards" value_type="bool" value="false"/>
                 <var name="follower" value_type="player" value=":(next_player_of(@round.trick_init_player, @sorder))"/>
                 <loop_until value_of="@round.is_player_valid_cards" ret_is="false">
-                    <act_opts timeout="30" timeout_act="force_chupai" to_player="@follower">
+                    <act_opts timeout="30" timeout_act="robot_follow_cards" to_player="@follower">
                             <act_ref act="playcard"/>
-                            <act_ref act="force_chupai" hidden="true"/>
+                            <act_ref act="robot_follow_cards" hidden="true"/>
                     </act_opts>
                 </loop_until>
                 <update property="@sorder" op="add" value="1"/>

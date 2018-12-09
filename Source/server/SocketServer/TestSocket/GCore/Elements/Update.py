@@ -11,9 +11,8 @@ import Mains.Log as Log
 # <update property="@round.defenders" value="@scene.defenders"/>
 # <update property="@drawer" value=":(next_player_of(@drawer))"/>
 # <update property="@round.bank_ctype" value=":(var c; var t; c=max_cfigure_of(@round.kitty); t=ctype_of(@c); return @t)" />
-# <update targets="@p1" property="IsMainPlayer" value="false"/>
-# <update property="IsMainPlayer" targets=":(find_player(seatid == @seatid + 1))" value="true"/>
-# <update targets=":(find_players(IsAttacter == true))" property="score" op="add" value="card_score"/>
+# <update property="@round.winners.[].IsDefender" value="true"/>
+# <update property="@players.[].Score" value="20"/>
 class Update(Statement):
     def __init__(self, prop, value, op = Operator.Update):
         super(Update, self).__init__()
@@ -80,11 +79,16 @@ class Update(Statement):
     def gen_runtime_obj(self, scene):
         def updates():
             try:
-                Log.debug("Executing:{0} ....".format(self.get_step()))
+                Log.debug("Executing update :{0} ....".format(self.get_step()))
                 opVal = scene.get_obj_value(self.__opVal)
+                if not opVal:
+                    Log.error("Value attr should not none at var :{0}".format(self.__opVal))
                 if isinstance(self.__prop, VarRef):
                     objs = []
                     rtVar = scene.get_rt_var(self.__prop)
+                    if not rtVar:
+                        Log.error("Prop attr should not none at var :{0}".format(self.__prop))
+
                     if isinstance(rtVar, list):
                         objs = rtVar[:]
                     elif rtVar:
