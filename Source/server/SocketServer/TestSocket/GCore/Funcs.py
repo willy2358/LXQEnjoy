@@ -60,6 +60,9 @@ def find_player(scene, args):
 def find_players(scene, args):
     pass
 
+# args: cards, cfigure
+def first_card_of_cfigure(scene, args):
+    pass
 
 #args: cards, pattern(single,pair,triple,quad,same_type,
 #def is_cards_match_pattern(scene, args):

@@ -232,18 +232,21 @@
                     <ift value_of=":(is_cards_contain_cfigure(@round.kitty, @round.bank_cfigure))" ret_is="true">
                         <then>
                             <!--有级数牌，从级数牌里选-->
-                            <update property="@round.bank_ctype" value=":(var c1; var t1; c1=card_of_cfigure(@round.kitty, @round.bank_cfigure); t1=ctype_of(@c1); return @t1)" />
+                            <update property="@round.bank_ctype" value=":(var c1; var t1; c1=first_card_of_cfigure(@round.kitty, @round.bank_cfigure); t1=ctype_of(@c1); return @t1)" />
                         </then>
                         <else>
                             <!--无王牌，无级牌，选点数最大牌-->
-                            <update property="@round.bank_ctype" value=":(var c2; var t2; c2=max_cfigure_of(@round.kitty); t2=ctype_of(@c2); return @t2)" />
+                            <update property="@round.bank_ctype" value=":(var c2; var t2; c2=max_cfigure_of_cards(@round.kitty); t2=ctype_of(@c2); return @t2)" />
                         </else>
                     </ift>
                 </else>
             </ift>
         </proc>
+
+        <!--是否为有效的起始出牌-->
         <proc name="is_valid_leading_cards" params="#arg_player, #arg_cards">
             <var name="#p2_valid_leading" value_type="bool" value="false"/>
+            <!--单牌，有效-->
             <ift value_of=":(count_of(@#arg_cards))" ret_is="1">
                 <update property="@#p2_valid_leading" value="true"></update>
             </ift>
@@ -260,18 +263,8 @@
                 <update property="@#p2_valid_leading" value="true"></update>
             </ift>
 
-            <ift value_of="@#p2_valid_leading" ret_is="false">
-                <var name="#p2_ctype" value_type="int" value=":(ctype_of(element_at(@#arg_cards,0)))"/>
-                <var name="#p2_other_cards" value_type="cards" value="none"/>
-                <var name="#p2_sorder" value_type="int" value="1"/>
-                <var name="#p2_next_player" value="none" value_type="player"/>
-                <loop_until value_of="@#p2_sorder" ret_lt="4">
-                    <update property="@#p2_next_player" value=":(next_player_of(@#arg_player, @#p2_sorder))"/>
-                    <update property="@#p2_other_cards" op="append" value=":(player_cards_of_ctype(@#p2_next_player, @#p2_ctype))"/>
-                </loop_until>
-            </ift>
+            <!--甩牌-->
             <ift>
-                <!--甩牌-->
                 <cases op="and">
                     <!--前提，任需探测-->
                     <case value_of="@#p2_valid_leading" ret_is="false"/>
@@ -279,10 +272,22 @@
                     <case value_of=":(is_cards_same_ctype(@#arg_cards))" ret_is="true" />
                     <!--不能是主-->
                     <case value_of=":(ctype_of(element_at(@#arg_cards,0)))" ret_not_as="@round.bank_ctype"/>
-                    <!--其他玩家没有大过的牌-->
-                    <case value_of=":(min_cfigure_of_cards(@#arg_cards))" ret_gt_as=":(max_cfigure_of_cards(@#p2_other_cards))" />
                 </cases>
-                <update property="@#p2_valid_leading" value="true"></update>
+                <then>
+                    <var name="#p2_ctype" value_type="int" value=":(ctype_of(element_at(@#arg_cards,0)))"/>
+                    <var name="#p2_other_cards" value_type="cards" value="none"/>
+                    <var name="#p2_sorder" value_type="int" value="1"/>
+                    <var name="#p2_next_player" value="none" value_type="player"/>
+                    <loop_until step="ivlc-3" value_of="@#p2_sorder" ret_lt="4">
+                        <update property="@#p2_next_player" value=":(next_player_of(@#arg_player, @#p2_sorder))"/>
+                        <update property="@#p2_other_cards" op="append" value=":(player_cards_of_ctype(@#p2_next_player, @#p2_ctype))"/>
+                        <update property="@#p2_sorder" op="add" value="1"/>
+                    </loop_until>
+                    <!--其他玩家没有大过的牌-->
+                    <ift step="ivlc-4" value_of=":(min_cfigure_of_cards(@#arg_cards))" ret_gt_as=":(max_cfigure_of_cards(@#p2_other_cards))">
+                        <update property="@#p2_valid_leading" value="true"></update>
+                    </ift>
+                </then>
             </ift>
 
             <ret value="@#p2_valid_leading"></ret>
@@ -329,7 +334,7 @@
                             <case value_of=":(ctype_of(element_at(@round.trick_leading_cards, 0)))" ret_as="@round.bank_ctype"/>
                             <case value_of=":(count_of(@#arg_cards))" ret_is="1"></case>
                             <case value_of=":(ctype_of(element_at(@#arg_cards,0)))" ret_not_as=":(ctype_of(element_at(@round.trick_leading_cards,0)))"></case>
-                            <case value_of=":(is_player_has_cards_of_ctype(ctype_of(element_at(@round.trick_leading_cards,0))))" ret_is="false"></case>
+                            <case value_of=":(is_player_has_cards_of_ctype(@round.bank_ctype)" ret_is="false"></case>
                             <case value_of=":(is_player_has_cards_of_cfigure(#arg_player, @round.bank_cfigure))" ret_is="false"/>
                             <case value_of=":(is_player_has_cards_of_ctype(#arg_player, j))" ret_is="false"></case>
                         </cases>
@@ -356,21 +361,25 @@
                             <case value_of=":(is_cards_same_cfigure(@round.trick_leading_cards))" ret_is="true"/>
                             <cases op="or">
                                 <cases op="and">
+                                    <!---缺少club, 玩家还有club, club card的点数不是主牌点数-->
                                     <case value_of=":(is_cards_contain_ctype(@#arg_cards, c))" ret_is="false"/>
                                     <case value_of=":(is_player_has_cards_of_ctype(@#arg_player, c))" ret_is="true"/>
                                     <case value_of=":(is_cards_contain_cfigure(player_cards_of_ctype(c), @round.bank_cfigure))" ret_is="false"/>
                                 </cases>
                                 <cases op="and">
+                                    <!---缺少diamond, 玩家还有diamond, diamond card的点数不是主牌点数-->
                                     <case value_of=":(is_cards_contain_ctype(@#arg_cards, d))" ret_is="false"/>
                                     <case value_of=":(is_player_has_cards_of_ctype(@#arg_player, d))" ret_is="true"/>
                                     <case value_of=":(is_cards_contain_cfigure(player_cards_of_ctype(d), @round.bank_cfigure))" ret_is="false"/>
                                 </cases>
                                 <cases op="and">
+                                    <!---缺少heart, 玩家还有heart, heart card的点数不是主牌点数-->
                                     <case value_of=":(is_cards_contain_ctype(@#arg_cards, h))" ret_is="false"/>
                                     <case value_of=":(is_player_has_cards_of_ctype(@#arg_player, h))" ret_is="true"/>
                                     <case value_of=":(is_cards_contain_cfigure(player_cards_of_ctype(h), @round.bank_cfigure))" ret_is="false"/>
                                 </cases>
                                 <cases op="and">
+                                    <!---缺少spade, 玩家还有spade, spade card的点数不是主牌点数-->
                                     <case value_of=":(is_cards_contain_ctype(@#arg_cards, s))" ret_is="false"/>
                                     <case value_of=":(is_player_has_cards_of_ctype(@#arg_player, s))" ret_is="true"/>
                                     <case value_of=":(is_cards_contain_cfigure(player_cards_of_ctype(s), @round.bank_cfigure))" ret_is="false"/>
