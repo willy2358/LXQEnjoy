@@ -509,7 +509,7 @@
             <ret value="@#f_val"></ret>
         </proc>
 
-        <proc name="set_player_trick_score" params="#arg_player, #arg_cards">
+        <proc name="get_cards_score" params="#arg_cards">
             <var name="#spts_score" value="0" value_type="int"/>
             <ift value_of=":(cfigure_of(element_at(@#arg_cards, 0)))" ret_is="5">
                 <update property="@#spts_score" value="5"/>
@@ -665,7 +665,7 @@
                     </ift>
                 </else>
             </ift>
-             <update step="act-playcard-2" property="@cmd_player.trick_score" value=":(#set_player_trick_score(none, @cmd_args))"/>
+             <update step="act-playcard-2" property="@cmd_player.trick_score" value=":(#get_cards_score(@cmd_args))"/>
 
         </action>
 
@@ -674,12 +674,12 @@
             <pick_cards from_player="@cmd_player" count="1" to_var="@#fc_tmp_card"/>
             <playcards player="@cmd_player" cards="@#fc_tmp_card" alias="chu pai" cards_face_up="true"/>
             <update step="robot_lead_card-3" property="@round.is_trick_valid_leading_cards" value="true"/>
-            <update step="robot_lead_card-4" property="@cmd_player.trick_score" value=":(#set_player_trick_score(none, @#fc_tmp_card))"/>
+            <update step="robot_lead_card-4" property="@cmd_player.trick_score" value=":(#get_cards_score(@#fc_tmp_card))"/>
             <update property="@cmd_player.trick_power" value=":(get_player_trick_power(@cmd_player,@#fc_tmp_card))"/>
             <update property="@round.trick_leading_pattern" value="single"/>
         </action>
 
-        <action name="robot_follow_cards">
+        <action step="act-robot_follow_cards" name="robot_follow_cards">
             <var name="#rfc_played_cards" value_type="cards" value="none"/>
             <ift value_of="@round.trick_leading_pattern" ret_is="single">
                 <then>

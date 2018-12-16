@@ -33,7 +33,7 @@ class Proc(Statement):
         # varibles, register in scene
         if self.__params:
             for p in self.__params:
-                p.gen_runtime_obj(scene)
+                p.gen_runtime_obj(scene)()
 
         def proc_func():
             try:

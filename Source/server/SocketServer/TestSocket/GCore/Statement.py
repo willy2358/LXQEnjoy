@@ -8,7 +8,7 @@ class Statement:
         pass
 
     def get_step(self):
-        if self.__step == "14-2":
+        if self.__step == "robot_lead_card-4":
             stop = 1
         return self.__step
 

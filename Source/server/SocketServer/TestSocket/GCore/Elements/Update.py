@@ -81,8 +81,8 @@ class Update(Statement):
             try:
                 Log.debug("Executing update :{0} ....".format(self.get_step()))
                 opVal = scene.get_obj_value(self.__opVal)
-                if not opVal:
-                    Log.error("Value attr should not none at var :{0}".format(self.__opVal))
+                # if opVal:
+                #     Log.error("Value attr should not none at var :{0}".format(self.__opVal))
                 if isinstance(self.__prop, VarRef):
                     objs = []
                     rtVar = scene.get_rt_var(self.__prop)
