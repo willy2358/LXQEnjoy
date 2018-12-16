@@ -212,6 +212,9 @@
             <attr name="trick_cards" value_type="cards" value="none"/>
             <attr name="trick_score" value_type="int" value="0"/>
             <attr name="kitty_score" value_type="int" value="0"/>
+
+            <!--values: single, squd, shuai-->
+            <attr name="trick_leading_pattern" value_type="str" value="single"/>
         </attrs>
         <!---for debug-->
         <debug ordered_cards="s3 , d3 ,c3, h3,h4,h5,c7,d6,s6,s8,s1 ,h2"></debug>
@@ -334,7 +337,7 @@
                             <case value_of=":(ctype_of(element_at(@round.trick_leading_cards, 0)))" ret_as="@round.bank_ctype"/>
                             <case value_of=":(count_of(@#arg_cards))" ret_is="1"></case>
                             <case value_of=":(ctype_of(element_at(@#arg_cards,0)))" ret_not_as=":(ctype_of(element_at(@round.trick_leading_cards,0)))"></case>
-                            <case value_of=":(is_player_has_cards_of_ctype(@round.bank_ctype)" ret_is="false"></case>
+                            <case value_of=":(is_player_has_cards_of_ctype(@round.bank_ctype))" ret_is="false"></case>
                             <case value_of=":(is_player_has_cards_of_cfigure(#arg_player, @round.bank_cfigure))" ret_is="false"/>
                             <case value_of=":(is_player_has_cards_of_ctype(#arg_player, j))" ret_is="false"></case>
                         </cases>
@@ -396,29 +399,28 @@
                     </ift>
 
                     <ift>
-                        <!--甩牌-->
+                        <!--甩牌, 甩牌为副牌-->
                         <cases>
                             <case value_of="@#ivfc_valid_following" ret_is="false"/>
                             <case value_of=":(is_cards_same_ctype(@round.trick_leading_cards))" ret_is="true"/>
                         </cases>
                         <then>
+                            <var name="#ivfc_leading_type" value_type="str" value=":(ctype_of(element_at(@round.trick_leading_cards,0)))"/>
                             <var name="#ivfc_tmp_cards2" value_type="cards" value=":(parts_of_cards_ex_cfigure(@#arg_cards, @round.bank_cfigure))"></var>
+                            <var name="#ivfc_ctype_fcount" value_type="int" value=":(count_of(parts_of_cards_of_ctype(@#arg_cards, @#ivfc_leading_type)))"/>
+                            <update property="@#ivfc_tmp_cards2" value=":(parts_of_cards_of_ctype(@#ivfc_tmp_cards2, @#ivfc_leading_type))"/>
                             <ift >
                                 <cases op="and">
-                                    <case value_of=":(count_of(@#ivfc_tmp_cards2))" ret_as=":(count_of(@round.trick_leading_cards))"></case>
-                                    <case value_of=":(ctype_of(element_at(@#ivfc_tmp_cards2,0)))" ret_as=":(ctype_of(element_at(@round.trick_leading_cards,0)))"></case>
+                                    <case value_of="@#ivfc_ctype_fcount" ret_lt_as=":(count_of(@round.trick_leading_cards))"></case>
+                                    <case value_of=":(count_of(@#ivfc_tmp_cards2))" ret_gt_as="@#ivfc_ctype_fcount"></case>
                                 </cases>
                                 <then>
-                                    <!--跟牌同色-->
-                                    <update property="@#ivfc_valid_following" value="true"></update>
+                                    <!--手里还有甩牌花色，但没出牌-->
+                                    <update property="@#ivfc_valid_following" value="false"></update>
                                 </then>
                                 <else>
                                     <!---玩家手里没有同色牌-->
-                                    <var name="#ivfc_tmp_cards1" value_type="cards" value=":(player_cards_of_free(@#arg_player))"/>
-                                    <update property="@#ivfc_tmp_cards1" value=":(parts_of_cards_ex_cfigure(@#ivfc_tmp_cards1, @round.bank_cfigure))"/>
-                                    <ift value_of=":(count_of(@#ivfc_tmp_cards2))" ret_as=":(count_of(@#ivfc_tmp_cards1))">
-                                        <update property="@#ivfc_valid_following" value="true"></update>
-                                    </ift>
+                                    <update property="@#ivfc_valid_following" value="true"></update>
                                 </else>
                             </ift>
 
@@ -519,6 +521,69 @@
             <ift value_of=":(cfigure_of(element_at(@#arg_cards, 0)))" ret_is="13">
                 <update property="@#spts_score" value="10"/>
             </ift>
+            <ret value="@#spts_score"/>
+        </proc>
+
+        <proc name="get_card_base_power" params="#arg_cards">
+            <var name="#gcbp_solo_card" value_type="card" value=":(element_at(@#arg_cards, 0))"/>
+            <var name="#gcbp_base_power" value="0" value_type="int"/>
+            <ift value_of=":(cfigure_of(@#gcbp_solo_card))" ret_is="1">
+                <update property="@#gcbp_base_power" value="14"></update>
+                <else>
+                    <update property="@#gcbp_base_power" value=":(cfigure_of(@#gcbp_solo_card))"></update>
+                </else>
+            </ift>
+            <ret value="@#gcbp_base_power"/>
+        </proc>
+
+        <proc name="get_player_trick_power" params="#arg_player, #arg_cards">
+            <var name="#gptp_power"  value_type="int" value="0"/>
+            <ift value_of=":(count_of(@#arg_cards))" ret_is="1" >
+                <!--单牌-->
+                <then>
+                    <!--单牌-->
+                    <var name="#gptp_solo_card" value_type="card" value=":(element_at(@#arg_cards, 0))"/>
+                    <ift value_of=":(cfigure_of(@#gptp_solo_card))" ret_is="22">
+                        <then>
+                            <!--大王-->
+                            <update property="@#gptp_power" value="51"/>
+                        </then>
+                        <else>
+                           <ift value_of=":(cfigure_of(@#gptp_solo_card))" ret_is="21">
+                               <then>
+                                   <!--小王-->
+                                   <update property="@#gptp_power" value="50"/>
+                               </then>
+                               <else>
+                                   <ift value_of=":(cfigure_of(@#gptp_solo_card))" ret_as="@round.bank_cfigure">
+                                       <update property="@#gptp_power" value="40"/>
+                                       <else>
+                                           <ift value_of=":(ctype_of(@#gptp_solo_card))" ret_as="@round.bank_ctype">
+                                               <then>
+                                                   <!--级牌-->
+                                                   <update property="@#gptp_power" value="20"/>
+                                                   <update property="@#gptp_power" op="add" value=":(#get_card_base_power(@#gptp_solo_card))"/>
+                                               </then>
+                                               <else>
+                                                   <!--副牌-->
+                                                   <update property="@#gptp_power" value=":(#get_card_base_power(@#gptp_solo_card))"/>
+                                               </else>
+                                           </ift>
+                                       </else>
+                                   </ift>
+                               </else>
+                           </ift>
+                        </else>
+                    </ift>
+                </then>
+                <else>
+                    <!--TODO, 甩牌 炸牌
+                    <ift value_of=""></ift>
+                    -->
+                </else>
+            </ift>
+            <ret value="@#gptp_power"/>
+
         </proc>
     </procs>
 
@@ -574,12 +639,29 @@
                     <ift value_of="@round.is_trick_valid_leading_cards" ret_is="true">
                         <playcards player="@cmd_player" cards="@cmd_args" alias="chupai" cards_face_up="true"/>
                         <update property="@round.trick_leading_cards" value="@cmd_args"/>
+                        <ift value_of=":(count_of(#cmd_args))" ret_is="1">
+                            <then>
+                                <update property="@round.trick_leading_pattern" value="single"/>
+                            </then>
+                            <else>
+                                <ift value_of=":(is_cards_same_cfigure(@cmd_args))" ret_is="true">
+                                    <then>
+                                        <update property="@round.trick_leading_pattern" value="squd"/>
+                                    </then>
+                                    <else>
+                                         <update property="@round.trick_leading_pattern" value="shuai"/>
+                                    </else>
+                                </ift>
+                            </else>
+                        </ift>
                     </ift>
+                    <update property="@cmd_player.trick_power" value=":(get_player_trick_power(@cmd_player,@cmd_args))"/>
                 </then>
                 <else>
                     <update property="@round.is_player_valid_cards" value=":(#is_valid_following_cards(@cmd_player, @cmd_args))"/>
                     <ift value_of="@round.is_player_valid_cards" ret_is="true">
                         <playcards player="@cmd_player" cards="@cmd_args" alias="chupai" cards_face_up="true"/>
+                        <update property="@cmd_player.trick_power" value=":(get_player_trick_power(@cmd_player,@cmd_args))"/>
                     </ift>
                 </else>
             </ift>
@@ -593,10 +675,55 @@
             <playcards player="@cmd_player" cards="@#fc_tmp_card" alias="chu pai" cards_face_up="true"/>
             <update step="robot_lead_card-3" property="@round.is_trick_valid_leading_cards" value="true"/>
             <update step="robot_lead_card-4" property="@cmd_player.trick_score" value=":(#set_player_trick_score(none, @#fc_tmp_card))"/>
+            <update property="@cmd_player.trick_power" value=":(get_player_trick_power(@cmd_player,@#fc_tmp_card))"/>
+            <update property="@round.trick_leading_pattern" value="single"/>
         </action>
 
         <action name="robot_follow_cards">
-
+            <var name="#rfc_played_cards" value_type="cards" value="none"/>
+            <ift value_of="@round.trick_leading_pattern" ret_is="single">
+                <then>
+                    <var name="#rfc_want_type" value_type="str" value=":(ctype_of(element_at(@round.trick_leading_cards, 0))"/>
+                    <var name="#rfc_type_cards" value_type="cards" value=":(player_cards_of_ctype(@cmd_player))"/>
+                    <var name="#rfc_type_cards_no_bank_figure" value_type="cards" value=":(parts_of_cards_ex_cfigure(@#rfc_type_cards, @round.bank_cfigure))"/>
+                    <var name="#rfc_picked_cards" value_type="cards" value="none"/>
+                    <ift value_of=":(count_of(@#rfc_type_cards_no_bank_figure))" ret_gt="0">
+                        <then>
+                            <!--有同花色-->
+                            <update property="@#rfc_played_cards" value=":(element_at(@#rfc_type_cards_no_bank_figure, 0))"/>
+                            <playcards player="@cmd_player" cards="@#rfc_played_cards" alias="chupai" cards_face_up="true"/>
+                        </then>
+                        <else>
+                            <!--没有同花色-->
+                            <ift value_of="@#rfc_want_type" ret_as="@round.bank_ctype">
+                                <then>
+                                    <!--起牌是主牌-->
+                                    <ift value_of=":(count_of(@#rfc_type_cards))" ret_gt_as=":(count_of(@#rfc_type_cards_no_bank_figure))" >
+                                        <then>
+                                            <!--还有主点牌-->
+                                            <var name="#rft_fig_cards" value_type="cards" value=":(parts_of_cards_of_cfigure(@#rfc_type_cards, @round.bank_cfigure))"/>
+                                            <update property="@#rfc_played_cards" value=":(element_at(@#rft_fig_cards, 0))"/>
+                                            <playcards player="@cmd_player" cards="@#rfc_played_cards" alias="chupai" cards_face_up="true"/>
+                                        </then>
+                                        <else>
+                                            <!--没有主点牌-->
+                                             <pick_cards from_player="@cmd_player" count="1" to_var="@#rfc_played_cards"/>
+                                            <playcards player="@cmd_player" cards="@#rfc_played_cards" alias="chupai" cards_face_up="true"/>
+                                        </else>
+                                    </ift>
+                                </then>
+                                <else>
+                                    <!--起牌是不是主牌-->
+                                    <pick_cards from_player="@cmd_player" count="1" to_var="@#rfc_played_cards"/>
+                                    <playcards player="@cmd_player" cards="@#rfc_played_cards" alias="chupai" cards_face_up="true"/>
+                                </else>
+                            </ift>
+                        </else>
+                    </ift>
+                </then>
+            </ift>
+            <!--TODO for other patterns-->
+            <update property="@cmd_player.trick_power" value=":(get_player_trick_power(@cmd_player,@#rfc_played_cards))"/>
         </action>
 
 

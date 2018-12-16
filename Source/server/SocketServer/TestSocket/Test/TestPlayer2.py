@@ -69,6 +69,18 @@ while True:
         }
         str_obj = json.dumps(packet)
         client.send_message(str_obj)
+    elif line == "get-cards":
+        packet = {
+            InterProtocol.cmd_type: InterProtocol.sock_req_cmd,
+            InterProtocol.sock_req_cmd: InterProtocol.client_req_get_cards,
+            InterProtocol.user_id: userid,
+            InterProtocol.room_id: roomid,
+            InterProtocol.game_id: gameid,
+            "clientid": "00001",
+            "token": client.get_token(),
+        }
+        str_obj = json.dumps(packet)
+        client.send_message(str_obj)
     elif ':' in line:
         parts = line.split(':')
         cmd = parts[0]

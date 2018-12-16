@@ -23,6 +23,7 @@ client_req_cmd_leave_game = "leave-game" #离开游戏
 client_req_select_action = "sel-act"
 client_req_type_reconnect = "reconnect"   # 断线重连
 client_req_type_exe_cmd = "exe-cmd"
+client_req_get_cards = "get-cards"     #取得当前可活动牌列表
 
 
 client_req_exe_cmd = "cmd"
@@ -95,6 +96,16 @@ majiang_acts_priorities = [majiang_player_act_zimo, majiang_player_act_hu,
 
 min_room_id = 10   # valid room id should > 10
 
+def create_player_cards_data_pack(player):
+    packet = {
+        cmd_type: sock_resp,
+        sock_resp: client_req_get_cards,
+        sock_result: sock_result_ok,
+        cmd_data_cards: player.get_free_cards()
+    }
+
+    return packet
+
 def create_success_resp_data_pack(cmd, dataName, dataObj):
     packet = {
         cmd_type: sock_resp,
@@ -117,6 +128,7 @@ def create_success_resp_pack(cmd):
     }
 
     return packet
+
 
 def create_cards_state_packet(player, isForOwn = True):
     packet = {
