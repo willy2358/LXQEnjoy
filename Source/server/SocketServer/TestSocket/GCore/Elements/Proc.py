@@ -37,7 +37,7 @@ class Proc(Statement):
 
         def proc_func():
             try:
-                Log.debug("Executing:{0} ....".format(self.get_step()))
+                Log.debug("Executing proc:{0} ....".format(self.get_step()))
                 rtObjs = []
                 for c in self.__statements:
                     if isinstance(c, Ret):

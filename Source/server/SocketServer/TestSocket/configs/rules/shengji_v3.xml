@@ -599,12 +599,12 @@
                 <!--第一局-->
                 <then>
                     <!--设置防守方-->
-                    <update property="@round.defenders" op="add" value="@cmd_player"/>
-                    <update property="@round.defenders" op="add" value=":(next_player_of(@cmd_player,2))"/>
-                    <update property="@cmd_player.IsMainPlayer" value="true"/>
+                    <update step="act1-2-1" property="@round.defenders" op="add" value="@cmd_player"/>
+                    <update step="act1-2-2" property="@round.defenders" op="add" value=":(next_player_of(@cmd_player,2))"/>
+                    <update step="act1-2-3" property="@cmd_player.IsMainPlayer" value="true"/>
                     
                     <!--设置进攻方-->
-                    <update property="@round.attacters" op="add" value=":(next_player_of(@cmd_player,1))"/>
+                    <update step="act1-2-4" property="@round.attacters" op="add" value=":(next_player_of(@cmd_player,1))"/>
                     <update property="@round.attacters" op="add" value=":(next_player_of(@cmd_player,3))"/>
 
                     <update property="@round.trick_init_player" value="@cmd_player"/>
@@ -821,7 +821,7 @@
         <!--进入打牌，从主打开始, 一局结束，主打手里没牌-->
         <loop_until step="14" value_of=":(count_of(player_cards_of_free(@round.trick_leading_player)))" ret_gt="0">
             <loop_until step="14-1" value_of="@round.is_trick_valid_leading_cards" ret_is="false">
-                <act_opts step="14-1-1" timeout="30" timeout_act="robot_lead_card" to_player="@round.trick_init_player">
+                <act_opts step="14-1-1" timeout="300" timeout_act="robot_lead_card" to_player="@round.trick_init_player">
                         <act_ref act="playcard"/>
                         <act_ref act="robot_lead_card" hidden="true"/>
                 </act_opts>
@@ -832,7 +832,7 @@
                 <var name="valid_following_cards" value_type="bool" value="false"/>
                 <var name="follower" value_type="player" value=":(next_player_of(@round.trick_init_player, @sorder))"/>
                 <loop_until value_of="@round.is_player_valid_cards" ret_is="false">
-                    <act_opts timeout="30" timeout_act="robot_follow_cards" to_player="@follower">
+                    <act_opts timeout="300" timeout_act="robot_follow_cards" to_player="@follower">
                             <act_ref act="playcard"/>
                             <act_ref act="robot_follow_cards" hidden="true"/>
                     </act_opts>

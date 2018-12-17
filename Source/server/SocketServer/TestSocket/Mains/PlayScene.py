@@ -421,7 +421,8 @@ class PlayScene(ExtAttrs):
                 player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_param)
                 return None, None
         else:
-            validCmdParam = cmdObjs[0].get_cmd_param()
+            args = cmdObjs[0].get_cmd_param()
+            validCmdParam = args if args else cmd_args
 
         return validCmd, validCmdParam
 
@@ -429,7 +430,7 @@ class PlayScene(ExtAttrs):
         if player != self.__pending_player:
             player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.player_not_pending_cmd)
         else:
-            args = cmd_args
+            args = cmd_args[:]
             if not auto_seled:
                 c,args = self.check_player_cmd_param(player, cmd, cmd_args)
                 if not c:

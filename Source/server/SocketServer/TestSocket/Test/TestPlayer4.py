@@ -108,7 +108,7 @@ while True:
                 InterProtocol.game_id: gameid,
                 "clientid": "00001",
                 "token": client.get_token(),
-                InterProtocol.client_req_exe_cmd: cmd,
+                InterProtocol.client_req_exe_cmd: cmd if not cmd.isnumeric() else cmd_opts[int(cmd) - 1]["cmd"],
                 InterProtocol.client_req_cmd_param: cmd_param
             }
             str_obj = json.dumps(packet)

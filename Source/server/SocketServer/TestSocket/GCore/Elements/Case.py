@@ -28,9 +28,9 @@ class Case(Statement):
                     f1 = None
                 ret = False
                 if self.__op == Operator.Equal:
-                    ret = (str(f1).lower() == str(f2).lower())
+                    ret = (f1 == f2 or (str(f1).lower() == str(f2).lower()))
                 elif self.__op == Operator.NotEqual:
-                    ret = (not (str(f1).lower() == str(f2).lower()))
+                    ret = f1 != f2 or (not (str(f1).lower() == str(f2).lower()))
                 elif self.__op == Operator.LessThan:
                     ret = (int(f1) < int(f2))
                 elif self.__op == Operator.NotLessThan:
