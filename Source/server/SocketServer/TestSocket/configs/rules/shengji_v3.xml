@@ -675,7 +675,7 @@
             <playcards player="@cmd_player" cards="@#fc_tmp_card" alias="chu pai" cards_face_up="true"/>
             <update step="robot_lead_card-3" property="@round.is_trick_valid_leading_cards" value="true"/>
             <update step="robot_lead_card-4" property="@cmd_player.trick_score" value=":(#get_cards_score(@#fc_tmp_card))"/>
-            <update property="@cmd_player.trick_power" value=":(get_player_trick_power(@cmd_player,@#fc_tmp_card))"/>
+            <update property="@cmd_player.trick_power" value=":(#get_player_trick_power(@cmd_player,@#fc_tmp_card))"/>
             <update property="@round.trick_leading_pattern" value="single"/>
         </action>
 

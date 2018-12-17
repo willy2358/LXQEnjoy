@@ -89,13 +89,14 @@ while True:
         if cmd == "play-cards":
             packet = {
                 InterProtocol.cmd_type: InterProtocol.sock_req_cmd,
-                InterProtocol.sock_req_cmd: InterProtocol.client_req_play_cards,
+                InterProtocol.sock_req_cmd: InterProtocol.client_req_type_exe_cmd,
                 InterProtocol.user_id: userid,
                 InterProtocol.room_id: roomid,
                 InterProtocol.game_id: gameid,
                 "clientid": "00001",
                 "token": client.get_token(),
-                InterProtocol.cmd_data_cards: cmd_param,
+                InterProtocol.client_req_exe_cmd: InterProtocol.client_req_play_cards,
+                InterProtocol.client_req_cmd_param: cmd_param
             }
             str_obj = json.dumps(packet)
             client.send_message(str_obj)
