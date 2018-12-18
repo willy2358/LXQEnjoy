@@ -75,11 +75,13 @@ class Clause(Statement):
             Log.debug("Executing:{0} ....".format(self.get_step()))
             try:
                 if cond():
+                    Log.debug("Executing true branch...")
                     if t_rt_objs:
                         for func in t_rt_objs:
                             if callable(func):
                                 func()
                 else:
+                    Log.debug("Executing false branch...")
                     if f_rt_objs:
                         for func in f_rt_objs:
                             if callable(func):

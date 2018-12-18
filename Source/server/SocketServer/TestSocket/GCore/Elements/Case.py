@@ -24,6 +24,7 @@ class Case(Statement):
             try:
                 f1 = scene.get_obj_value(self.__expr1)
                 f2 = scene.get_obj_value(self.__expr2)
+                Log.debug("expr1:{0}, cmp {2} with expr2:{1}".format(f1, f2, self.__op))
                 if isinstance(f1, list) and len(f1) == 0:
                     f1 = None
                 ret = False

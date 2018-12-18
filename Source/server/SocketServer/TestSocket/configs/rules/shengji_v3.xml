@@ -207,6 +207,7 @@
             <attr name="losers" value_type="players" value="none"/>
             <attr name="is_trick_valid_leading_cards" value_type="bool" value="false"/>
             <attr name="is_player_valid_cards" value_type="bool" value="false"/>
+            <attr name="is_valid_following_cards" value_type="bool" value="false"/>
             <attr name="trick_init_player" value="none" value_type="player"/>
             <attr name="trick_winner" value_type="player" value="none"/>
             <attr name="trick_cards" value_type="cards" value="none"/>
@@ -599,13 +600,13 @@
                 <!--第一局-->
                 <then>
                     <!--设置防守方-->
-                    <update step="act1-2-1" property="@round.defenders" op="add" value="@cmd_player"/>
-                    <update step="act1-2-2" property="@round.defenders" op="add" value=":(next_player_of(@cmd_player,2))"/>
+                    <update step="act1-2-1" property="@round.defenders" op="append" value="@cmd_player"/>
+                    <update step="act1-2-2" property="@round.defenders" op="append" value=":(next_player_of(@cmd_player,2))"/>
                     <update step="act1-2-3" property="@cmd_player.IsMainPlayer" value="true"/>
                     
                     <!--设置进攻方-->
-                    <update step="act1-2-4" property="@round.attacters" op="add" value=":(next_player_of(@cmd_player,1))"/>
-                    <update property="@round.attacters" op="add" value=":(next_player_of(@cmd_player,3))"/>
+                    <update step="act1-2-4" property="@round.attacters" op="append" value=":(next_player_of(@cmd_player,1))"/>
+                    <update property="@round.attacters" op="append" value=":(next_player_of(@cmd_player,3))"/>
 
                     <update property="@round.trick_init_player" value="@cmd_player"/>
                 </then>
@@ -655,13 +656,13 @@
                             </else>
                         </ift>
                     </ift>
-                    <update property="@cmd_player.trick_power" value=":(get_player_trick_power(@cmd_player,@cmd_args))"/>
+                    <update property="@cmd_player.trick_power" value=":(#get_player_trick_power(@cmd_player,@cmd_args))"/>
                 </then>
                 <else>
-                    <update property="@round.is_player_valid_cards" value=":(#is_valid_following_cards(@cmd_player, @cmd_args))"/>
-                    <ift value_of="@round.is_player_valid_cards" ret_is="true">
+                    <update property="@round.is_valid_following_cards" value=":(#is_valid_following_cards(@cmd_player, @cmd_args))"/>
+                    <ift value_of="@round.is_valid_following_cards" ret_is="true">
                         <playcards player="@cmd_player" cards="@cmd_args" alias="chupai" cards_face_up="true"/>
-                        <update property="@cmd_player.trick_power" value=":(get_player_trick_power(@cmd_player,@cmd_args))"/>
+                        <update property="@cmd_player.trick_power" value=":(#get_player_trick_power(@cmd_player,@cmd_args))"/>
                     </ift>
                 </else>
             </ift>
@@ -723,7 +724,8 @@
                 </then>
             </ift>
             <!--TODO for other patterns-->
-            <update property="@cmd_player.trick_power" value=":(get_player_trick_power(@cmd_player,@#rfc_played_cards))"/>
+            <update property="@cmd_player.trick_power" value=":(#get_player_trick_power(@cmd_player,@#rfc_played_cards))"/>
+            <update property="@round.is_valid_following_cards" value="true"/>
         </action>
 
 
@@ -818,8 +820,13 @@
         <update property="@round.trick_init_player" value="@main_defender"/>
         <!--<var step="13" name="trick_init_player" value_type="player" value="@main_defender"/>-->
 
+        <var step="12-2" name="sorder" value_type="int" value="0"/>
+        <var step="12-3" name="valid_following_cards" value_type="bool" value="false"/>
+        <var step="12-4" name="follower" value_type="player" value="none"/>
+
         <!--进入打牌，从主打开始, 一局结束，主打手里没牌-->
         <loop_until step="14" value_of=":(count_of(player_cards_of_free(@round.trick_leading_player)))" ret_gt="0">
+            <update property="@round.is_trick_valid_leading_cards" value="false"/>
             <loop_until step="14-1" value_of="@round.is_trick_valid_leading_cards" ret_is="false">
                 <act_opts step="14-1-1" timeout="300" timeout_act="robot_lead_card" to_player="@round.trick_init_player">
                         <act_ref act="playcard"/>
@@ -827,11 +834,10 @@
                 </act_opts>
             </loop_until>
 
-            <var step="14-2" name="sorder" value_type="int" value="1"/>
+            <update property="@sorder" value="1"/>
             <loop_until step="14-3" value_of="@sorder" ret_lt="4">
-                <var name="valid_following_cards" value_type="bool" value="false"/>
-                <var name="follower" value_type="player" value=":(next_player_of(@round.trick_init_player, @sorder))"/>
-                <loop_until value_of="@round.is_player_valid_cards" ret_is="false">
+                <update property="@follower" value=":(next_player_of(@round.trick_init_player, @sorder))"/>
+                <loop_until value_of="@round.is_valid_following_cards" ret_is="false">
                     <act_opts timeout="300" timeout_act="robot_follow_cards" to_player="@follower">
                             <act_ref act="playcard"/>
                             <act_ref act="robot_follow_cards" hidden="true"/>

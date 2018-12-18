@@ -9,10 +9,10 @@ def warn(msg):
     print(msg)
 
 def error(errMsg):
-    print(errMsg)
+    print("EEEEEEEEEERRRRRRROOOOORRRRR:" + errMsg)
 
 def exception(ex):
-    print(ex)
+    print("EXEXEXEXEXEXEXEXEX:" + ex)
 
 
 
