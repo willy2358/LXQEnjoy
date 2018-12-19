@@ -79,7 +79,7 @@ class Update(Statement):
     def gen_runtime_obj(self, scene):
         def updates():
             try:
-                Log.debug("Executing update :{0} ....".format(self.get_step()))
+                Log.debug("Executing:{0} ....".format(self.get_step()))
                 opVal = scene.get_obj_value(self.__opVal)
                 # if opVal:
                 #     Log.error("Value attr should not none at var :{0}".format(self.__opVal))

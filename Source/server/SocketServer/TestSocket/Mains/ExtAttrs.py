@@ -3,6 +3,7 @@ from Mains.GVar import GVar
 from GCore.ValueType import ValueType
 
 from GCore.VarRef import VarRef
+import Mains.Log as Log
 
 
 class ExtAttrs:
@@ -11,30 +12,40 @@ class ExtAttrs:
         self.__vars = {}  # name:GVar
 
     def get_attr_value(self, attrName):
+        Log.debug('get_attr_value:{0},...'.format(attrName))
+        finalVal = None
         if attrName in self.__cus_attrs:
             val = self.__cus_attrs[attrName].get_value()
             if type(val) is VarRef :
                 obj = val.gen_runtime_obj(self)()
                 if type(obj) is GVar:
-                    return obj.get_value()
+                    finalVal = obj.get_value()
                 else:
-                    return obj
-            return val
-        else:
-            return None
+                    finalVal = obj
+            else:
+                finalVal = val
+        Log.debug('got attr value {0}'.format(finalVal))
+        return finalVal
 
     def get_var_value(self, varName):
+        Log.debug('get_var_value:{0},...'.format(varName))
+        finalVal = None
         if varName in self.__vars:
             val = self.__vars[varName].get_value()
             if type(val) is VarRef:
                 obj = val.gen_runtime_obj(self)()
                 if type(obj) is GVar:
-                    return obj.get_value()
+                    # return obj.get_value()
+                    finalVal = obj.get_value()
                 else:
-                    return obj
-            return val
-        else:
-            return None
+                    # return obj
+                    finalVal = obj
+            # return val
+            finalVal = val
+        # else:
+        #     return None
+        Log.debug('got var value {0}'.format(finalVal))
+        return finalVal
 
     def get_prop_value(self, propName):
         if propName in self.__cus_attrs:
@@ -79,7 +90,7 @@ class ExtAttrs:
             self.__cus_attrs[attrName].set_value(value)
 
 
-    def add_variable(self, name, vtype, value):
+    def add_variable(self, name, vtype, value, scope=None):
         if name not in self.__vars:
             self.__vars[name] = GVar(name, ValueType.undef, value)
 

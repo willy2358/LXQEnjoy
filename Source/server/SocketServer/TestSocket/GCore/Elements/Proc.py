@@ -1,5 +1,6 @@
 from GCore.Statement import Statement
 from GCore.Elements.Ret import Ret
+from GCore.Elements.Variable import Variable
 import Mains.Log as Log
 
 # <proc name="proc_example" params="#player,#cards">
@@ -33,18 +34,23 @@ class Proc(Statement):
         # varibles, register in scene
         if self.__params:
             for p in self.__params:
-                p.gen_runtime_obj(scene)()
+                p.gen_runtime_obj(scene)(self.__name)
 
         def proc_func():
             try:
-                Log.debug("Executing proc:{0} ....".format(self.get_step()))
+                Log.debug("Executing:{0} ....".format(self.get_step()))
                 rtObjs = []
                 for c in self.__statements:
+                    # this ctx will ge overridden by inner calling proc
+                    scene.set_cur_proc_ctx(self.__name)
                     if isinstance(c, Ret):
                         return scene.get_obj_value(c.gen_runtime_obj(scene))
                     func = c.gen_runtime_obj(scene)
                     if callable(func):
-                        func()
+                        if isinstance(c, Variable):
+                            func(self.__name)
+                        else:
+                            func()
             except Exception as ex:
                 Log.exception(ex)
         return proc_func

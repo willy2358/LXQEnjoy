@@ -63,7 +63,8 @@ class PlayScene(ExtAttrs):
         self.__cmd_player = None
         self.__cmd_args = None
 
-        self.__local_vars = {}
+        self.__procs_vars = {} #{proc_name:{var_name,gvar}}
+        self.__cur_proc_ctx = ""
         self.__procs = {}
         self.__actions = {} # {act_name: (check_param, func)}
         self.parse_rule(self.__rule)
@@ -85,11 +86,18 @@ class PlayScene(ExtAttrs):
 
         return self.__players[idx]
 
-    def get_proc_local_var(self, varName):
-        if varName in self.__local_vars:
-            return self.__local_vars[varName]
-        else:
-            return None
+    def get_proc_local_var(self, varName, procName = None):
+        Log.debug("getting proc {0} var {1} obj....".format(procName, varName))
+        obj = None
+        if procName in self.__procs_vars:
+            if varName in self.__procs_vars[procName]:
+                obj = self.__procs_vars[procName][varName]
+        # if varName in self.__local_vars:
+        #     return self.__local_vars[varName]
+        # else:
+        #     return None
+        Log.debug("got proc {0} var {1} with obj {2}".format(procName, varName, obj))
+        return obj
 
     # scene has default attribute:players
     def get_runtime_objs(self, varStr):
@@ -112,7 +120,7 @@ class PlayScene(ExtAttrs):
             else:
                 return self.__cmd_player.get_attr(varStr[len("@cmd_player."):])
         elif varStr.startswith("@#"):
-            return self.get_proc_local_var(varStr.lstrip("@"))
+            return self.get_proc_local_var(varStr.lstrip("@"), self.__cur_proc_ctx)
         elif varStr.startswith("@"):
             if ".[]." in varStr:
                 # format  "@players.[].IsMainPlayer"
@@ -177,14 +185,23 @@ class PlayScene(ExtAttrs):
         else:
             return None
 
+    def set_cur_proc_ctx(self, ctx):
+        self.__cur_proc_ctx = ctx
+
     def set_obj_value(self, obj, value):
         if isinstance(obj, VarRef):
             var = obj.gen_runtime_obj(self)()
             if isinstance(var, GVar):
                 var.set_value(value)
 
-    def add_proc_local_var(self, varName, vType, value):
-        self.__local_vars[varName] = GVar(varName, vType, value)
+    def add_proc_local_var(self, varName, vType, value, scope):
+        if scope not in self.__procs_vars:
+            self.__procs_vars[scope] = {}
+        Log.debug("creating proc {0} var {1} with value {2}".format(scope, varName, value))
+        self.__procs_vars[scope][varName] = GVar(varName, vType, value)
+        # if varName not in self.__procs_vars[scope]:
+        #     self.__procs_vars[scope][varName] = GVar(varName, vType, value)
+        # self.__local_vars[varName] = GVar(varName, vType, value)
 
     def get_current_round(self):
         return self.__cur_round
@@ -346,7 +363,7 @@ class PlayScene(ExtAttrs):
             if params:
                 for i in range(len(params)):
                     if i < len(args):
-                        gVar = self.get_proc_local_var(params[i])
+                        gVar = self.get_proc_local_var(params[i], proc_name)
                         if gVar:
                             gVar.set_value(args[i])
 
