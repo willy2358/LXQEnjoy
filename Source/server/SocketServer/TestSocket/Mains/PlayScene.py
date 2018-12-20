@@ -69,6 +69,8 @@ class PlayScene(ExtAttrs):
         self.__actions = {} # {act_name: (check_param, func)}
         self.parse_rule(self.__rule)
 
+        self.__pending_cmd_lock = threading.Lock()
+
     def is_player_in(self, player):
         return player in self.__players
 
@@ -195,6 +197,9 @@ class PlayScene(ExtAttrs):
                 var.set_value(value)
 
     def add_proc_local_var(self, varName, vType, value, scope):
+        if not scope:
+            scope = self.__cur_proc_ctx
+
         if scope not in self.__procs_vars:
             self.__procs_vars[scope] = {}
         Log.debug("creating proc {0} var {1} with value {2}".format(scope, varName, value))
@@ -328,20 +333,27 @@ class PlayScene(ExtAttrs):
             self.waiting_for_player_exe_cmd()
 
     def waiting_for_player_exe_cmd(self):
-        while self.__pending_player and self.__pending_cmds:
-            time.sleep(0.5)  # sleep 0.2 seconds
-            if int(time.time()) % 6 == 0:
-                Log.debug("waiting_for_player_exe_cmd, thread:{0}".format(threading.get_ident()))
-                Log.debug("waiting for player {0} action ...".format(self.__pending_player.get_userid()))
-            # 超时, 执行默认命令
-            if 0 < self.__pending_seconds < time.time() - self.__pending_start_tm:
-                if self.__timeout_cmd:
-                    defcmd = self.__timeout_cmd
-                else:
-                    defcmd = self.__pending_cmds[0]
+            waiting = True
+            while waiting:
+                if self.__pending_cmd_lock.acquire():
+                    if not self.__pending_player and not self.__pending_cmds:
+                        waiting = False
+                    if waiting:
+                        time.sleep(0.2)  # sleep 0.2 seconds
+                        if int(time.time()) % 10 == 0:
+                            # Log.debug("waiting_for_player_exe_cmd, thread:{0}".format(threading.get_ident()))
+                            Log.debug("waiting for player {0} action, in thread:{1} ...".format(self.__pending_player.get_userid(),threading.get_ident()))
+                        # 超时, 执行默认命令
+                        if 0 < self.__pending_seconds < time.time() - self.__pending_start_tm:
+                            if self.__timeout_cmd:
+                                defcmd = self.__timeout_cmd
+                            else:
+                                defcmd = self.__pending_cmds[0]
 
-                cmd, cmd_args = defcmd.get_cmd(), defcmd.get_cmd_param()
-                self.process_player_exed_cmd(self.__pending_player, cmd, cmd_args, True)
+                            cmd, cmd_args = defcmd.get_cmd(), defcmd.get_cmd_param()
+                            self.process_player_exed_cmd(self.__pending_player, cmd, cmd_args, True)
+
+                    self.__pending_cmd_lock.release()
 
 
     def init_player_type_attrs(self):
@@ -479,6 +491,8 @@ class PlayScene(ExtAttrs):
 
             Log.debug("player {0} exed action {1}".format(self.__pending_player.get_userid(), cmd))
             # 重置，允许继续执行后面的命令
-            self.__pending_player = None
-            self.__pending_cmds = None
+            if self.__pending_cmd_lock.acquire():
+                self.__pending_player = None
+                self.__pending_cmds = None
+                self.__pending_cmd_lock.release()
 

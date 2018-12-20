@@ -9,7 +9,7 @@ class Statement:
         pass
 
     def get_step(self):
-        if self.__step == "robot_lead_card-4":
+        if self.__step == "194156" or self.__step == "192213":
             stop = 1
         return self.__xml_text
 

@@ -68,6 +68,13 @@ def element_at(scene, args):
         if isinstance(arr, list):
             if 0 <= idx < len(arr):
                 return arr[idx]
+            else:
+                Log.error("index {0} out of range, list:{1} ".format(idx, arr))
+        elif idx == 0:
+            Log.info("Fetching non-list {0} 0 idx element".format(arr))
+            return arr
+        else:
+            Log.error("Invalid arguments for element_at:{0},{1}".format(arr, idx))
     except Exception as ex:
         Log.exception(ex)
         return  None

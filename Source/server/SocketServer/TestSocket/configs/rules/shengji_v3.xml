@@ -301,7 +301,7 @@
             <var name="#ivfc_valid_following" value_type="bool" value="false"/>
             <ift>
                 <cases op="or">
-                    <case value_of=":(count_of(#arg_cards))" ret_not_as=":(count_of(@round.trick_leading_cards))"/>
+                    <case value_of=":(count_of(@#arg_cards))" ret_not_as=":(count_of(@round.trick_leading_cards))"/>
                     <case value_of=":(player_has_cards(@#arg_cards))" ret_is="false"/>
                 </cases>
 
@@ -528,7 +528,7 @@
         <proc name="get_card_base_power" params="#arg_cards">
             <var name="#gcbp_solo_card" value_type="card" value=":(element_at(@#arg_cards, 0))"/>
             <var name="#gcbp_base_power" value="0" value_type="int"/>
-            <ift value_of=":(cfigure_of(@#gcbp_solo_card))" ret_is="1">
+            <ift step="get_card_base_power-3" value_of=":(cfigure_of(@#gcbp_solo_card))" ret_is="1">
                 <update property="@#gcbp_base_power" value="14"></update>
                 <else>
                     <update property="@#gcbp_base_power" value=":(cfigure_of(@#gcbp_solo_card))"></update>
@@ -543,7 +543,7 @@
                 <!--单牌-->
                 <then>
                     <!--单牌-->
-                    <var name="#gptp_solo_card" value_type="card" value=":(element_at(@#arg_cards, 0))"/>
+                    <var step="#gptp_solo_card" name="#gptp_solo_card" value_type="card" value=":(element_at(@#arg_cards, 0))"/>
                     <ift value_of=":(cfigure_of(@#gptp_solo_card))" ret_is="22">
                         <then>
                             <!--大王-->
@@ -563,11 +563,11 @@
                                                <then>
                                                    <!--级牌-->
                                                    <update property="@#gptp_power" value="20"/>
-                                                   <update property="@#gptp_power" op="add" value=":(#get_card_base_power(@#gptp_solo_card))"/>
+                                                   <update step="194156" property="@#gptp_power" op="add" value=":(#get_card_base_power(@#gptp_solo_card))"/>
                                                </then>
                                                <else>
                                                    <!--副牌-->
-                                                   <update property="@#gptp_power" value=":(#get_card_base_power(@#gptp_solo_card))"/>
+                                                   <update step="192213" property="@#gptp_power" value=":(#get_card_base_power(@#gptp_solo_card))"/>
                                                </else>
                                            </ift>
                                        </else>
@@ -640,7 +640,7 @@
                     <ift value_of="@round.is_trick_valid_leading_cards" ret_is="true">
                         <playcards player="@cmd_player" cards="@cmd_args" alias="chupai" cards_face_up="true"/>
                         <update property="@round.trick_leading_cards" value="@cmd_args"/>
-                        <ift value_of=":(count_of(#cmd_args))" ret_is="1">
+                        <ift step="debugggg" value_of=":(count_of(@cmd_args))" ret_is="1">
                             <then>
                                 <update property="@round.trick_leading_pattern" value="single"/>
                             </then>
