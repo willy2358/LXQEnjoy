@@ -98,7 +98,10 @@ class PlayScene(ExtAttrs):
         #     return self.__local_vars[varName]
         # else:
         #     return None
-        Log.debug("got proc {0} var {1} with obj {2}".format(procName, varName, obj))
+        if isinstance(obj, GVar):
+            Log.debug("got proc {0} var {1} with value {2} at obj {3}".format(procName, varName, obj.get_value(), obj))
+        else:
+            Log.debug("got proc {0} var {1} with obj {2}".format(procName, varName, obj))
         return obj
 
     # scene has default attribute:players
@@ -334,7 +337,7 @@ class PlayScene(ExtAttrs):
 
     def waiting_for_player_exe_cmd(self):
             waiting = True
-            while waiting:
+            while self.__pending_player and waiting:
                 if self.__pending_cmd_lock.acquire():
                     if not self.__pending_player and not self.__pending_cmds:
                         waiting = False
@@ -351,7 +354,7 @@ class PlayScene(ExtAttrs):
                                 defcmd = self.__pending_cmds[0]
 
                             cmd, cmd_args = defcmd.get_cmd(), defcmd.get_cmd_param()
-                            self.process_player_exed_cmd(self.__pending_player, cmd, cmd_args, True)
+                            self.auto_exe_default_cmd(self.__pending_player, cmd, cmd_args)
 
                     self.__pending_cmd_lock.release()
 
@@ -455,44 +458,67 @@ class PlayScene(ExtAttrs):
 
         return validCmd, validCmdParam
 
-    def process_player_exed_cmd(self, player, cmd, cmd_args, auto_seled = False):
-        if player != self.__pending_player:
-            player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.player_not_pending_cmd)
-        else:
-            args = cmd_args[:]
-            if not auto_seled:
-                c,args = self.check_player_cmd_param(player, cmd, cmd_args)
+    def auto_exe_default_cmd(self, player, cmd, cmd_args):
+        act_stms = None
+        if cmd in self.__actions:
+            act_stms = self.__actions[cmd]
+
+        # 准备参数
+        self.__cmd_player = player
+        self.__cmd_args = cmd_args
+
+        if callable(act_stms[0]):  # has param checker
+            # 优先使用param_check检查参数
+            ret = act_stms[0]()
+            if not ret:
+                player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_param)
+                return
+
+        # 执行内部逻辑
+        if callable(act_stms[1]):
+            act_stms[1]()
+
+        Log.debug("Auto exed default action, player: {0}, exed action: {1}".format(self.__pending_player.get_userid(), cmd))
+        # 重置，允许继续执行后面的命令
+        self.__pending_player = None
+        self.__pending_cmds = None
+
+    def process_player_exed_cmd(self, player, cmd, cmd_args):
+        with self.__pending_cmd_lock:
+            if player != self.__pending_player:
+                player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.player_not_pending_cmd)
+            else:
+                args = cmd_args
+                c, args = self.check_player_cmd_param(player, cmd, cmd_args)
                 if not c:
                     return
 
-            act_stms = None
-            if cmd in self.__actions:
-                act_stms = self.__actions[cmd]
+                act_stms = None
+                if cmd in self.__actions:
+                    act_stms = self.__actions[cmd]
 
-            if not act_stms:
-                Log.error("Action {0} lacking of configuration".format(cmd))
-                player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd)
-                return
-
-            # 准备参数
-            self.__cmd_player = player
-            self.__cmd_args = args
-
-            if callable(act_stms[0]):  # has param checker
-                # 优先使用param_check检查参数
-                ret = act_stms[0]()
-                if not ret:
-                    player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_param)
+                if not act_stms:
+                    Log.error("Action {0} lacking of configuration".format(cmd))
+                    player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd)
                     return
 
-            # 执行内部逻辑
-            if callable(act_stms[1]):
-                act_stms[1]()
+                # 准备参数
+                self.__cmd_player = player
+                self.__cmd_args = args
 
-            Log.debug("player {0} exed action {1}".format(self.__pending_player.get_userid(), cmd))
-            # 重置，允许继续执行后面的命令
-            if self.__pending_cmd_lock.acquire():
+                if callable(act_stms[0]):  # has param checker
+                    # 优先使用param_check检查参数
+                    ret = act_stms[0]()
+                    if not ret:
+                        player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_param)
+                        return
+
+                # 执行内部逻辑
+                if callable(act_stms[1]):
+                    act_stms[1]()
+
+                Log.debug("player {0} exed action {1}".format(self.__pending_player.get_userid(), cmd))
+                # 重置，允许继续执行后面的命令
                 self.__pending_player = None
                 self.__pending_cmds = None
-                self.__pending_cmd_lock.release()
 

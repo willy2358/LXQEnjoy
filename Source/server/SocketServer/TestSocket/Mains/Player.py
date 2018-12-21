@@ -55,7 +55,7 @@ class Player(ExtAttrs):
         #考虑到cards中有多张相同牌的可能
         tmpCards = self.__free_cards[:]
         for c in tmpCards:
-            if c not in self.tmpCards:
+            if c not in tmpCards:
                 return False
             else:
                 tmpCards.remove(c)

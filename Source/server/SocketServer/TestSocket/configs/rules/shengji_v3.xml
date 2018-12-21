@@ -302,7 +302,7 @@
             <ift>
                 <cases op="or">
                     <case value_of=":(count_of(@#arg_cards))" ret_not_as=":(count_of(@round.trick_leading_cards))"/>
-                    <case value_of=":(player_has_cards(@#arg_cards))" ret_is="false"/>
+                    <case step="21821" value_of=":(player_has_cards(@#arg_player, @#arg_cards))" ret_is="false"/>
                 </cases>
 
                 <then>
