@@ -74,6 +74,9 @@ class PlayScene(ExtAttrs):
     def is_player_in(self, player):
         return player in self.__players
 
+    def get_cur_proc_rtx(self):
+        return self.__cur_proc_ctx
+
     def get_players(self):
         return self.__players
 
@@ -205,7 +208,7 @@ class PlayScene(ExtAttrs):
 
         if scope not in self.__procs_vars:
             self.__procs_vars[scope] = {}
-        Log.debug("creating proc {0} var {1} with value {2}".format(scope, varName, value))
+        Log.debug("creating var {1} for proc {0} with value {2}".format(scope, varName, value))
         self.__procs_vars[scope][varName] = GVar(varName, vType, value)
         # if varName not in self.__procs_vars[scope]:
         #     self.__procs_vars[scope][varName] = GVar(varName, vType, value)

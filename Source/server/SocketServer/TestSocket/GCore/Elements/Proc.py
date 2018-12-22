@@ -37,6 +37,7 @@ class Proc(Statement):
                 p.gen_runtime_obj(scene)(self.__name)
 
         def proc_func():
+            bakCtx = scene.get_cur_proc_rtx()
             try:
                 Log.debug("Executing:{0} ....".format(self.get_step()))
                 rtObjs = []
@@ -53,6 +54,8 @@ class Proc(Statement):
                             func()
             except Exception as ex:
                 Log.exception(ex)
+            finally:
+                scene.set_cur_proc_ctx(bakCtx)
         return proc_func
 
 

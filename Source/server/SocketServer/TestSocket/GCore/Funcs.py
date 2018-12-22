@@ -203,11 +203,19 @@ def min_cfigure_of_cards(scene, args):
 
 #next_player_of(scene, player, dis=1)
 def next_player_of(scene, args):
-    player = args[0]
-    dis = 1
-    if len(args) > 1:
-        dis = int(args[1])
-    return scene.get_next_player(player)
+    try:
+        dis = 1
+        player = args[0]
+        if len(args) > 1:
+            dis = int(args[1])
+        targPlayer = player
+        while dis > 0:
+            targPlayer = scene.get_next_player(targPlayer)
+            dis -= 1
+        return targPlayer
+    except Exception as ex:
+        Log.exception(ex)
+        return None
 
 # args: cards, cfigure
 def parts_of_cards_of_cfigure(scene, args):

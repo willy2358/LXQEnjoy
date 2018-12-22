@@ -26,7 +26,7 @@ class MyTCPHandler(socketserver.StreamRequestHandler):
                     PlayManager.process_client_disconnected(conn)
                     break
                 else:
-                    Log.info('received:' + data.decode())
+                    Log.info('received:{0}, in thread:{1}'.format(data.decode, threading.get_ident()))
                     PlayManager.dispatch_player_commands(conn, data.decode())
             except Exception as e:
                 PlayManager.process_client_disconnected(conn)

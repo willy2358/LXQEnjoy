@@ -309,128 +309,73 @@
                     <update property="@#ivfc_valid_following" value="false"></update>
                 </then>
                 <else>
-                     <ift>
-                        <!--单牌，有同色牌-->
-                        <cases op="and">
-                            <case value_of=":(count_of(@round.trick_leading_cards))" ret_is="1"></case>
-                            <case value_of=":(count_of(@#arg_cards))" ret_is="1"></case>
-                            <case value_of=":(ctype_of(element_at(@#arg_cards,0)))" ret_as=":(ctype_of(element_at(@round.trick_leading_cards,0)))"></case>
-                        </cases>
-                        <update property="@#ivfc_valid_following" value="true"></update>
-                    </ift>
-
-                    <ift>
-                        <!--单牌，无同色牌,起牌为非主-->
-                        <cases>
-                            <case value_of="@#ivfc_valid_following" ret_is="false"/>
-                            <case value_of=":(ctype_of(element_at(@round.trick_leading_cards, 0)))" ret_not_as="@round.bank_ctype"/>
-                            <case value_of=":(count_of(@#arg_cards))" ret_is="1"></case>
-                            <case value_of=":(ctype_of(element_at(@#arg_cards,0)))" ret_not_as=":(ctype_of(element_at(@round.trick_leading_cards, 0)))"></case>
-                            <case value_of=":(is_player_has_cards_of_ctype(ctype_of(element_at(@#arg_cards,0))))" ret_is="false"></case>
-                        </cases>
-                        <update property="@#ivfc_valid_following" value="true"></update>
-                    </ift>
-
-                    <ift>
-                        <!--单牌，无同色牌,起牌为主牌-->
-                        <cases>
-                            <case value_of="@#ivfc_valid_following" ret_is="false"/>
-                            <case value_of=":(ctype_of(element_at(@round.trick_leading_cards, 0)))" ret_as="@round.bank_ctype"/>
-                            <case value_of=":(count_of(@#arg_cards))" ret_is="1"></case>
-                            <case value_of=":(ctype_of(element_at(@#arg_cards,0)))" ret_not_as=":(ctype_of(element_at(@round.trick_leading_cards,0)))"></case>
-                            <case value_of=":(is_player_has_cards_of_ctype(@round.bank_ctype))" ret_is="false"></case>
-                            <case value_of=":(is_player_has_cards_of_cfigure(#arg_player, @round.bank_cfigure))" ret_is="false"/>
-                            <case value_of=":(is_player_has_cards_of_ctype(#arg_player, j))" ret_is="false"></case>
-                        </cases>
-                        <update property="@#ivfc_valid_following" value="true"></update>
-                    </ift>
-
-                    <ift>
-                        <!--四张，同点, 跟牌，各色都有-->
-                        <cases>
-                            <case value_of="@#ivfc_valid_following" ret_is="false"/>
-                            <case value_of=":(is_cards_same_cfigure(@round.trick_leading_cards))" ret_is="true"/>
-                            <case value_of=":(is_cards_contain_ctype(@#arg_cards, c))" ret_is="true"/>
-                            <case value_of=":(is_cards_contain_ctype(@#arg_cards, d))" ret_is="true"/>
-                            <case value_of=":(is_cards_contain_ctype(@#arg_cards, h))" ret_is="true"/>
-                            <case value_of=":(is_cards_contain_ctype(@#arg_cards, s))" ret_is="true"/>
-                        </cases>
-                        <update property="@#ivfc_valid_following" value="true"></update>
-                    </ift>
-
-                    <ift>
-                        <!--四张，同点，缺色-->
-                        <cases>
-                            <case value_of="@#ivfc_valid_following" ret_is="false"/>
-                            <case value_of=":(is_cards_same_cfigure(@round.trick_leading_cards))" ret_is="true"/>
-                            <cases op="or">
-                                <cases op="and">
-                                    <!---缺少club, 玩家还有club, club card的点数不是主牌点数-->
-                                    <case value_of=":(is_cards_contain_ctype(@#arg_cards, c))" ret_is="false"/>
-                                    <case value_of=":(is_player_has_cards_of_ctype(@#arg_player, c))" ret_is="true"/>
-                                    <case value_of=":(is_cards_contain_cfigure(player_cards_of_ctype(c), @round.bank_cfigure))" ret_is="false"/>
-                                </cases>
-                                <cases op="and">
-                                    <!---缺少diamond, 玩家还有diamond, diamond card的点数不是主牌点数-->
-                                    <case value_of=":(is_cards_contain_ctype(@#arg_cards, d))" ret_is="false"/>
-                                    <case value_of=":(is_player_has_cards_of_ctype(@#arg_player, d))" ret_is="true"/>
-                                    <case value_of=":(is_cards_contain_cfigure(player_cards_of_ctype(d), @round.bank_cfigure))" ret_is="false"/>
-                                </cases>
-                                <cases op="and">
-                                    <!---缺少heart, 玩家还有heart, heart card的点数不是主牌点数-->
-                                    <case value_of=":(is_cards_contain_ctype(@#arg_cards, h))" ret_is="false"/>
-                                    <case value_of=":(is_player_has_cards_of_ctype(@#arg_player, h))" ret_is="true"/>
-                                    <case value_of=":(is_cards_contain_cfigure(player_cards_of_ctype(h), @round.bank_cfigure))" ret_is="false"/>
-                                </cases>
-                                <cases op="and">
-                                    <!---缺少spade, 玩家还有spade, spade card的点数不是主牌点数-->
-                                    <case value_of=":(is_cards_contain_ctype(@#arg_cards, s))" ret_is="false"/>
-                                    <case value_of=":(is_player_has_cards_of_ctype(@#arg_player, s))" ret_is="true"/>
-                                    <case value_of=":(is_cards_contain_cfigure(player_cards_of_ctype(s), @round.bank_cfigure))" ret_is="false"/>
-                                </cases>
-                            </cases>
-                        </cases>
+                     <ift value_of=":(count_of(@round.trick_leading_cards))" ret_is="1">
+                        <!--单牌-->
                         <then>
-                            <update property="@#ivfc_valid_following" value="false"></update>
-                        </then>
-                        <else>
-                            <update property="@#ivfc_valid_following" value="true"></update>
-                        </else>
-
-                    </ift>
-
-                    <ift>
-                        <!--甩牌, 甩牌为副牌-->
-                        <cases>
-                            <case value_of="@#ivfc_valid_following" ret_is="false"/>
-                            <case value_of=":(is_cards_same_ctype(@round.trick_leading_cards))" ret_is="true"/>
-                        </cases>
-                        <then>
-                            <var name="#ivfc_leading_type" value_type="str" value=":(ctype_of(element_at(@round.trick_leading_cards,0)))"/>
-                            <var name="#ivfc_tmp_cards2" value_type="cards" value=":(parts_of_cards_ex_cfigure(@#arg_cards, @round.bank_cfigure))"></var>
-                            <var name="#ivfc_ctype_fcount" value_type="int" value=":(count_of(parts_of_cards_of_ctype(@#arg_cards, @#ivfc_leading_type)))"/>
-                            <update property="@#ivfc_tmp_cards2" value=":(parts_of_cards_of_ctype(@#ivfc_tmp_cards2, @#ivfc_leading_type))"/>
-                            <ift >
-                                <cases op="and">
-                                    <case value_of="@#ivfc_ctype_fcount" ret_lt_as=":(count_of(@round.trick_leading_cards))"></case>
-                                    <case value_of=":(count_of(@#ivfc_tmp_cards2))" ret_gt_as="@#ivfc_ctype_fcount"></case>
-                                </cases>
-                                <then>
-                                    <!--手里还有甩牌花色，但没出牌-->
-                                    <update property="@#ivfc_valid_following" value="false"></update>
-                                </then>
+                            <var name="#want_ctype" value_type="str" value=":(ctype_of(element_at(@round.trick_leading_cards, 0)))"/>
+                            <var name="#solo_follow_ctype" value_type="str" value=":(ctype_of(element_at(@#arg_cards, 0)))"/>
+                            <ift value_of="@#solo_follow_ctype" ret_as="@#want_ctype">
+                                <!--跟牌同色，有效-->
+                                <update property="@#ivfc_valid_following" value="true"></update>
+                                <!--跟异色牌-->
                                 <else>
-                                    <!---玩家手里没有同色牌-->
-                                    <update property="@#ivfc_valid_following" value="true"></update>
+                                    <ift >
+                                        <cases op="and">
+                                            <case value_of="@#want_ctype" ret_not_as="@round.bank_ctype"/>
+                                            <case value_of=":(cfigure_of(element_at(@round.trick_leading_cards, 0)))" ret_not_as="@round.bank_cfigure"/>
+                                        </cases>
+                                        <!--起牌为非主-->
+                                        <then>
+                                            <ift value_of=":(is_player_has_cards_of_ctype(@#arg_player, @#want_ctype))" ret_is="false">
+                                                <!--手里没有同色牌，跟牌有效-->
+                                                <update property="@#ivfc_valid_following" value="true"></update>
+
+                                                <!--手里有同色牌-->
+                                                <else>
+                                                    <var name="#ctyped_cards" value_type="cards" value=":(player_cards_of_ctype(@#arg_player,@#want_ctype))"/>
+                                                    <ift value_of=":(count_of(@#ctyped_cards))" ret_gt="1">
+                                                        <!--同色牌张数大于1，跟牌无效-->
+                                                        <update property="@#ivfc_valid_following" value="false"></update>
+                                                        <else>
+                                                            <ift value_of=":(cfigure_of(element_at(@#ctyped_cards,0)))" ret_as="@round.bank_cfigure">
+                                                                <!--唯一同色牌是级牌，跟牌有效-->
+                                                                <update property="@#ivfc_valid_following" value="true"></update>
+                                                                <!--唯一同色牌不是级牌，跟牌无效-->
+                                                                <else>
+                                                                    <update property="@#ivfc_valid_following" value="false"></update>
+                                                                </else>
+                                                            </ift>
+                                                        </else>
+                                                    </ift>
+                                                </else>
+                                            </ift>
+                                        </then>
+                                        <!--起牌为主牌-->
+                                        <else>
+                                            <ift>
+                                                <cases op="or">
+                                                    <case value_of=":(count_of(player_cards_of_ctype(@#arg_player, @#want_ctype)))" ret_gt="0"/>
+                                                    <case value_of=":(count_of(player_cards_of_ctype(@#arg_player, j)))" ret_gt="0"/>
+                                                    <case value_of=":(count_of(player_cards_of_cfigure(@#arg_player, @round.bank_cfigure)))" ret_gt="0"/>
+                                                </cases>
+                                                <!--手中还有主牌，跟牌无效-->
+                                                <update property="@#ivfc_valid_following" value="false"></update>
+                                                <else>
+                                                    <!--手中还有主牌，跟牌有效-->
+                                                    <update property="@#ivfc_valid_following" value="true"></update>
+                                                </else>
+                                            </ift>
+                                        </else>
+                                    </ift>
                                 </else>
                             </ift>
-
                         </then>
 
+                         <!--TODO 其它牌型，甩牌，炸牌跟牌判断-->
+                         <else></else>
                     </ift>
                 </else>
             </ift>
-
             <ret value="@#ivfc_valid_following"/>
         </proc>
 
@@ -684,7 +629,7 @@
             <var name="#rfc_played_cards" value_type="cards" value="none"/>
             <ift value_of="@round.trick_leading_pattern" ret_is="single">
                 <then>
-                    <var name="#rfc_want_type" value_type="str" value=":(ctype_of(element_at(@round.trick_leading_cards, 0))"/>
+                    <var name="#rfc_want_type" value_type="str" value=":(ctype_of(element_at(@round.trick_leading_cards, 0)))"/>
                     <var name="#rfc_type_cards" value_type="cards" value=":(player_cards_of_ctype(@cmd_player))"/>
                     <var name="#rfc_type_cards_no_bank_figure" value_type="cards" value=":(parts_of_cards_ex_cfigure(@#rfc_type_cards, @round.bank_cfigure))"/>
                     <var name="#rfc_picked_cards" value_type="cards" value="none"/>
@@ -836,6 +781,7 @@
 
             <update property="@sorder" value="1"/>
             <loop_until step="14-3" value_of="@sorder" ret_lt="4">
+                <update property="@round.is_valid_following_cards" value="false"/>
                 <update property="@follower" value=":(next_player_of(@round.trick_init_player, @sorder))"/>
                 <loop_until value_of="@round.is_valid_following_cards" ret_is="false">
                     <act_opts timeout="300" timeout_act="robot_follow_cards" to_player="@follower">
