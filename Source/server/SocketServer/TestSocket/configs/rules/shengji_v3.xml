@@ -218,9 +218,8 @@
             <attr name="trick_leading_pattern" value_type="str" value="single"/>
         </attrs>
         <!---for debug-->
-        <debug ordered_cards="s3 , d3 ,c3, h3,h4,h5,c7,d6,s6,s8,s1 ,h2"></debug>
+        <debug ordered_cards="s3,d3,c3,h3,h4,h5,c7,d6,s6,h8,s1 ,h2"></debug>
     </round>
-
 
 
     <!--玩家操作命令列表-->
@@ -630,7 +629,7 @@
             <ift value_of="@round.trick_leading_pattern" ret_is="single">
                 <then>
                     <var name="#rfc_want_type" value_type="str" value=":(ctype_of(element_at(@round.trick_leading_cards, 0)))"/>
-                    <var name="#rfc_type_cards" value_type="cards" value=":(player_cards_of_ctype(@cmd_player))"/>
+                    <var name="#rfc_type_cards" value_type="cards" value=":(player_cards_of_ctype(@cmd_player,@#rfc_want_type))"/>
                     <var name="#rfc_type_cards_no_bank_figure" value_type="cards" value=":(parts_of_cards_ex_cfigure(@#rfc_type_cards, @round.bank_cfigure))"/>
                     <var name="#rfc_picked_cards" value_type="cards" value="none"/>
                     <ift value_of=":(count_of(@#rfc_type_cards_no_bank_figure))" ret_gt="0">
