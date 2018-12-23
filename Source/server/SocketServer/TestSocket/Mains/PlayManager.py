@@ -1,15 +1,21 @@
 import json
 import os
+import threading
 
 from Mains import Log, InterProtocol, Errors
 
 from threading import Timer
 from datetime import datetime
+from Mains import CmdQueues
 
 from Clients import Clients
 
 from GRules.GRule import GRule
 import Mains.Errors as Err
+
+__comm_event = None
+__cmds_dispatch_thread = None
+__exit = False
 
 ConfigRoot = ""
 
@@ -43,14 +49,41 @@ timer_clear_dead_connection = None
 MAX_PLAYER_NUM_IN_ROOM = 8
 
 
-def initialize():
+def initialize(cmd_evt):
+    global __comm_event
+    __comm_event = cmd_evt
+
     load_rules()   # must before load_clients
 
     load_clients()
 
+    start_cmds_dispatcher()
+
     start_timer_to_clear_dead_connection()
 
+def exit_service():
+    global __exit
+    __exit = True
+
+def start_cmds_dispatcher():
+    global __cmds_dispatch_thread
+    __cmds_dispatch_thread = threading.Thread(group=None, target=dispatch_clients_cmds)
+    __cmds_dispatch_thread.setDaemon(True)
+    __cmds_dispatch_thread.start()
+
+def dispatch_clients_cmds():
+    while not __exit:
+        __comm_event.wait(100)
+        if __exit:
+            break
+        conn, cmd = CmdQueues.get_cmd()
+        # TODO consider whether event is thread safe
+        __comm_event.clear()
+        if conn and cmd:
+            dispatch_player_commands(conn, cmd)
+
 def start_timer_to_clear_dead_connection():
+    global  timer_clear_dead_connection
     timeout = min(cycle_minutes_check_dead, dead_connect_reserve_minutes)
     timer_clear_dead_connection = Timer(timeout * 60, remove_dead_connection)
     timer_clear_dead_connection.start()

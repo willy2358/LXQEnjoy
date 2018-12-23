@@ -54,6 +54,8 @@ client.send_message(cmd_str)
 while True:
     # cmd_args = json.dumps(cmds) + "\r\n"
     line = input("selcmd:1,2,3; play cards: s1,s2,c3\r\n")
+    # client.send_message(line)
+    # continue
     packet = None
     if line.isnumeric():
         packet = {

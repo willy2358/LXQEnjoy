@@ -1,10 +1,12 @@
-import socketserver
 
-from Mains import PlayManager, Log
 import threading
 import sys
 import os
-import time
+
+import socketserver
+
+from Mains import PlayManager, Log
+from Mains import CmdQueues
 
 
 class MyTCPHandler(socketserver.StreamRequestHandler):
@@ -19,15 +21,16 @@ class MyTCPHandler(socketserver.StreamRequestHandler):
 
         while True:
             try:
-                time.sleep(0.2)
-                data = conn.recv(256)
+                # time.sleep(0.2)
+                data = conn.recv(1024)
                 if not data:
-                    Log.info("client closed")
+                    Log.debug("client closed")
                     PlayManager.process_client_disconnected(conn)
                     break
                 else:
-                    Log.info('received:{0}, in thread:{1}'.format(data.decode, threading.get_ident()))
-                    PlayManager.dispatch_player_commands(conn, data.decode())
+                    Log.debug('received:{0}, in thread:{1}'.format(data.decode(), threading.get_ident()))
+                    # PlayManager.dispatch_player_commands(conn, data.decode())
+                    CmdQueues.put_cmd(conn, data.decode())
             except Exception as e:
                 PlayManager.process_client_disconnected(conn)
                 Log.exception(e)
@@ -53,7 +56,10 @@ if __name__ == "__main__":
 
     PlayManager.ConfigRoot = configDir
 
-    PlayManager.initialize()
+    evt = threading.Event()
+    CmdQueues.set_event(evt)
+
+    PlayManager.initialize(evt)
 
     run_background_server()
 
@@ -62,6 +68,8 @@ if __name__ == "__main__":
         if line == "qz":
             server.server_close()
             server.shutdown()
+            PlayManager.exit_service()
+            evt.set() # sending exit event
 
             Log.info("socket server closed")
             break

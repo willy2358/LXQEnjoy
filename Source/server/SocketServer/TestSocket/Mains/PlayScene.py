@@ -1,4 +1,3 @@
-import random
 import time
 import threading
 
@@ -11,18 +10,6 @@ from GRules.RulePart_Running import RulePart_Running
 from GRules.RulePart_Scene import RulePart_Scene
 from GRules.RulePart_Procs import RulePart_Procs
 
-from GCore.Elements.Variable import Variable
-from GCore.Elements.Loop import Loop
-
-from GCore.Elements.ActRef import ActRef
-from GCore.Elements.ProcRef import ProcRef
-from GCore.Elements.Action import Action
-from GCore.Elements.Delay import Delay
-from GCore.Elements.PubMsg import PubMsg
-from GCore.Elements.Clause import Clause
-from GCore.Elements.ActOpts import ActOpts
-from GCore.Elements.Case import Case
-from GCore.Elements.Cases import Cases
 from GCore.VarRef import VarRef
 from Mains.Player import Player
 from GCore.FuncCall import FuncCall
@@ -67,9 +54,11 @@ class PlayScene(ExtAttrs):
         self.__cur_proc_ctx = ""
         self.__procs = {}
         self.__actions = {} # {act_name: (check_param, func)}
+        self.__pending_cmd_lock = threading.Lock()
+        self.__running_thread = None
+
         self.parse_rule(self.__rule)
 
-        self.__pending_cmd_lock = threading.Lock()
 
     def is_player_in(self, player):
         return player in self.__players
@@ -333,10 +322,11 @@ class PlayScene(ExtAttrs):
 
     def start_game(self):
         self.init_player_type_attrs()
-        self.create_new_round()
-        for rtObj in self.__runtimes:
-            rtObj()
-            self.waiting_for_player_exe_cmd()
+
+        self.__running_thread = threading.Thread(group=None, target=self.run)
+        self.__running_thread.setDaemon(True)
+        self.__running_thread.start()
+
 
     def waiting_for_player_exe_cmd(self):
             waiting = True
@@ -524,4 +514,10 @@ class PlayScene(ExtAttrs):
                 # 重置，允许继续执行后面的命令
                 self.__pending_player = None
                 self.__pending_cmds = None
+
+    def run(self):
+        self.create_new_round()
+        for rtObj in self.__runtimes:
+            rtObj()
+            self.waiting_for_player_exe_cmd()
 
