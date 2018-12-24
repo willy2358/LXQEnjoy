@@ -9,7 +9,7 @@ class Statement:
         pass
 
     def get_step(self):
-        if self.__step == "194156" or self.__step == "192213":
+        if self.__step == "242233" or self.__step == "242233":
             stop = 1
         return self.__xml_text
 

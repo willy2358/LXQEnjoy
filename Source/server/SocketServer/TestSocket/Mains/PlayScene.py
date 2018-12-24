@@ -351,6 +351,8 @@ class PlayScene(ExtAttrs):
 
                     self.__pending_cmd_lock.release()
 
+    def next_statement(self):
+        pass
 
     def init_player_type_attrs(self):
         if not self.__players:

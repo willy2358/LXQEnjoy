@@ -442,7 +442,7 @@
                     <case value_of=":(count_of(player_cards_of_free(@round.trick_winner)))" ret_is="0"/>
                     <case value_of="@round.kitty_score" ret_gt="0"/>
                 </cases>
-                <update property="@round.attacters.[].Score" op="add" value="@round.trick_score"></update>
+                <update property="@round.attacters.[].Score" op="add" value="@round.kitty_score"></update>
             </ift>
         </proc>
 
@@ -454,18 +454,25 @@
             <ret value="@#f_val"></ret>
         </proc>
 
-        <proc name="get_cards_score" params="#arg_cards">
+        <proc step="242233" name="get_cards_score" params="#arg_cards">
             <var name="#spts_score" value="0" value_type="int"/>
-            <ift value_of=":(cfigure_of(element_at(@#arg_cards, 0)))" ret_is="5">
-                <update property="@#spts_score" value="5"/>
-            </ift>
+            <var name="#idx" value="0" value_type="int"/>
+            <var name="#len" value_type="int" value=":(count_of(@#arg_cards))"/>
+            <loop_until value_of="@#idx" ret_lt_as="@#len">
+                <ift value_of=":(cfigure_of(element_at(@#arg_cards, @#idx)))" ret_is="5">
+                    <update property="@#spts_score" op="add" value="5"/>
+                </ift>
 
-            <ift value_of=":(cfigure_of(element_at(@#arg_cards, 0)))" ret_is="10">
-                <update property="@#spts_score" value="10"/>
-            </ift>
-            <ift value_of=":(cfigure_of(element_at(@#arg_cards, 0)))" ret_is="13">
-                <update property="@#spts_score" value="10"/>
-            </ift>
+                <ift value_of=":(cfigure_of(element_at(@#arg_cards, @#idx)))" ret_is="10">
+                    <update property="@#spts_score" op="add" value="10"/>
+                </ift>
+                <ift value_of=":(cfigure_of(element_at(@#arg_cards, @#idx)))" ret_is="13">
+                    <update property="@#spts_score" op="add" value="10"/>
+                </ift>
+                <update property="@#idx" op="add" value="1"/>
+
+            </loop_until>
+
             <ret value="@#spts_score"/>
         </proc>
 
@@ -575,6 +582,7 @@
             </check_param>
             <update property="@round.koupai" value="@cmd_args"/>
             <playcards player="@cmd_player" cards="@cmd_args" alias="kuopai" cards_face_up="false"/>
+            <update property="@round.kitty_score" value=":(#get_cards_score(@cmd_args))"/>
         </action>
 
         <action name="playcard" text="chupai">
@@ -673,12 +681,11 @@
         </action>
 
 
-        <action name="force_koupai" text="koupai">
-            <var name="#afk_other_players" value_type="players" value="@round.players"></var>
-            <update step="fk_2" property="@#afk_other_players" op="remove" value="@cmd_player"></update>
+        <action name="robot_koupai" text="koupai">
 
             <pick_cards from_player="@cmd_player" count="6" to_var="@round.koupai"/>
             <playcards player="@cmd_player" cards="@round.koupai" alias="kuopai" cards_face_up="false"/>
+            <update property="@round.kitty_score" value=":(#get_cards_score(@round.koupai))"/>
             <!--
             <pub_act exer="@cmd_player" to_players="@cmd_player" act="koupai" args="@round.koupai"/>
             <pub_act exer="@cmd_player" to_players="@#afk_other_players" act="koupai" args="list:*,*,*,*,*,*"/>
@@ -755,9 +762,9 @@
         <send_cards step="10" cards="@round.kitty" player="@main_defender"></send_cards>
 
         <!--等待主打扣牌-->
-        <act_opts step="11" timeout="30" timeout_act="force_koupai" to_player="@main_defender">
+        <act_opts step="11" timeout="30" timeout_act="robot_koupai" to_player="@main_defender">
                 <act_ref act="koupai"/>
-                <act_ref act="force_koupai" hidden="true"/>
+                <act_ref act="robot_koupai" hidden="true"/>
         </act_opts>
 
         <update step="12" property="@round.trick_leading_player" value="@main_defender"/>
