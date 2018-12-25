@@ -48,6 +48,7 @@ class Closet:
             cmdTxt = req_json[InterProtocol.client_req_exe_cmd]
             cmdArgs = req_json[InterProtocol.client_req_cmd_param]
             self.__playScene.process_player_exed_cmd(player, cmdTxt, cmdArgs)
+            self.__playScene.go_progress()
         elif cmd == InterProtocol.client_req_get_cards:
             pack = InterProtocol.create_player_cards_data_pack(player)
             player.send_server_cmd_packet(pack)

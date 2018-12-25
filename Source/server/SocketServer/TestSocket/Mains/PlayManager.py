@@ -73,7 +73,11 @@ def start_cmds_dispatcher():
 
 def dispatch_clients_cmds():
     while not __exit:
-        __comm_event.wait(100)
+        if __comm_event.is_set():
+            conn, cmd = CmdQueues.get_cmd()
+            if conn and cmd:
+                dispatch_player_commands(conn, cmd)
+        __comm_event.wait(0.2)
         if __exit:
             break
         conn, cmd = CmdQueues.get_cmd()

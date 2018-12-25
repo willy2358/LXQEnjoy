@@ -35,9 +35,11 @@ class Loop(Statement):
                 Log.debug("Executing:{0} ....".format(self.get_step()))
                 while loop_test():
                     for func in rtObjs:
+                        if scene.is_waiting_player_act():
+                            return
                         if callable(func):
-                            func()
-                        scene.waiting_for_player_exe_cmd()
+                            yield func
+                        # scene.waiting_for_player_exe_cmd()
             except Exception as ex:
                 Log.exception(ex)
         return sub_proc

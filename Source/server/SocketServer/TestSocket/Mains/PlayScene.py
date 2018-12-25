@@ -1,4 +1,5 @@
 import time
+from threading import Timer
 import threading
 
 from GRules.RulePart_Cards import RulePart_Cards
@@ -9,6 +10,7 @@ from GRules.RulePart_Round import RulePart_Round
 from GRules.RulePart_Running import RulePart_Running
 from GRules.RulePart_Scene import RulePart_Scene
 from GRules.RulePart_Procs import RulePart_Procs
+from GCore.Elements.Loop import Loop
 
 from GCore.VarRef import VarRef
 from Mains.Player import Player
@@ -56,6 +58,7 @@ class PlayScene(ExtAttrs):
         self.__actions = {} # {act_name: (check_param, func)}
         self.__pending_cmd_lock = threading.Lock()
         self.__running_thread = None
+        self.__timer_robot_exe_cmd = None
 
         self.parse_rule(self.__rule)
 
@@ -239,6 +242,9 @@ class PlayScene(ExtAttrs):
         else:
             return False
 
+    def is_waiting_player_act(self):
+        return self.__pending_player
+
     def init_player_attrs(self, player):
         playerPart = self.__rule.get_part_by_name(RulePart_Players.PART_NAME)
         if not playerPart:
@@ -250,8 +256,8 @@ class PlayScene(ExtAttrs):
             val = attr.get_value()
             player.add_cus_attr(name, vtype, val)
 
-    def _append_rt_obj(self, obj):
-        self.__runtimes.append(obj)
+    def _append_rt_obj(self, obj, nodeName):
+        self.__runtimes.append((obj, nodeName))
 
 
     def remove_player(self, player):
@@ -275,7 +281,7 @@ class PlayScene(ExtAttrs):
         for stm in partRun.get_statements():
             obj = stm.gen_runtime_obj(self)
             if obj:
-                self._append_rt_obj(obj)
+                self._append_rt_obj(obj, type(stm))
 
     def load_cards_space(self, rule):
         cards_set= Card.get_cards(rule.get_gtype())
@@ -352,7 +358,16 @@ class PlayScene(ExtAttrs):
                     self.__pending_cmd_lock.release()
 
     def next_statement(self):
-        pass
+        # if self.__pending_player:
+        #     yield None
+        # else:
+        for (rtObj,tName) in self.__runtimes:
+            if self.is_waiting_player_act():
+                return
+            if str(tName) == str(Loop):
+                yield from rtObj()
+            else:
+                yield rtObj
 
     def init_player_type_attrs(self):
         if not self.__players:
@@ -406,6 +421,26 @@ class PlayScene(ExtAttrs):
             self.__pending_seconds = int(timeout_seconds)
             self.__timeout_cmd = timeout_act
             self.__pending_start_tm = time.time()
+            self.__timer_robot_exe_cmd = Timer(self.__pending_seconds, self.timer_exe_default_cmd)
+
+            self.__timer_robot_exe_cmd.start()
+
+    def timer_exe_default_cmd(self):
+        if self.__timeout_cmd:
+            defcmd = self.__timeout_cmd
+        else:
+            defcmd = self.__pending_cmds[0]
+        cmd, cmd_args = defcmd.get_cmd(), defcmd.get_cmd_param()
+        self.auto_exe_default_cmd(self.__pending_player, cmd, cmd_args)
+
+        # for stm in self.next_statement():
+        #     if callable(stm):
+        #         stm()
+        #     if not stm:
+        #         break
+        self.go_progress()
+
+        Log.debug("XXXXXXXXXLeaving act")
 
     def process_player_play_cards(self, player, cards, cmd_alias = InterProtocol.server_push_play_cards,
                                   faces_up = True, quiet = False):
@@ -454,29 +489,30 @@ class PlayScene(ExtAttrs):
         return validCmd, validCmdParam
 
     def auto_exe_default_cmd(self, player, cmd, cmd_args):
-        act_stms = None
-        if cmd in self.__actions:
-            act_stms = self.__actions[cmd]
+        with self.__pending_cmd_lock:
+            act_stms = None
+            if cmd in self.__actions:
+                act_stms = self.__actions[cmd]
 
-        # 准备参数
-        self.__cmd_player = player
-        self.__cmd_args = cmd_args
+            # 准备参数
+            self.__cmd_player = player
+            self.__cmd_args = cmd_args
 
-        if callable(act_stms[0]):  # has param checker
-            # 优先使用param_check检查参数
-            ret = act_stms[0]()
-            if not ret:
-                player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_param)
-                return
+            if callable(act_stms[0]):  # has param checker
+                # 优先使用param_check检查参数
+                ret = act_stms[0]()
+                if not ret:
+                    player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_param)
+                    return
 
-        # 执行内部逻辑
-        if callable(act_stms[1]):
-            act_stms[1]()
+            # 执行内部逻辑
+            if callable(act_stms[1]):
+                act_stms[1]()
 
-        Log.debug("Auto exed default action, player: {0}, exed action: {1}".format(self.__pending_player.get_userid(), cmd))
-        # 重置，允许继续执行后面的命令
-        self.__pending_player = None
-        self.__pending_cmds = None
+            Log.debug("Auto exed default action, player: {0}, exed action: {1}".format(self.__pending_player.get_userid(), cmd))
+            # 重置，允许继续执行后面的命令
+            self.__pending_player = None
+            self.__pending_cmds = None
 
     def process_player_exed_cmd(self, player, cmd, cmd_args):
         with self.__pending_cmd_lock:
@@ -516,10 +552,26 @@ class PlayScene(ExtAttrs):
                 # 重置，允许继续执行后面的命令
                 self.__pending_player = None
                 self.__pending_cmds = None
+    def go_progress(self):
+        for stm in self.next_statement():
+            stm()
 
     def run(self):
         self.create_new_round()
-        for rtObj in self.__runtimes:
-            rtObj()
-            self.waiting_for_player_exe_cmd()
+        # stm = None
+        # while True:
+        #     stm = self.next_statement()
+        #     if callable(stm):
+        #         stm()
+        #     if not stm:
+        #         break
+        self.go_progress()
+            # if callable(stm):
+            #     stm()
+            # if not stm and self.__pending_player:
+            #     break
+        Log.debug("XXXXXXXXXLeaving run")
+        # for rtObj in self.__runtimes:
+        #     rtObj()
+        #     self.waiting_for_player_exe_cmd()
 
