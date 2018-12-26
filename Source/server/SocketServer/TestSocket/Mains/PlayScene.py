@@ -84,7 +84,7 @@ class PlayScene(ExtAttrs):
         return self.__players[idx]
 
     def get_proc_local_var(self, varName, procName = None):
-        Log.debug("getting proc {0} var {1} obj....".format(procName, varName))
+        Log.debug("getting var {1} of proc {0} ....".format(procName, varName))
         obj = None
         if procName in self.__procs_vars:
             if varName in self.__procs_vars[procName]:
@@ -94,9 +94,9 @@ class PlayScene(ExtAttrs):
         # else:
         #     return None
         if isinstance(obj, GVar):
-            Log.debug("got proc {0} var {1} with value {2} at obj {3}".format(procName, varName, obj.get_value(), obj))
+            Log.debug("got var {1} with value {2} in proc {0}  at obj {3}".format(procName, varName, obj.get_value(), obj))
         else:
-            Log.debug("got proc {0} var {1} with obj {2}".format(procName, varName, obj))
+            Log.debug("got var {1} in proc {0} with obj {2}".format(procName, varName, obj))
         return obj
 
     # scene has default attribute:players
@@ -421,25 +421,33 @@ class PlayScene(ExtAttrs):
             self.__pending_seconds = int(timeout_seconds)
             self.__timeout_cmd = timeout_act
             self.__pending_start_tm = time.time()
-            self.__timer_robot_exe_cmd = Timer(self.__pending_seconds, self.timer_exe_default_cmd)
 
+            if self.__timer_robot_exe_cmd:
+                self.__timer_robot_exe_cmd.cancel()
+
+            self.__timer_robot_exe_cmd = Timer(self.__pending_seconds, self.timer_exe_default_cmd)
             self.__timer_robot_exe_cmd.start()
 
     def timer_exe_default_cmd(self):
-        if self.__timeout_cmd:
-            defcmd = self.__timeout_cmd
-        else:
-            defcmd = self.__pending_cmds[0]
-        self.__timer_robot_exe_cmd.cancel()
-        cmd, cmd_args = defcmd.get_cmd(), defcmd.get_cmd_param()
-        self.auto_exe_default_cmd(self.__pending_player, cmd, cmd_args)
+        if self.__timer_robot_exe_cmd and self.__timer_robot_exe_cmd.is_alive():
+            with self.__pending_cmd_lock:
+                if self.__timeout_cmd:
+                    defcmd = self.__timeout_cmd
+                else:
+                    defcmd = self.__pending_cmds[0]
 
-        # for stm in self.next_statement():
-        #     if callable(stm):
-        #         stm()
-        #     if not stm:
-        #         break
-        self.go_progress()
+                self.__timer_robot_exe_cmd.cancel()
+
+                cmd, cmd_args = defcmd.get_cmd(), defcmd.get_cmd_param()
+                self.auto_exe_default_cmd(self.__pending_player, cmd, cmd_args)
+
+                self.__timer_robot_exe_cmd = None
+            # for stm in self.next_statement():
+            #     if callable(stm):
+            #         stm()
+            #     if not stm:
+            #         break
+            self.go_progress()
 
         Log.debug("XXXXXXXXXLeaving act")
 
@@ -490,30 +498,30 @@ class PlayScene(ExtAttrs):
         return validCmd, validCmdParam
 
     def auto_exe_default_cmd(self, player, cmd, cmd_args):
-        with self.__pending_cmd_lock:
-            act_stms = None
-            if cmd in self.__actions:
-                act_stms = self.__actions[cmd]
 
-            # 准备参数
-            self.__cmd_player = player
-            self.__cmd_args = cmd_args
+        act_stms = None
+        if cmd in self.__actions:
+            act_stms = self.__actions[cmd]
 
-            if callable(act_stms[0]):  # has param checker
-                # 优先使用param_check检查参数
-                ret = act_stms[0]()
-                if not ret:
-                    player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_param)
-                    return
+        # 准备参数
+        self.__cmd_player = player
+        self.__cmd_args = cmd_args
 
-            # 执行内部逻辑
-            if callable(act_stms[1]):
-                act_stms[1]()
+        if callable(act_stms[0]):  # has param checker
+            # 优先使用param_check检查参数
+            ret = act_stms[0]()
+            if not ret:
+                player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_param)
+                return
 
-            Log.debug("Auto exed default action, player: {0}, exed action: {1}".format(self.__pending_player.get_userid(), cmd))
-            # 重置，允许继续执行后面的命令
-            self.__pending_player = None
-            self.__pending_cmds = None
+        # 执行内部逻辑
+        if callable(act_stms[1]):
+            act_stms[1]()
+
+        Log.debug("Auto exed default action, player: {0}, exed action: {1}".format(self.__pending_player.get_userid(), cmd))
+        # 重置，允许继续执行后面的命令
+        self.__pending_player = None
+        self.__pending_cmds = None
 
     def process_player_exed_cmd(self, player, cmd, cmd_args):
         with self.__pending_cmd_lock:
@@ -544,6 +552,10 @@ class PlayScene(ExtAttrs):
                     if not ret:
                         player.response_err_pack(InterProtocol.client_req_type_exe_cmd, Errors.invalid_cmd_param)
                         return
+
+                if self.__timer_robot_exe_cmd:
+                    self.__timer_robot_exe_cmd.cancel()
+                    self.__timer_robot_exe_cmd = None
 
                 # 执行内部逻辑
                 if callable(act_stms[1]):

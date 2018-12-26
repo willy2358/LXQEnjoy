@@ -762,7 +762,7 @@
         <send_cards step="10" cards="@round.kitty" player="@main_defender"></send_cards>
 
         <!--等待主打扣牌-->
-        <act_opts step="11" timeout="30" timeout_act="robot_koupai" to_player="@main_defender">
+        <act_opts step="11" timeout="10" timeout_act="robot_koupai" to_player="@main_defender">
                 <act_ref act="koupai"/>
                 <act_ref act="robot_koupai" hidden="true"/>
         </act_opts>
