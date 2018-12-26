@@ -48,15 +48,17 @@ class Loop(Statement):
         for c in self.__clauses:
             obj = c.gen_runtime_obj(scene)
             if obj:
-                rtObjs.append(obj)
+                rtObjs.append((obj, type(c)))
 
         def sub_proc():
             try:
                 Log.debug("Executing:{0} ....".format(self.get_step()))
                 while loop_test():
-                    for func in rtObjs:
+                    for (func,tName) in rtObjs:
                         if scene.is_waiting_player_act():
                             return
+                        if str(tName) == str(Loop):
+                            yield from func()
                         if callable(func):
                             yield func
                         # scene.waiting_for_player_exe_cmd()

@@ -59,6 +59,7 @@ class PlayScene(ExtAttrs):
         self.__pending_cmd_lock = threading.Lock()
         self.__running_thread = None
         self.__timer_robot_exe_cmd = None
+        self.__rt_steps = None
 
         self.parse_rule(self.__rule)
 
@@ -365,7 +366,7 @@ class PlayScene(ExtAttrs):
             if self.is_waiting_player_act():
                 return
             if str(tName) == str(Loop):
-                yield from rtObj()
+                yield  from rtObj()
             else:
                 yield rtObj
 
@@ -566,8 +567,17 @@ class PlayScene(ExtAttrs):
                 self.__pending_player = None
                 self.__pending_cmds = None
     def go_progress(self):
-        for stm in self.next_statement():
-            stm()
+        if not self.__rt_steps:
+            self.__rt_steps = self.next_statement()
+
+        while not self.__pending_player:
+            step = self.__rt_steps.__next__()
+            if step and callable(step):
+                step()
+
+
+        # for stm in self.next_statement():
+        #     stm()
 
     def run(self):
         self.create_new_round()
