@@ -1,6 +1,7 @@
 from GCore.Statement import Statement
 from GCore.Elements.Ret import Ret
 from GCore.Elements.Variable import Variable
+from GCore.Elements.Loop import Loop
 import Mains.Log as Log
 
 # <proc name="proc_example" params="#player,#cards">
@@ -46,7 +47,11 @@ class Proc(Statement):
                     scene.set_cur_proc_ctx(self.__name)
                     if isinstance(c, Ret):
                         return scene.get_obj_value(c.gen_runtime_obj(scene))
-                    func = c.gen_runtime_obj(scene)
+                    func = None
+                    if isinstance(c, Loop):
+                        func = c.gen_runtime_no_pause_obj(scene)
+                    else:
+                        func = c.gen_runtime_obj(scene)
                     if callable(func):
                         if isinstance(c, Variable):
                             func(self.__name)

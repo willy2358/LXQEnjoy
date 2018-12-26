@@ -430,6 +430,7 @@ class PlayScene(ExtAttrs):
             defcmd = self.__timeout_cmd
         else:
             defcmd = self.__pending_cmds[0]
+        self.__timer_robot_exe_cmd.cancel()
         cmd, cmd_args = defcmd.get_cmd(), defcmd.get_cmd_param()
         self.auto_exe_default_cmd(self.__pending_player, cmd, cmd_args)
 

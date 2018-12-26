@@ -20,6 +20,26 @@ class Loop(Statement):
     def add_clause(self, clause):
         self.__clauses.append(clause)
 
+    def gen_runtime_no_pause_obj(self, scene):
+        assert self.__exit_cond
+        loop_test = self.__exit_cond.gen_runtime_obj(scene)
+        rtObjs = []
+        for c in self.__clauses:
+            obj = c.gen_runtime_obj(scene)
+            if obj:
+                rtObjs.append(obj)
+
+        def sub_proc():
+            try:
+                Log.debug("Executing:{0} ....".format(self.get_step()))
+                while loop_test():
+                    for func in rtObjs:
+                        if callable(func):
+                            func()
+            except Exception as ex:
+                Log.exception(ex)
+        return sub_proc
+
     def gen_runtime_obj(self, scene):
         assert self.__exit_cond
 
