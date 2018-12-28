@@ -244,7 +244,11 @@ class PlayScene(ExtAttrs):
             return False
 
     def is_waiting_player_act(self):
-        return self.__pending_player
+        ret = True if self.__pending_player else False
+        if ret:
+            Log.debug("waiting for player {0} action, in thread:{1} ...".format(self.__pending_player.get_userid(),
+                                                                                threading.get_ident()))
+        return ret
 
     def init_player_attrs(self, player):
         playerPart = self.__rule.get_part_by_name(RulePart_Players.PART_NAME)
@@ -365,7 +369,7 @@ class PlayScene(ExtAttrs):
         for (rtObj,tName) in self.__runtimes:
             if self.is_waiting_player_act():
                 return
-            if str(tName) == str(Loop):
+            if rtObj and str(tName) == str(Loop):
                 yield  from rtObj()
             else:
                 yield rtObj
@@ -415,6 +419,7 @@ class PlayScene(ExtAttrs):
 
 
     def send_player_cmd_opts(self, player, cmds, timeout_seconds, timeout_act):
+
         pack = InterProtocol.create_cmd_options_json_packet(player, cmds, timeout_act, timeout_seconds)
         if player and player.send_server_cmd_packet(pack):
             self.__pending_player = player
@@ -425,9 +430,11 @@ class PlayScene(ExtAttrs):
 
             if self.__timer_robot_exe_cmd:
                 self.__timer_robot_exe_cmd.cancel()
-
+            Log.debug("waiting for player {0} action, in thread:{1} ...".format(self.__pending_player.get_userid(),
+                                                                                threading.get_ident()))
             self.__timer_robot_exe_cmd = Timer(self.__pending_seconds, self.timer_exe_default_cmd)
             self.__timer_robot_exe_cmd.start()
+
 
     def timer_exe_default_cmd(self):
         if self.__timer_robot_exe_cmd and self.__timer_robot_exe_cmd.is_alive():
@@ -443,14 +450,9 @@ class PlayScene(ExtAttrs):
                 self.auto_exe_default_cmd(self.__pending_player, cmd, cmd_args)
 
                 self.__timer_robot_exe_cmd = None
-            # for stm in self.next_statement():
-            #     if callable(stm):
-            #         stm()
-            #     if not stm:
-            #         break
-            self.go_progress()
 
-        Log.debug("XXXXXXXXXLeaving act")
+                self.go_progress()
+
 
     def process_player_play_cards(self, player, cards, cmd_alias = InterProtocol.server_push_play_cards,
                                   faces_up = True, quiet = False):

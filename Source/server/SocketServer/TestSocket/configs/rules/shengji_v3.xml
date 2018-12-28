@@ -424,7 +424,7 @@
 
         <proc name="trick_end">
 
-            <update property="@round.trick_winner" value=":(max_attr_of_player(trick_power))"/>
+            <update property="@round.trick_winner" value=":(max_attr_of_player(attr!trick_power))"/>
             <var name="#te_trick_winner" value_type="player" value="@round.trick_winner"/>
             <ift >
                 <!--进攻方赢，得到分数牌-->
@@ -626,6 +626,7 @@
             <var name="#fc_tmp_card" value_type="card" value="none"></var>
             <pick_cards from_player="@cmd_player" count="1" to_var="@#fc_tmp_card"/>
             <playcards player="@cmd_player" cards="@#fc_tmp_card" alias="chu pai" cards_face_up="true"/>
+            <update property="@round.trick_leading_cards" value="@#fc_tmp_card"/>
             <update step="robot_lead_card-3" property="@round.is_trick_valid_leading_cards" value="true"/>
             <update step="robot_lead_card-4" property="@cmd_player.trick_score" value=":(#get_cards_score(@#fc_tmp_card))"/>
             <update property="@cmd_player.trick_power" value=":(#get_player_trick_power(@cmd_player,@#fc_tmp_card))"/>
@@ -733,7 +734,7 @@
                     <case value_of=":(cfigure_of(@drawn_card))" ret_as="@round.bank_cfigure"/>
                     <case value_of="@round.bank_ctype" ret_is="none"/>
                 </cases>
-                <act_opts timeout="60" timeout_act="pass_jiaozhu" to_player="@drawer">
+                <act_opts timeout="30" timeout_act="pass_jiaozhu" to_player="@drawer">
                     <act_ref act="jiaozhu" param="@drawn_card"/>
                     <act_ref act="pass_jiaozhu" param="none"/>
                 </act_opts>
@@ -779,7 +780,7 @@
         <loop_until step="14" value_of=":(count_of(player_cards_of_free(@round.trick_leading_player)))" ret_gt="0">
             <update property="@round.is_trick_valid_leading_cards" value="false"/>
             <loop_until step="14-1" value_of="@round.is_trick_valid_leading_cards" ret_is="false">
-                <act_opts step="14-1-1" timeout="300" timeout_act="robot_lead_card" to_player="@round.trick_init_player">
+                <act_opts step="14-1-1" timeout="5" timeout_act="robot_lead_card" to_player="@round.trick_init_player">
                         <act_ref act="playcard"/>
                         <act_ref act="robot_lead_card" hidden="true"/>
                 </act_opts>
@@ -790,7 +791,7 @@
                 <update property="@round.is_valid_following_cards" value="false"/>
                 <update property="@follower" value=":(next_player_of(@round.trick_init_player, @sorder))"/>
                 <loop_until value_of="@round.is_valid_following_cards" ret_is="false">
-                    <act_opts timeout="300" timeout_act="robot_follow_cards" to_player="@follower">
+                    <act_opts timeout="5" timeout_act="robot_follow_cards" to_player="@follower">
                             <act_ref act="playcard"/>
                             <act_ref act="robot_follow_cards" hidden="true"/>
                     </act_opts>
