@@ -55,8 +55,8 @@ class Loop(Statement):
                 Log.debug("Executing:{0} ....".format(self.get_step()))
                 while loop_test():
                     for (func,tName) in rtObjs:
-                        if scene.is_waiting_player_act():
-                            return
+                        # if scene.is_waiting_player_act():
+                        #     return
                         if str(tName) == str(Loop):
                             yield from func()
                         if callable(func):

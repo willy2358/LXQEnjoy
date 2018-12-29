@@ -367,8 +367,8 @@ class PlayScene(ExtAttrs):
         #     yield None
         # else:
         for (rtObj,tName) in self.__runtimes:
-            if self.is_waiting_player_act():
-                return
+            # if self.is_waiting_player_act():
+            #     return
             if rtObj and str(tName) == str(Loop):
                 yield  from rtObj()
             else:
