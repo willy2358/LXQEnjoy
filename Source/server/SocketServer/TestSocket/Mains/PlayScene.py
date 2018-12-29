@@ -103,7 +103,23 @@ class PlayScene(ExtAttrs):
     # scene has default attribute:players
     def get_runtime_objs(self, varStr):
         varStr = varStr.strip()
-        if varStr.startswith("@round."):
+        if not varStr.startswith('@'):
+            return None
+        if ".[]." in varStr:
+            # format  "@players.[].IsMainPlayer"
+            ps = varStr.split(".[].")
+            objsVar = self.get_runtime_objs(ps[0])
+            insts = self.get_obj_value(objsVar)
+            if isinstance(insts, list):
+                attrObjs = []
+                for inst in insts:
+                    # inst is a ExtAttrs, mostly a player
+                    attrObjs.append(inst.get_prop(ps[1].lstrip('@')))
+                return attrObjs
+            else:
+                return objsVar
+
+        elif varStr.startswith("@round."):
             r = self.get_current_round()
             return r.get_attr(varStr[len("@round."):])
         elif varStr.startswith("@scene."):
@@ -121,26 +137,19 @@ class PlayScene(ExtAttrs):
             else:
                 return self.__cmd_player.get_attr(varStr[len("@cmd_player."):])
         elif varStr.startswith("@#"):
-            return self.get_proc_local_var(varStr.lstrip("@"), self.__cur_proc_ctx)
-        elif varStr.startswith("@"):
-            if ".[]." in varStr:
-                # format  "@players.[].IsMainPlayer"
-                ps = varStr.split(".[].")
-                objsVar = self.get_runtime_objs(ps[0])
-                insts = self.get_obj_value(objsVar)
-                if isinstance(insts, list):
-                    attrObjs = []
-                    for inst in insts:
-                        # inst is a ExtAttrs, mostly a player
-                        attrObjs.append(inst.get_prop(ps[1].lstrip('@')))
-                    return attrObjs
+            if '.' in varStr:
+                ps = varStr.split('.')
+                localVar = self.get_runtime_objs(ps[0])
+                if localVar:
+                    inst = self.get_obj_value(localVar)
+                    return inst.get_prop(ps[1])
                 else:
-                    return objsVar
+                    Log.error("Should not none at:" + varStr)
+                    return None
             else:
-                # format @player
-                return self.get_var(varStr.lstrip("@"))
+                return self.get_proc_local_var(varStr.lstrip("@"), self.__cur_proc_ctx)
         else:
-            return None
+            return self.get_var(varStr.lstrip("@"))
 
     def get_obj_value(self, obj):
         if isinstance(obj, CFigure):
@@ -573,30 +582,16 @@ class PlayScene(ExtAttrs):
             self.__rt_steps = self.next_statement()
 
         while not self.__pending_player:
-            step = self.__rt_steps.__next__()
-            if step and callable(step):
-                step()
-
-
-        # for stm in self.next_statement():
-        #     stm()
+            try:
+                step = self.__rt_steps.__next__()
+                if step and callable(step):
+                    step()
+            except StopIteration:
+                Log.info("Round finshed")
 
     def run(self):
         self.create_new_round()
-        # stm = None
-        # while True:
-        #     stm = self.next_statement()
-        #     if callable(stm):
-        #         stm()
-        #     if not stm:
-        #         break
         self.go_progress()
-            # if callable(stm):
-            #     stm()
-            # if not stm and self.__pending_player:
-            #     break
+
         Log.debug("XXXXXXXXXLeaving run")
-        # for rtObj in self.__runtimes:
-        #     rtObj()
-        #     self.waiting_for_player_exe_cmd()
 

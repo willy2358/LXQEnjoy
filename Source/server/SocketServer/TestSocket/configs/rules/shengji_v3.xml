@@ -379,9 +379,9 @@
         </proc>
 
         <proc name="round_end">
-            <var name="#pre_one_attacter" value_type="player" value=":(find_player(IsAttacter:true))"/>
+            <var name="#pre_one_attacter" step="292158" value_type="player" value=":(find_player(IsAttacter:true))"/>
             <var name="#pre_cur_main_player" value_type="player" value=":(find_player(IsMainPlayer:true))"/>
-            <ift value_of="@#pre_one_attacter.Score" ret_not_lt="int:40">
+            <ift step="292300" value_of="@#pre_one_attacter.Score" ret_not_lt="int:40">
                 <then>
                     <var name="#pre_next_main_player" value=":(next_player_of(@#pre_cur_main_player, 1))" value_type="player"></var>
                      <!--进攻方分数>40，进攻方赢, 防守方输, 攻守互换，进攻方升一级-->
@@ -393,7 +393,7 @@
                     <update property="@round.losers.[].IsDefender" value="false"/>
                     <update property="@#pre_cur_main_player.IsMainPlayer" value="false"/>
                     <update property="@#pre_next_main_player.IsMainPlayer" value="true"/>
-                    <update property="@round.winners.[].bank_cfigure" op="add" value="1"/>
+                    <update step="292337" property="@round.winners.[].bank_cfigure" op="add" value="1"/>
                     <ift value_of="@#pre_one_attacter.Score" ret_not_lt="int:80">
                         <!--进攻方分数>80, 升2级-->
                         <update property="@round.winners.[].bank_cfigure" op="add" value="1"/>
@@ -402,6 +402,8 @@
                     <update property="@scene.bank_cfigure" value="@#pre_next_main_player.bank_cfigure"/>
                 </then>
                 <else>
+                    <update property="@round.winners" value=":(find_players(IsAttacter:false))"/>
+                    <update property="@round.losers" value=":(find_players(IsAttacter:true))"/>
                     <!--进攻方分数<40，防守方赢, 防守方升1级 -->
                     <var name="#pre_the_other_defender" value=":(next_player_of(@#pre_cur_main_player, 3))" value_type="player"></var>
                     <!--交换主打-->
@@ -429,7 +431,7 @@
             <ift >
                 <!--进攻方赢，得到分数牌-->
                 <cases op="and">
-                    <case value_of="@#te_trick_winner.IsAttacter" ret_is="true"></case>
+                    <case step="292322" value_of="@#te_trick_winner.IsAttacter" ret_is="true"></case>
                     <case value_of="@round.trick_score" ret_gt="0"></case>
                 </cases>
                 <update property="@round.attacters.[].Score" op="add" value="@round.trick_score"></update>
@@ -558,6 +560,11 @@
                     <!--设置进攻方-->
                     <update step="act1-2-4" property="@round.attacters" op="append" value=":(next_player_of(@cmd_player,1))"/>
                     <update property="@round.attacters" op="append" value=":(next_player_of(@cmd_player,3))"/>
+
+                    <update step="292227" property="@round.defenders.[].IsDefender" value="true"/>
+                    <update property="@round.defenders.[].IsAttacter" value="false"/>
+                    <update property="@round.attacters.[].IsAttacter" value="true"/>
+                    <update property="@round.attacters.[].IsDefender" value="false"/>
 
                     <update property="@round.trick_init_player" value="@cmd_player"/>
                 </then>
@@ -780,7 +787,7 @@
         <loop_until step="14" value_of=":(count_of(player_cards_of_free(@round.trick_leading_player)))" ret_gt="0">
             <update property="@round.is_trick_valid_leading_cards" value="false"/>
             <loop_until step="14-1" value_of="@round.is_trick_valid_leading_cards" ret_is="false">
-                <act_opts step="14-1-1" timeout="5" timeout_act="robot_lead_card" to_player="@round.trick_init_player">
+                <act_opts step="14-1-1" timeout="1" timeout_act="robot_lead_card" to_player="@round.trick_init_player">
                         <act_ref act="playcard"/>
                         <act_ref act="robot_lead_card" hidden="true"/>
                 </act_opts>
@@ -791,7 +798,7 @@
                 <update property="@round.is_valid_following_cards" value="false"/>
                 <update property="@follower" value=":(next_player_of(@round.trick_init_player, @sorder))"/>
                 <loop_until value_of="@round.is_valid_following_cards" ret_is="false">
-                    <act_opts timeout="5" timeout_act="robot_follow_cards" to_player="@follower">
+                    <act_opts timeout="1" timeout_act="robot_follow_cards" to_player="@follower">
                             <act_ref act="playcard"/>
                             <act_ref act="robot_follow_cards" hidden="true"/>
                     </act_opts>
