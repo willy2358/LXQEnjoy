@@ -1,6 +1,7 @@
 
 from Mains.GVar import GVar
 from GCore.ValueType import ValueType
+from GCore.CValue import CValue
 
 from GCore.VarRef import VarRef
 import Mains.Log as Log
@@ -76,14 +77,27 @@ class ExtAttrs:
         else:
             return None
 
+    def get_pub_attrs(self):
+        attrs = []
+        for attr in self.__cus_attrs:
+            varObj = self.__cus_attrs[attr]
+            if varObj.is_pub_status():
+                attrs.append(varObj)
+
+        return attrs
+
     def get_attrs(self):
         return self.__cus_attrs
 
     def get_vars(self):
         return self.__vars
 
-    def add_cus_attr(self, attrName, attrType = 'integer', attrVal=None):
-        self.__cus_attrs[attrName] = GVar(attrName, attrType, attrVal)
+    def add_cus_attr(self, attrName, attrType = 'integer', attrVal=None, is_pub_status=False):
+        gVar = GVar(attrName, attrType, attrVal)
+        if is_pub_status:
+            gVar.set_is_pub_status()
+        self.__cus_attrs[attrName] = gVar
+
 
     def update_attr(self, attrName, value):
         if attrName in self.__cus_attrs:

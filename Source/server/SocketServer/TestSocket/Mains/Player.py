@@ -108,6 +108,10 @@ class Player(ExtAttrs):
 
         if cmd_str_bak:
             self.send_raw_network_data(cmd_str_bak)
+    def pub_my_status(self):
+        status = self.get_pub_status()
+        pack = InterProtocol.create_game_status_packet(InterProtocol.server_push_player_status, status)
+        self.send_server_cmd_packet(pack)
 
     def update_last_alive(self):
         self.__last_alive_time = datetime.now()

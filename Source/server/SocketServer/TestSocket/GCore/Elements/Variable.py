@@ -8,6 +8,7 @@ class Variable(Operand):
         self.__name = varName
         self.__value_type = ValueType.undef
         self.__value = None
+        self.__is_pub_status = False
 
     def get_name(self):
         return self.__name
@@ -21,11 +22,17 @@ class Variable(Operand):
     def get_value(self):
         return self.__value
 
+    def is_pub_status(self):
+        return self.__is_pub_status
+
     def set_value_type(self, vtype):
         self.__value_type = vtype
 
     def set_value(self, val):
         self.__value = val
+
+    def set_pub_status(self):
+        self.__is_pub_status = True
 
     def gen_runtime_obj(self, scene):
         def new_var(scope=None):

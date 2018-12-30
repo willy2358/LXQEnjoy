@@ -33,6 +33,8 @@ def parse_ctype(strCtype, gType = GType.Poker):
     else:
         return CType.Undefined
 
+
+
 class CType(Enum):
     Any = "*"
     Undefined = "-"
@@ -47,3 +49,29 @@ class CType(Enum):
     M_Tong = "t"
     M_Feng = "f"
     M_Arrow = "a"
+
+    @staticmethod
+    def get_type_str(cType):
+        if cType == CType.P_Club:
+            return 'c'
+        elif cType == CType.P_Diamond:
+            return 'd'
+        elif cType == CType.P_Heart:
+            return 'h'
+        elif cType == CType.P_Spade:
+            return 's'
+        elif cType == CType.P_Joker:
+            return 'j'
+        elif cType == cType.M_Wan:
+            return 'w'
+        elif cType == CType.M_Suo:
+            return 's'
+        elif cType == CType.M_Tong:
+            return 't'
+        elif cType == CType.M_Feng:
+            return 'f'
+        elif cType == CType.M_Arrow:
+            return 'a'
+        else:
+            return 'undef'
+

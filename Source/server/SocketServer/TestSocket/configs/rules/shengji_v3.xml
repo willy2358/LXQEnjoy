@@ -170,10 +170,10 @@
     <players min="4" max="4">
         <attr name="bank_cfigure" value_type="int" value="2"/>
         <attr name="IsMainPlayer" value_type="bool" value="false" />
-        <attr name="IsAttacter" value_type="bool" value="false"/>
-        <attr name="IsDefender" value_type="bool" value="false"/>
-        <attr name="sum_score" value_type="int" value="0"/>
-        <attr name="Score" value_type="int" value="0"/>
+        <attr name="IsAttacter" value_type="bool" value="false" pub_status="true"/>
+        <attr name="IsDefender" value_type="bool" value="false" pub_status="true"/>
+        <attr name="sum_score" value_type="int" value="0" pub_status="true"/>
+        <attr name="Score" value_type="int" value="0" pub_status="true"/>
         <attr name="IsTrickWinner" value_type="bool" value="false"/>
         <attr name="trick_cards" value_type="cards" value="none"/>
         <attr name="trick_power" value_type="int" value="0"/>
@@ -192,11 +192,11 @@
     <round>
         <attrs>
              <!--庄牌点数-->
-            <attr name="bank_cfigure" value_type="int" value="2"/>
+            <attr name="bank_cfigure" value_type="int" value="2" pub_status="true"/>
             <!--庄牌花色-->
-            <attr name="bank_ctype" value_type="string" value="none"/>
-            <attr name="defenders" value_type="players" value="none"/>
-            <attr name="attacters" value_type="players" value="none"/>
+            <attr name="bank_ctype" value_type="string" value="none" pub_status="true"/>
+            <attr name="defenders" value_type="players" value="none" pub_status="true"/>
+            <attr name="attacters" value_type="players" value="none" pub_status="true"/>
             <!--起牌玩家，第一个摸牌的人-->
             <attr name="init_drawer" value_type="player" value="random"/>
             <attr name="kitty" value_type="cards" value="none"/>
@@ -813,6 +813,9 @@
 
         <!--出牌结束，确定一局输赢玩家-->
         <proc_ref step="15" proc="round_end"/>
+        <pub_msg players="@round.players" msg="Round finished"/>
+        <pub_player_status players="@round.players"></pub_player_status>
+        <pub_round_status players="@round.players"/>
 
         <!--广播一局胜负-->
         <!--<publish_round_winners_losers/>-->

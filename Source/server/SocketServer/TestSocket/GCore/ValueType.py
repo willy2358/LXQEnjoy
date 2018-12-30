@@ -12,6 +12,24 @@ class ValueType(Enum):
     players = 7 # list of players
     void = 8
 
+    @staticmethod
+    def get_type_str(valType):
+        if valType == ValueType.integer:
+            return "int"
+        elif valType == ValueType.string:
+            return "str"
+        elif valType == ValueType.bool:
+            return "bool"
+        elif valType == ValueType.card:
+            return "card"
+        elif valType == ValueType.cards:
+            return "cards"
+        elif valType == ValueType.player:
+            return "player"
+        elif valType == ValueType.players:
+            return "players"
+        else:
+            return "undef"
 
 def parse_from_str(sType):
     slower = sType.lower()

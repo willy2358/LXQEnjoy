@@ -60,6 +60,8 @@ server_push_shown_card_groups = "shown-cards-groups"
 server_push_private_cards_count = "private-cards-count"
 server_push_pending_player = "pending-player"
 server_push_pub_msg = "pub-msg"
+server_push_round_status = "round-status"
+server_push_player_status = "player-status"
 
 pack_field_msg = "msg"
 pack_field_silent="silent"
@@ -156,7 +158,7 @@ def create_msg_packet(msg):
     packet = {
         cmd_type: server_cmd_type_push,
         server_cmd_type_push: server_push_pub_msg,
-        pack_field_msg: server_push_pub_msg
+        pack_field_msg: msg
     }
     return packet
 
@@ -189,6 +191,9 @@ def create_game_status_packet(status, status_data = None):
         server_push_status_data:status_data
     }
     return packet
+
+# def create_round_status_packet(status_data):
+
 
 def create_game_players_packet(players):
     packet = {

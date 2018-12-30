@@ -84,6 +84,8 @@ class PlayScene(ExtAttrs):
 
         return self.__players[idx]
 
+
+
     def get_proc_local_var(self, varName, procName = None):
         Log.debug("getting var {1} of proc {0} ....".format(procName, varName))
         obj = None
@@ -99,6 +101,57 @@ class PlayScene(ExtAttrs):
         else:
             Log.debug("got var {1} in proc {0} with obj {2}".format(procName, varName, obj))
         return obj
+
+    def get_obj_status_data(self, obj):
+        if isinstance(obj, CFigure):
+            return int(obj)
+        if isinstance(obj, CType):
+            return CType.get_type_str(obj)
+        elif isinstance(obj, int) or isinstance(obj, bool) or isinstance(obj, str):
+            return obj
+        elif isinstance(obj, Player):
+            return {InterProtocol.user_id : obj.get_userid()}
+        elif isinstance(obj, list):
+            ls = []
+            for o in obj:
+                ls.append(self.get_obj_status_data(o))
+            return ls
+        elif isinstance(obj, GArray):
+            objs = obj.gen_runtime_obj(self)()
+            return self.get_obj_status_data(objs)
+        elif type(obj) is GVar:
+            return self.get_obj_status_data(self.get_obj_value(obj.get_value()))
+        elif isinstance(obj, CValue):
+            return obj.get_value()
+        elif type(obj) is VarRef:
+            return self.get_obj_status_data(self.get_obj_value(obj.gen_runtime_obj(self)()))
+        elif isinstance(obj, FuncCall):
+            return self.get_obj_status_data(self.get_obj_value(obj.gen_runtime_obj(self)()))
+        elif callable(obj):
+            return self.get_obj_status_data(self.get_obj_value(obj()))
+        else:
+            return None
+
+    def pub_player_status(self, player):
+        attrs = player.get_pub_attrs()
+        dicAttrs = {}
+        for attr in attrs:
+            data = self.get_obj_status_data(attr.get_value())
+            dicAttrs[attr.get_name()] = {'datatype': attr.get_value_type_name(), 'value': data}
+        pack = InterProtocol.create_game_status_packet(InterProtocol.server_push_player_status, dicAttrs)
+        player.send_server_cmd_packet(pack)
+
+    def pub_round_status(self, to_players):
+        if not to_players:
+            return
+        attrs = self.__cur_round.get_pub_attrs()
+        dicAttrs = {}
+        for attr in attrs:
+            data = self.get_obj_status_data(attr.get_value())
+            dicAttrs[attr.get_name()] = {'datatype': attr.get_value_type_name(), 'value': data}
+        pack = InterProtocol.create_game_status_packet(InterProtocol.server_push_round_status, dicAttrs)
+        for p in to_players:
+            p.send_server_cmd_packet(pack)
 
     # scene has default attribute:players
     def get_runtime_objs(self, varStr):
@@ -268,7 +321,7 @@ class PlayScene(ExtAttrs):
             name = attr.get_name()
             vtype = attr.get_value_type()
             val = attr.get_value()
-            player.add_cus_attr(name, vtype, val)
+            player.add_cus_attr(name, vtype, val, attr.is_pub_status())
 
     def _append_rt_obj(self, obj, nodeName):
         self.__runtimes.append((obj, nodeName))
@@ -418,7 +471,7 @@ class PlayScene(ExtAttrs):
                 name = attr.get_name()
                 vtype = attr.get_value_type()
                 val = attr.get_value()
-                newRound.add_cus_attr(name, vtype, val)
+                newRound.add_cus_attr(name, vtype, val, attr.is_pub_status())
             newRound.set_debug_cards(roundPart.get_debug_cards())
 
         newRound.init_cards_pack(self.__cards_space)
@@ -588,6 +641,7 @@ class PlayScene(ExtAttrs):
                     step()
             except StopIteration:
                 Log.info("Round finshed")
+                break
 
     def run(self):
         self.create_new_round()
