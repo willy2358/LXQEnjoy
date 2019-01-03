@@ -381,7 +381,7 @@
         <proc name="round_end">
             <var name="#pre_one_attacter" step="292158" value_type="player" value=":(find_player(IsAttacter:true))"/>
             <var name="#pre_cur_main_player" value_type="player" value=":(find_player(IsMainPlayer:true))"/>
-            <ift step="292300" value_of="@#pre_one_attacter.Score" ret_not_lt="int:40">
+            <ift step="292300" value_of="@#pre_one_attacter.Score" ret_not_lt="int%40">
                 <then>
                     <var name="#pre_next_main_player" value=":(next_player_of(@#pre_cur_main_player, 1))" value_type="player"></var>
                      <!--进攻方分数>40，进攻方赢, 防守方输, 攻守互换，进攻方升一级-->
@@ -394,7 +394,7 @@
                     <update property="@#pre_cur_main_player.IsMainPlayer" value="false"/>
                     <update property="@#pre_next_main_player.IsMainPlayer" value="true"/>
                     <update step="292337" property="@round.winners.[].bank_cfigure" op="add" value="1"/>
-                    <ift value_of="@#pre_one_attacter.Score" ret_not_lt="int:80">
+                    <ift value_of="@#pre_one_attacter.Score" ret_not_lt="int%80">
                         <!--进攻方分数>80, 升2级-->
                         <update property="@round.winners.[].bank_cfigure" op="add" value="1"/>
                     </ift>
@@ -411,7 +411,7 @@
                     <update property="@#pre_the_other_defender.IsMainPlayer" value="true"/>
 
                     <update property="@round.winners.[].bank_cfigure" op="add" value="1"/>
-                    <ift value_of="@#pre_one_attacter.Score" ret_is="int:0">
+                    <ift value_of="@#pre_one_attacter.Score" ret_is="int%0">
                         <!--进攻方分数=0，防守方升2级 -->
                         <update property="@round.winners.[].bank_cfigure" op="add" value="1"/>
                     </ift>
@@ -426,7 +426,7 @@
 
         <proc name="trick_end">
 
-            <update property="@round.trick_winner" value=":(max_attr_of_player(attr!trick_power))"/>
+            <update property="@round.trick_winner" value=":(max_attr_of_player(str%trick_power))"/>
             <var name="#te_trick_winner" value_type="player" value="@round.trick_winner"/>
             <ift >
                 <!--进攻方赢，得到分数牌-->
@@ -450,7 +450,7 @@
 
         <proc name="proc_example" params="#arg_player,#arg_cards">
             <var name="#f_val" value_type="int" value="0"/>
-            <ift value_of=":(element_at(@#arg_cards, 0))" ret_not_is="str:s1">
+            <ift value_of=":(element_at(@#arg_cards, 0))" ret_not_is="str%s1">
                 <update property="@#f_val" value="4"/>
             </ift>
             <ret value="@#f_val"></ret>
@@ -696,7 +696,7 @@
             <update property="@round.kitty_score" value=":(#get_cards_score(@round.koupai))"/>
             <!--
             <pub_act exer="@cmd_player" to_players="@cmd_player" act="koupai" args="@round.koupai"/>
-            <pub_act exer="@cmd_player" to_players="@#afk_other_players" act="koupai" args="list:*,*,*,*,*,*"/>
+            <pub_act exer="@cmd_player" to_players="@#afk_other_players" act="koupai" args="list%*,*,*,*,*,*"/>
             -->
         </action>
     </actions>
@@ -704,8 +704,8 @@
 
     <running>
         <!--for debugging, start-->
-        <!--<var name="test_var" value_type="cards" value="list:s1,s2,s3"/>
-        <update property="@test_var" value="list:s4,s5,s6"/>
+        <!--<var name="test_var" value_type="cards" value="list%s1,s2,s3"/>
+        <update property="@test_var" value="list%s4,s5,s6"/>
         <update property="@round.bank_cfigure" value=":(#proc_example(none, @test_var))"/>-->
         <!--for debugging, end-->
 
@@ -714,7 +714,7 @@
         <update property="@players.[].Score" value="20"/>
         <var name="drawer1" value="@scene.init_drawer" value_type="player"/>
         <act_opts timeout="500" timeout_act="pass" to_player="@drawer1">
-                    <act_ref act="koupai" param="list:s2"/>
+                    <act_ref act="koupai" param="list%s2"/>
                     <act_ref act="pass" param="none"/>
         </act_opts>
         -->

@@ -32,7 +32,7 @@ class Pattern_Single(Pattern):
                 self.__ctype = parse_ctype(xmlElement.getAttribute(GCore.Engine.attr_name_ctype), self.getGRule().get_gtype())
             if xmlElement.hasAttribute(Pattern.ATTR_NAME_POWER):
                 powerAttrVal = xmlElement.getAttribute(Pattern.ATTR_NAME_POWER)
-                if powerAttrVal.isnumeric():
+                if powerAttrVal.isdigit():
                     self.set_power(int(powerAttrVal))
                 elif is_str_statement(powerAttrVal) or is_var_ref(powerAttrVal) :
                     self.add_power_statement(parse_attribute_text(xmlElement, powerAttrVal))

@@ -7,7 +7,7 @@ def parse_cfigure(strFig):
         return CFigure.Any
     elif strFig.startswith('-'):
         return CFigure.Undefined
-    elif strFig.isnumeric():
+    elif strFig.isdigit():
         return CFigure(int(strFig))
     else:
         return CFigure.Undefined
