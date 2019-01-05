@@ -813,7 +813,7 @@
 
         <!--出牌结束，确定一局输赢玩家-->
         <proc_ref step="15" proc="round_end"/>
-        <pub_msg players="@round.players" msg="Round finished"/>
+        <pub_msg players="@round.players" msg="str%Round finished"/>
         <pub_player_status players="@round.players"></pub_player_status>
         <pub_round_status players="@round.players"/>
 
