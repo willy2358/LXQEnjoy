@@ -78,7 +78,7 @@ class Room(Closet):
                 if self.can_new_player_seated():
                     self._seated_players.append(player)
                     player.set_my_room(self)
-                    player.set_seat_id(seatid)
+                    player.set_seatid(seatid)
                     return True, Errors.ok
                 else:
                     return False, Errors.room_no_empty_seat

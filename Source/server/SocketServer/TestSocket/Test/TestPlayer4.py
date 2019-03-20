@@ -5,7 +5,7 @@ import time
 
 
 roomid = "0"
-userid = 4444
+userid = 444
 gameid = "shengji001"
 # roomid = 888
 # client = SocketClient.SocketClient("117.78.40.54", 9229)
@@ -21,7 +21,7 @@ def join_game():
         "gameid":gameid,
         "clientid": "00001",
         "token": client.get_token(),
-        "seatid":1
+        "seatid":0
     }
     myCmd_str = json.dumps(mycmd)
     client.send_message(myCmd_str)

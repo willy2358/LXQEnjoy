@@ -1,3 +1,5 @@
+import threading
+
 from Mains.PlayScene import PlayScene
 from Mains import InterProtocol
 import Mains.Errors as Errors
@@ -9,6 +11,7 @@ class Closet:
         self.__roomId = roomId
         self.__gameid = gameid
         self.__playScene = PlayScene(gRule)
+        self._lock_seated_players = threading.Lock()
 
     def get_rule(self):
         return self.__gRule
@@ -56,7 +59,7 @@ class Closet:
     def get_players_status(self):
         players = []
         for p in self.__playScene.get_players():
-            players.append({'userid': p.get_userid(), 'seated': p.get_seatid()})
+            players.append({'userid': p.get_userid(), 'seatid': p.get_seatid()})
 
         return players
 
