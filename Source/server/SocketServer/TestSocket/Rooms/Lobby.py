@@ -4,7 +4,7 @@ from Mains import InterProtocol
 import threading
 
 from Clients import Clients
-from Mains.Errors import *
+from Mains import Errors
 from Mains import Log
 
 
@@ -25,7 +25,8 @@ def process_player_join_game(player, req_json):
                 if _lock_seated_players.acquire(5):
                     if closet.add_player(player):
                         player.set_seatid(len(closet.get_scene_players()))
-                        pack = InterProtocol.create_success_resp_pack(InterProtocol.client_req_cmd_join_game)
+                        pack = InterProtocol.create_success_resp_data_pack(InterProtocol.client_req_cmd_join_game,
+                                                                           InterProtocol.seat_id, player.get_seatid())
                         player.response_success_pack(pack)
                         closet.publish_players_status()
 
