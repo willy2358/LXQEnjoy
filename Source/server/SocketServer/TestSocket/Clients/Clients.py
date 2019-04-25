@@ -32,8 +32,10 @@ def reload():
             clientId = jsonConf[Client.field_client_id]
             token = jsonConf[Client.field_auth_token]
             limits = jsonConf[Client.field_player_limits]
+            keyFile = jsonConf[Client.field_key_file]
             client = Client(name, clientId, token)
             client.set_player_limits(limits)
+            client.init_rsakey(os.path.join(root, keyFile))
             for g in jsonConf[Client.field_games]:
                 gameid = g[Client.field_game_game_id]
                 ruleid = g[Client.field_game_rule_id]
@@ -65,7 +67,7 @@ def is_client_valid(client, token):
     if lock.acquire():
         for c in __clients:
             if c.get_clientid() == client:
-                if c.get_token() == token:
+                if c.verify_token(token):
                     ret = True
                 break
 

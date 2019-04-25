@@ -1,7 +1,12 @@
 
 
-import pymysql
-import pymysql.cursors
+# import pymysql
+# import pymysql.cursors
+
+from Crypto.Hash import SHA
+from Crypto.Signature import PKCS1_v1_5
+from Crypto.PublicKey import RSA
+import base64
 
 
 
@@ -9,17 +14,31 @@ dbconn = "heell"
 
 var1 = "hello"
 
-def test1():
-    global dbconn
-    if not dbconn:
-        print("None")
-        dbconn = "connected"
-    print(dbconn)
+def verify(data, signature):
+	key = RSA.importKey(open('/Users/willy/MyCodes/lxqenjoy/Source/server/SocketServer/TestSocket/configs/clients/pub512.pem').read())
+	h = SHA.new(data)
+	verifier = PKCS1_v1_5.new(key)
+	if verifier.verify(h, base64.b64decode(signature)):
+		print("verified")
+	else:
+		print("invalid")
 
 
-test1()
+oriSalt = "e43879b5-4cf8-485c-939c-76ed531feee6"
+sig = "FAoIWmjZRPmdOWj+LFL9LwpR6pTcVDGnI/nUgU/jIv8r4WXYE0M+cj2O/u+mjx76jKInKmsWn6jIZPJ/vVdlWQ=="
+bys = oriSalt.encode('utf-8')
+verify(bys, sig)
+# def test1():
+#     global dbconn
+#     if not dbconn:
+#         print("None")
+#         dbconn = "connected"
+#     print(dbconn)
 
-test1()
+
+# test1()
+#
+# test1()
 
 # def get_connection():
 #     if not db_conn:

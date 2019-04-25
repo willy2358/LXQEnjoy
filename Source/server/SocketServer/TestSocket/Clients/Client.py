@@ -1,4 +1,9 @@
 
+from Crypto.Hash import SHA
+from Crypto.Signature import PKCS1_v1_5
+from Crypto.PublicKey import RSA
+import base64
+
 import Mains.Errors as Err
 import secrets
 import Rooms.Lobby
@@ -19,6 +24,7 @@ class Client:
     field_game_rule_id = "ruleid"
     field_game_game_id = "gameid"
     field_game_coin_base = "coin-base"
+    field_key_file = "key-file"
 
     def __init__(self, name, clientid, token):
         self.__name = name
@@ -31,6 +37,10 @@ class Client:
         self.__expire_date = None
         self.__players = {}  #{userid:player}
         self.__closet_lock = threading.Lock()
+        self.__rsaKey = None
+
+    def init_rsakey(self, keyFile):
+        self.__rsaKey = RSA.importKey(open(keyFile).read())
 
     def get_clientid(self):
         return self.__clientid
@@ -80,6 +90,14 @@ class Client:
 
     def set_player_limits(self, limits):
         self.__player_limits = limits
+
+    def verify_token(self, token):
+        oriSalt = token[InterProtocol.field_salt]
+        sig = token[InterProtocol.field_signature]
+
+        h = SHA.new(oriSalt.encode('utf-8'))
+        verifier = PKCS1_v1_5.new(self.__rsaKey)
+        return verifier.verify(h, base64.b64decode(sig))
 
     def register_player(self, userid):
         if userid in self.__players:

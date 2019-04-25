@@ -2,6 +2,7 @@
     "name": "lxqenjoy",
     "clientid": "00001",
     "token":"prs35tqjMI3VUn6M6lyyPLcj84Q",
+    "key-file":"pub512.pem",
     "player-limits":1000,
     "games" : [
         {

@@ -787,7 +787,7 @@
         <loop_until step="14" value_of=":(count_of(player_cards_of_free(@round.trick_leading_player)))" ret_gt="0">
             <update property="@round.is_trick_valid_leading_cards" value="false"/>
             <loop_until step="14-1" value_of="@round.is_trick_valid_leading_cards" ret_is="false">
-                <act_opts step="14-1-1" timeout="1" timeout_act="robot_lead_card" to_player="@round.trick_init_player">
+                <act_opts step="14-1-1" timeout="10" timeout_act="robot_lead_card" to_player="@round.trick_init_player">
                         <act_ref act="playcard"/>
                         <act_ref act="robot_lead_card" hidden="true"/>
                 </act_opts>
@@ -798,7 +798,7 @@
                 <update property="@round.is_valid_following_cards" value="false"/>
                 <update property="@follower" value=":(next_player_of(@round.trick_init_player, @sorder))"/>
                 <loop_until value_of="@round.is_valid_following_cards" ret_is="false">
-                    <act_opts timeout="1" timeout_act="robot_follow_cards" to_player="@follower">
+                    <act_opts timeout="10" timeout_act="robot_follow_cards" to_player="@follower">
                             <act_ref act="playcard"/>
                             <act_ref act="robot_follow_cards" hidden="true"/>
                     </act_opts>

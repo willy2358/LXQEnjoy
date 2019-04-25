@@ -178,8 +178,9 @@ def send_welcome_to_new_connection(conn):
     send_msg_to_client(conn, welcome_msg)
 
 def process_register_player(conn, cmd, req_json):
-    clientid = req_json[InterProtocol.client_id]
+
     token = req_json[InterProtocol.authed_token]
+    clientid = token[InterProtocol.client_id]
     if not Clients.is_client_valid(clientid, token):
         send_err_pack_to_client(conn, cmd, Errors.invalid_client_token)
         return
@@ -194,15 +195,16 @@ def process_register_player(conn, cmd, req_json):
         send_err_pack_to_client(cmd, err)
 
 def validate_client_player(conn, cmd, req_json):
+    token = req_json[InterProtocol.authed_token]
     # validate client
-    clientid = req_json[InterProtocol.client_id]
+    clientid = token[InterProtocol.client_id]
     client = Clients.get_client(clientid)
     if not client:
         send_err_pack_to_client(conn, cmd, Errors.invalid_player_clientid)
         return False, None, None
     # validate user
     userid = req_json[InterProtocol.user_id]
-    token = req_json[InterProtocol.authed_token]
+
     ret = client.is_player_registered(userid, token)
     if not ret:
         send_err_pack_to_client(conn, cmd, Errors.player_not_registered)

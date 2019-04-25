@@ -33,6 +33,11 @@ client_req_cmd_enter_room = "enter-room"
 client_req_cmd_leave_room = "leave-room"
 client_req_play_cards = "play-cards"
 
+field_salt = "salt"
+field_signature = "signature"
+field_expire = "expire"
+
+
 player_auth_token = "user_token"
 
 server_cmd_type_push = "sockpush"
