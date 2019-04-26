@@ -188,24 +188,23 @@ def process_register_player(conn, cmd, req_json):
     userid = req_json[InterProtocol.user_id]
     err, player = client.register_player(userid)
     if err == Err.ok:
-        obj = {InterProtocol.user_id: player.get_userid(), InterProtocol.authed_token:player.get_token()}
-        resp_pack = InterProtocol.create_success_resp_data_pack(cmd, InterProtocol.resp_player, obj)
+        # obj = {InterProtocol.user_id: player.get_userid(), InterProtocol.field_sock_token:player.get_token()}
+        resp_pack = InterProtocol.create_success_resp_pack(cmd)
         send_pack_to_client(conn, resp_pack)
     else:
         send_err_pack_to_client(cmd, err)
 
 def validate_client_player(conn, cmd, req_json):
-    token = req_json[InterProtocol.authed_token]
+    # token = req_json[InterProtocol.authed_token]
     # validate client
-    clientid = token[InterProtocol.client_id]
+    clientid = req_json[InterProtocol.client_id]
     client = Clients.get_client(clientid)
     if not client:
         send_err_pack_to_client(conn, cmd, Errors.invalid_player_clientid)
         return False, None, None
     # validate user
     userid = req_json[InterProtocol.user_id]
-
-    ret = client.is_player_registered(userid, token)
+    ret = client.is_player_registered(userid)
     if not ret:
         send_err_pack_to_client(conn, cmd, Errors.player_not_registered)
         return False, None, None

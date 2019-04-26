@@ -77,11 +77,11 @@ class Client:
                 return p.get_rule()
         return None
 
-    def is_player_registered(self, userid, token):
-        if userid not in self.__players:
-            return False
-        if self.__players[userid].get_token() == token:
+    def is_player_registered(self, userid):
+        if userid in self.__players:
             return True
+        # if self.__players[userid].get_token() == token:
+        #     return True
         else:
             return False
 

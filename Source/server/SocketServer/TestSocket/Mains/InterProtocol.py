@@ -36,6 +36,8 @@ client_req_play_cards = "play-cards"
 field_salt = "salt"
 field_signature = "signature"
 field_expire = "expire"
+field_token = "token"
+field_sock_token="sock-token"
 
 
 player_auth_token = "user_token"

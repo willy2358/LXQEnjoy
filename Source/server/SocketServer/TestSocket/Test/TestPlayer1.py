@@ -20,7 +20,7 @@ def join_game():
         "roomid":roomid,
         "gameid":gameid,
         "clientid": "00001",
-        "token": client.get_token(),
+        # "sock-token": client.get_token(),
         "seatid":0
     }
     myCmd_str = json.dumps(mycmd)
@@ -45,8 +45,14 @@ cmd = {
         "sockreq":"reg-player",
         "userid":userid,
         "clientid":"00001",
-        "token":"prs35tqjMI3VUn6M6lyyPLcj84Q"
-    }
+        "token":
+            {
+                "clientid":"00001",
+                "expire": "2019-04-27 22:17:10",
+                "salt": "e43879b5-4cf8-485c-939c-76ed531feee7",
+                "signature": "FAoIWmjZRPmdOWj+LFL9LwpR6pTcVDGnI/nUgU/jIv8r4WXYE0M+cj2O/u+mjx76jKInKmsWn6jIZPJ/vVdlWQ=="
+            }
+     }
 
 cmd_str = json.dumps(cmd)
 client.send_message(cmd_str)
@@ -66,7 +72,7 @@ while True:
             InterProtocol.room_id: roomid,
             InterProtocol.game_id: gameid,
             "clientid": "00001",
-            "token": client.get_token(),
+            # "sock-token": client.get_token(),
             InterProtocol.client_req_exe_cmd: cmd_opts[int(line)-1]["cmd"],
             InterProtocol.client_req_cmd_param: cmd_opts[int(line)-1]["cmd-param"]
         }
@@ -80,7 +86,7 @@ while True:
             InterProtocol.room_id: roomid,
             InterProtocol.game_id: gameid,
             "clientid": "00001",
-            "token": client.get_token(),
+            # "token": client.get_token(),
         }
         str_obj = json.dumps(packet)
         client.send_message(str_obj)
@@ -96,7 +102,7 @@ while True:
                 InterProtocol.room_id: roomid,
                 InterProtocol.game_id: gameid,
                 "clientid": "00001",
-                "token": client.get_token(),
+                # "token": client.get_token(),
                 InterProtocol.client_req_exe_cmd: InterProtocol.client_req_play_cards,
                 InterProtocol.client_req_cmd_param: cmd_param
             }
@@ -110,7 +116,7 @@ while True:
                 InterProtocol.room_id: roomid,
                 InterProtocol.game_id: gameid,
                 "clientid": "00001",
-                "token": client.get_token(),
+                # "token": client.get_token(),
                 InterProtocol.client_req_exe_cmd: cmd if not cmd.isnumeric() else cmd_opts[int(cmd) - 1]["cmd"],
                 InterProtocol.client_req_cmd_param: cmd_param
             }
