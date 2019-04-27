@@ -399,7 +399,7 @@ user-info，用户信息，具体待定
 	"cmdtype":"sockresp",
 	"sockresp":"reg-player",
 	"result":"OK"，
-	"result-data":"games"
+	"result-data":""
 }
 如果玩家通过验证，注册成功，则相同socket channel的后续请求是有效的，后续请求的有效性通过socket channel来区分
 
@@ -754,7 +754,8 @@ score > 0 赢的分数，score < 0 输的分数
 	"cmd-param":[] //命令数据，预留 当cmd为hu, peng, gang,时cmd-data须为服务器push的牌点数
 }
 
-5.3玩家断网重连(无需调用特定接口，每个sockreq 的API都有断网重连的能力)
+5.3玩家断网重连
+客户端断开连接后，再次连接是，需调用reg-player再次验证用户的有效性
 
 5.4 玩家设置机器人托管
 请求参数：
