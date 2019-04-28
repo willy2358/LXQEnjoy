@@ -17,6 +17,8 @@ __comm_event = None
 __cmds_dispatch_thread = None
 __exit = False
 
+__websock_server = None
+
 ConfigRoot = ""
 
 Conn_Players = {} #{connection, player}
@@ -49,9 +51,10 @@ timer_clear_dead_connection = None
 MAX_PLAYER_NUM_IN_ROOM = 8
 
 
-def initialize(cmd_evt):
-    global __comm_event
+def initialize(cmd_evt, websock_server = None):
+    global __comm_event, __websock_server
     __comm_event = cmd_evt
+    __websock_server = websock_server
 
     load_rules()   # must before load_clients
 
@@ -126,7 +129,7 @@ def get_rule_by_id(ruleid):
         return None
 
 def validate_req_packet(j_obj):
-    if InterProtocol.user_id not in j_obj \
+    if not isinstance(j_obj, dict) or InterProtocol.user_id not in j_obj \
             or InterProtocol.client_id not in j_obj \
             or InterProtocol.sock_req_cmd not in j_obj:
         return False
@@ -140,15 +143,16 @@ def dispatch_player_commands(conn, comm_text):
     try:
         j_obj = json.loads(comm_text)
     except Exception as ex:
-        print(ex)
+        Log.error("json format error: " + comm_text)
         send_err_pack_to_client(conn, 'unknown', Errors.invalid_packet_format)
         return
 
-    if not validate_req_packet(j_obj):
-        send_err_pack_to_client(conn, "invalid", Errors.invalid_request_parameter)
-        return
-
     try:
+
+        if not validate_req_packet(j_obj):
+            send_err_pack_to_client(conn, "invalid", Errors.invalid_request_parameter)
+            return
+
         if j_obj[InterProtocol.cmd_type].lower() == InterProtocol.sock_req_cmd.lower():
             process_client_request(conn, j_obj)
     except Exception as ex:
@@ -167,7 +171,13 @@ def send_err_pack_to_client(clientConn, cmd, errCode):
 
 def send_msg_to_client(conn, msg):
     try:
-        conn.sendall(msg.encode(encoding="utf-8"))
+        if isinstance(conn, dict) and __websock_server :
+            #send to web client
+            __websock_server.send_message(conn, msg)
+        else:
+            #send to raw socket
+            conn.sendall(msg.encode(encoding="utf-8"))
+
         return True
     except Exception as ex:
         Log.exception(ex)
@@ -215,9 +225,9 @@ def process_player_request(conn, cmd, req_json):
     ret, client, player = validate_client_player(conn, cmd, req_json)
     if not ret:
         return
-
-    if conn not in Conn_Players:
-        Conn_Players[conn] = player
+    conn_id = id(conn)
+    if conn_id not in Conn_Players:
+        Conn_Players[conn_id] = player
         player.set_sock_conn(conn)
         Log.info("client number:" + str(len(Conn_Players)))
 
@@ -295,8 +305,9 @@ def process_client_request(conn, req_json):
 
 
 def get_player_client_from_conn(conn):
-    if conn in Conn_Players:
-        return Conn_Players[conn]
+    conn_id = id(conn)
+    if conn_id in Conn_Players:
+        return Conn_Players[conn_id]
     else:
         return None
 
@@ -309,16 +320,17 @@ def remove_dead_connection():
             dead.append((p, Players[p].get_socket_conn()))
 
     for item in dead:
-        conn = item[1]
+        conn_id = id(item[1])
+        # conn = item[1]
         userid = item[0]
         player = Players[userid]
         room = player.get_my_room()
         if room:
             room.remove_player(player)
-        send_msg_to_client(conn, "disconnected as dead connection")
+        Log.info("disconnected as dead connection:%d" % userid )
         Players.pop(item[0])
-        Conn_Players.pop(item[1])
-        conn.close()
+        Conn_Players.pop(conn_id)
+        # conn.close()
 
     Log.info("client number:" + str(len(Conn_Players)))
     start_timer_to_clear_dead_connection()

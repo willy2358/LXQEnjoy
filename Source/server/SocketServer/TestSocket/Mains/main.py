@@ -4,9 +4,29 @@ import sys
 import os
 
 import socketserver
+from websocket_server import WebsocketServer
 
 from Mains import PlayManager, Log
 from Mains import CmdQueues
+
+# Called for every client connecting (after handshake)
+def new_client(client, server):
+    Log.info("New web client connected and was given id %d" % client['id'])
+    server.send_message(client, "Welcome!Just enjoy!")
+
+# Called for every client disconnecting
+def client_left(client, server):
+    Log.info("web client(%d) disconnected" % client['id'])
+    PlayManager.process_client_disconnected(client)
+
+
+# Called when a client sends a message
+def message_received(client, server, message):
+    if len(message) > 200:
+        message = message[:200]+'..'
+
+    Log.info("web client(%d) said: %s" % (client['id'], message))
+    CmdQueues.put_cmd(client, message)
 
 
 class MyTCPHandler(socketserver.StreamRequestHandler):
@@ -37,18 +57,32 @@ class MyTCPHandler(socketserver.StreamRequestHandler):
                 break
 
 
-HOST, PORT = "127.0.0.1", 9229
+HOST, RAWSOCK_PORT = "127.0.0.1",9229
+# RAWSOCK_PORT = 9229
     # HOST, PORT = "192.168.1.57", 9229
     # HOST, PORT = "117.78.40.54", 9229
-server = socketserver.ThreadingTCPServer((HOST, PORT), MyTCPHandler)
+rawsock_server = socketserver.ThreadingTCPServer((HOST, RAWSOCK_PORT), MyTCPHandler)
 
-thread = None
+WEBSOCK_PORT = 9228
+websock_server = WebsocketServer(WEBSOCK_PORT, HOST)
+websock_server.set_fn_new_client(new_client)
+websock_server.set_fn_client_left(client_left)
+websock_server.set_fn_message_received(message_received)
 
-def run_background_server():
-    global thread
-    thread = threading.Thread(group=None, target=server.serve_forever)
-    thread.setDaemon(True)
-    thread.start()
+rawsock_thread = None
+websock_thread = None
+
+def run_background_servers():
+    global rawsock_thread, websock_thread
+    rawsock_thread = threading.Thread(group=None, target=rawsock_server.serve_forever)
+    rawsock_thread.setDaemon(True)
+    rawsock_thread.start()
+    Log.info("raw socket is listening at {0}:{1}".format(HOST, RAWSOCK_PORT))
+
+    websock_thread = threading.Thread(group=None, target=websock_server.run_forever)
+    websock_thread.setDaemon(True)
+    websock_thread.start()
+    Log.info("web socket is listening at {0}:{1}".format(HOST, WEBSOCK_PORT))
 
 if __name__ == "__main__":
 
@@ -59,15 +93,19 @@ if __name__ == "__main__":
     evt = threading.Event()
     CmdQueues.set_event(evt)
 
-    PlayManager.initialize(evt)
+    PlayManager.initialize(evt, websock_server)
 
-    run_background_server()
+    run_background_servers()
 
     while True:
         line = input("input qz to exit\n")
         if line == "qz":
-            server.server_close()
-            server.shutdown()
+            rawsock_server.server_close()
+            rawsock_server.shutdown()
+
+            websock_server.server_close()
+            websock_server.shutdown()
+
             PlayManager.exit_service()
             evt.set() # sending exit event
 
