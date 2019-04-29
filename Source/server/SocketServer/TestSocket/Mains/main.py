@@ -22,8 +22,6 @@ def client_left(client, server):
 
 # Called when a client sends a message
 def message_received(client, server, message):
-    if len(message) > 200:
-        message = message[:200]+'..'
 
     Log.info("web client(%d) said: %s" % (client['id'], message))
     CmdQueues.put_cmd(client, message)
