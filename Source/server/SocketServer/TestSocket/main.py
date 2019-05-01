@@ -84,7 +84,7 @@ def run_background_servers():
 
 if __name__ == "__main__":
 
-    configDir = os.path.join(os.getcwd(), '..')
+    configDir = os.path.join(os.getcwd())
 
     PlayManager.ConfigRoot = configDir
 
