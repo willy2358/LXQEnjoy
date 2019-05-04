@@ -110,15 +110,17 @@ sockresp:socket服务器向客户端发送的socket应答
 		
 		"user-info":{
 			"userid":124422,
-			useralias:"user alias",
+			"alias":"user alias",
 			"image":"用户头像web路径", 
-			"assets":[
-				      {  name:"asset1", 
-			             assetid:11, 
+			"username":"用户登录名",
+			"phone":"手机号"
+			"stuffs":[       //物品清单
+				      {  name:"stuff1", 
+			             stuffid:11, 
 						 amount: 13000
 				      },
-					  {  name:"asset2", 
-			             assetid:12, 
+					  {  name:"stuff2", 
+			             stuffid:12, 
 						 amount: 53000
 				      }]	
 		}
