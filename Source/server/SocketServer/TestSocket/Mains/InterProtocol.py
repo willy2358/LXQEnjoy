@@ -33,11 +33,17 @@ client_req_cmd_enter_room = "enter-room"
 client_req_cmd_leave_room = "leave-room"
 client_req_play_cards = "play-cards"
 
+field_expire = "expire"
+
+field_roomtoken = "roomtoken"
+
 field_salt = "salt"
 field_signature = "signature"
-field_expire = "expire"
-field_token = "token"
 field_sock_token="sock-token"
+
+field_token = "token"
+
+
 
 
 player_auth_token = "user_token"
@@ -254,13 +260,13 @@ def create_cmd_options_json_packet(player, cmd_options, def_cmd=None, resp_timeo
 # def create_error_json_packet(player, err_msg):
 #     pass
 
-def create_error_pack(req_cmd, errCode):
+def create_error_pack(req_cmd, errCode, errArg=None):
     pack = {
         cmd_type: sock_resp,
         sock_resp:req_cmd,
         sock_result:sock_result_error,
         sock_error_code:errCode,
-        sock_error_message: Errors.Errors[errCode]
+        sock_error_message: Errors.Errors[errCode] if not errArg else Errors.Errors[errCode].format(errArg)
     }
 
     return pack

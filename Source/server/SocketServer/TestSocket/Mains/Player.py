@@ -119,8 +119,8 @@ class Player(ExtAttrs):
     def response_success_pack(self, pack):
         PlayManager.send_pack_to_client(self.__sock_conn, pack)
 
-    def response_err_pack(self, cmd, err_code):
-        PlayManager.send_err_pack_to_client(self.__sock_conn, cmd, err_code)
+    def response_err_pack(self, cmd, err_code, errArg=None):
+        PlayManager.send_err_pack_to_client(self.__sock_conn, cmd, err_code, errArg)
 
     def send_server_cmd_packet(self, pack):
         return PlayManager.send_pack_to_client(self.__sock_conn, pack)

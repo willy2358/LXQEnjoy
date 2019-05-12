@@ -10,6 +10,7 @@ import Rooms.Lobby
 from Rooms.Lobby import *
 import Rooms.Room
 from Rooms.Closet import Closet
+from Rooms.Room import Room
 import threading
 import Mains.Log as Log
 
@@ -32,7 +33,8 @@ class Client:
         self.__token = token
         self.__products = []
         
-        self.__closets = {}  #{gameid:[]}
+        self.__lobby_closets = {}  #{gameid:[]}
+        self.__rooms = {} # {roomid:room}
         self.__player_limits = 0   #all products share a same player limits
         self.__expire_date = None
         self.__players = {}  #{userid:player}
@@ -48,19 +50,19 @@ class Client:
     def get_token(self):
         return self.__token
 
-    def get_available_closet(self, gameid):
+    def get_available_lobby_closet(self, gameid):
         try:
             if self.__closet_lock.acquire(10):
-                if gameid not in self.__closets:
-                    self.__closets[gameid] = []
+                if gameid not in self.__lobby_closets:
+                    self.__lobby_closets[gameid] = []
 
-                for c in self.__closets[gameid]:
+                for c in self.__lobby_closets[gameid]:
                     if c.is_accept_new_player():
                         return c
 
                 rule = self.get_rule_by_gameid(gameid)
                 newCloset = Closet(rule, gameid)
-                self.__closets[gameid].append(newCloset)
+                self.__lobby_closets[gameid].append(newCloset)
                 return newCloset
         except Exception as ex:
             Log.exception(ex)
@@ -136,8 +138,32 @@ class Client:
         room_id = InterProtocol.room_id
         if room_id not in req_json or str(req_json[room_id]) == "-1" \
                 or str(req_json[room_id]) == "0" \
-                or str(req_json[room_id].lower()) == "null" \
-                or str(req_json[room_id].lower()) == "none":
+                or str(req_json[room_id]).lower() == "null" \
+                or str(req_json[room_id]).lower() == "none":
             Rooms.Lobby.process_player_request(player, cmd, req_json)
         else:
-            Rooms.Room.process_player_request(player, cmd, req_json)
+            if cmd == InterProtocol.client_req_cmd_enter_room:
+                if InterProtocol.field_roomtoken not in req_json:
+                    player.response_err_pack(InterProtocol.client_req_cmd_enter_room, Errors.lack_field, InterProtocol.field_roomtoken)
+                    return
+
+                roomtoken = req_json[InterProtocol.field_roomtoken]
+                if not self.verify_token(roomtoken):
+                    player.response_err_pack(InterProtocol.client_req_cmd_enter_room, Errors.invalid_room_token)
+                    return
+
+                # valide room token
+                if room_id not in self.__rooms:
+                    if InterProtocol.game_id in req_json:
+                        gameid = req_json[InterProtocol.game_id]
+                        gRule = self.get_rule_by_gameid(gameid)
+                        self.__rooms[room_id] = Room(gRule, room_id)
+                    else:
+                        # ToDo create multi table room
+                        pass
+
+                self.__rooms[room_id].process_player_request(player, InterProtocol.client_req_cmd_enter_room, req_json)
+
+            else:
+
+                Rooms.Room.process_player_request(player, cmd, req_json)

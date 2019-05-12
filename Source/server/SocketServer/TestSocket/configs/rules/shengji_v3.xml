@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--gtype:M, mahong; P: Poker
 -->
-<rule name="shengji" ruleid="shengji001" gtype="P" text="shengji001">
+<rule name="shengji" ruleid="111" gtype="P" text="shengji001">
 
     <!--
       sets:牌副数：默认值：1

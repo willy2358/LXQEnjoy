@@ -62,6 +62,6 @@ def process_player_request(player, cmd, req_json):
 def get_available_closet(clientid, gameid):
     c = Clients.get_client(clientid)
     if c:
-        return c.get_available_closet(gameid)
+        return c.get_available_lobby_closet(gameid)
 
     return None

@@ -163,8 +163,8 @@ def send_pack_to_client(conn, pack):
     msg = "LXQ<(:" + j_str + ":)>QXL"
     return send_msg_to_client(conn, msg)
 
-def send_err_pack_to_client(clientConn, cmd, errCode):
-    err_pack = InterProtocol.create_error_pack(cmd, errCode);
+def send_err_pack_to_client(clientConn, cmd, errCode, errArg=None):
+    err_pack = InterProtocol.create_error_pack(cmd, errCode, errArg);
     err_str = json.dumps(err_pack)
     msg = "LXQ<(:" + err_str + ":)>QXL"
     send_msg_to_client(clientConn, msg)

@@ -6,7 +6,7 @@ import time
 # roomid = "LX888"
 roomid = "0"
 userid = 333
-gameid = "shengji001"
+gameid = 111
 # roomid = 888
 # client = SocketClient.SocketClient("117.78.40.54", 9229)
 cmd_opts = None

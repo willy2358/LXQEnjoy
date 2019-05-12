@@ -21,6 +21,9 @@ player_not_join_game = 125
 player_not_pending_cmd = 126
 invalid_cmd = 127
 invalid_cmd_param = 128
+lack_field = 129
+invalid_room_token = 130
+
 
 
 
@@ -48,5 +51,7 @@ Errors = {
     player_not_join_game: "Not in game, should join game at first",
     player_not_pending_cmd: "Illegal player, should not send cmd when not been asked for",
     invalid_cmd: "Invalid cmd",
-    invalid_cmd_param:"Invalid cmd arguments"
+    invalid_cmd_param:"Invalid cmd arguments",
+    lack_field: "Lack of field:{0}",
+    invalid_room_token: "invalid room token"
 }

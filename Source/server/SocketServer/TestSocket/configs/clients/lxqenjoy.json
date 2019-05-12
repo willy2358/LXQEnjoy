@@ -6,13 +6,13 @@
     "player-limits":1000,
     "games" : [
         {
-            "ruleid": "shengji001",
-            "gameid": "shengji001",
+            "ruleid": "111",
+            "gameid": "111",
             "coin-base": 500
         },
         {
-            "ruleid": "ddz001",
-            "gameid": "ddz001",
+            "ruleid": "112",
+            "gameid": "112",
             "coin-base": 1000
         }
     ]

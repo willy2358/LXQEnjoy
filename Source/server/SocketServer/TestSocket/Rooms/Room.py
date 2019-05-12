@@ -24,7 +24,7 @@ class Room(Closet):
         self._max_seated_players = 0
         self._min_seated_players = 0
         # self._max_lookon_players = 0
-        self._max_players_number = 0
+        self._max_players_number = 10
         self._round_num = 2
         self._current_round_order = 0
         self._current_round = None
@@ -121,7 +121,7 @@ class Room(Closet):
             if self._lock_all_players.acquire(5):
                 if self.can_new_player_enter():
                     self._all_players.append(player)
-                    player.set_my_room(self)
+                    player.set_closet(self)
                     return True, Errors.ok
                 else:
                     return False, Errors.room_is_full
@@ -150,7 +150,42 @@ class Room(Closet):
         self._last_winners = winners
 
     def process_player_request(self, player, cmd, req_json):
-        pass
+        req_cmd = cmd.lower()
+        if req_cmd == InterProtocol.client_req_cmd_enter_room:
+            self.process_player_enter_room(player)
+        elif req_cmd == InterProtocol.client_req_cmd_leave_room:
+            self.process_player_leave_room(player)
+        elif req_cmd == InterProtocol.client_req_cmd_join_game:
+            seatid = req_json[InterProtocol.seat_id]
+            self.process_join_game(player, seatid)
+        elif req_cmd == InterProtocol.client_req_cmd_leave_game:
+            self.process_player_leave_game(player)
+        elif req_cmd == InterProtocol.client_req_type_exe_cmd:
+            if InterProtocol.client_req_exe_cmd not in req_json:
+                err = InterProtocol.create_request_error_packet(req_cmd)
+                player.send_server_cmd_packet(err)
+            elif self._current_round:
+                cmd = req_json[InterProtocol.client_req_exe_cmd]
+                const_param = InterProtocol.client_req_cmd_param
+                cmd_param = req_json[const_param] if const_param in req_json else None
+                self._current_round.process_player_execute_command(player, cmd, cmd_param)
+        elif req_cmd == InterProtocol.client_req_play_cards:
+            if InterProtocol.cmd_data_cards not in req_json:
+                err = InterProtocol.create_request_error_packet(req_cmd)
+                player.send_server_cmd_packet(err)
+            else:
+                cards = req_json[InterProtocol.cmd_data_cards]
+                self._current_round.process_player_execute_command(player, InterProtocol.client_req_play_cards, cards)
+
+        elif req_cmd == InterProtocol.client_req_robot_play:
+            flag = str(req_json[InterProtocol.client_req_robot_play])
+            if flag.lower().startswith('y'):
+                self._current_round.process_player_robot_play_request(player, True)
+            elif flag.lower().startswith('n'):
+                self._current_round.process_player_robot_play_request(player, False)
+            else:
+                err = InterProtocol.create_request_error_packet(req_cmd)
+                player.send_server_cmd_packet(err)
 
     def process_player_cmd_request(self, player, req_json):
         req_cmd = req_json[InterProtocol.sock_req_cmd].lower()
@@ -227,10 +262,10 @@ class Room(Closet):
             resp_pack = None
             if ret:
                 roomObj = {
-                    InterProtocol.game_id : self._game_rule.get_rule_id(),
+                    InterProtocol.game_id : self._game_rule.get_ruleid(),
                     InterProtocol.room_id : self._room_id,
                     InterProtocol.resp_players: self.get_players_status(),
-                    InterProtocol.resp_seats_ids:self._game_rule.get_seats_ids()
+                    # InterProtocol.resp_seats_ids:self._game_rule.get_seats_ids()
                 }
                 resp_pack = InterProtocol.create_success_resp_data_pack(cmd, InterProtocol.resp_room, roomObj)
             else:
