@@ -12,12 +12,12 @@ def process_player_request(player, cmd, req_json):
         player.response_err_pack(cmd, Errors.did_not_call_enter_room)
 
 
-class Room(Closet):
-    def __init__(self, gRule, roomId):
-        super(Room, self).__init__(gRule, roomId)
+class Room():
+    def __init__(self, roomId):
+        # super(Room, self).__init__(gRule, roomId)
 
         self._room_id = roomId
-        self._game_rule = gRule
+        # self._game_rule = gRule
         self._seated_players = []
         # self._lookon_players = []
         self._all_players = []
@@ -38,6 +38,9 @@ class Room(Closet):
         self._lock_all_players = threading.Lock()
 
         self.__lookon_players = []
+
+        self.__closets = []
+        self.__closet_limts = 10
 
     def is_player_in(self, player):
         return player in self._seated_players
@@ -71,6 +74,11 @@ class Room(Closet):
 
     def can_new_player_enter(self):
         return len(self._all_players) < self._max_players_number
+
+    def create_closet(self, gRule):
+        closet = Closet(gRule, len(self.__closets) + 1)
+        self.__closets.append(closet)
+
 
     def add_seated_player(self, player, seatid):
         try:
@@ -153,44 +161,8 @@ class Room(Closet):
         req_cmd = cmd.lower()
         if req_cmd == InterProtocol.client_req_cmd_enter_room:
             self.process_player_enter_room(player)
-        elif req_cmd == InterProtocol.client_req_cmd_leave_room:
-            self.process_player_leave_room(player)
-        elif req_cmd == InterProtocol.client_req_cmd_join_game:
-            seatid = req_json[InterProtocol.seat_id]
-            self.process_join_game(player, seatid)
-        elif req_cmd == InterProtocol.client_req_cmd_leave_game:
-            self.process_player_leave_game(player)
-        elif req_cmd == InterProtocol.client_req_type_exe_cmd:
-            if InterProtocol.client_req_exe_cmd not in req_json:
-                err = InterProtocol.create_request_error_packet(req_cmd)
-                player.send_server_cmd_packet(err)
-            elif self._current_round:
-                cmd = req_json[InterProtocol.client_req_exe_cmd]
-                const_param = InterProtocol.client_req_cmd_param
-                cmd_param = req_json[const_param] if const_param in req_json else None
-                self._current_round.process_player_execute_command(player, cmd, cmd_param)
-        elif req_cmd == InterProtocol.client_req_play_cards:
-            if InterProtocol.cmd_data_cards not in req_json:
-                err = InterProtocol.create_request_error_packet(req_cmd)
-                player.send_server_cmd_packet(err)
-            else:
-                cards = req_json[InterProtocol.cmd_data_cards]
-                self._current_round.process_player_execute_command(player, InterProtocol.client_req_play_cards, cards)
-
-        elif req_cmd == InterProtocol.client_req_robot_play:
-            flag = str(req_json[InterProtocol.client_req_robot_play])
-            if flag.lower().startswith('y'):
-                self._current_round.process_player_robot_play_request(player, True)
-            elif flag.lower().startswith('n'):
-                self._current_round.process_player_robot_play_request(player, False)
-            else:
-                err = InterProtocol.create_request_error_packet(req_cmd)
-                player.send_server_cmd_packet(err)
-
-    def process_player_cmd_request(self, player, req_json):
-        req_cmd = req_json[InterProtocol.sock_req_cmd].lower()
-        if req_cmd == InterProtocol.client_req_cmd_enter_room:
-            self.process_player_enter_room(player)
+        elif req_cmd == InterProtocol.client_req_cmd_new_table:
+            self.process_player_create_table(player, req_json)
         elif req_cmd == InterProtocol.client_req_cmd_leave_room:
             self.process_player_leave_room(player)
         elif req_cmd == InterProtocol.client_req_cmd_join_game:
@@ -272,6 +244,9 @@ class Room(Closet):
                 resp_pack = InterProtocol.create_error_pack(cmd, err)
             player.send_server_cmd_packet(resp_pack)
             self.publish_players_status()
+
+    def process_player_create_table(self, player, req_json):
+        pass
 
     def process_join_game(self, player, seatid):
         cmd = InterProtocol.client_req_cmd_join_game

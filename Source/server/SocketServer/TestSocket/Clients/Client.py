@@ -154,13 +154,14 @@ class Client:
 
                 # valide room token
                 if room_id not in self.__rooms:
+                    self.__rooms[room_id] = Room(room_id)
                     if InterProtocol.game_id in req_json:
                         gameid = req_json[InterProtocol.game_id]
                         gRule = self.get_rule_by_gameid(gameid)
-                        self.__rooms[room_id] = Room(gRule, room_id)
-                    else:
-                        # ToDo create multi table room
-                        pass
+                        if not gRule:
+                            player.response_err_pack(InterProtocol.client_req_cmd_enter_room, Errors.invalid_gameid)
+                        else:
+                            self.__rooms[room_id].create_closet(gRule)
 
                 self.__rooms[room_id].process_player_request(player, InterProtocol.client_req_cmd_enter_room, req_json)
 

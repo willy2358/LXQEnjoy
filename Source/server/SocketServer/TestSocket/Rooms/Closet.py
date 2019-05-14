@@ -6,17 +6,18 @@ import Mains.Errors as Errors
 
 
 class Closet:
-    def __init__(self, gRule, roomId = None):
+    def __init__(self, gRule, closetId = None):
         self.__gRule = gRule
-        self.__roomId = roomId
+        # self.__roomId = roomId
         self.__playScene = PlayScene(gRule)
         self._lock_seated_players = threading.Lock()
+        self.__closetId = closetId
 
     def get_rule(self):
         return self.__gRule
 
-    def get_roomId(self):
-        return self.__roomId
+    def get_closetId(self):
+        return self.__closetId
 
     def get_scene(self):
         return self.__playScene

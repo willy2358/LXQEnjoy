@@ -29,6 +29,7 @@ client_req_get_cards = "get-cards"     #取得当前可活动牌列表
 client_req_exe_cmd = "cmd"
 client_req_cmd_param = "cmd-param"
 client_req_robot_play = "robot-play"
+client_req_cmd_new_table = "new-table"
 client_req_cmd_enter_room = "enter-room"
 client_req_cmd_leave_room = "leave-room"
 client_req_play_cards = "play-cards"
