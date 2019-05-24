@@ -63,6 +63,14 @@ class Room():
         else:
             return 0
 
+    def get_closet_by_id(self, closetid):
+        sid = str(closetid)
+        for c in self.__closets:
+            if str(c.get_closetId()) == sid:
+                return c
+
+        return None
+
     def get_all_players(self):
         return self.__lookon_players + self.get_scene_players()
 
@@ -129,7 +137,7 @@ class Room():
             if self._lock_all_players.acquire(5):
                 if self.can_new_player_enter():
                     self._all_players.append(player)
-                    player.set_closet(self)
+                    # player.set_closet(self)
                     return True, Errors.ok
                 else:
                     return False, Errors.room_is_full
@@ -144,7 +152,7 @@ class Room():
             if self._lock_all_players.acquire(5):
                 if player in self._all_players:
                     self._all_players.remove(player)
-                    player.set_my_room(None)
+                    player.set_closet(None)
                     return True, Errors.ok
                 else:
                     return False, Errors.player_not_in_room
@@ -161,13 +169,14 @@ class Room():
         req_cmd = cmd.lower()
         if req_cmd == InterProtocol.client_req_cmd_enter_room:
             self.process_player_enter_room(player)
-        elif req_cmd == InterProtocol.client_req_cmd_new_table:
-            self.process_player_create_table(player, req_json)
+        elif req_cmd == InterProtocol.client_req_cmd_new_closet:
+            self.process_player_create_closet(player, req_json)
         elif req_cmd == InterProtocol.client_req_cmd_leave_room:
             self.process_player_leave_room(player)
         elif req_cmd == InterProtocol.client_req_cmd_join_game:
             seatid = req_json[InterProtocol.seat_id]
-            self.process_join_game(player, seatid)
+            closetid = req_json[InterProtocol.field_closetid]
+            self.process_join_game(player, closetid, seatid)
         elif req_cmd == InterProtocol.client_req_cmd_leave_game:
             self.process_player_leave_game(player)
         elif req_cmd == InterProtocol.client_req_type_exe_cmd:
@@ -234,10 +243,9 @@ class Room():
             resp_pack = None
             if ret:
                 roomObj = {
-                    InterProtocol.game_id : self._game_rule.get_ruleid(),
                     InterProtocol.room_id : self._room_id,
                     InterProtocol.resp_players: self.get_players_status(),
-                    # InterProtocol.resp_seats_ids:self._game_rule.get_seats_ids()
+                    InterProtocol.field_closets: self.get_closets_status()
                 }
                 resp_pack = InterProtocol.create_success_resp_data_pack(cmd, InterProtocol.resp_room, roomObj)
             else:
@@ -245,12 +253,17 @@ class Room():
             player.send_server_cmd_packet(resp_pack)
             self.publish_players_status()
 
-    def process_player_create_table(self, player, req_json):
+    def process_player_create_closet(self, player, req_json):
         pass
 
-    def process_join_game(self, player, seatid):
+    def process_join_game(self, player, closetid, seatid):
         cmd = InterProtocol.client_req_cmd_join_game
-        if not self.is_seatid_valid(seatid):
+        closet = self.get_closet_by_id(closetid)
+        if not closet:
+            resp_pack = InterProtocol.create_error_pack(cmd, Errors.invalid_closetid)
+            player.send_server_cmd_packet(resp_pack)
+
+        if not closet.is_seatid_valid(seatid):
             resp_pack = InterProtocol.create_error_pack(cmd, Errors.invalid_seat_id)
             player.send_server_cmd_packet(resp_pack)
         elif player not in self._all_players:
@@ -295,18 +308,32 @@ class Room():
         return seatid in self._game_rule.get_seats_ids()
 
     def get_players_status(self):
-        players = Closet.get_players_status(self)
-        for p in self.__lookon_players:
-            players.append({'userid': p.get_userid(), 'seated': p.get_seatid()})
+        players = []
+        for p in self._all_players:
+            info = {
+                InterProtocol.user_id: p.get_userid(),
+            }
+            players.append(info)
 
         return players
 
-    # def publish_players_status(self):
-    #     players = self.get_players_status()
-    #
-    #     pack = InterProtocol.create_game_players_packet(players)
-    #     for p in self._all_players:
-    #         p.send_server_cmd_packet(pack)
+    def get_closets_status(self):
+        infos = []
+        for c in self.__closets:
+            info = {
+                InterProtocol.field_gameid: c.get_rule().get_ruleid(),
+                InterProtocol.field_closetid: c.get_closetId(),
+                InterProtocol.field_players: c.get_players_status()
+            }
+            infos.append(info)
+        return infos
+
+    def publish_players_status(self):
+        players = self.get_players_status()
+
+        pack = InterProtocol.create_game_players_packet(players)
+        for p in self._all_players:
+            p.send_server_cmd_packet(pack)
 
     def test_continue_next_round(self):
         if self._current_round_order < self._round_num:

@@ -3,8 +3,8 @@ from Mains import InterProtocol
 import json
 import time
 
-# roomid = "LX888"
-roomid = "0"
+roomid = "888"
+# roomid = "0"
 userid = 111
 gameid = 111
 # roomid = 888
@@ -19,8 +19,36 @@ def join_game():
         "userid":userid,
         "roomid":roomid,
         "gameid":gameid,
+        "closetid":1,
         "clientid": "00001",
         # "sock-token": client.get_token(),
+        "seatid":0
+    }
+    myCmd_str = json.dumps(mycmd)
+    client.send_message(myCmd_str)
+    print('sent: ' + myCmd_str)
+
+def enter_room():
+    mycmd = {
+        "cmdtype":"sockreq",
+        "sockreq":"enter-room",
+        "userid":userid,
+        "roomid":roomid,
+        "gameid":gameid,
+        "clientid": "00001",
+         "token":
+            {
+                "clientid":"00001",
+                "expire": "2019-04-27 22:17:10",
+                "salt": "e43879b5-4cf8-485c-939c-76ed531feee7",
+                "signature": "FAoIWmjZRPmdOWj+LFL9LwpR6pTcVDGnI/nUgU/jIv8r4WXYE0M+cj2O/u+mjx76jKInKmsWn6jIZPJ/vVdlWQ=="
+            },
+        "roomtoken":{
+            "clientid":"00001",
+                "expire": "2019-04-27 22:17:10",
+                "salt": "e43879b5-4cf8-485c-939c-76ed531feee7",
+                "signature": "FAoIWmjZRPmdOWj+LFL9LwpR6pTcVDGnI/nUgU/jIv8r4WXYE0M+cj2O/u+mjx76jKInKmsWn6jIZPJ/vVdlWQ=="
+            },
         "seatid":0
     }
     myCmd_str = json.dumps(mycmd)
@@ -30,6 +58,10 @@ def join_game():
 def msg_callback(jsonObj):
     global cmd_opts, def_cmd
     if  "sockresp" in jsonObj and jsonObj["sockresp"] == "reg-player" and jsonObj["result"] == "OK":
+        time.sleep(0.5)
+        #join_game()
+        enter_room()
+    if  "sockresp" in jsonObj and jsonObj["sockresp"] == "enter-room" and jsonObj["result"] == "OK":
         time.sleep(0.5)
         join_game()
     if "sockpush" in jsonObj and jsonObj["sockpush"] == "cmd-opts":

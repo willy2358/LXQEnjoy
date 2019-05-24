@@ -28,11 +28,21 @@ class Closet:
     def get_all_players(self):
         return self.__playScene.get_players()
 
+    def get_players(self):
+        return self.__playScene.get_players()
+
     def is_player_in(self, player):
         return self.__playScene.is_player_in(player)
 
     def is_accept_new_player(self):
         return self.__playScene.has_vacancy()
+
+    def is_seatid_valid(self, seatid):
+        seatids = self.__gRule.get_seats_ids()
+        if seatids is None or len(seatids) < 2: #at least two players
+            return True
+
+        return seatid in seatids
 
     def add_player(self, player):
         if self.__playScene.add_player(player):

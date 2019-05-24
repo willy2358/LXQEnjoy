@@ -75,7 +75,7 @@ class Client:
 
     def get_rule_by_gameid(self, gameid):
         for p in self.__products:
-            if p.get_gameid() == gameid:
+            if str(p.get_gameid()) == str(gameid):
                 return p.get_rule()
         return None
 
