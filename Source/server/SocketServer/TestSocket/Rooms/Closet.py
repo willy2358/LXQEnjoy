@@ -176,6 +176,8 @@ class Closet:
         # reached the min players,  start game.
         if len(self.__playScene.get_players()) >= self.__gRule.get_min_players_capacity():
             self._current_round_order += 1
+            for p in self.get_players():
+                p.publish_message("new round:{0}".format(self._current_round_order))
             self.__playScene.start_game()
 
     def publish_players_status(self):

@@ -1,6 +1,7 @@
 import time
 from threading import Timer
 import threading
+from itertools import tee
 
 from GRules.RulePart_Cards import RulePart_Cards
 from GRules.RulePart_Actions import RulePart_Actions
@@ -61,6 +62,7 @@ class PlayScene(ExtAttrs):
         self.__running_thread = None
         self.__timer_robot_exe_cmd = None
         self.__rt_steps = None
+        self.__rt_steps_clone = None
         self.__round_end_callback = None
         self.__exit_cur_round = False
 
@@ -490,6 +492,8 @@ class PlayScene(ExtAttrs):
         self.__history_rounds.append(newRound)
         self.__cur_round = newRound
         self.reset_exit_cur_round()
+        if self.__rt_steps:
+            self.__rt_steps, self.__rt_steps_clone = tee(self.__rt_steps)
 
 
     def send_player_cmd_opts(self, player, cmds, timeout_seconds, timeout_act):
@@ -645,11 +649,13 @@ class PlayScene(ExtAttrs):
     def go_progress(self):
         if not self.__rt_steps:
             self.__rt_steps = self.next_statement()
+            self.__rt_steps, self.__rt_steps_clone = tee(self.__rt_steps)
+        # steps, self.__rt_steps = itertools.tee(self.__rt_steps)
 
         roundEnd = False
         while not self.__pending_player:
             try:
-                step = self.__rt_steps.__next__()
+                step = self.__rt_steps_clone.__next__()
                 if step and callable(step):
                     step()
                 if self.__exit_cur_round:
@@ -660,8 +666,8 @@ class PlayScene(ExtAttrs):
                 roundEnd = True
                 break
 
-        # if roundEnd and self.__round_end_callback:
-        #     self.__round_end_callback()
+        if roundEnd and self.__round_end_callback:
+            self.__round_end_callback()
 
     def run(self):
         self.create_new_round()
