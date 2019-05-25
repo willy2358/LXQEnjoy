@@ -12,6 +12,7 @@ class Closet:
         self.__gRule = gRule
         # self.__roomId = roomId
         self.__playScene = PlayScene(gRule)
+        self.__playScene.set_round_end_callback(self.test_continue_next_round)
         self._lock_seated_players = threading.Lock()
         self.__closetId = closetId
 
@@ -70,7 +71,8 @@ class Closet:
     def remove_player(self, player):
         if self.__playScene.remove_player(player):
             self.__seated_players.remove(player)
-            self.publish_players_status()
+            player.set_closet(None)
+            # self.publish_players_status()
 
     def process_player_request(self, player, cmd, req_json):
 
@@ -132,9 +134,10 @@ class Closet:
     def process_player_leave_game(self, player):
         cmd = InterProtocol.client_req_cmd_leave_game
         resp_pack = None
-        if player in self._seated_players:
+        if player in self.__seated_players:
             self.remove_player(player)
             resp_pack = InterProtocol.create_success_resp_pack(cmd)
+            self.get_scene().pub_round_status(self.get_players())
         else:
             resp_pack = InterProtocol.create_error_pack(cmd, Errors.player_not_in_game)
 
@@ -165,13 +168,14 @@ class Closet:
 
     def test_continue_next_round(self):
         if self._current_round_order < self._round_num:
-            self.is_accept_new_player()
+            self.test_to_start_game()
         else:
-            self.close_room()
+            self.close_closet()
 
     def test_to_start_game(self):
         # reached the min players,  start game.
         if len(self.__playScene.get_players()) >= self.__gRule.get_min_players_capacity():
+            self._current_round_order += 1
             self.__playScene.start_game()
 
     def publish_players_status(self):
@@ -182,9 +186,13 @@ class Closet:
             p.send_server_cmd_packet(pack)
 
     def close_closet(self):
-        packet = InterProtocol.create_game_status_packet("Room will be closed")
-        if self._current_round:
-            self._current_round.publish_round_states(packet)
+        packet = InterProtocol.create_game_status_packet("Closet will be closed")
+        for p in self.get_players():
+            p.send_server_cmd_packet(packet)
+
+        players = self.__seated_players[:]
+        for p in players:
+            self.remove_player(p)
 
 
 

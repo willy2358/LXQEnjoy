@@ -11,6 +11,7 @@ from GRules.RulePart_Running import RulePart_Running
 from GRules.RulePart_Scene import RulePart_Scene
 from GRules.RulePart_Procs import RulePart_Procs
 from GCore.Elements.Loop import Loop
+from GCore.Elements.ExitRound import ExitRound
 
 from GCore.VarRef import VarRef
 from Mains.Player import Player
@@ -60,6 +61,8 @@ class PlayScene(ExtAttrs):
         self.__running_thread = None
         self.__timer_robot_exe_cmd = None
         self.__rt_steps = None
+        self.__round_end_callback = None
+        self.__exit_cur_round = False
 
         self.parse_rule(self.__rule)
 
@@ -326,6 +329,14 @@ class PlayScene(ExtAttrs):
     def _append_rt_obj(self, obj, nodeName):
         self.__runtimes.append((obj, nodeName))
 
+    def set_round_end_callback(self, callback):
+        self.__round_end_callback = callback
+
+    def set_exit_cur_round(self):
+        self.__exit_cur_round = True
+
+    def reset_exit_cur_round(self):
+        self.__exit_cur_round = False
 
     def remove_player(self, player):
         if player in self.__players:
@@ -402,27 +413,27 @@ class PlayScene(ExtAttrs):
 
 
     def waiting_for_player_exe_cmd(self):
-            waiting = True
-            while self.__pending_player and waiting:
-                if self.__pending_cmd_lock.acquire():
-                    if not self.__pending_player and not self.__pending_cmds:
-                        waiting = False
-                    if waiting:
-                        time.sleep(0.2)  # sleep 0.2 seconds
-                        if int(time.time()) % 10 == 0:
-                            # Log.debug("waiting_for_player_exe_cmd, thread:{0}".format(threading.get_ident()))
-                            Log.debug("waiting for player {0} action, in thread:{1} ...".format(self.__pending_player.get_userid(),threading.get_ident()))
-                        # 超时, 执行默认命令
-                        if 0 < self.__pending_seconds < time.time() - self.__pending_start_tm:
-                            if self.__timeout_cmd:
-                                defcmd = self.__timeout_cmd
-                            else:
-                                defcmd = self.__pending_cmds[0]
+        waiting = True
+        while self.__pending_player and waiting:
+            if self.__pending_cmd_lock.acquire():
+                if not self.__pending_player and not self.__pending_cmds:
+                    waiting = False
+                if waiting:
+                    time.sleep(0.2)  # sleep 0.2 seconds
+                    if int(time.time()) % 10 == 0:
+                        # Log.debug("waiting_for_player_exe_cmd, thread:{0}".format(threading.get_ident()))
+                        Log.debug("waiting for player {0} action, in thread:{1} ...".format(self.__pending_player.get_userid(),threading.get_ident()))
+                    # 超时, 执行默认命令
+                    if 0 < self.__pending_seconds < time.time() - self.__pending_start_tm:
+                        if self.__timeout_cmd:
+                            defcmd = self.__timeout_cmd
+                        else:
+                            defcmd = self.__pending_cmds[0]
 
-                            cmd, cmd_args = defcmd.get_cmd(), defcmd.get_cmd_param()
-                            self.auto_exe_default_cmd(self.__pending_player, cmd, cmd_args)
+                        cmd, cmd_args = defcmd.get_cmd(), defcmd.get_cmd_param()
+                        self.auto_exe_default_cmd(self.__pending_player, cmd, cmd_args)
 
-                    self.__pending_cmd_lock.release()
+                self.__pending_cmd_lock.release()
 
     def next_statement(self):
         # if self.__pending_player:
@@ -478,6 +489,7 @@ class PlayScene(ExtAttrs):
         newRound.add_cus_attr("players", ValueType.players, self.__players)
         self.__history_rounds.append(newRound)
         self.__cur_round = newRound
+        self.reset_exit_cur_round()
 
 
     def send_player_cmd_opts(self, player, cmds, timeout_seconds, timeout_act):
@@ -634,14 +646,22 @@ class PlayScene(ExtAttrs):
         if not self.__rt_steps:
             self.__rt_steps = self.next_statement()
 
+        roundEnd = False
         while not self.__pending_player:
             try:
                 step = self.__rt_steps.__next__()
                 if step and callable(step):
                     step()
+                if self.__exit_cur_round:
+                    roundEnd = True
+                    break
             except StopIteration:
                 Log.info("Round finshed")
+                roundEnd = True
                 break
+
+        # if roundEnd and self.__round_end_callback:
+        #     self.__round_end_callback()
 
     def run(self):
         self.create_new_round()

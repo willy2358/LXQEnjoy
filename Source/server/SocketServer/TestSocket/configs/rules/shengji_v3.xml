@@ -741,7 +741,7 @@
                     <case value_of=":(cfigure_of(@drawn_card))" ret_as="@round.bank_cfigure"/>
                     <case value_of="@round.bank_ctype" ret_is="none"/>
                 </cases>
-                <act_opts timeout="30" timeout_act="pass_jiaozhu" to_player="@drawer">
+                <act_opts timeout="10" timeout_act="pass_jiaozhu" to_player="@drawer">
                     <act_ref act="jiaozhu" param="@drawn_card"/>
                     <act_ref act="pass_jiaozhu" param="none"/>
                 </act_opts>
@@ -756,7 +756,7 @@
             <ift value_of="@scene.defenders" ret_is="none">
                <then>
                     <pub_msg msg="liuju" players="@scene.players"></pub_msg>
-                    <exitround/>
+                    <exitround step="20190525"/>
                </then>
                <else>
                     <!--从底牌中选主-->

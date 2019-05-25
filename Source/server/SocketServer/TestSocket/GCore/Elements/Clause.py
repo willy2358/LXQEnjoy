@@ -78,6 +78,7 @@ class Clause(Statement):
                     Log.debug("Executing true branch...")
                     if t_rt_objs:
                         for func in t_rt_objs:
+
                             if callable(func):
                                 func()
                 else:
