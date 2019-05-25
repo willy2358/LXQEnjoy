@@ -4,7 +4,7 @@ from Mains.PlayScene import PlayScene
 from Mains import InterProtocol
 import Mains.Errors as Errors
 
-
+#最小的游戏空间，入坐即进入空间，没有旁观玩家
 class Closet:
     def __init__(self, gRule, closetId = None):
         self.__gRule = gRule
@@ -12,6 +12,21 @@ class Closet:
         self.__playScene = PlayScene(gRule)
         self._lock_seated_players = threading.Lock()
         self.__closetId = closetId
+
+        self._seated_players = []
+        self._max_seated_players = 0
+        self._min_seated_players = 0
+
+        self._round_num = 2
+        self._current_round_order = 0
+        self._current_round = None
+        self._fee_stuff_id = 0
+        self._fee_stuff_name = ""
+        self._stake_stuff_id = 0
+        self._stake_stuff_name = ""
+        self._last_winners = []
+        self._players_total_score = {}
+        self._lock_seated_players = threading.Lock()
 
     def get_rule(self):
         return self.__gRule

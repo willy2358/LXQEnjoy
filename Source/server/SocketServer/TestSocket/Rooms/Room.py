@@ -14,16 +14,13 @@ def process_player_request(player, cmd, req_json):
 
 class Room():
     def __init__(self, roomId):
-        # super(Room, self).__init__(gRule, roomId)
 
         self._room_id = roomId
-        # self._game_rule = gRule
         self._seated_players = []
-        # self._lookon_players = []
         self._all_players = []
         self._max_seated_players = 0
         self._min_seated_players = 0
-        # self._max_lookon_players = 0
+
         self._max_players_number = 10
         self._round_num = 2
         self._current_round_order = 0
@@ -77,9 +74,6 @@ class Room():
     def can_new_player_seated(self):
         return len(self._seated_players) < self._max_seated_players
 
-    # def can_new_player_lookon(self):
-    #     return len(self._lookon_players) < self._max_lookon_players
-
     def can_new_player_enter(self):
         return len(self._all_players) < self._max_players_number
 
@@ -124,14 +118,7 @@ class Room():
             self._seated_players.remove(player)
         if player in self._all_players:
             self._all_players.remove(player)
-        
-    # def add_lookon_player(self, player):
-    #     if self.can_new_player_lookon():
-    #         self._lookon_players.append(player)
-    #         return True
-    #     else:
-    #         return False
-    #
+
     def add_new_enter_player(self, player):
         try:
             if self._lock_all_players.acquire(5):
@@ -350,13 +337,6 @@ class Room():
 
     def begin_next_game_round(self):
         pass
-        # game_round = GameRound_Majiang(self.__game_rule)
-        # game_round.set_my_room(self)
-        # game_round.set_round_end_callback(self.test_continue_next_round)
-        # for p in self._seated_players:
-        #     game_round.add_player(p)
-        # self._current_round = game_round
-        # self._current_round_order += 1
 
     def close_room(self):
         packet = InterProtocol.create_game_status_packet("Room will be closed")
