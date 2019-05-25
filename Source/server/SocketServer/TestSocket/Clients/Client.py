@@ -126,22 +126,19 @@ class Client:
                                                                InterProtocol.resp_room, roomObj)
             player.response_success_pack(pack)
 
-    def get_closet(self, gameid, roomid):
-        pass
-
     def process_player_request(self, player, cmd, req_json):
 
         if cmd == InterProtocol.client_req_cmd_new_room:
             self.process_create_room(player, req_json)
             return
 
-        room_id = InterProtocol.room_id
-        if room_id not in req_json or str(req_json[room_id]) == "-1" \
-                or str(req_json[room_id]) == "0" \
-                or str(req_json[room_id]).lower() == "null" \
-                or str(req_json[room_id]).lower() == "none":
+        if InterProtocol.room_id not in req_json or str(req_json[InterProtocol.room_id]) == "-1" \
+                or str(req_json[InterProtocol.room_id]) == "0" \
+                or str(req_json[InterProtocol.room_id]).lower() == "null" \
+                or str(req_json[InterProtocol.room_id]).lower() == "none":
             Rooms.Lobby.process_player_request(player, cmd, req_json)
         else:
+            room_id = req_json[InterProtocol.room_id]
             if cmd == InterProtocol.client_req_cmd_enter_room:
                 if InterProtocol.field_roomtoken not in req_json:
                     player.response_err_pack(InterProtocol.client_req_cmd_enter_room, Errors.lack_field, InterProtocol.field_roomtoken)
@@ -166,5 +163,7 @@ class Client:
                 self.__rooms[room_id].process_player_request(player, InterProtocol.client_req_cmd_enter_room, req_json)
 
             else:
-
-                Rooms.Room.process_player_request(player, cmd, req_json)
+                if room_id not in self.__rooms:
+                    player.response_err_pack(cmd, Errors.did_not_call_enter_room)
+                else:
+                    self.__rooms[room_id].process_player_request(player, cmd, req_json)

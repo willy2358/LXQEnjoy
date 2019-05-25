@@ -46,6 +46,11 @@ class GRule:
                 return p
 
         return None
+
+    #Todo this function may need to be honor the settings of a rule
+    def get_seats_ids(self):
+        return [i + 1 for i in range(self.__max_players_capacity)]
+
     def set_players_capacity(self, minPlayers, maxPlayers):
         self.__min_players_capacity = minPlayers
         self.__max_players_capacity = maxPlayers

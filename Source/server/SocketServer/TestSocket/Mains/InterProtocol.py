@@ -43,7 +43,13 @@ field_roomtoken = "roomtoken"
 field_players = "players"
 
 field_salt = "salt"
+
+field_seatid = "seatid"
+
+
 field_signature = "signature"
+
+
 field_sock_token="sock-token"
 
 field_token = "token"
@@ -309,10 +315,10 @@ def create_request_error_packet(player_req_cmd):
     }
     return packet
 
-def create_players_total_score_in_room(room):
+def create_closet_players_acc_score_packet(closet):
     scores = []
-    for p in room.get_scene_players():
-        scores.append({user_id: p.get_userid(), server_push_score: room.get_player_total_score(p)})
+    for p in closet.get_players():
+        scores.append({user_id: p.get_userid(), server_push_score: closet.get_player_acc_score(p)})
 
     packet = {
         cmd_type: server_cmd_type_push,

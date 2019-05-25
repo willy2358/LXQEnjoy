@@ -13,6 +13,7 @@ invalid_cmd_param = 128
 invalid_seat_id = 121
 invalid_player_clientid = 123
 invalid_closetid = 124
+invalid_closet = 125
 
 client_reach_players_limit = 11
 wrong_room_number = 111
@@ -65,5 +66,6 @@ Errors = {
     lack_field: "Lack of field:{0}",
     invalid_room_token: "invalid room token",
     invalid_gameid: "invalid gameid",
-    invalid_closetid: "invalid closetid"
+    invalid_closetid: "invalid closetid",
+    invalid_closet: "invalid closet info"
 }

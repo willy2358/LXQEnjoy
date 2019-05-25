@@ -23,14 +23,15 @@ def process_player_join_game(player, req_json):
         if closet:
             try:
                 if _lock_seated_players.acquire(5):
-                    if closet.add_player(player):
-                        player.set_seatid(len(closet.get_scene_players()))
-                        pack = InterProtocol.create_success_resp_data_pack(InterProtocol.client_req_cmd_join_game,
-                                                                           InterProtocol.seat_id, player.get_seatid())
-                        player.response_success_pack(pack)
-                        closet.publish_players_status()
+                    seatid = len(closet.get_players()) + 1
+                    closet.add_seated_player(player, seatid)
 
-                        closet.test_to_start_game()
+                    pack = InterProtocol.create_success_resp_data_pack(InterProtocol.client_req_cmd_join_game,
+                                                                       InterProtocol.seat_id, player.get_seatid())
+                    player.response_success_pack(pack)
+                    closet.publish_players_status()
+
+                    closet.test_to_start_game()
             except Exception as ex:
                 Log.exception(ex)
             finally:

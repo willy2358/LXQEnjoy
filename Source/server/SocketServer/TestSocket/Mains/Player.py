@@ -14,6 +14,7 @@ class Player(ExtAttrs):
         self.__userid = userid
         self.__token = None
         self.__sock_conn = None
+        self.__room = None
         self.__closet = None
         self.__last_alive_time = datetime.now()
         self.__seatid = 0
@@ -36,6 +37,9 @@ class Player(ExtAttrs):
     def get_sock_conn(self):
         return self.__sock_conn
 
+    def get_room(self):
+        return self.__room
+
     def get_closet(self):
         return self.__closet
 
@@ -54,6 +58,7 @@ class Player(ExtAttrs):
     def has_cards(self, cards):
         #考虑到cards中有多张相同牌的可能
         tmpCards = self.__free_cards[:]
+        #ToDo optimization is need, since tmpCards can not be changed in for loop
         for c in tmpCards:
             if c not in tmpCards:
                 return False
@@ -72,6 +77,9 @@ class Player(ExtAttrs):
 
     def set_token(self, token):
         self.__token = token
+
+    def set_room(self, room):
+        self.__room = room
 
     def set_closet(self, closet):
         self.__closet = closet

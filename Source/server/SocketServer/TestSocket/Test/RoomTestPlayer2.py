@@ -21,7 +21,7 @@ def join_game():
         "closetid": 1,
         "clientid": "00001",
         # "sock-token": client.get_token(),
-        "seatid":0
+        "seatid":2
     }
     myCmd_str = json.dumps(mycmd)
     client.send_message(myCmd_str)
